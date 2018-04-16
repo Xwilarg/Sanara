@@ -16,6 +16,8 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -46,6 +48,9 @@ namespace SanaraV2
 
         public List<Character> relations;
 
+        private GoogleCredential credential;
+        public TranslationClient translationClient;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -68,6 +73,9 @@ namespace SanaraV2
             string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
             malClient = new WebClient();
             malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
+
+            credential = GoogleCredential.FromFile(@"Keys\Sanara-7430da57d6af.json");
+            translationClient = TranslationClient.Create(credential);
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();

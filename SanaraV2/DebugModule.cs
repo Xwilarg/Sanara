@@ -57,7 +57,7 @@ namespace SanaraV2
             "Messages received: " + totalMessages + "." + Environment.NewLine +
             "(The user who sent me more messages is " + mostSpeakUser + " with " + nbMessages + " messages)." + Environment.NewLine +
             "Users know: " + userMet + " (I already spoke with " + userKnow + " of them)." + Environment.NewLine +
-            "Guilds available: "+ p.client.Guilds.Count + " servers." + Environment.NewLine;
+            "Guilds available: "+ p.client.Guilds.Count + "." + Environment.NewLine;
 
             EmbedBuilder embed = new EmbedBuilder()
             {

@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using Google;
 
 namespace SanaraV2
 {
@@ -53,6 +55,46 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.toKatakanaHelp);
             else
                 await ReplyAsync(toKatakana(fromHiragana(Program.addArgs(word))));
+        }
+
+        [Command("Translation"), Summary("Translate a sentence")]
+        public async Task translation(params string[] words)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            if (words.Length < 2)
+                await ReplyAsync(Sentences.translateHelp);
+            else
+            {
+                string language;
+                if (words[0].Length == 2)
+                    language = words[0];
+                else if (words[0].ToLower() == "french" || words[0].ToLower() == "français")
+                    language = "fr";
+                else if (words[0].ToLower() == "japanese" || words[0].ToLower() == "日本語")
+                    language = "ja";
+                else if (words[0].ToLower() == "english")
+                    language = "en";
+                else if (words[0].ToLower() == "spanish" || words[0].ToLower() == "español")
+                    language = "es";
+                else if (words[0].ToLower() == "german" || words[0].ToLower() == "deutsch")
+                    language = "de";
+                else
+                {
+                    await ReplyAsync(Sentences.invalidLanguage);
+                    return;
+                }
+                List<string> newWords = words.ToList();
+                newWords.RemoveAt(0);
+                try
+                {
+                    await ReplyAsync(p.translationClient.TranslateText(Program.addArgs(newWords.ToArray()), language).TranslatedText);
+                }
+                catch (GoogleApiException)
+                {
+                    await ReplyAsync(Sentences.invalidLanguage);
+                    return;
+                }
+            }
         }
 
         [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word")]

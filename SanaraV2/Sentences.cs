@@ -74,6 +74,8 @@ namespace SanaraV2
         public readonly static string toRomajiHelp = "Please give the word you want me to transcript in romaji.";
         public readonly static string toKatakanaHelp = "Please give the word you want me to transcript in katakana.";
         public readonly static string japaneseHelp = "Please give the word you want me to translate.";
+        public readonly static string translateHelp = "Please give the language you want me to translate in followed by a sentence.";
+        public readonly static string invalidLanguage = "I don't know the language you gave.";
 
         /// --------------------------- KanColle---------------------------
         public readonly static string kancolleHelp = "Please give the shipgirl you want informations about.";
@@ -102,6 +104,7 @@ namespace SanaraV2
                                            + "Katakana [word]: Transcript a word to katakana" + Environment.NewLine
                                            + "Romaji [word]: Transcript a word to romaji" + Environment.NewLine
                                            + "Definition [word]: Translate a word in both japanese and english" + Environment.NewLine
+                                           + "Translation [language] [sentence]: Translate a sentence in the language given" + Environment.NewLine
                                            + "Safebooru [tags]: Request a random image from Safebooru (only SFW images)" + Environment.NewLine
                                            + "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
                                            + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
