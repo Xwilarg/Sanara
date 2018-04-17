@@ -100,23 +100,30 @@ namespace SanaraV2
         public readonly static string youtubeBadVideo = "The first thing I found wasn't a video.";
 
         /// --------------------------- Help ---------------------------
-        public readonly static string help = "Hiragana [word]: Transcript a word to hiragana" + Environment.NewLine
-                                           + "Katakana [word]: Transcript a word to katakana" + Environment.NewLine
-                                           + "Romaji [word]: Transcript a word to romaji" + Environment.NewLine
-                                           + "Definition [word]: Translate a word in both japanese and english" + Environment.NewLine
-                                           + "Translation [language] [sentence]: Translate a sentence in the language given" + Environment.NewLine
-                                           + "Safebooru [tags]: Request a random image from Safebooru (only SFW images)" + Environment.NewLine
-                                           + "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
-                                           + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
-                                           + "Rule34 [tags]: Request a random image from Safebooru (mostly weird images)" + Environment.NewLine
-                                           + "Vn [visual novel]: Give informations about a visual novel" + Environment.NewLine
-                                           + "Kancolle [shipgirl]: Give informations about a shipgirl from KanColle wikia" + Environment.NewLine
-                                           + "Doujinshi [tags]: Request a doujinshi from Nhentai" + Environment.NewLine
-                                           + "Indente [code]: Indente the code given" + Environment.NewLine
-                                           + "Anime [name]: Give informations about an anime" + Environment.NewLine
-                                           + "Manga [code]: Give informations about a manga" + Environment.NewLine
-                                           + "Play [shiritori/kancolle]: Play a game" + Environment.NewLine
-                                           + "Youtube [keywords]: Give a YouTube video given some keywords" + Environment.NewLine
-                                           + "Random url: Give a random URL from goo.gl" + Environment.NewLine;
+        public static string help(bool isChanNsfw)
+        {
+            string finalStr = "Hiragana [word]: Transcript a word to hiragana" + Environment.NewLine
+                            + "Katakana [word]: Transcript a word to katakana" + Environment.NewLine
+                            + "Romaji [word]: Transcript a word to romaji" + Environment.NewLine
+                            + "Definition [word]: Translate a word in both japanese and english" + Environment.NewLine
+                            + "Translation [language] [sentence]: Translate a sentence in the language given" + Environment.NewLine
+                            + "Safebooru [tags]: Request a random image from Safebooru (only SFW images)" + Environment.NewLine
+                            + "Vn [visual novel]: Give informations about a visual novel" + Environment.NewLine
+                            + "Kancolle [shipgirl]: Give informations about a shipgirl from KanColle wikia" + Environment.NewLine
+                            + "Indente [code]: Indente the code given" + Environment.NewLine
+                            + "Anime [name]: Give informations about an anime" + Environment.NewLine
+                            + "Manga [code]: Give informations about a manga" + Environment.NewLine
+                            + "Play [shiritori/kancolle]: Play a game" + Environment.NewLine
+                            + "Youtube [keywords]: Give a YouTube video given some keywords" + Environment.NewLine;
+            if (isChanNsfw)
+                finalStr += "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
+                          + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
+                          + "Rule34 [tags]: Request a random image from Safebooru (mostly weird images)" + Environment.NewLine
+                          + "Doujinshi [tags]: Request a doujinshi from Nhentai" + Environment.NewLine
+                          + "Random url: Give a random URL from goo.gl" + Environment.NewLine;
+            else
+                finalStr += "(Ask again in a NSFW channel for a full list of features.)";
+            return (finalStr);
+        }
     }
 }

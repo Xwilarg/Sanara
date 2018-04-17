@@ -27,7 +27,7 @@ namespace SanaraV2
         public async Task help()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            string help = Sentences.help;
+            string help = Sentences.help(Context.Channel.IsNsfw);
             EmbedBuilder embed = new EmbedBuilder()
             {
                 Description = help,
