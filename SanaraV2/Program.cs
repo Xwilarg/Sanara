@@ -17,6 +17,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -51,6 +53,8 @@ namespace SanaraV2
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
+        public YouTubeService youtubeService;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -77,6 +81,11 @@ namespace SanaraV2
             credential = GoogleCredential.FromFile(@"Keys\Sanara-7430da57d6af.json");
             translationClient = TranslationClient.Create(credential);
 
+            youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
+            });
+
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
             await commands.AddModuleAsync<LinguistModule>();
@@ -90,6 +99,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<GameModule>();
             await commands.AddModuleAsync<YoutubeModule>();
             await commands.AddModuleAsync<GoogleShortenerModule>();
+            await commands.AddModuleAsync<RadioModule>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -261,6 +271,7 @@ namespace SanaraV2
             Kancolle,
             MyAnimeList,
             Nhentai,
+            Radio,
             Settings,
             Vndb,
             Youtube

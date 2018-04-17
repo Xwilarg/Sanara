@@ -45,6 +45,7 @@ namespace SanaraV2
             return ("I didn't find anything with the tag '" + finalStr.Substring(0, finalStr.Length - 2) + " and '" + tags[tags.Length - 1] + "'.");
         }
         public readonly static string noCorrespondingGuild = "I'm not in any guild with this name.";
+        public readonly static string betaFeature = "I'm sorry but this feature is currently in a closed testing phase.";
 
         /// --------------------------- Communication ---------------------------
         public readonly static string introductionMsg = "Hi, my name is Sanara" + Environment.NewLine + "Nice to meet you everyone!";
@@ -95,9 +96,13 @@ namespace SanaraV2
         public readonly static string mangaNotFound = "I didn't find any manga with this name.";
         public readonly static string animeNotFound = "I didn't find any anime with this name.";
 
-        /// --------------------------- MyAnimeList ---------------------------
+        /// --------------------------- Youtube ---------------------------
+        public readonly static string youtubeHelp = "Please give the keywords about the video you want.";
         public readonly static string youtubeNotFound = "I didn't find any video with this keyword.";
         public readonly static string youtubeBadVideo = "The first thing I found wasn't a video.";
+
+        /// --------------------------- Radio ---------------------------
+        public readonly static string radioNeedChannel = "Please join a voice channel.";
 
         /// --------------------------- Help ---------------------------
         public static string help(bool isChanNsfw)

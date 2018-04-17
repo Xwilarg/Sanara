@@ -13,10 +13,8 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using Discord;
 using Discord.Commands;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,31 +27,41 @@ namespace SanaraV2
         public async Task youtubeVideo(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
-            });
+            string url = await GetYoutubeVideo(words, Context.Channel);
+            if (url != null)
+                await ReplyAsync(url);
+        }
 
-            var searchListRequest = youtubeService.Search.List("snippet");
+        public static async Task<string> GetYoutubeVideo(string[] words, IMessageChannel chan)
+        {
+            if (words.Length == 0)
+            {
+                await chan.SendMessageAsync(Sentences.youtubeHelp);
+                return (null);
+            }
+            var searchListRequest = Program.p.youtubeService.Search.List("snippet");
             searchListRequest.Q = Program.addArgs(words);
             searchListRequest.MaxResults = 1;
             var searchListResponse = await searchListRequest.ExecuteAsync();
             if (searchListResponse.Items.Count == 0)
             {
-                await ReplyAsync(Sentences.youtubeNotFound);
-                return;
+                await chan.SendMessageAsync(Sentences.youtubeNotFound);
+                return (null);
             }
             Google.Apis.YouTube.v3.Data.SearchResult sr;
             /// TODO: Search for second video if first isn't one
             if (!searchListResponse.Items.Any(x => x.Id.Kind == "youtube#video"))
-                await ReplyAsync(Sentences.youtubeBadVideo);
+            {
+                await chan.SendMessageAsync(Sentences.youtubeBadVideo);
+                return (null);
+            }
             else
             {
                 do
                 {
-                    sr = searchListResponse.Items[p.rand.Next(0, searchListResponse.Items.Count)];
+                    sr = searchListResponse.Items[Program.p.rand.Next(0, searchListResponse.Items.Count)];
                 } while (sr.Id.Kind != "youtube#video");
-                await ReplyAsync("https://www.youtube.com/watch?v=" + sr.Id.VideoId);
+                return ("https://www.youtube.com/watch?v=" + sr.Id.VideoId);
             }
         }
     }
