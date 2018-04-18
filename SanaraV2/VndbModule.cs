@@ -97,20 +97,21 @@ namespace SanaraV2
                  + ((vn.Released.Year != null) ? ("Released" + ((vn.Released.Month != null) ? ((vn.Released.Day != null) ? (" the " + vn.Released.Day + "/" + vn.Released.Month + "/" + vn.Released.Year) : (" in " + vn.Released.Month + "/" + vn.Released.Year)) : (" in " + vn.Released.Year))) : ("Not released yet.")) + Environment.NewLine
                  + Environment.NewLine + Environment.NewLine
                  + desc;
+            bool isNsfw = (Context.Channel as ITextChannel).IsNsfw;
             EmbedBuilder embed = new EmbedBuilder()
             {
-                ImageUrl = ((vn.IsImageNsfw && Context.Channel.IsNsfw) || !vn.IsImageNsfw) ? (vn.Image) : (null),
+                ImageUrl = ((vn.IsImageNsfw && isNsfw || !vn.IsImageNsfw) ? (vn.Image) : (null)),
                 Description = finalDesc,
                 Color = Color.Green
             };
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
             IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
             if (me.GuildPermissions.AttachFiles)
             {
                 int counter = 0;
                 foreach (ScreenshotMetadata image in vn.Screenshots.ToArray())
                 {
-                    if ((!Context.Channel.IsNsfw && !image.IsNsfw) || Context.Channel.IsNsfw)
+                    if ((!isNsfw && !image.IsNsfw) || isNsfw)
                     {
                         using (WebClient wc = new WebClient())
                         {

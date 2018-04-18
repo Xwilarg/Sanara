@@ -1,4 +1,6 @@
-﻿/// This file is part of Sanara.
+﻿
+using Discord;
+/// This file is part of Sanara.
 ///
 /// Sanara is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU General Public License as published by
@@ -12,7 +14,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord.Commands;
 using Google;
 using Google.Apis.Services;
@@ -34,7 +35,7 @@ namespace SanaraV2
         public async Task randomPastebin()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
-            if (!Context.Channel.IsNsfw)
+            if (!(Context.Channel as ITextChannel).IsNsfw)
             {
                 await ReplyAsync(Sentences.chanIsNotNsfw);
             }

@@ -27,13 +27,13 @@ namespace SanaraV2
         public async Task help()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            string help = Sentences.help(Context.Channel.IsNsfw);
+            string help = Sentences.help((Context.Channel as ITextChannel).IsNsfw);
             EmbedBuilder embed = new EmbedBuilder()
             {
                 Description = help,
                 Color = Color.Purple,
             };
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("Hi"), Summary("Answer with hi"), Alias("Hey", "Hello", "Hi!", "Hey!", "Hello!")]

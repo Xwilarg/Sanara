@@ -102,6 +102,7 @@ namespace SanaraV2
         public readonly static string youtubeBadVideo = "The first thing I found wasn't a video.";
 
         /// --------------------------- Radio ---------------------------
+        public readonly static string radioAlreadyStarted = "A radio is already started on this guild.";
         public readonly static string radioNeedChannel = "Please join a voice channel.";
 
         /// --------------------------- Help ---------------------------

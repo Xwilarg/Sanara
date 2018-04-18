@@ -55,6 +55,8 @@ namespace SanaraV2
 
         public YouTubeService youtubeService;
 
+        public List<RadioModule.RadioChannel> radios;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -85,6 +87,8 @@ namespace SanaraV2
             {
                 ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
             });
+
+            radios = new List<RadioModule.RadioChannel>();
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -250,6 +254,7 @@ namespace SanaraV2
             }
         }
 
+#pragma warning disable CS1998
         private async Task UserJoin(SocketGuildUser arg)
         {
             string currTime = DateTime.UtcNow.ToString("ddMMyyHHmmss");
@@ -258,6 +263,7 @@ namespace SanaraV2
                 relations.Add(new Character(arg.Id, arg.Nickname));
             }
         }
+#pragma warning restore CS1998
 
         public enum Module
         {

@@ -42,8 +42,8 @@ namespace SanaraV2
                     await ReplyAsync(Sentences.animeNotFound);
                 else
                 {
-                    EmbedBuilder b = parseContent(result, animeName, Context.Channel.IsNsfw);
-                    await ReplyAsync("", false, b);
+                    EmbedBuilder b = parseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw);
+                    await ReplyAsync("", false, b.Build());
                 }
             }
             catch (WebException ex)
@@ -76,11 +76,11 @@ namespace SanaraV2
                     await ReplyAsync(Sentences.mangaNotFound);
                 else
                 {
-                    EmbedBuilder b = parseContent(result, mangaName, Context.Channel.IsNsfw);
+                    EmbedBuilder b = parseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw);
                     if (b == null)
                         await ReplyAsync(Sentences.chanIsNotNsfw);
                     else
-                        await ReplyAsync("", false, b);
+                        await ReplyAsync("", false, b.Build());
                 }
             }
             catch (WebException ex)

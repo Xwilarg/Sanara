@@ -64,7 +64,7 @@ namespace SanaraV2
                 Description = infosDebug,
                 Color = Color.Purple,
             };
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
         }
     }
 }

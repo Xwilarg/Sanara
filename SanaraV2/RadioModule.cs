@@ -17,7 +17,9 @@ using Discord;
 using Discord.Commands;
 using MediaToolkit;
 using MediaToolkit.Model;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using VideoLibrary;
 
@@ -26,6 +28,21 @@ namespace SanaraV2
     public class RadioModule : ModuleBase
     {
         Program p = Program.p;
+
+        public class RadioChannel
+        {
+            public RadioChannel(IVoiceChannel chan)
+            {
+                m_chan = chan;
+                m_musics = new List<string>();
+                m_guildId = chan.GuildId;
+            }
+
+            private IVoiceChannel m_chan;
+            private List<string> m_musics;
+            public ulong m_guildId { private set; get; }
+        }
+
         [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio")]
         public async Task youtubeVideo(params string[] words)
         {
@@ -35,12 +52,18 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.betaFeature);
                 return;
             }
+            if (p.radios.Any(x => x.m_guildId == Context.Guild.Id))
+            {
+                await ReplyAsync(Sentences.radioAlreadyStarted);
+                return;
+            }
             foreach (IVoiceChannel chan in await Context.Guild.GetVoiceChannelsAsync())
             {
                 IGuildUser user = await chan.GetUserAsync(Context.User.Id);
                 if (user != null)
                 {
-                    await chan.ConnectAsync();
+                    p.radios.Add(new RadioChannel(chan));
+                    // await chan.ConnectAsync(); // TODO
                     return;
                 }
             }

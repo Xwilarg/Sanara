@@ -173,12 +173,13 @@ namespace SanaraV2
             }
         }
 
+#pragma warning disable CS1998
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task safebooruSearch(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Safebooru(), tags, Context.Channel, currName, true);
+            getImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -186,7 +187,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Gelbooru(), tags, Context.Channel, currName, false);
+            getImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -194,7 +195,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Konachan(), tags, Context.Channel, currName, false);
+            getImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
@@ -202,10 +203,11 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Rule34(), tags, Context.Channel, currName, false);
+            getImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false);
         }
+#pragma warning restore CS1998
 
-        private async void getImage(Booru booru, string[] tags, IMessageChannel chan, string currName, bool isSfw)
+        private async void getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw)
         {
             if (!isSfw && !chan.IsNsfw)
             {
