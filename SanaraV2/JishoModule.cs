@@ -480,6 +480,7 @@ namespace SanaraV2
                 else if (curr == 'ヲ') finalName += "wo";
                 else if (curr == 'ヴ') finalName += "vu";
                 else if (curr == 'ン') finalName += "n";
+                else if (curr == 'ー' && finalStr.Length > 0) finalName += finalStr.Substring(finalStr.Length - 1, 1);
                 else finalName += curr;
                 if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
                      && curr != 'ッ' && curr != 'ア' && curr != 'イ' && curr != 'ウ' && curr != 'エ' && curr != 'オ')

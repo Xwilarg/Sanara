@@ -105,6 +105,11 @@ namespace SanaraV2
         public readonly static string radioAlreadyStarted = "A radio is already started on this guild.";
         public readonly static string radioNeedChannel = "Please join a voice channel.";
         public readonly static string radioNeedArg = "Please give the keywords about the song you want.";
+        public readonly static string radioNotStarted = "The radio isn't start.";
+        public readonly static string radioAlreadyInList = "This song is already in the playlist.";
+        public readonly static string radioTooMany = "There can't be more than 10 songs in the playlist.";
+        public readonly static string radioNoSong = "There is currently no song playing.";
+        public readonly static string cantDownload = "I'm sorry but I wasn't able to download this song.";
 
         /// --------------------------- Help ---------------------------
         public static string help(bool isChanNsfw)

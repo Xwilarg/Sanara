@@ -15,6 +15,7 @@
 
 using Discord;
 using Discord.Commands;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,12 +28,12 @@ namespace SanaraV2
         public async Task youtubeVideo(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
-            string url = await GetYoutubeVideo(words, Context.Channel);
+            Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));
             if (url != null)
-                await ReplyAsync(url);
+                await ReplyAsync(url.Item1);
         }
 
-        public static async Task<string> GetYoutubeVideo(string[] words, IMessageChannel chan)
+        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan)
         {
             if (words.Length == 0)
             {
@@ -61,7 +62,7 @@ namespace SanaraV2
                 {
                     sr = searchListResponse.Items[Program.p.rand.Next(0, searchListResponse.Items.Count)];
                 } while (sr.Id.Kind != "youtube#video");
-                return ("https://www.youtube.com/watch?v=" + sr.Id.VideoId);
+                return new Tuple<string, string>("https://www.youtube.com/watch?v=" + sr.Id.VideoId, sr.Snippet.Title);
             }
         }
     }
