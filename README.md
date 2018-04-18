@@ -11,6 +11,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 [VNDBSharp](https://github.com/Nikey646/VndbSharp)<br/>
 [libvideo](https://github.com/i3arnon/libvideo)<br/>
 [MediaToolkit](https://github.com/AydinAdn/MediaToolkit)<br/>
+[Opus, Sodium and FFmpeg](https://dsharpplus.emzi0767.com/natives/index.html)
 
 # Commands available
 

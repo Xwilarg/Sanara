@@ -104,6 +104,7 @@ namespace SanaraV2
         /// --------------------------- Radio ---------------------------
         public readonly static string radioAlreadyStarted = "A radio is already started on this guild.";
         public readonly static string radioNeedChannel = "Please join a voice channel.";
+        public readonly static string radioNeedArg = "Please give the keywords about the song you want.";
 
         /// --------------------------- Help ---------------------------
         public static string help(bool isChanNsfw)
