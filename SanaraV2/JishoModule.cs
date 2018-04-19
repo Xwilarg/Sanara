@@ -24,7 +24,7 @@ using Google;
 
 namespace SanaraV2
 {
-    public class LinguistModule : ModuleBase // TODO vavivuvevo http://jrgraphix.net/r/Unicode/30A0-30FF
+    public class LinguistModule : ModuleBase
     {
         Program p = Program.p;
         [Command("Hiragana"), Summary("To hiragana")]
@@ -460,7 +460,7 @@ namespace SanaraV2
                 else if (curr == 'メ') finalName += "me";
                 else if (curr == 'モ') finalName += "mo";
                 else if (curr == 'ヤ') finalName += "ya";
-                else if (curr == 'イ' && next == 'ェ') finalName += "ye";
+                else if (curr == 'イ' && next == 'ェ') { finalName += "ye"; i++; }
                 else if (curr == 'ユ') finalName += "yu";
                 else if (curr == 'ヨ') finalName += "yo";
                 else if (curr == 'ラ') finalName += "ra";
@@ -474,10 +474,14 @@ namespace SanaraV2
                 else if (curr == 'レ') finalName += "re";
                 else if (curr == 'ロ') finalName += "ro";
                 else if (curr == 'ワ') finalName += "wa";
+                else if (curr == 'ウ' && next == 'ィ') { finalName += "wi"; i++; }
+                else if (curr == 'ウ' && next == 'ェ') { finalName += "we"; i++; }
                 else if (curr == 'ウ') finalName += "wu";
-                else if (curr == 'ウ' && next == 'ィ') finalName += "wi";
-                else if (curr == 'ウ' && next == 'ェ') finalName += "we";
                 else if (curr == 'ヲ') finalName += "wo";
+                else if (curr == 'ヴ' && next == 'ャ') { finalName += "va"; i++; }
+                else if (curr == 'ヴ' && next == 'ィ') { finalName += "vi"; i++; }
+                else if (curr == 'ヴ' && next == 'ェ') { finalName += "ve"; i++; }
+                else if (curr == 'ヴ' && next == 'ォ') { finalName += "vo"; i++; }
                 else if (curr == 'ヴ') finalName += "vu";
                 else if (curr == 'ン') finalName += "n";
                 else if (curr == 'ー' && finalStr.Length > 0) finalName += finalStr.Substring(finalStr.Length - 1, 1);
@@ -801,7 +805,12 @@ namespace SanaraV2
                 else if (curr == 'w' && next == 'a') finalName += "ワ";
                 else if (curr == 'w' && next == 'i') finalName += "ウィ";
                 else if (curr == 'w' && next == 'e') finalName += "ウェ";
+                else if (curr == 'w' && next == 'u') finalName += "ウ";
                 else if (curr == 'w' && next == 'o') finalName += "ヲ";
+                else if (curr == 'v' && next == 'a') finalName += "ヴャ";
+                else if (curr == 'v' && next == 'i') finalName += "ヴィ";
+                else if (curr == 'v' && next == 'e') finalName += "ヴェ";
+                else if (curr == 'v' && next == 'o') finalName += "ヴォ";
                 else if (curr == 'v' && next == 'u') finalName += "ヴ";
                 else if (curr == 'n') { finalName += "ン"; i--; }
                 else { finalName += curr; i--; }
