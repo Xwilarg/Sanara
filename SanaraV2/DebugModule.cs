@@ -64,6 +64,88 @@ namespace SanaraV2
                 Description = infosDebug,
                 Color = Color.Purple,
             };
+
+            await ReplyAsync("", false, embed.Build());
+
+            infosDebug = "**Linguist Module:**" + Environment.NewLine + "Translation: ";
+            try
+            {
+                if (LinguistModule.getTranslation("cat", "fr") == "chat") infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+            infosDebug += Environment.NewLine + "Definition: ";
+            try
+            {
+                if (LinguistModule.getAllKanjis("cat")[0].Contains("猫")) infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Booru Module:**" + Environment.NewLine + "Safebooru: ";
+            try
+            {
+                if (BooruModule.getBooruUrl(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+            infosDebug += Environment.NewLine + "Gelbooru: ";
+            try
+            {
+                if (BooruModule.getBooruUrl(new BooruModule.Gelbooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+            infosDebug += Environment.NewLine + "Konachan: ";
+            try
+            {
+                if (BooruModule.getBooruUrl(new BooruModule.Konachan(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+            infosDebug += Environment.NewLine + "Rule 34: ";
+            try
+            {
+                if (BooruModule.getBooruUrl(new BooruModule.Rule34(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += "OK";
+                else infosDebug += "Error";
+            } catch (Exception e) {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Vndb Module:**" + Environment.NewLine + "Vn: ";
+            try
+            {
+                if ((await VndbModule.getVn("Sunrider: Mask of Arcadius")).Name == "Sunrider: Mask of Arcadius") infosDebug += "OK";
+                else infosDebug += "Error";
+            }
+            catch (Exception e)
+            {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Google Shortener Module:**" + Environment.NewLine + "Vn: ";
+            try
+            {
+                Tuple<string, string> result = await GoogleShortenerModule.getUrl();
+                if (result == null || result.Item1.StartsWith("https://goo.gl/") || result.Item1.StartsWith("http://goo.gl/")) infosDebug += "OK";
+                else infosDebug += "Error";
+            }
+            catch (Exception e)
+            {
+                infosDebug += e.ToString().Split(':')[0];
+            }
+
+            embed = new EmbedBuilder()
+            {
+                Title = "Unit tests:",
+                Description = infosDebug,
+                Color = Color.Purple,
+            };
             await ReplyAsync("", false, embed.Build());
         }
     }

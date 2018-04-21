@@ -18,6 +18,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
+using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +58,8 @@ namespace SanaraV2
 
         public List<RadioModule.RadioChannel> radios;
 
+        public UrlshortenerService service;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -89,6 +92,11 @@ namespace SanaraV2
             });
 
             radios = new List<RadioModule.RadioChannel>();
+
+            service = new UrlshortenerService(new BaseClientService.Initializer
+            {
+                ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
+            });
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -351,6 +359,8 @@ namespace SanaraV2
                 await client.PostAsync(File.ReadAllLines("Keys/websiteToken.dat")[0], content);
             }
             catch (HttpRequestException)
+            { }
+            catch (TaskCanceledException)
             { }
         }
 

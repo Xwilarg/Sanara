@@ -87,7 +87,7 @@ namespace SanaraV2
                 newWords.RemoveAt(0);
                 try
                 {
-                    await ReplyAsync(p.translationClient.TranslateText(Program.addArgs(newWords.ToArray()), language).TranslatedText);
+                    await ReplyAsync(getTranslation(Program.addArgs(newWords.ToArray()), language));
                 }
                 catch (GoogleApiException)
                 {
@@ -112,7 +112,12 @@ namespace SanaraV2
             }
         }
 
-        private List<string> getAllKanjis(string word)
+        public static string getTranslation(string words, string language)
+        {
+            return (Program.p.translationClient.TranslateText(words, language).TranslatedText);
+        }
+
+        public static List<string> getAllKanjis(string word)
         {
             string newWord = word.Replace(" ", "%20");
             string json;

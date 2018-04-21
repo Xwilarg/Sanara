@@ -28,7 +28,7 @@ namespace SanaraV2
     {
         Program p = Program.p;
 
-        public string getTags(string[] tags)
+        private static string getTags(string[] tags)
         {
             string finalTags = "&tags=";
             if (tags.Length > 0)
@@ -40,7 +40,7 @@ namespace SanaraV2
             return (finalTags);
         }
 
-        private abstract class Booru
+        public abstract class Booru
         {
             public abstract int getNbMax(string tags);
             public abstract string getLink(string tags, int maxNb);
@@ -48,7 +48,7 @@ namespace SanaraV2
             public abstract string getTagInfo(string tag);
         }
 
-        private class Safebooru : Booru
+        public class Safebooru : Booru
         {
             public override int getNbMax(string tags)
             {
@@ -77,7 +77,7 @@ namespace SanaraV2
             }
         }
 
-        private class Gelbooru : Booru
+        public class Gelbooru : Booru
         {
             public override int getNbMax(string tags)
             {
@@ -110,7 +110,7 @@ namespace SanaraV2
             }
         }
 
-        private class Konachan : Booru
+        public class Konachan : Booru
         {
             public override int getNbMax(string tags)
             {
@@ -139,7 +139,7 @@ namespace SanaraV2
             }
         }
 
-        private class Rule34 : Booru
+        public class Rule34 : Booru
         {
             public override int getNbMax(string tags)
             {
@@ -221,14 +221,14 @@ namespace SanaraV2
                 return;
             }
             await ReplyAsync(Sentences.prepareImage);
-            int maxVal = booru.getNbMax(getTags(tags));
-            if (maxVal <= 0) // TODO: weird parsing sometimes (example hibiki_(kantai_collection) cut in half if not found)
+            string url = getBooruUrl(booru, tags);
+            if (url == null)
                 await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
             else
             {
                 using (WebClient wc = new WebClient())
                 {
-                    string json = wc.DownloadString(booru.getLink(getTags(tags), maxVal));
+                    string json = wc.DownloadString(url);
                     string image = booru.getFileUrl(json);
                     string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
                     wc.DownloadFile(image, imageName);
@@ -245,6 +245,15 @@ namespace SanaraV2
                     File.Delete(imageName);
                 }
             }
+        }
+
+        public static string getBooruUrl(Booru booru, string[] tags)
+        {
+            int maxVal = booru.getNbMax(getTags(tags));
+            if (maxVal <= 0) // TODO: weird parsing sometimes (example hibiki_(kantai_collection) cut in half if not found)
+                return (null);
+            else
+                return (booru.getLink(getTags(tags), maxVal));
         }
 
         private List<string> getTagsInfos(string json, Booru booru)

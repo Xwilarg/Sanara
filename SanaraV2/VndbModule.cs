@@ -40,38 +40,12 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.vndbHelp);
                 return;
             }
-            string vnTxt = Program.addArgs(vns);
-            Vndb client = new Vndb();
-
-            uint id = 0;
-            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + vnTxt.Replace(' ', '+'));
-            http.AllowAutoRedirect = false;
-            string html;
-            using (HttpWebResponse response = (HttpWebResponse)http.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                html = reader.ReadToEnd();
-            }
-            html = html.Split(new string[] { "<div class=\"mainbox browse vnbrowse\">" }, StringSplitOptions.None)[1];
-            html = html.Split(new string[] { "</thead>" }, StringSplitOptions.None)[1];
-            List<string> allVnsId = html.Split(new string[] { "href=\"/v" }, StringSplitOptions.None).ToList();
-            string cleanName = Program.cleanWord(vnTxt);
-            string name = allVnsId.Find(x => Program.cleanWord(x).Contains(cleanName));
-            try
-            {
-                if (name == null)
-                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + allVnsId[1], '"'));
-                else
-                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + name, '"'));
-            }
-            catch (FormatException)
+            VisualNovel vn = await getVn(Program.addArgs(vns));
+            if (vn == null)
             {
                 await ReplyAsync(Sentences.vndbNotFound);
                 return;
             }
-            VndbResponse<VisualNovel> visualNovels = await client.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel);
-            VisualNovel vn = visualNovels.ToArray()[0];
             List<string> tmpDesc = vn.Description.Split('\n').ToList();
             Console.WriteLine(tmpDesc.Count);
             if (tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
@@ -126,6 +100,39 @@ namespace SanaraV2
                     }
                 }
             }
+        }
+        public static async Task<VisualNovel> getVn(string vnName)
+        {
+            Vndb client = new Vndb();
+
+            uint id = 0;
+            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + vnName.Replace(' ', '+'));
+            http.AllowAutoRedirect = false;
+            string html;
+            using (HttpWebResponse response = (HttpWebResponse)http.GetResponse())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                html = reader.ReadToEnd();
+            }
+            html = html.Split(new string[] { "<div class=\"mainbox browse vnbrowse\">" }, StringSplitOptions.None)[1];
+            html = html.Split(new string[] { "</thead>" }, StringSplitOptions.None)[1];
+            List<string> allVnsId = html.Split(new string[] { "href=\"/v" }, StringSplitOptions.None).ToList();
+            string cleanName = Program.cleanWord(vnName);
+            string name = allVnsId.Find(x => Program.cleanWord(x).Contains(cleanName));
+            try
+            {
+                if (name == null)
+                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + allVnsId[1], '"'));
+                else
+                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + name, '"'));
+            }
+            catch (FormatException)
+            {
+                return (null);
+            }
+            VndbResponse<VisualNovel> visualNovels = await client.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel);
+            return (visualNovels.ToArray()[0]);
         }
     }
 }
