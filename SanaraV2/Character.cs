@@ -30,6 +30,7 @@ namespace SanaraV2
             _nbMessage = 0;
             _name = name;
             _nameStr = nameStr;
+            File.WriteAllText("Saves/Users/" + _name + ".dat", returnInformationsRaw(false));
         }
 
         private string returnInformationsRaw(bool increaseMsg)
