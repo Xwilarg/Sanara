@@ -124,7 +124,7 @@ namespace SanaraV2
             using (WebClient wc = new WebClient())
             {
                 wc.Encoding = Encoding.UTF8;
-                json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + newWord);
+                json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + newWord.ToLower());
             }
             string[] url = Program.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
             string finalStr = "Here are the japanese translations for " + word + ":" + Environment.NewLine + Environment.NewLine;
