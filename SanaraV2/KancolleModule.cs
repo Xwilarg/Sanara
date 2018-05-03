@@ -101,7 +101,10 @@ namespace SanaraV2
                     }
                 }
                 if (finalStr.Length > 0)
-                    await ReplyAsync(finalStr);
+                {
+                    string rarity = Program.getElementXml(">", cathegories[1], '<');
+                    await ReplyAsync("Rarity: " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
+                }
                 else
                     await ReplyAsync(Sentences.dontDropOnMaps);
             }
