@@ -81,6 +81,7 @@ namespace SanaraV2
         /// --------------------------- KanColle---------------------------
         public readonly static string kancolleHelp = "Please give the shipgirl you want informations about.";
         public readonly static string shipgirlDontExist = "I didn't find any shipgirl with this name.";
+        public readonly static string dontDropOnMaps = "You can't drop this ship on maps.";
 
         /// --------------------------- VNDB ---------------------------
         public readonly static string vndbHelp = "Please give the visual novel you want informations about.";
@@ -122,6 +123,7 @@ namespace SanaraV2
                             + "Safebooru [tags]: Request a random image from Safebooru (only SFW images)" + Environment.NewLine
                             + "Vn [visual novel]: Give informations about a visual novel" + Environment.NewLine
                             + "Kancolle [shipgirl]: Give informations about a shipgirl from KanColle wikia" + Environment.NewLine
+                            + "Drop [shipgirl]: Give informations about where you can find a shipgirl in Kancolle" + Environment.NewLine
                             + "Indente [code]: Indente the code given" + Environment.NewLine
                             + "Anime [name]: Give informations about an anime" + Environment.NewLine
                             + "Manga [code]: Give informations about a manga" + Environment.NewLine
