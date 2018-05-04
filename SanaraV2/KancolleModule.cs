@@ -111,6 +111,30 @@ namespace SanaraV2
                 }
                 else
                     await ReplyAsync(Sentences.dontDropOnMaps);
+                wc.Headers.Add("User-Agent: Sanara");
+                html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLogList");
+                html = Regex.Replace(
+                        html,
+                        @"\\[Uu]([0-9A-Fa-f]{4})",
+                        m => char.ToString(
+                            (char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
+                string[] htmlSplit = html.Split(new string[] { shipName }, StringSplitOptions.None);
+                if (htmlSplit.Length == 1)
+                    return;
+                string[] allIds = htmlSplit[0].Split(new string[] { "\",\"" }, StringSplitOptions.None);
+                wc.Headers.Add("User-Agent: Sanara");
+                html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
+                html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
+                html = html.Split(new string[] { "flagship_order" }, StringSplitOptions.None)[0];
+                string[] allElements = html.Split(new string[] { "{\"item1\":" }, StringSplitOptions.None);
+                finalStr = "Ship Construction:" + Environment.NewLine;
+                for (int i = 1; i < ((allElements.Length > 6) ? (6) : (allElements.Length)); i++)
+                {
+                    string[] ressources = allElements[i].Split(new string[] { ",\"" }, StringSplitOptions.None);
+                    finalStr += Program.getElementXml(":", ressources[7], '}') + "% -- Fuel: " + ressources[0] + ", Ammos: " + Program.getElementXml(":", ressources[1], '?') + ", Iron: " + Program.getElementXml(":", ressources[2], '?') + ", Bauxite: " + Program.getElementXml(":", ressources[3], '?')
+                         + ", Dev mat: " + Program.getElementXml(":", ressources[4], '?') + Environment.NewLine;
+                }
+                await ReplyAsync(finalStr);
             }
         }
 
