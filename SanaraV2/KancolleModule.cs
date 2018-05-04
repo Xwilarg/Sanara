@@ -46,7 +46,7 @@ namespace SanaraV2
                 string html = wc.DownloadString("http://kancolle.wikia.com/wiki/Internals/Translations");
                 List<string> allShipsName = html.Split(new string[] { "<tr" }, StringSplitOptions.None).ToList();
                 allShipsName.RemoveAt(0);
-                string shipContain = allShipsName.Find(x => x.ToLower().Contains(shipName));
+                string shipContain = allShipsName.Find(x => Program.getElementXml("\">", x, '<').ToLower() == shipName);
                 if (shipContain == null)
                 {
                     await ReplyAsync(Sentences.shipgirlDontExist);
@@ -91,10 +91,15 @@ namespace SanaraV2
                             case '◎':
                                 finalStr += world + "-" + level + ": Anywhere on the map" + Environment.NewLine;
                                 break;
+
+                            default:
+                                finalStr += world + "-" + level + ": Findable on the map" + Environment.NewLine;
+                                break;
                         }
                     }
+                    Console.WriteLine(world + "-" + level + ":" + Program.getElementXml(">", cathegories[i], '<'));
                     level++;
-                    if (level > 6)
+                    if ((world == 1 && level > 6) || (world > 1 && level > 5))
                     {
                         world++;
                         level = 1;
