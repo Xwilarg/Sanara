@@ -82,7 +82,8 @@ namespace SanaraV2
         public readonly static string kancolleHelp = "Please give the shipgirl you want informations about.";
         public readonly static string shipgirlDontExist = "I didn't find any shipgirl with this name.";
         public readonly static string dontDropOnMaps = "You can't drop this ship on maps.";
-        public readonly static string shipNotReferenced = "This ship isn't referenced on the drop list of the website I'm using.";
+        public readonly static string shipNotReferencedMap = "There is no data available for ship drop.";
+        public readonly static string shipNotReferencedConstruction = "There is no data available for ship construction.";
 
         /// --------------------------- VNDB ---------------------------
         public readonly static string vndbHelp = "Please give the visual novel you want informations about.";

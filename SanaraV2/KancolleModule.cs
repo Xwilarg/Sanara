@@ -58,59 +58,59 @@ namespace SanaraV2
                 html = html.Split(new string[] { "艦種別表" }, StringSplitOptions.None)[0];
                 string[] shipgirls = html.Split(new string[] { "<tr>" }, StringSplitOptions.None);
                 string shipgirl = shipgirls.ToList().Find(x => x.Contains(shipName));
-                if (shipgirl == null)
-                {
-                    await ReplyAsync(Sentences.shipNotReferenced);
-                    return;
-                }
-                string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
                 string finalStr = "";
-                int[] toKeep = new int[] { 4, 5, 6, 7, 8, 9,    // World 1
+                if (shipgirl == null)
+                    await ReplyAsync(Sentences.shipNotReferencedMap);
+                else
+                {
+                    string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
+                    int[] toKeep = new int[] { 4, 5, 6, 7, 8, 9,    // World 1
                                            11, 12, 13, 14, 15,  // world 2
                                            17, 18, 19, 20, 21,  // World 3
                                            23, 24, 25, 26, 27,  // World 4
                                            29, 30, 31, 32, 33,  // World 5
                                            35, 36, 37, 38, 39}; // World 6
-                int level = 1;
-                int world = 1;
-                foreach (int i in toKeep)
-                {
-                    string node = Program.getElementXml(">", cathegories[i], '<');
-                    if (node.Length > 0)
+                    int level = 1;
+                    int world = 1;
+                    foreach (int i in toKeep)
                     {
-                        switch (node[0])
+                        string node = Program.getElementXml(">", cathegories[i], '<');
+                        if (node.Length > 0)
                         {
-                            case '●':
-                                finalStr += world + "-" + level + ": Only on normal nodes" + Environment.NewLine;
-                                break;
+                            switch (node[0])
+                            {
+                                case '●':
+                                    finalStr += world + "-" + level + ": Only on normal nodes" + Environment.NewLine;
+                                    break;
 
-                            case '○':
-                                finalStr += world + "-" + level + ": Only on boss node" + Environment.NewLine;
-                                break;
+                                case '○':
+                                    finalStr += world + "-" + level + ": Only on boss node" + Environment.NewLine;
+                                    break;
 
-                            case '◎':
-                                finalStr += world + "-" + level + ": Anywhere on the map" + Environment.NewLine;
-                                break;
+                                case '◎':
+                                    finalStr += world + "-" + level + ": Anywhere on the map" + Environment.NewLine;
+                                    break;
 
-                            default:
-                                finalStr += world + "-" + level + ": Findable on the map" + Environment.NewLine;
-                                break;
+                                default:
+                                    finalStr += world + "-" + level + ": Findable on the map" + Environment.NewLine;
+                                    break;
+                            }
+                        }
+                        level++;
+                        if ((world == 1 && level > 6) || (world > 1 && level > 5))
+                        {
+                            world++;
+                            level = 1;
                         }
                     }
-                    level++;
-                    if ((world == 1 && level > 6) || (world > 1 && level > 5))
+                    if (finalStr.Length > 0)
                     {
-                        world++;
-                        level = 1;
+                        string rarity = Program.getElementXml(">", cathegories[1], '<');
+                        await ReplyAsync("Rarity: " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
+                    else
+                        await ReplyAsync(Sentences.dontDropOnMaps);
                 }
-                if (finalStr.Length > 0)
-                {
-                    string rarity = Program.getElementXml(">", cathegories[1], '<');
-                    await ReplyAsync("Rarity: " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
-                }
-                else
-                    await ReplyAsync(Sentences.dontDropOnMaps);
                 wc.Headers.Add("User-Agent: Sanara");
                 html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLogList");
                 html = Regex.Replace(
@@ -120,8 +120,11 @@ namespace SanaraV2
                             (char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
                 string[] htmlSplit = html.Split(new string[] { shipName }, StringSplitOptions.None);
                 if (htmlSplit.Length == 1)
+                {
+                    await ReplyAsync(Sentences.shipNotReferencedConstruction);
                     return;
-                string[] allIds = htmlSplit[0].Split(new string[] { "\",\"" }, StringSplitOptions.None);
+                }
+                string[] allIds = htmlSplit[htmlSplit.Length - 2].Split(new string[] { "\",\"" }, StringSplitOptions.None);
                 wc.Headers.Add("User-Agent: Sanara");
                 html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
                 html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
