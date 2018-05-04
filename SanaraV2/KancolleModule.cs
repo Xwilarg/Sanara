@@ -39,14 +39,14 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.kancolleHelp);
                 return;
             }
-            string shipName = Program.addArgs(shipNameArr).ToLower();
+            string shipName = Program.cleanWord(Program.addArgs(shipNameArr));
             using (WebClient wc = new WebClient())
             {
                 wc.Encoding = Encoding.UTF8;
                 string html = wc.DownloadString("http://kancolle.wikia.com/wiki/Internals/Translations");
                 List<string> allShipsName = html.Split(new string[] { "<tr" }, StringSplitOptions.None).ToList();
                 allShipsName.RemoveAt(0);
-                string shipContain = allShipsName.Find(x => Program.getElementXml("\">", x, '<').ToLower() == shipName);
+                string shipContain = allShipsName.Find(x => Program.cleanWord(Program.getElementXml("\">", x, '<')) == shipName);
                 if (shipContain == null)
                 {
                     await ReplyAsync(Sentences.shipgirlDontExist);
@@ -60,7 +60,7 @@ namespace SanaraV2
                 string shipgirl = shipgirls.ToList().Find(x => x.Contains(shipName));
                 if (shipgirl == null)
                 {
-                    await ReplyAsync(Sentences.shipgirlDontExist);
+                    await ReplyAsync(Sentences.shipNotReferenced);
                     return;
                 }
                 string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
@@ -97,7 +97,6 @@ namespace SanaraV2
                                 break;
                         }
                     }
-                    Console.WriteLine(world + "-" + level + ":" + Program.getElementXml(">", cathegories[i], '<'));
                     level++;
                     if ((world == 1 && level > 6) || (world > 1 && level > 5))
                     {
