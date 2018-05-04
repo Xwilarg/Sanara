@@ -30,6 +30,47 @@ namespace SanaraV2
     public class KancolleModule : ModuleBase
     {
         Program p = Program.p;
+        [Command("Map", RunMode = RunMode.Async), Summary("Get informations about a map")]
+        public async Task map(params string[] mapName)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            if (mapName.Length != 2 || mapName[0].Length != 1 || mapName[1].Length != 1
+                || mapName[0][0] <= '0' || mapName[0][0] > '6' || mapName[1][0] <= '0' || mapName[1][0] > '6'
+                || (mapName[0][0] != '1' && mapName[1][0] == '6'))
+            {
+                await ReplyAsync(Sentences.mapHelp);
+                return;
+            }
+            using (WebClient wc = new WebClient())
+            {
+                string url = "http://kancolle.wikia.com/wiki/World_" + mapName[0][0] + "/" + mapName[0][0] + "-" + mapName[1][0];
+                string html = wc.DownloadString(url);
+                wc.Encoding = Encoding.UTF8;
+                string htmlRaw = wc.DownloadString(url + "?action=raw");
+                html = html.Split(new string[] { "typography-xl-optout" }, StringSplitOptions.None)[1];
+                string[] allLinks = html.Split(new string[] { "href=" }, StringSplitOptions.None);
+                int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
+                wc.DownloadFile(Program.getElementXml("\"", allLinks[1], '"'), "kancolleMap" + currentTime + "1.png");
+                wc.DownloadFile(Program.getElementXml("\"", allLinks[2], '"'), "kancolleMap" + currentTime + "2.png");
+                await ReplyAsync(Program.getElementXml("|en = ", htmlRaw, '\n'));
+                await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "1.png");
+                await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "2.png");
+                File.Delete("kancolleMap" + currentTime + "1.png");
+                File.Delete("kancolleMap" + currentTime + "2.png");
+                string branchingRules = htmlRaw.Split(new string[] { "{{MapBranchingTable" }, StringSplitOptions.None)[1];
+                string[] allBranches = branchingRules.Split(new string[] { "}}" }, StringSplitOptions.None)[0].Split('\n');
+                string finalStr = "";
+                foreach (string currBranch in allBranches)
+                {
+                    if (currBranch.Length == 0 || currBranch.StartsWith("|title") || currBranch.StartsWith("|id"))
+                        continue;
+                    string line = currBranch.Substring(1, currBranch.Length - 1);
+                    finalStr += line + Environment.NewLine;
+                }
+                await ReplyAsync(finalStr);
+            }
+        }
+
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task drop(params string[] shipNameArr)
         {

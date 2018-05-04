@@ -84,6 +84,7 @@ namespace SanaraV2
         public readonly static string dontDropOnMaps = "You can't drop this ship on maps.";
         public readonly static string shipNotReferencedMap = "There is no data available for ship drop.";
         public readonly static string shipNotReferencedConstruction = "There is no data available for ship construction.";
+        public readonly static string mapHelp = "You must give the number of the world then the number of the level.";
 
         /// --------------------------- VNDB ---------------------------
         public readonly static string vndbHelp = "Please give the visual novel you want informations about.";
@@ -126,6 +127,7 @@ namespace SanaraV2
                             + "Vn [visual novel]: Give informations about a visual novel" + Environment.NewLine
                             + "Kancolle [shipgirl]: Give informations about a shipgirl from KanColle wikia" + Environment.NewLine
                             + "Drop [shipgirl]: Give informations about where you can find a shipgirl in Kancolle" + Environment.NewLine
+                            + "Map [world] [level]: Give informations about a map in Kancolle" + Environment.NewLine
                             + "Indente [code]: Indente the code given" + Environment.NewLine
                             + "Anime [name]: Give informations about an anime" + Environment.NewLine
                             + "Manga [code]: Give informations about a manga" + Environment.NewLine
