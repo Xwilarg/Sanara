@@ -57,7 +57,11 @@ namespace SanaraV2
                 await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "2.png");
                 File.Delete("kancolleMap" + currentTime + "1.png");
                 File.Delete("kancolleMap" + currentTime + "2.png");
-                string branchingRules = htmlRaw.Split(new string[] { "{{MapBranchingTable" }, StringSplitOptions.None)[1];
+                string branchingRules;
+                if (htmlRaw.Contains("{{MapBranchingTable"))
+                    branchingRules = htmlRaw.Split(new string[] { "{{MapBranchingTable" }, StringSplitOptions.None)[1];
+                else
+                    branchingRules = htmlRaw.Split(new string[] { "{{Map/Branching" }, StringSplitOptions.None)[1];
                 string[] allBranches = branchingRules.Split(new string[] { "}}" }, StringSplitOptions.None)[0].Split('\n');
                 string finalStr = "";
                 foreach (string currBranch in allBranches)
