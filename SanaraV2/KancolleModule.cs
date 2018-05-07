@@ -157,7 +157,7 @@ namespace SanaraV2
                         await ReplyAsync(Sentences.dontDropOnMaps);
                 }
                 wc.Headers.Add("User-Agent: Sanara");
-                html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLogList");
+                html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLogList");
                 html = Regex.Replace(
                         html,
                         @"\\[Uu]([0-9A-Fa-f]{4})",
@@ -171,7 +171,7 @@ namespace SanaraV2
                 }
                 string[] allIds = htmlSplit[htmlSplit.Length - 2].Split(new string[] { "\",\"" }, StringSplitOptions.None);
                 wc.Headers.Add("User-Agent: Sanara");
-                html = wc.DownloadString("http://unlockacgweb.galstars.net/Kancollewiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
+                html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
                 html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
                 html = html.Split(new string[] { "flagship_order" }, StringSplitOptions.None)[0];
                 string[] allElements = html.Split(new string[] { "{\"item1\":" }, StringSplitOptions.None);
