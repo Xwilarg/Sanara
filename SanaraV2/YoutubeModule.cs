@@ -33,7 +33,7 @@ namespace SanaraV2
                 await ReplyAsync(url.Item1);
         }
 
-        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan)
+        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan, int maxResult = 1)
         {
             if (words.Length == 0)
             {
@@ -42,28 +42,18 @@ namespace SanaraV2
             }
             var searchListRequest = Program.p.youtubeService.Search.List("snippet");
             searchListRequest.Q = Program.addArgs(words);
-            searchListRequest.MaxResults = 1;
+            searchListRequest.MaxResults = maxResult;
             var searchListResponse = await searchListRequest.ExecuteAsync();
-            if (searchListResponse.Items.Count == 0)
+            if (searchListResponse.Items.Count < maxResult)
             {
                 await chan.SendMessageAsync(Sentences.youtubeNotFound);
                 return (null);
             }
-            Google.Apis.YouTube.v3.Data.SearchResult sr;
-            /// TODO: Search for second video if first isn't one
-            if (!searchListResponse.Items.Any(x => x.Id.Kind == "youtube#video"))
-            {
-                await chan.SendMessageAsync(Sentences.youtubeBadVideo);
-                return (null);
-            }
+            Google.Apis.YouTube.v3.Data.SearchResult sr = searchListResponse.Items[maxResult - 1];
+            if (sr.Id.Kind != "youtube#video")
+                return (await GetYoutubeVideo(words, chan, maxResult + 1));
             else
-            {
-                do
-                {
-                    sr = searchListResponse.Items[Program.p.rand.Next(0, searchListResponse.Items.Count)];
-                } while (sr.Id.Kind != "youtube#video");
                 return new Tuple<string, string>("https://www.youtube.com/watch?v=" + sr.Id.VideoId, sr.Snippet.Title);
-            }
         }
     }
 }
