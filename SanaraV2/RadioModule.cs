@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using VideoLibrary;
 
@@ -34,18 +35,35 @@ namespace SanaraV2
 
         public class Song
         {
-            public Song(string mpath, string mtitle, string murl)
+            public Song(string mpath, string mtitle, string murl, IGuildUser me, string guildId)
             {
                 path = mpath;
                 title = mtitle;
                 url = murl;
                 downloading = true;
+                if (me.GuildPermissions.AttachFiles)
+                {
+                    using (WebClient wc = new WebClient())
+                    {
+                        imageName = "Saves/Radio/" + guildId + "/thumbnail" + DateTime.Now.ToString("HHmmssfff") + me.Id.ToString() + ".jpg";
+                        wc.DownloadFile("https://img.youtube.com/vi/" + url.Split('=')[1] + "/0.jpg", imageName);
+                    }
+                }
+                else
+                    imageName = null;
+            }
+
+            ~Song()
+            {
+                if (imageName != null)
+                    File.Delete(imageName);
             }
 
             public string path;
             public string title;
             public string url;
             public bool downloading;
+            public string imageName;
         }
 
         public class RadioChannel
@@ -79,9 +97,9 @@ namespace SanaraV2
                 return (m_musics.Any(x => x.url == url));
             }
 
-            public void AddMusic(string path, string title, string url)
+            public void AddMusic(string path, string title, string url, IGuildUser me, string guildId)
             {
-                m_musics.Add(new Song(path, title, url));
+                m_musics.Add(new Song(path, title, url, me, guildId));
             }
 
             public void RemoveSong(string url)
@@ -118,6 +136,7 @@ namespace SanaraV2
                 if (m_musics.Count == 0 || (m_process != null && !m_process.HasExited) || m_musics[0].downloading)
                     return;
                 await m_msgChan.SendMessageAsync("Now playing " + m_musics[0].title);
+                await m_msgChan.SendFileAsync(m_musics[0].imageName);
                 m_process = Process.Start(new ProcessStartInfo
                 {
                     FileName = "ffmpeg.exe",
@@ -178,7 +197,7 @@ namespace SanaraV2
                         await ReplyAsync(Sentences.radioAlreadyInList);
                         return;
                     }
-                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Program.cleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1);
+                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Program.cleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
                     YouTubeVideo video = GetYoutubeVideo(youtubeResult.Item1);
                     if (video == null)
                     {

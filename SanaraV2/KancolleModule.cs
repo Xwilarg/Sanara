@@ -196,7 +196,7 @@ namespace SanaraV2
                 return;
             }
             string shipName = Program.addArgs(shipNameArr);
-            IGuildUser me = await Context.Guild.GetUserAsync(329664361016721408); // Sanara
+            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
             string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + shipName + "&limit=1";
             try
             {
