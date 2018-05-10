@@ -28,6 +28,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -214,6 +215,41 @@ namespace SanaraV2
                 lastChar = c;
             }
             return (saveString);
+        }
+
+        /// <summary>
+        /// Get a user by his username/nickname/id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="guild"></param>
+        /// <returns></returns>
+        public static async Task<IGuildUser> GetUser(string name, IGuild guild)
+        {
+            Match match = Regex.Match(name, "<@![0-9]{18}>");
+            if (match.Success)
+            {
+                try
+                {
+                    string val = match.Value;
+                    val = val.Substring(3, val.Length - 3);
+                    val = val.Substring(0, val.Length - 1);
+                    return (await guild.GetUserAsync(Convert.ToUInt64(val)));
+                }
+                catch (Exception)
+                { }
+            }
+            try
+            {
+                return (await guild.GetUserAsync(Convert.ToUInt64(name)));
+            }
+            catch (Exception)
+            { }
+            foreach (IGuildUser user in await guild.GetUsersAsync())
+            {
+                if (user.Nickname == name || user.Username == name)
+                    return (user);
+            }
+            return (null);
         }
 
         private async Task GuildJoin(SocketGuild arg)

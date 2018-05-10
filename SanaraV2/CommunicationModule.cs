@@ -49,5 +49,50 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync(Sentences.whoIAmStr);
         }
+
+        [Command("Infos"), Summary("Give informations about an user")]
+        public async Task InfosUser(params string[] command)
+        {
+            System.Console.WriteLine(Program.addArgs(command));
+            IGuildUser user;
+            if (command.Length == 0)
+                user = Context.User as IGuildUser;
+            else
+            {
+                user = await Program.GetUser(Program.addArgs(command), Context.Guild);
+                if (user == null)
+                {
+                    await ReplyAsync(Sentences.userNotExist);
+                    return;
+                }
+            }
+            string roles = "";
+            foreach (ulong roleId in user.RoleIds)
+            {
+                IRole role = Context.Guild.GetRole(roleId);
+                if (role.Name == "@everyone")
+                    continue;
+                roles += role.Name + ", ";
+            }
+            if (roles != "")
+                roles = roles.Substring(0, roles.Length - 2);
+            EmbedBuilder embed = new EmbedBuilder
+            {
+                ImageUrl = user.GetAvatarUrl(),
+                Color = Color.Purple
+            };
+            embed.AddField("Username", user.ToString(), true);
+            if (user.Nickname != null)
+                embed.AddField("Nickname", user.Nickname, true);
+            embed.AddField("Account creation", user.CreatedAt.ToString("dd/MM/yy HH:mm:ss"), true);
+            embed.AddField("Server joined", user.JoinedAt.Value.ToString("dd/MM/yy HH:mm:ss"), true);
+            if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
+            {
+                embed.AddField("Creator", "Zirk#0001", true);
+                embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
+            }
+            embed.AddField("Roles", ((roles == "") ? ("Vous n'avez aucun rôle") : (roles)));
+            await ReplyAsync("", false, embed.Build());
+        }
     }
 }

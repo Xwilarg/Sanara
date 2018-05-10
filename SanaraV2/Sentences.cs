@@ -52,6 +52,7 @@ namespace SanaraV2
         public readonly static string hiStr = "Hi~";
         public readonly static string whoIAmStr = "My name is Sanaya Miyuki(差成夜 深雪) but just call me Sanara." + Environment.NewLine
                                                 + "I'll do my best to learn new things to help you.";
+        public readonly static string userNotExist = "This user does not exist.";
 
         /// --------------------------- Booru ---------------------------
         public readonly static string fileTooBig = "I wasn't able to post the file I found since it was bigger than 8 MB.";
@@ -132,7 +133,8 @@ namespace SanaraV2
                             + "Anime [name]: Give informations about an anime" + Environment.NewLine
                             + "Manga [code]: Give informations about a manga" + Environment.NewLine
                             + "Play [shiritori/kancolle]: Play a game" + Environment.NewLine
-                            + "Youtube [keywords]: Give a YouTube video given some keywords" + Environment.NewLine;
+                            + "Youtube [keywords]: Give a YouTube video given some keywords" + Environment.NewLine
+                            + "Infos [user]: Give informations about an user" + Environment.NewLine;
             if (isChanNsfw)
                 finalStr += "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
                           + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
