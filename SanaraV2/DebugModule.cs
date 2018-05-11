@@ -67,7 +67,7 @@ namespace SanaraV2
 
             await ReplyAsync("", false, embed.Build());
 
-            infosDebug = "**Linguist Module:**" + Environment.NewLine + "Translation: ";
+            infosDebug = "**Linguistic Module:**" + Environment.NewLine + "Translation: ";
             try
             {
                 if (LinguistModule.getTranslation("cat", "fr") == "chat") infosDebug += "OK";

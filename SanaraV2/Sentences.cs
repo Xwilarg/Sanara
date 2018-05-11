@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using Discord;
 using System;
 
 namespace SanaraV2
@@ -115,35 +116,62 @@ namespace SanaraV2
         public readonly static string radioTooMany = "There can't be more than 10 songs in the playlist.";
         public readonly static string radioNoSong = "There is currently no song playing.";
         public readonly static string cantDownload = "I'm sorry but I wasn't able to download this song.";
+        public static string songSkipped(string songName) { return (songName + " was skipped."); }
 
         /// --------------------------- Help ---------------------------
-        public static string help(bool isChanNsfw)
+        private readonly static string noCommandAvailable = "There is no command available for this module";
+        public static Embed help(bool isChanNsfw)
         {
-            string finalStr = "Hiragana [word]: Transcript a word to hiragana" + Environment.NewLine
-                            + "Katakana [word]: Transcript a word to katakana" + Environment.NewLine
-                            + "Romaji [word]: Transcript a word to romaji" + Environment.NewLine
-                            + "Definition [word]: Translate a word in both japanese and english" + Environment.NewLine
-                            + "Translation [language] [sentence]: Translate a sentence in the language given" + Environment.NewLine
-                            + "Safebooru [tags]: Request a random image from Safebooru (only SFW images)" + Environment.NewLine
-                            + "Vn [visual novel]: Give informations about a visual novel" + Environment.NewLine
-                            + "Kancolle [shipgirl]: Give informations about a shipgirl from KanColle wikia" + Environment.NewLine
-                            + "Drop [shipgirl]: Give informations about where you can find a shipgirl in Kancolle" + Environment.NewLine
-                            + "Map [world] [level]: Give informations about a map in Kancolle" + Environment.NewLine
-                            + "Indente [code]: Indente the code given" + Environment.NewLine
-                            + "Anime [name]: Give informations about an anime" + Environment.NewLine
-                            + "Manga [code]: Give informations about a manga" + Environment.NewLine
-                            + "Play [shiritori/kancolle]: Play a game" + Environment.NewLine
-                            + "Youtube [keywords]: Give a YouTube video given some keywords" + Environment.NewLine
-                            + "Infos [user]: Give informations about an user" + Environment.NewLine;
-            if (isChanNsfw)
-                finalStr += "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
-                          + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
-                          + "Rule34 [tags]: Request a random image from Rule34 (mostly weird images)" + Environment.NewLine
-                          + "Doujinshi [tags]: Request a doujinshi from Nhentai" + Environment.NewLine
-                          + "Random url: Give a random URL from goo.gl" + Environment.NewLine;
-            else
-                finalStr += "(Ask again in a NSFW channel for a full list of features.)";
-            return (finalStr);
+            EmbedBuilder embed = new EmbedBuilder
+            {
+                Title = "Help",
+                Color = Color.Purple
+            };
+            embed.AddField("Anime/Manga Module",
+                "**Anime [name]:** Give informations about an anime" + Environment.NewLine +
+                "**Manga [code]:** Give informations about a manga");
+            embed.AddField("Booru Module",
+                "**Safebooru [tags]:** Request a random image from Safebooru (only SFW images)"
+                + ((isChanNsfw) ? (Environment.NewLine + "**Konachan [tags]:** Request a random image from Konachan (only wallpapers)"
+                                 + Environment.NewLine + "**Gelbooru [tags]:** Request a random image from Gelbooru (no particular rules)"
+                                 + Environment.NewLine + "**Rule34 [tags]:** Request a random image from Rule34 (mostly weird images)") : ("")));
+            embed.AddField("Code Module",
+                "**Indente [code]:** Indente the code given");
+            embed.AddField("Communication Module",
+                "**Infos [user]:** Give informations about an user");
+            embed.AddField("Debug Module",
+                "**Print debug:** Give general informations about the bot");
+            embed.AddField("Doujinshi Module",
+                ((isChanNsfw) ? ("**Doujinshi [tags]:** Request a doujinshi from Nhentai")
+                              : (noCommandAvailable)));
+            embed.AddField("Game Module",
+                "**Play shiritori:** Play the shiritori game (you need to find a japanese word beginning by the ending of the previous one)" + Environment.NewLine +
+                "**Play kancolle:** Play the KanColle guess game (you need to identify shipgirls by an image)");
+            embed.AddField("Google Shortener Module",
+                ((isChanNsfw) ? ("**Random url:** Give a random URL from goo.gl")
+                              : (noCommandAvailable)));
+            embed.AddField("Kantai Collection Module",
+                "**Kancolle [shipgirl]:** Give informations about a shipgirl from KanColle wikia" + Environment.NewLine +
+                "**Drop [shipgirl]:** Give informations about where you can find a shipgirl in Kancolle" + Environment.NewLine +
+                "**Map [world] [level]:** Give informations about a map in Kancolle");
+            embed.AddField("Linguistic Module",
+                "**Hiragana [word]:** Transcript a word to hiragana" + Environment.NewLine +
+                "**Katakana [word]:** Transcript a word to katakana" + Environment.NewLine +
+                "**Romaji [word]:** Transcript a word to romaji" + Environment.NewLine +
+                "**Definition [word]:** Translate a word in both japanese and english" + Environment.NewLine +
+                "**Translation [language] [sentence]:** Translate a sentence in the language given" + Environment.NewLine);
+            embed.AddField("Radio Module",
+                "**Radio launch:** Make the bot join you in a vocal channel" + Environment.NewLine +
+                "**Radio add [YouTube url/keywords]:** Add a song to the playlist" + Environment.NewLine +
+                "**Radio playlist:** Display current playlist" + Environment.NewLine +
+                "**Radio skip:** Skip the song currently played" + Environment.NewLine +
+                "**Radio stop:** Stop the radio and leave the vocal channel");
+            embed.AddField("Settings Module", noCommandAvailable);
+            embed.AddField("Visual Novel Module",
+                "**Vn [visual novel]:** Give informations about a visual novel");
+            embed.AddField("YouTube Module",
+                "**Youtube [keywords]:** Give a YouTube video given some keywords");
+            return (embed.Build());
         }
     }
 }

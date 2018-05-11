@@ -53,7 +53,7 @@ namespace SanaraV2
                     imageName = null;
             }
 
-            ~Song()
+            public void DeleteThumbnail()
             {
                 if (imageName != null)
                     File.Delete(imageName);
@@ -107,6 +107,15 @@ namespace SanaraV2
                 m_musics.Remove(m_musics.Find(x => x.url == url));
             }
 
+            public async Task<bool> Skip(IMessageChannel chan)
+            {
+                if (m_process == null)
+                    return (false);
+                await chan.SendMessageAsync(Sentences.songSkipped(m_musics[0].title));
+                m_process.Kill();
+                return (true);
+            }
+
             public async Task Stop()
             {
                 for (int i = 1; i < m_musics.Count; i++)
@@ -154,6 +163,7 @@ namespace SanaraV2
                         while (true)
                         {
                             try {
+                                m_musics[0].DeleteThumbnail();
                                 File.Delete(m_musics[0].path);
                                 break;
                             } catch (IOException) { }
@@ -161,6 +171,7 @@ namespace SanaraV2
                     }
                     await discord.FlushAsync();
                 }
+                m_musics[0].DeleteThumbnail();
                 File.Delete(m_musics[0].path);
                 m_musics.RemoveAt(0);
                 Play();
@@ -178,9 +189,7 @@ namespace SanaraV2
         public async Task addRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            if (Context.User.Id != Sentences.ownerId)
-                await ReplyAsync(Sentences.betaFeature);
-            else if (words.Length == 0)
+            if (words.Length == 0)
                 await ReplyAsync(Sentences.radioNeedArg);
             else if (p.radios.Any(x => x.m_guildId == Context.Guild.Id) && !p.radios.Find(x => x.m_guildId == Context.Guild.Id).CanAddMusic())
                 await ReplyAsync(Sentences.radioTooMany);
@@ -217,24 +226,32 @@ namespace SanaraV2
         public async Task launchRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            if (Context.User.Id != Sentences.ownerId)
-            {
-                await ReplyAsync(Sentences.betaFeature);
-                return;
-            }
             await StartRadio(Context.Channel);
         }
 
-        [Command("Playlist radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio playlist")]
+        [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist")]
         public async Task listRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            if (Context.User.Id != Sentences.ownerId)
-                await ReplyAsync(Sentences.betaFeature);
-            else if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
+            if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
                 await ReplyAsync(Sentences.radioNotStarted);
             else
                 await ReplyAsync(p.radios.Find(x => x.m_guildId == Context.Guild.Id).GetPlaylist());
+        }
+
+        [Command("Skip radio", RunMode = RunMode.Async), Summary("Skip the current song"), Alias("Radio skip")]
+        public async Task skipRadio(params string[] words)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
+            if (radio == null)
+                await ReplyAsync(Sentences.radioNotStarted);
+            else
+            {
+                bool suceed = await radio.Skip(Context.Channel);
+                if (!suceed)
+                    await ReplyAsync(Sentences.radioNoSong);
+            }
         }
 
         private async Task StartRadio(IMessageChannel chan)
@@ -258,11 +275,6 @@ namespace SanaraV2
         public async Task stopRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            if (Context.User.Id != Sentences.ownerId)
-            {
-                await ReplyAsync(Sentences.betaFeature);
-                return;
-            }
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
                 await ReplyAsync(Sentences.radioNotStarted);
