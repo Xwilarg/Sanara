@@ -138,7 +138,7 @@ namespace SanaraV2
             if (isChanNsfw)
                 finalStr += "Konachan [tags]: Request a random image from Konachan (only wallpapers)" + Environment.NewLine
                           + "Gelbooru [tags]: Request a random image from Gelbooru (no particular rules)" + Environment.NewLine
-                          + "Rule34 [tags]: Request a random image from Safebooru (mostly weird images)" + Environment.NewLine
+                          + "Rule34 [tags]: Request a random image from Rule34 (mostly weird images)" + Environment.NewLine
                           + "Doujinshi [tags]: Request a doujinshi from Nhentai" + Environment.NewLine
                           + "Random url: Give a random URL from goo.gl" + Environment.NewLine;
             else
