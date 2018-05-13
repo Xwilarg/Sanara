@@ -225,14 +225,17 @@ namespace SanaraV2
         /// <returns></returns>
         public static async Task<IGuildUser> GetUser(string name, IGuild guild)
         {
-            Match match = Regex.Match(name, "<@![0-9]{18}>");
+            Match match = Regex.Match(name, "<@[!]?[0-9]{18}>");
             if (match.Success)
             {
                 try
                 {
-                    string val = match.Value;
-                    val = val.Substring(3, val.Length - 3);
-                    val = val.Substring(0, val.Length - 1);
+                    string val = "";
+                    foreach (char c in match.Value)
+                    {
+                        if (char.IsNumber(c))
+                            val += c;
+                    }
                     return (await guild.GetUserAsync(Convert.ToUInt64(val)));
                 }
                 catch (Exception)

@@ -47,7 +47,6 @@ namespace SanaraV2
         [Command("Infos"), Summary("Give informations about an user")]
         public async Task InfosUser(params string[] command)
         {
-            System.Console.WriteLine(Program.addArgs(command));
             IGuildUser user;
             if (command.Length == 0)
                 user = Context.User as IGuildUser;
