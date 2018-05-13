@@ -196,7 +196,10 @@ namespace SanaraV2
             else
             {
                 if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
-                    await StartRadio(Context.Channel);
+                {
+                    if (!await StartRadio(Context.Channel))
+                        return;
+                }
                 Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeVideo(words, Context.Channel);
                 if (youtubeResult != null)
                 {
@@ -254,21 +257,22 @@ namespace SanaraV2
             }
         }
 
-        private async Task StartRadio(IMessageChannel chan)
+        private async Task<bool> StartRadio(IMessageChannel chan)
         {
             if (p.radios.Any(x => x.m_guildId == Context.Guild.Id))
             {
                 await chan.SendMessageAsync(Sentences.radioAlreadyStarted);
-                return;
+                return (true);
             }
             IGuildUser guildUser = Context.User as IGuildUser;
             if (guildUser.VoiceChannel == null)
-                await chan.SendMessageAsync(Sentences.radioNeedChannel);
-            else
             {
-                IAudioClient audioClient = await guildUser.VoiceChannel.ConnectAsync();
-                p.radios.Add(new RadioChannel(guildUser.VoiceChannel, Context.Channel, audioClient)); // You need opus.dll and libsodium.dll
+                await chan.SendMessageAsync(Sentences.radioNeedChannel);
+                return (false);
             }
+            IAudioClient audioClient = await guildUser.VoiceChannel.ConnectAsync();
+            p.radios.Add(new RadioChannel(guildUser.VoiceChannel, Context.Channel, audioClient)); // You need opus.dll and libsodium.dll
+            return (true);
         }
 
         [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop")]
