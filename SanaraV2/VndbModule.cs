@@ -41,7 +41,7 @@ namespace SanaraV2
                 return;
             }
             VisualNovel vn = await getVn(Program.addArgs(vns));
-            if (vn == null)
+            if (vn == null || !Program.cleanWord(vn.Name).Contains(Program.cleanWord(Program.addArgs(vns))))
             {
                 await ReplyAsync(Sentences.vndbNotFound);
                 return;
