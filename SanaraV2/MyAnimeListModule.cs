@@ -28,7 +28,7 @@ namespace SanaraV2
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
         public async Task mal(params string[] animeNameArr)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.MyAnimeList);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             string animeName = Program.addArgs(animeNameArr);
             if (animeName.Length == 0)
             {
@@ -62,7 +62,7 @@ namespace SanaraV2
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
         public async Task malManga(params string[] mangaNameArr) // Stuck in loop ?
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.MyAnimeList);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             string mangaName = Program.addArgs(mangaNameArr);
             if (mangaName.Length == 0)
             {

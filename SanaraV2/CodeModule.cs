@@ -27,6 +27,7 @@ namespace SanaraV2
         [Command("Indente"), Summary("Indente the code given in parameter")]
         public async Task Indent(params string[] arg)
         {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Code);
             if (arg.Length == 0)
             {
                 await ReplyAsync(Sentences.codeHelp);

@@ -61,6 +61,9 @@ namespace SanaraV2
 
         public UrlshortenerService service;
 
+        private int commandReceived;
+        private string lastHourSent;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -98,6 +101,18 @@ namespace SanaraV2
             {
                 ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
             });
+
+            lastHourSent = DateTime.Now.ToString("HH");
+            if (File.Exists("Saves/CommandReceived.dat"))
+            {
+                string[] content = File.ReadAllLines("Saves/CommandReceived.dat");
+                if (content[1] == lastHourSent)
+                    commandReceived = Convert.ToInt32(content[0]);
+                else
+                    commandReceived = 0;
+            }
+            else
+                commandReceived = 0;
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -220,8 +235,8 @@ namespace SanaraV2
         /// <summary>
         /// Get a user by his username/nickname/id
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="guild"></param>
+        /// <param name="name">The name/id of the user</param>
+        /// <param name="guild">The guild the user is in</param>
         /// <returns></returns>
         public static async Task<IGuildUser> GetUser(string name, IGuild guild)
         {
@@ -312,21 +327,55 @@ namespace SanaraV2
         }
 #pragma warning restore CS1998
 
+        /// <summary>
+        /// Get usage of modules for the current month
+        /// </summary>
+        /// <returns></returns>
+        private string GetModulesStats()
+        {
+            string currDate = DateTime.Now.ToString("yyyyMM");
+            List<string> allModules = new List<string>();
+            int[] valuesModules = new int[(int)Module.Youtube + 1];
+            for (int i = 0; i < valuesModules.Length; i++)
+            {
+                allModules.Add(((Module)i).ToString().ToLower());
+                valuesModules[i] = 0;
+            }
+            foreach (string d in Directory.GetDirectories("Saves/Servers"))
+            {
+                string dir = d.Replace('\\', '/') + "/ModuleCount/" + currDate;
+                if (Directory.Exists(dir))
+                {
+                    foreach (string f in Directory.GetFiles(dir))
+                    {
+                        string[] elems = f.Split(new string[] { "/", "\\" }, StringSplitOptions.None);
+                        int index = allModules.ToList().FindIndex(x => elems[elems.Length - 1].ToLower().Contains(x));
+                        if (index > -1)
+                            valuesModules[index] += Convert.ToInt32(File.ReadAllText(f));
+                    }
+                }
+            }
+            string finalStr = "";
+            for (int i = 0; i < valuesModules.Length; i++)
+                finalStr += valuesModules[i] + "|";
+            return (finalStr);
+        }
+
         public enum Module
         {
+            AnimeManga,
             Booru,
             Code,
             Communication,
             Debug,
+            Doujinshi,
             Game,
             GoogleShortener,
-            Jisho,
             Kancolle,
-            MyAnimeList,
-            Nhentai,
+            Linguistic,
             Radio,
             Settings,
-            Vndb,
+            Vn,
             Youtube
         }
 
@@ -391,6 +440,13 @@ namespace SanaraV2
                            { "token", File.ReadAllLines("Keys/websiteToken.dat")[1] },
                            { "name", "Sanara" }
                         };
+            if (lastHourSent != DateTime.Now.ToString("HH"))
+            {
+                lastHourSent = DateTime.Now.ToString("HH");
+                commandReceived = 0;
+                values.Add("modules", GetModulesStats());
+            }
+            values.Add("nbMsgs", commandReceived.ToString());
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
 
             try
@@ -451,6 +507,7 @@ namespace SanaraV2
                 // Count how many messages the bot receive
                 if (result.IsSuccess && !context.User.IsBot)
                 {
+                    commandReceived++;
                     if (!Directory.Exists("Saves"))
                         Directory.CreateDirectory("Saves");
                     if (!Directory.Exists("Saves/Stats"))
@@ -461,6 +518,7 @@ namespace SanaraV2
                         File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
                     else
                         File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
+                    File.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
                 }
             }
         }

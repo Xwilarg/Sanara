@@ -31,7 +31,7 @@ namespace SanaraV2
         [Command("Doujinshi", RunMode = RunMode.Async), Summary("Give a random doujinshi using nhentai API")]
         public async Task getNhentai(params string[] keywords)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Nhentai);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             if (!(Context.Channel as ITextChannel).IsNsfw)
             {
                 await ReplyAsync(Sentences.chanIsNotNsfw);

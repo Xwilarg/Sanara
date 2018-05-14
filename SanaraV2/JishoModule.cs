@@ -30,7 +30,7 @@ namespace SanaraV2
         [Command("Hiragana"), Summary("To hiragana")]
         public async Task toHiraganaCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toHiraganaHelp);
             else
@@ -40,7 +40,7 @@ namespace SanaraV2
         [Command("Romaji"), Summary("To romaji")]
         public async Task toRomajiCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toRomajiHelp);
             else
@@ -50,7 +50,7 @@ namespace SanaraV2
         [Command("Katakana"), Summary("To romaji")]
         public async Task toKatakanaCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toKatakanaHelp);
             else
@@ -60,7 +60,7 @@ namespace SanaraV2
         [Command("Translation"), Summary("Translate a sentence")]
         public async Task translation(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (words.Length < 2)
                 await ReplyAsync(Sentences.translateHelp);
             else
@@ -100,7 +100,7 @@ namespace SanaraV2
         [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word")]
         public async Task meaning(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Jisho);
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.japaneseHelp);
             else
