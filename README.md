@@ -15,9 +15,10 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 # Commands available
 
-Full list of commands available here: https://zirk.eu/sanara.html
+Full list of commands available here: https://zirk.eu/sanara.php#commands
 
 # Please make note that the bot also collect and save the following datas:
 
 About users: Name, id, date of first encounter and number of messages sent<br/>
 About guilds: Name, id, date of first joined, best score in games when applicable and number of messages sent by modules<br/>
+You can check the different stats about the bot here: https://zirk.eu/sanara.php#stats
