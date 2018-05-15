@@ -61,9 +61,11 @@ namespace SanaraV2
 
         public UrlshortenerService service;
 
-        private List<int> commandModules;
-        private int commandReceived;
+        private List<int> commandModules; // Nb of command received per months (split by modules)
+        public List<long> statsMonth; // Total size of download for boorus per months
+        private int commandReceived; // Nb of command received per hours
         private string lastHourSent;
+        public string lastMonthSent;
 
         private Program()
         {
@@ -103,7 +105,10 @@ namespace SanaraV2
                 ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
             });
 
+            #region StatsInit
+            /// Stats at https://zirk.eu/sanara-stats.php
             lastHourSent = DateTime.Now.ToString("HH");
+            lastMonthSent = DateTime.Now.ToString("MM");
             if (File.Exists("Saves/CommandReceived.dat"))
             {
                 string[] content = File.ReadAllLines("Saves/CommandReceived.dat");
@@ -132,6 +137,25 @@ namespace SanaraV2
             else
                 for (int i = 0; i <= (int)Module.Youtube; i++)
                     commandModules.Add(0);
+
+            statsMonth = new List<long>();
+            if (File.Exists("Saves/MonthModules.dat"))
+            {
+                string[] content = File.ReadAllLines("Saves/MonthModules.dat");
+                if (content[1] == lastMonthSent)
+                {
+                    string[] mods = content[0].Split('|');
+                    for (int i = 0; i < 4; i++)
+                        statsMonth.Add(Convert.ToInt64(mods[i]));
+                }
+                else
+                    for (int i = 0; i < 4; i++)
+                        statsMonth.Add(0);
+            }
+            else
+                for (int i = 0; i < 4; i++)
+                    statsMonth.Add(0);
+            #endregion StatsInit
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -397,7 +421,7 @@ namespace SanaraV2
                     if (biggest == null || tuple.Item2 > biggest.Item2)
                         biggest = tuple;
                 }
-                finalStr += biggest.Item1 + "|" + biggest.Item2 + "|" + biggest.Item3 + "|";
+                finalStr += biggest.Item1.Replace("'", "") + "|" + biggest.Item2 + "|" + biggest.Item3 + "|";
                 guilds.Remove(biggest);
                 biggest = null;
             }
@@ -469,7 +493,7 @@ namespace SanaraV2
         /// Get size of the given folder
         /// </summary>
         /// <param name="folder">folder which size need to be calculated</param>
-        /// <returns></returns>
+        /// <returns>the size of the folder</returns>
         private long getLenghtFolder(string folder)
         {
             long currSize = 0;
@@ -500,11 +524,21 @@ namespace SanaraV2
                     commandModules[i] = 0;
                 values.Add("modules", await GetModulesStats());
             }
+            if (lastMonthSent != DateTime.Now.ToString("MM"))
+            {
+                lastHourSent = DateTime.Now.ToString("MM");
+                for (int i = 0; i < 4; i++)
+                    statsMonth[i] = 0;
+            }
             string finalStr = "";
             foreach (int i in commandModules)
                 finalStr += i + "|";
+            string finalStrMonth = "";
+            foreach (int i in statsMonth)
+                finalStrMonth += i + "|";
             values.Add("nbMsgs", commandReceived.ToString());
             values.Add("serverModules", finalStr);
+            values.Add("monthStats", finalStrMonth);
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
 
             try

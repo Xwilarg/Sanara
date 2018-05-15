@@ -46,6 +46,15 @@ namespace SanaraV2
             public abstract string getLink(string tags, int maxNb);
             public abstract string getFileUrl(string json);
             public abstract string getTagInfo(string tag);
+            public abstract BooruId getId();
+        }
+
+        public enum BooruId
+        {
+            Safebooru,
+            Gelbooru,
+            Konachan,
+            Rule34
         }
 
         public class Safebooru : Booru
@@ -74,6 +83,11 @@ namespace SanaraV2
                 {
                     return (wc.DownloadString("https://safebooru.org/index.php?page=dapi&s=tag&q=index&name=" + tag));
                 }
+            }
+
+            public override BooruId getId()
+            {
+                return (BooruId.Safebooru);
             }
         }
 
@@ -108,6 +122,11 @@ namespace SanaraV2
                     return (wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=tag&q=index&name=" + tag));
                 }
             }
+
+            public override BooruId getId()
+            {
+                return (BooruId.Gelbooru);
+            }
         }
 
         public class Konachan : Booru
@@ -136,6 +155,11 @@ namespace SanaraV2
                 {
                     return (wc.DownloadString("https://konachan.com/tag.xml?limit=10000&name=" + tag));
                 }
+            }
+
+            public override BooruId getId()
+            {
+                return (BooruId.Konachan);
             }
         }
 
@@ -170,6 +194,11 @@ namespace SanaraV2
                 {
                     return (wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=tag&q=index&name=" + tag));
                 }
+            }
+
+            public override BooruId getId()
+            {
+                return (BooruId.Rule34);
             }
         }
 
@@ -233,6 +262,7 @@ namespace SanaraV2
                     string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
                     wc.DownloadFile(image, imageName);
                     FileInfo file = new FileInfo(imageName);
+                    p.statsMonth[(int)booru.getId()] += file.Length;
                     if (file.Length >= 8000000)
                         await ReplyAsync(Sentences.fileTooBig);
                     else
@@ -244,6 +274,11 @@ namespace SanaraV2
                     }
                     File.Delete(imageName);
                 }
+                string finalStrModule = "";
+                foreach (long i in p.statsMonth)
+                    finalStrModule += i + "|";
+                finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
+                File.WriteAllText("Saves/CommandModules.dat", finalStrModule + Environment.NewLine + p.lastMonthSent);
             }
         }
 
