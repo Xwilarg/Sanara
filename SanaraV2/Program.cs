@@ -591,7 +591,7 @@ namespace SanaraV2
                     game.CheckCorrect(arg.Content, arg.Author);
             }
             int pos = 0;
-            if (msg.HasMentionPrefix(client.CurrentUser, ref pos))
+            if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || msg.HasStringPrefix("s.", ref pos))
             {
                 var context = new SocketCommandContext(client, msg);
                 DateTime dt = DateTime.UtcNow;
