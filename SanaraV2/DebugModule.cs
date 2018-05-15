@@ -117,7 +117,7 @@ namespace SanaraV2
                 infosDebug += e.ToString().Split(':')[0];
             }
 
-            infosDebug += Environment.NewLine + Environment.NewLine + "**Vndb Module:**" + Environment.NewLine + "Vn: ";
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Vn Module:**" + Environment.NewLine + "Vn: ";
             try
             {
                 if ((await VndbModule.getVn("Sunrider: Mask of Arcadius")).Name == "Sunrider: Mask of Arcadius") infosDebug += "OK";
@@ -128,7 +128,7 @@ namespace SanaraV2
                 infosDebug += e.ToString().Split(':')[0];
             }
 
-            infosDebug += Environment.NewLine + Environment.NewLine + "**Google Shortener Module:**" + Environment.NewLine + "Vn: ";
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Google Shortener Module:**" + Environment.NewLine + "Random URL: ";
             try
             {
                 Tuple<string, string> result = await GoogleShortenerModule.getUrl();

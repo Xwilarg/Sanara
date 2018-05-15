@@ -328,10 +328,10 @@ namespace SanaraV2
 #pragma warning restore CS1998
 
         /// <summary>
-        /// Get usage of modules for the current month
+        /// Get usage of modules for the current month and amount of users by servers
         /// </summary>
         /// <returns></returns>
-        private string GetModulesStats()
+        private async Task<string> GetModulesStats()
         {
             string currDate = DateTime.Now.ToString("yyyyMM");
             List<string> allModules = new List<string>();
@@ -358,6 +358,30 @@ namespace SanaraV2
             string finalStr = "";
             for (int i = 0; i < valuesModules.Length; i++)
                 finalStr += valuesModules[i] + "|";
+            List<Tuple<string, int, int>> guilds = new List<Tuple<string, int, int>>();
+            foreach (IGuild g in client.Guilds)
+            {
+                int users = 0;
+                int bots = 0;
+                foreach (IGuildUser u in await g.GetUsersAsync())
+                {
+                    if (u.IsBot) bots++;
+                    else users++;
+                }
+                guilds.Add(new Tuple<string, int, int>(g.Name, users, bots));
+            }
+            Tuple<string, int, int> biggest = null;
+            while (guilds.Count > 0)
+            {
+                foreach (var tuple in guilds)
+                {
+                    if (biggest == null || tuple.Item2 > biggest.Item2)
+                        biggest = tuple;
+                }
+                finalStr += biggest.Item1 + "|" + biggest.Item2 + "|" + biggest.Item3 + "|";
+                guilds.Remove(biggest);
+                biggest = null;
+            }
             return (finalStr);
         }
 
@@ -444,7 +468,7 @@ namespace SanaraV2
             {
                 lastHourSent = DateTime.Now.ToString("HH");
                 commandReceived = 0;
-                values.Add("modules", GetModulesStats());
+                values.Add("modules", await GetModulesStats());
             }
             values.Add("nbMsgs", commandReceived.ToString());
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
