@@ -61,6 +61,7 @@ namespace SanaraV2
 
         public UrlshortenerService service;
 
+        private List<int> commandModules;
         private int commandReceived;
         private string lastHourSent;
 
@@ -113,6 +114,24 @@ namespace SanaraV2
             }
             else
                 commandReceived = 0;
+
+            commandModules = new List<int>();
+            if (File.Exists("Saves/CommandModules.dat"))
+            {
+                string[] content = File.ReadAllLines("Saves/CommandModules.dat");
+                if (content[1] == lastHourSent)
+                {
+                    string[] mods = content[0].Split('|');
+                    for (int i = 0; i <= (int)Module.Youtube; i++)
+                        commandModules.Add(Convert.ToInt32(mods[i]));
+                }
+                else
+                    for (int i = 0; i <= (int)Module.Youtube; i++)
+                        commandModules.Add(0);
+            }
+            else
+                for (int i = 0; i <= (int)Module.Youtube; i++)
+                    commandModules.Add(0);
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -411,6 +430,15 @@ namespace SanaraV2
         /// <param name="m">The module that was called (see above)</param>
         public void doAction(IUser u, ulong serverId, Module m)
         {
+            if (!u.IsBot)
+            {
+                commandModules[(int)m]++;
+                string finalStr = "";
+                foreach (int i in commandModules)
+                    finalStr += i + "|";
+                finalStr = finalStr.Substring(0, finalStr.Length - 1);
+                File.WriteAllText("Saves/CommandModules.dat", finalStr + Environment.NewLine + lastHourSent);
+            }
             if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM")))
             {
                 Directory.CreateDirectory("Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM"));
@@ -468,9 +496,15 @@ namespace SanaraV2
             {
                 lastHourSent = DateTime.Now.ToString("HH");
                 commandReceived = 0;
+                for (int i = 0; i <= (int)Module.Youtube; i++)
+                    commandModules[i] = 0;
                 values.Add("modules", await GetModulesStats());
             }
+            string finalStr = "";
+            foreach (int i in commandModules)
+                finalStr += i + "|";
             values.Add("nbMsgs", commandReceived.ToString());
+            values.Add("serverModules", finalStr);
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
 
             try
