@@ -145,15 +145,15 @@ namespace SanaraV2
                 if (content[1] == lastMonthSent)
                 {
                     string[] mods = content[0].Split('|');
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 5; i++)
                         statsMonth.Add(Convert.ToInt64(mods[i]));
                 }
                 else
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 5; i++)
                         statsMonth.Add(0);
             }
             else
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                     statsMonth.Add(0);
             #endregion StatsInit
 
@@ -526,8 +526,8 @@ namespace SanaraV2
             }
             if (lastMonthSent != DateTime.Now.ToString("MM"))
             {
-                lastHourSent = DateTime.Now.ToString("MM");
-                for (int i = 0; i < 4; i++)
+                lastMonthSent = DateTime.Now.ToString("MM");
+                for (int i = 0; i < 5; i++)
                     statsMonth[i] = 0;
             }
             string finalStr = "";

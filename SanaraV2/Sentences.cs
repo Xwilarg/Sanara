@@ -39,7 +39,7 @@ namespace SanaraV2
         public static string tagsNotFound(string[] tags)
         {
             if (tags.Length == 1)
-                return ("I didn't find anything with the tag '" + tags + "'.");
+                return ("I didn't find anything with the tag '" + tags[0] + "'.");
             string finalStr = "";
             for (int i = 0; i < tags.Length - 1; i++)
                 finalStr += "'" + tags[i] + "', ";
@@ -134,7 +134,8 @@ namespace SanaraV2
                 "**Safebooru [tags]:** Request a random image from Safebooru (only SFW images)"
                 + ((isChanNsfw) ? (Environment.NewLine + "**Konachan [tags]:** Request a random image from Konachan (only wallpapers)"
                                  + Environment.NewLine + "**Gelbooru [tags]:** Request a random image from Gelbooru (no particular rules)"
-                                 + Environment.NewLine + "**Rule34 [tags]:** Request a random image from Rule34 (mostly weird images)") : ("")));
+                                 + Environment.NewLine + "**Rule34 [tags]:** Request a random image from Rule34 (mostly weird images)"
+                                 + Environment.NewLine + "**E621 [tags]:** Request a random image from E621 (mostly furries)") : ("")));
             embed.AddField("Code Module",
                 "**Indente [code]:** Indente the code given");
             embed.AddField("Communication Module",
