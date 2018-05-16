@@ -346,7 +346,7 @@ namespace SanaraV2
                 foreach (long i in p.statsMonth)
                     finalStrModule += i + "|";
                 finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
-                File.WriteAllText("Saves/CommandModules.dat", finalStrModule + Environment.NewLine + p.lastMonthSent);
+                File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + p.lastMonthSent);
             }
         }
 
