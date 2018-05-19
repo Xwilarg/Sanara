@@ -15,6 +15,7 @@
 
 using Discord;
 using Discord.Commands;
+using System;
 using System.Threading.Tasks;
 
 namespace SanaraV2
@@ -83,6 +84,7 @@ namespace SanaraV2
             if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
             {
                 embed.AddField("Creator", "Zirk#0001", true);
+                embed.AddField("Uptime", Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime)));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
             }
             embed.AddField("Roles", ((roles == "") ? ("Vous n'avez aucun rôle") : (roles)));

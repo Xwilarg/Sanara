@@ -67,6 +67,8 @@ namespace SanaraV2
         private string lastHourSent;
         public string lastMonthSent;
 
+        public DateTime startTime;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -179,6 +181,7 @@ namespace SanaraV2
             client.JoinedGuild += GuildJoin;
 
             await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
+            startTime = DateTime.Now;
             await client.StartAsync();
 
             var task = Task.Run(async () => {
@@ -446,6 +449,23 @@ namespace SanaraV2
             Vn,
             Xkcd,
             Youtube
+        }
+
+        /// <summary>
+        /// Return a string given a TimeSpan
+        /// </summary>
+        /// <param name="ts">The TimeSpan to transform</param>
+        /// <returns>The string wanted</returns>
+        public static string TimeSpanToString(TimeSpan ts)
+        {
+            string finalStr = ts.Seconds + " seconds";
+            if (ts.Days > 0)
+                finalStr = ts.Days + " days, " + ts.Hours + " hours, " + ts.Minutes + " minutes and " + finalStr;
+            else if (ts.Hours > 0)
+                finalStr = ts.Hours + " hours, " + ts.Minutes + " minutes and " + finalStr;
+            else if (ts.Minutes > 0)
+                finalStr = ts.Minutes + " minutes and " + finalStr;
+            return (finalStr);
         }
 
         /// <summary>
