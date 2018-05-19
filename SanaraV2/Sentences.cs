@@ -118,6 +118,11 @@ namespace SanaraV2
         public readonly static string cantDownload = "I'm sorry but I wasn't able to download this song.";
         public static string songSkipped(string songName) { return (songName + " was skipped."); }
 
+
+        /// --------------------------- XKCD ---------------------------
+        public readonly static string xkcdWrongArg = "If you want a specific comic, please give its id.";
+        public static string xkcdWrongId(int max) { return ("The id given must be between 1 and " + max.ToString() + "."); }
+
         /// --------------------------- Help ---------------------------
         private readonly static string noCommandAvailable = "There is no command available for this module";
         public static Embed help(bool isChanNsfw)

@@ -211,6 +211,7 @@
     <Compile Include="Sentences.cs" />
     <Compile Include="SettingsModule.cs" />
     <Compile Include="VndbModule.cs" />
+    <Compile Include="XKCDModule.cs" />
     <Compile Include="YoutubeModule.cs" />
   </ItemGroup>
   <ItemGroup>

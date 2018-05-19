@@ -171,6 +171,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<YoutubeModule>();
             await commands.AddModuleAsync<GoogleShortenerModule>();
             await commands.AddModuleAsync<RadioModule>();
+            await commands.AddModuleAsync<XKCDModule>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -443,6 +444,7 @@ namespace SanaraV2
             Radio,
             Settings,
             Vn,
+            Xkcd,
             Youtube
         }
 
