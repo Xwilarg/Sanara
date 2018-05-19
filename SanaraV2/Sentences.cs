@@ -175,6 +175,8 @@ namespace SanaraV2
             embed.AddField("Settings Module", noCommandAvailable);
             embed.AddField("Visual Novel Module",
                 "**Vn [visual novel]:** Give informations about a visual novel");
+            embed.AddField("Visual Novel Module",
+                "**Xkcd [(optional) comic id]:** Give a random xkcd comic");
             embed.AddField("YouTube Module",
                 "**Youtube [keywords]:** Give a YouTube video given some keywords");
             return (embed.Build());
