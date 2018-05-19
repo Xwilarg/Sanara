@@ -1,3 +1,4 @@
+[<img src="https://discordbots.org/api/widget/owner/329664361016721408.svg"/>](https://discordbots.org/bot/329664361016721408)<br/>
 # Sanara
 
 Sanara is a Discord bot made in C#.
