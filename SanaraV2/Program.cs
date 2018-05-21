@@ -533,7 +533,7 @@ namespace SanaraV2
 
         private async void UpdateStatus()
         {
-            HttpClient client = new HttpClient();
+            HttpClient httpClient = new HttpClient();
             var values = new Dictionary<string, string> {
                            { "token", File.ReadAllLines("Keys/websiteToken.dat")[1] },
                            { "name", "Sanara" }
@@ -545,6 +545,7 @@ namespace SanaraV2
                 for (int i = 0; i <= (int)Module.Youtube; i++)
                     commandModules[i] = 0;
                 values.Add("modules", await GetModulesStats());
+                values.Add("serverCount", client.Guilds.Count.ToString());
             }
             if (lastMonthSent != DateTime.Now.ToString("MM"))
             {
@@ -565,7 +566,7 @@ namespace SanaraV2
 
             try
             {
-                await client.PostAsync(File.ReadAllLines("Keys/websiteToken.dat")[0], content);
+                await httpClient.PostAsync(File.ReadAllLines("Keys/websiteToken.dat")[0], content);
             }
             catch (HttpRequestException)
             { }

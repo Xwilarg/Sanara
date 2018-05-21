@@ -144,7 +144,8 @@ namespace SanaraV2
             embed.AddField("Code Module",
                 "**Indente [code]:** Indente the code given");
             embed.AddField("Communication Module",
-                "**Infos [user]:** Give informations about an user");
+                "**Infos [user]:** Give informations about an user" + Environment.NewLine +
+                "**BotInfos:** Give informations about the bot");
             embed.AddField("Debug Module",
                 "**Print debug:** Give general informations about the bot");
             embed.AddField("Doujinshi Module",

@@ -45,8 +45,8 @@ namespace SanaraV2
             await ReplyAsync(Sentences.whoIAmStr);
         }
 
-        [Command("Infos"), Summary("Give informations about an user")]
-        public async Task InfosUser(params string[] command)
+        [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
+        public async Task Infos(params string[] command)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IGuildUser user;
@@ -61,6 +61,18 @@ namespace SanaraV2
                     return;
                 }
             }
+            await InfosUser(user);
+        }
+
+        [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
+        public async Task BotInfos(params string[] command)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await InfosUser(await Context.Channel.GetUserAsync(Sentences.myId) as IGuildUser);
+        }
+
+        public async Task InfosUser(IGuildUser user)
+        {
             string roles = "";
             foreach (ulong roleId in user.RoleIds)
             {
@@ -86,6 +98,8 @@ namespace SanaraV2
                 embed.AddField("Creator", "Zirk#0001", true);
                 embed.AddField("Uptime", Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime)));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
+                embed.AddField("Website", "https://zirk.eu/sanara.html");
+                embed.AddField("Official Discord", "https://discordapp.com/invite/H6wMRYV");
             }
             embed.AddField("Roles", ((roles == "") ? ("Vous n'avez aucun rôle") : (roles)));
             await ReplyAsync("", false, embed.Build());
