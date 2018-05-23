@@ -58,7 +58,7 @@ namespace SanaraV2
                 if (File.Exists("Saves/Servers/" + m_guild.Id + "/" + fileName))
                     datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/" + fileName);
                 else
-                    datas = new string[] { "0", "0", "0", "0" };
+                    datas = new string[] { "0", "0", "0", "0", "0" };
                 string allUsers = "";
                 if (nbFound > Convert.ToInt32(datas[3]))
                 {
@@ -456,7 +456,7 @@ namespace SanaraV2
 #pragma warning disable CS1998
             public override async void Loose()
             {
-                SaveServerScores(m_booruFound, m_booruAttempt, "kancolle.dat", m_userIds, m_toGuess);
+                SaveServerScores(m_booruFound, m_booruAttempt, "booru.dat", m_userIds, m_toGuess);
             }
 #pragma warning restore CS1998
 
