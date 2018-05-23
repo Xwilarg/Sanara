@@ -32,7 +32,7 @@ namespace SanaraV2
 
         public static readonly int shiritoriTimer = 10;
         public static readonly int kancolleTimer = 10;
-        public static readonly int booruTimer = 30;
+        public static readonly int booruTimer = 45;
 
         public abstract class Game
         {
@@ -448,8 +448,10 @@ namespace SanaraV2
                         await m_chan.SendMessageAsync("You found the right answer.");
                         Post();
                     }
+                    else if (Program.cleanWord(m_toGuess).Contains(Program.cleanWord(userWord)) || Program.cleanWord(userWord).Contains(Program.cleanWord(m_toGuess)))
+                        await m_chan.SendMessageAsync("No, this is not " + userWord + " but you're close to the answer.");
                     else
-                        await m_chan.SendMessageAsync("No, this is not " + userWord);
+                        await m_chan.SendMessageAsync("No, this is not " + userWord + ".");
                 }
             }
 
