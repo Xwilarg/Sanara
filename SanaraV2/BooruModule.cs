@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Discord.Net;
 
 namespace SanaraV2
 {
@@ -345,7 +346,15 @@ namespace SanaraV2
                         await chan.SendMessageAsync(Sentences.fileTooBig);
                     else
                     {
-                        await chan.SendFileAsync(imageName);
+                        while (true)
+                        {
+                            try
+                            {
+                                await chan.SendFileAsync(imageName);
+                                break;
+                            }
+                            catch (RateLimitedException) { }
+                        }
                         if (!isGame)
                         {
                             List<string> finalStr = getTagsInfos(json, booru);
