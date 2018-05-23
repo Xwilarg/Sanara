@@ -30,6 +30,10 @@ namespace SanaraV2
     {
         Program p = Program.p;
 
+        public static readonly int shiritoriTimer = 10;
+        public static readonly int kancolleTimer = 10;
+        public static readonly int booruTimer = 30;
+
         public abstract class Game
         {
             protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime)
@@ -48,6 +52,43 @@ namespace SanaraV2
                 return (m_didLost || m_time != DateTime.MinValue && m_time.AddSeconds(m_refTime).CompareTo(DateTime.Now) == -1);
             }
 
+            protected async void SaveServerScores(int nbFound, int nbAttempt, string fileName, List<ulong> usersId, string answer)
+            {
+                string[] datas;
+                if (File.Exists("Saves/Servers/" + m_guild.Id + "/" + fileName))
+                    datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/" + fileName);
+                else
+                    datas = new string[] { "0", "0", "0", "0" };
+                string allUsers = "";
+                if (nbFound > Convert.ToInt32(datas[3]))
+                {
+                    foreach (ulong u in usersId)
+                    {
+                        allUsers += u.ToString() + "|";
+                    }
+                    if (allUsers != "")
+                        allUsers = allUsers.Substring(0, allUsers.Length - 1);
+                }
+                else
+                {
+                    allUsers = datas[4];
+                }
+                File.WriteAllText("Saves/Servers/" + m_guild.Id + "/" + fileName,
+                    (Convert.ToInt32(datas[0]) + 1).ToString() + Environment.NewLine +
+                    (Convert.ToInt32(datas[1]) + nbAttempt).ToString() + Environment.NewLine +
+                    (Convert.ToInt32(datas[2]) + nbFound).ToString() + Environment.NewLine +
+                    ((nbFound > Convert.ToInt32(datas[3])) ? (nbFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
+                    allUsers);
+                string finalStr = "Time out, the answer was " + answer + "." + Environment.NewLine;
+                if (nbFound > Convert.ToInt32(datas[3]))
+                    finalStr += "Congratulation, you beat the previous best score of " + Convert.ToInt32(datas[3]) + " with a new score of " + nbFound + ".";
+                else if (nbFound == Convert.ToInt32(datas[3]))
+                    finalStr += "You equilized the previous best score of " + nbFound + ".";
+                else
+                    finalStr += "You didn't beat the current best score of " + Convert.ToInt32(datas[3]) + " with the score of " + nbFound + ".";
+                await m_chan.SendMessageAsync(finalStr);
+            }
+
             public abstract void Post();
             public abstract void CheckCorrect(string userWord, IUser user);
             public abstract void Loose();
@@ -63,7 +104,7 @@ namespace SanaraV2
 
         public class Shiritori : Game
         {
-            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, 10)
+            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, shiritoriTimer)
             {
                 m_currWord = null;
                 m_words = File.ReadAllLines("Saves/shiritoriWords.dat").ToList();
@@ -196,7 +237,7 @@ namespace SanaraV2
 
         public class Kancolle : Game
         {
-            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, 10)
+            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, kancolleTimer)
             {
                 using (WebClient w = new WebClient())
                 {
@@ -345,38 +386,12 @@ namespace SanaraV2
                 }
             }
 
+#pragma warning disable CS1998
             public override async void Loose()
             {
-                string[] datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/kancolle.dat");
-                string allUsers = "";
-                if (m_shipFound > Convert.ToInt32(datas[3]))
-                {
-                    foreach (ulong u in m_userIds)
-                    {
-                        allUsers += u.ToString() + "|";
-                    }
-                    if (allUsers != "")
-                        allUsers = allUsers.Substring(0, allUsers.Length - 1);
-                }
-                else
-                {
-                    allUsers = datas[4];
-                }
-                File.WriteAllText("Saves/Servers/" + m_guild.Id + "/kancolle.dat",
-                    (Convert.ToInt32(datas[0]) + 1).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[1]) + m_shipAttempt).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[2]) + m_shipFound).ToString() + Environment.NewLine +
-                    ((m_shipFound > Convert.ToInt32(datas[3])) ? (m_shipFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
-                    allUsers);
-                string finalStr = "Time out, the answer was " + m_toGuess + "." + Environment.NewLine;
-                if (m_shipFound > Convert.ToInt32(datas[3]))
-                    finalStr += "Congratulation, you beat the previous best score of " + Convert.ToInt32(datas[3]) + " with a new score of " + m_shipFound + ".";
-                else if (m_shipFound == Convert.ToInt32(datas[3]))
-                    finalStr += "You equilized the previous best score of " + m_shipFound + ".";
-                else
-                    finalStr += "You didn't beat the current best score of " + Convert.ToInt32(datas[3]) + " with the score of " + m_shipFound + ".";
-                await m_chan.SendMessageAsync(finalStr);
+                SaveServerScores(m_shipFound, m_shipAttempt, "kancolle.dat", m_userIds, m_toGuess);
             }
+#pragma warning restore CS1998
 
             private string m_toGuess;
             private int m_shipAttempt;
@@ -384,6 +399,72 @@ namespace SanaraV2
             private List<ulong> m_userIds;
             private string m_idImage;
             private List<string> m_shipNames;
+        }
+
+        public class BooruGame : Game
+        {
+            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, booruTimer)
+            {
+                m_booruAttempt = 0;
+                m_booruFound = 0;
+                m_userIds = new List<ulong>();
+                m_toGuess = null;
+                m_allTags = new List<string>();
+                string[] allLines = File.ReadAllLines("Saves/BooruTriviaTags.dat");
+                foreach (string line in allLines)
+                {
+                    string[] linePart = line.Split(' ');
+                    if (Convert.ToInt32(linePart[1]) > 3)
+                        m_allTags.Add(linePart[0]);
+                }
+                m_time = DateTime.MinValue;
+            }
+
+#pragma warning disable CS1998
+            public override async void Post()
+            {
+                m_time = DateTime.MinValue;
+                m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
+                string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + m_guild.Id.ToString();
+                BooruModule.getImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "1", false, true);
+                BooruModule.getImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "2", false, true);
+                BooruModule.getImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "3", false, true);
+                m_time = DateTime.Now;
+            }
+#pragma warning restore CS1998
+
+            public override async void CheckCorrect(string userWord, IUser user)
+            {
+                if (m_time == DateTime.MinValue)
+                    await m_chan.SendMessageAsync("Please wait until I posted all images.");
+                else
+                {
+                    m_booruAttempt++;
+                    if (Program.cleanWord(userWord) == Program.cleanWord(m_toGuess))
+                    {
+                        m_booruFound++;
+                        if (!m_userIds.Contains(user.Id))
+                            m_userIds.Add(user.Id);
+                        await m_chan.SendMessageAsync("You found the right answer.");
+                        Post();
+                    }
+                    else
+                        await m_chan.SendMessageAsync("No, this is not " + userWord);
+                }
+            }
+
+#pragma warning disable CS1998
+            public override async void Loose()
+            {
+                SaveServerScores(m_booruFound, m_booruAttempt, "kancolle.dat", m_userIds, m_toGuess);
+            }
+#pragma warning restore CS1998
+
+            private int m_booruAttempt;
+            private int m_booruFound;
+            private List<ulong> m_userIds;
+            private string m_toGuess;
+            private List<string> m_allTags;
         }
 
         [Command("Play"), Summary("Launch a game")]
@@ -397,7 +478,7 @@ namespace SanaraV2
             else
             {
                 string finalGameName = Program.addArgs(gameName);
-                if (finalGameName == null || (finalGameName.ToLower() != "shiritori" && finalGameName.ToLower() != "kancolle"))
+                if (finalGameName == null || (finalGameName.ToLower() != "shiritori" && finalGameName.ToLower() != "kancolle" && finalGameName.ToLower() != "booru"))
                 {
                     await ReplyAsync(Sentences.invalidGameName);
                 }
@@ -415,6 +496,16 @@ namespace SanaraV2
                     {
                         await ReplyAsync(Sentences.rulesKancolle);
                         g = new Kancolle(Context.Channel, Context.Guild, Context.User);
+                    }
+                    else if (finalGameName.ToLower() == "booru")
+                    {
+                        if (!(Context.Channel as ITextChannel).IsNsfw)
+                        {
+                            await ReplyAsync(Sentences.chanIsNotNsfw);
+                            return;
+                        }
+                        await ReplyAsync(Sentences.rulesBooru);
+                        g = new BooruGame(Context.Channel, Context.Guild, Context.User);
                     }
                     p.games.Add(g);
                     g.Post();

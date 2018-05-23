@@ -266,7 +266,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true);
+            getImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true, false);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -274,7 +274,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false);
+            getImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -282,7 +282,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false);
+            getImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
@@ -290,7 +290,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false);
+            getImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
@@ -298,24 +298,34 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
-            getImage(new E621(), tags, Context.Channel as ITextChannel, currName, false);
+            getImage(new E621(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 #pragma warning restore CS1998
 
-        private async void getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw)
+        /// <summary>
+        /// Get an image given various informations
+        /// </summary>
+        /// <param name="booru">Which booru is concerned (see above)</param>
+        /// <param name="tags">Tags that need to be contain on the image</param>
+        /// <param name="chan">Channel the image will be post in</param>
+        /// <param name="currName">Temporary name of the file</param>
+        /// <param name="isSfw">Is the channel safe for work ?</param>
+        /// <param name="isGame">If the request from Game module (doesn't count dl for stats and don't get informations about tags)</param>
+        public static async void getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
         {
             if (!isSfw && !chan.IsNsfw)
             {
                 await chan.SendMessageAsync(Sentences.chanIsNotNsfw);
                 return;
             }
-            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
+            IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
             if (!me.GuildPermissions.AttachFiles)
             {
                 await chan.SendMessageAsync(Sentences.needAttachFile);
                 return;
             }
-            await ReplyAsync(Sentences.prepareImage);
+            if (!isGame)
+                await chan.SendMessageAsync(Sentences.prepareImage);
             string url = getBooruUrl(booru, tags);
             if (url == null)
                 await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
@@ -330,23 +340,29 @@ namespace SanaraV2
                     wc.Headers.Add("User-Agent: Sanara");
                     wc.DownloadFile(image, imageName);
                     FileInfo file = new FileInfo(imageName);
-                    p.statsMonth[(int)booru.getId()] += file.Length;
+                    Program.p.statsMonth[(int)booru.getId()] += file.Length;
                     if (file.Length >= 8000000)
-                        await ReplyAsync(Sentences.fileTooBig);
+                        await chan.SendMessageAsync(Sentences.fileTooBig);
                     else
                     {
                         await chan.SendFileAsync(imageName);
-                        List<string> finalStr = getTagsInfos(json, booru);
-                        foreach (string s in finalStr)
-                            await ReplyAsync(s);
+                        if (!isGame)
+                        {
+                            List<string> finalStr = getTagsInfos(json, booru);
+                            foreach (string s in finalStr)
+                                await chan.SendMessageAsync(s);
+                        }
                     }
                     File.Delete(imageName);
                 }
-                string finalStrModule = "";
-                foreach (long i in p.statsMonth)
-                    finalStrModule += i + "|";
-                finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
-                File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + p.lastMonthSent);
+                if (!isGame)
+                {
+                    string finalStrModule = "";
+                    foreach (long i in Program.p.statsMonth)
+                        finalStrModule += i + "|";
+                    finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
+                    File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + Program.p.lastMonthSent);
+                }
             }
         }
 
@@ -359,7 +375,7 @@ namespace SanaraV2
                 return (booru.getLink(getTags(tags), maxVal));
         }
 
-        private List<string> getTagsInfos(string json, Booru booru)
+        private static List<string> getTagsInfos(string json, Booru booru)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();
@@ -395,7 +411,7 @@ namespace SanaraV2
             return (writeTagsInfos(animeFrom, characs, artists));
         }
 
-        private string fixName(string original)
+        private static string fixName(string original)
         {
             original = Regex.Replace(original, @"\(([^\)]+)\)", "");
             string newName = "";
@@ -414,7 +430,7 @@ namespace SanaraV2
             return newName;
         }
 
-        private List<string> writeTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists)
+        private static List<string> writeTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists)
         {
             List<string> finalMsg = new List<string>();
             for (int i = 0; i < artists.Count; i++)

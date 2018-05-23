@@ -63,6 +63,7 @@ namespace SanaraV2
         public readonly static string rulesShiritori = "I'll give you a word in japanese, for example りゅう (ryuu) and you'll have to find another word beginning by the last syllabe." + Environment.NewLine
             + "(In this example, a word starting by う (u), for example うさぎ (usagi).)";
         public readonly static string rulesKancolle = "I'll post an image of a shipgirl, you have to give her name.";
+        public readonly static string rulesBooru = "I'll post 3 images from Gelbooru, you have to identify the tag they have in common.";
         public readonly static string invalidGameName = "I don't know any game with this name.";
         public readonly static string gameAlreadyrunning = "A game is already running on this channel.";
 
@@ -153,7 +154,8 @@ namespace SanaraV2
                               : (noCommandAvailable)));
             embed.AddField("Game Module",
                 "**Play shiritori:** Play the shiritori game (you need to find a japanese word beginning by the ending of the previous one)" + Environment.NewLine +
-                "**Play kancolle:** Play the KanColle guess game (you need to identify shipgirls by an image)");
+                "**Play kancolle:** Play the KanColle guess game (you need to identify shipgirls by an image)"
+                + ((isChanNsfw) ? (Environment.NewLine + "**Play booru:** Play the booru game (you need to identify tag of Gelbooru images)") : ("")));
             embed.AddField("Google Shortener Module",
                 ((isChanNsfw) ? ("**Random url:** Give a random URL from goo.gl")
                               : (noCommandAvailable)));
