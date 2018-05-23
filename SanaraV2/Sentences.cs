@@ -47,6 +47,7 @@ namespace SanaraV2
         }
         public readonly static string noCorrespondingGuild = "I'm not in any guild with this name.";
         public readonly static string betaFeature = "I'm sorry but this feature is currently in a closed testing phase.";
+        public readonly static string dontPm = "I'm sorry but due to some internal problems I can't answer to command in PM yet.";
 
         /// --------------------------- Communication ---------------------------
         public readonly static string introductionMsg = "Hi, my name is Sanara" + Environment.NewLine + "Nice to meet you everyone!";

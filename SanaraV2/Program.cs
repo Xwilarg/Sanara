@@ -617,6 +617,11 @@ namespace SanaraV2
             if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || msg.HasStringPrefix("s.", ref pos))
             {
                 var context = new SocketCommandContext(client, msg);
+                if (context.Guild == null)
+                {
+                    await context.Channel.SendMessageAsync(Sentences.dontPm);
+                    return;
+                }
                 DateTime dt = DateTime.UtcNow;
                 var result = await commands.ExecuteAsync(context, pos);
                 // Count how many messages the bot receive
