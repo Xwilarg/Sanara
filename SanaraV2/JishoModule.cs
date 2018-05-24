@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Google;
+using Google.Cloud.Translation.V2;
 
 namespace SanaraV2
 {
@@ -87,7 +88,14 @@ namespace SanaraV2
                 newWords.RemoveAt(0);
                 try
                 {
-                    await ReplyAsync(getTranslation(Program.addArgs(newWords.ToArray()), language));
+                    string sourceLanguage;
+                    string translation = getTranslation(Program.addArgs(newWords.ToArray()), language, out sourceLanguage);
+                    if (sourceLanguage == "en") sourceLanguage = "english";
+                    else if (sourceLanguage == "fr") sourceLanguage = "french";
+                    else if (sourceLanguage == "ja") sourceLanguage = "japanese";
+                    else if (sourceLanguage == "es") sourceLanguage = "spanish";
+                    else if (sourceLanguage == "de") sourceLanguage = "german";
+                    await ReplyAsync("From " + sourceLanguage + ":" + Environment.NewLine + "```" + Environment.NewLine + translation + Environment.NewLine + "```");
                 }
                 catch (GoogleApiException)
                 {
@@ -112,9 +120,11 @@ namespace SanaraV2
             }
         }
 
-        public static string getTranslation(string words, string language)
+        public static string getTranslation(string words, string language, out string sourceLanguage)
         {
-            return (Program.p.translationClient.TranslateText(words, language).TranslatedText);
+            TranslationResult translation = Program.p.translationClient.TranslateText(words, language);
+            sourceLanguage = translation.DetectedSourceLanguage;
+            return (translation.TranslatedText);
         }
 
         public static List<string> getAllKanjis(string word)

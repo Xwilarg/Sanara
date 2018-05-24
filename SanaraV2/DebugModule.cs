@@ -70,7 +70,7 @@ namespace SanaraV2
             infosDebug = "**Linguistic Module:**" + Environment.NewLine + "Translation: ";
             try
             {
-                if (LinguistModule.getTranslation("cat", "fr") == "chat") infosDebug += "OK";
+                if (LinguistModule.getTranslation("cat", "fr", out _).Contains("chat")) infosDebug += "OK";
                 else infosDebug += "Error";
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
