@@ -260,7 +260,7 @@ namespace SanaraV2
                                 string per = Program.getElementXml("xt\":\"", str, '"');
                                 if (per != "")
                                 {
-                                    if (finalStr[currI].Length > 1500)
+                                    if (finalStr[currI].Length + per.Length > 1500)
                                     {
                                         currI++;
                                         finalStr.Add("");
@@ -282,7 +282,7 @@ namespace SanaraV2
                                 string per = Program.getElementXml("xt\":\"", str, '"');
                                 if (per != "")
                                 {
-                                    if (finalStr[currI].Length > 1500)
+                                    if (finalStr[currI].Length + per.Length > 1500)
                                     {
                                         currI++;
                                         finalStr.Add("");
@@ -304,7 +304,7 @@ namespace SanaraV2
                                 string per = Program.getElementXml("xt\":\"", str, '"');
                                 if (per != "")
                                 {
-                                    if (finalStr[currI].Length > 1500)
+                                    if (finalStr[currI].Length + per.Length > 1500)
                                     {
                                         currI++;
                                         finalStr.Add("");

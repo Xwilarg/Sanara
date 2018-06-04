@@ -130,9 +130,9 @@ namespace SanaraV2
                         string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                         string[] insideWord = word.Split('$');
                         await m_chan.SendMessageAsync(insideWord[0] + " (" + LinguistModule.fromHiragana(insideWord[0]) + ") - Meaning: " + insideWord[1]);
-                        m_words.Remove(insideWord[0]);
-                        m_currWord = insideWord[0];
+                        m_words.Remove(word);
                         m_alreadySaid.Add(insideWord[0]);
+                        m_currWord = insideWord[0];
                     }
                 }
                 m_time = DateTime.Now;
@@ -204,7 +204,8 @@ namespace SanaraV2
                         return;
                     }
                     m_time = DateTime.MinValue;
-                    m_words.Remove(userWord);
+                    m_words.Remove(m_words.Find(x => x.Split('$')[0] == userWord));
+                    m_alreadySaid.Add(userWord);
                     m_currWord = userWord;
                     Post();
                     m_score++;
