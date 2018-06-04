@@ -36,15 +36,18 @@ namespace SanaraV2
 
         public abstract class Game
         {
-            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime)
+            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName)
             {
                 m_chan = chan;
-                m_score = 0;
                 m_didLost = false;
                 m_refTime = refTime;
                 m_time = DateTime.Now;
                 m_charac = Program.p.relations.Find(x => x._name == charac.Id);
                 m_guild = guild;
+                m_nbAttempt = 0;
+                m_nbFound = 0;
+                m_userIds = new List<ulong>();
+                m_fileName = fileName;
             }
 
             public bool IsGameLost()
@@ -52,17 +55,17 @@ namespace SanaraV2
                 return (m_didLost || m_time != DateTime.MinValue && m_time.AddSeconds(m_refTime).CompareTo(DateTime.Now) == -1);
             }
 
-            protected async void SaveServerScores(int nbFound, int nbAttempt, string fileName, List<ulong> usersId, string answer)
+            protected async void SaveServerScores(string answer)
             {
                 string[] datas;
-                if (File.Exists("Saves/Servers/" + m_guild.Id + "/" + fileName))
-                    datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/" + fileName);
+                if (File.Exists("Saves/Servers/" + m_guild.Id + "/" + m_fileName))
+                    datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/" + m_fileName);
                 else
                     datas = new string[] { "0", "0", "0", "0", "0" };
                 string allUsers = "";
-                if (nbFound > Convert.ToInt32(datas[3]))
+                if (m_nbFound > Convert.ToInt32(datas[3]))
                 {
-                    foreach (ulong u in usersId)
+                    foreach (ulong u in m_userIds)
                     {
                         allUsers += u.ToString() + "|";
                     }
@@ -73,19 +76,19 @@ namespace SanaraV2
                 {
                     allUsers = datas[4];
                 }
-                File.WriteAllText("Saves/Servers/" + m_guild.Id + "/" + fileName,
+                File.WriteAllText("Saves/Servers/" + m_guild.Id + "/" + m_fileName,
                     (Convert.ToInt32(datas[0]) + 1).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[1]) + nbAttempt).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[2]) + nbFound).ToString() + Environment.NewLine +
-                    ((nbFound > Convert.ToInt32(datas[3])) ? (nbFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
+                    (Convert.ToInt32(datas[1]) + m_nbAttempt).ToString() + Environment.NewLine +
+                    (Convert.ToInt32(datas[2]) + m_nbFound).ToString() + Environment.NewLine +
+                    ((m_nbFound > Convert.ToInt32(datas[3])) ? (m_nbFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
                     allUsers);
-                string finalStr = "Time out, the answer was " + answer + "." + Environment.NewLine;
-                if (nbFound > Convert.ToInt32(datas[3]))
-                    finalStr += "Congratulation, you beat the previous best score of " + Convert.ToInt32(datas[3]) + " with a new score of " + nbFound + ".";
-                else if (nbFound == Convert.ToInt32(datas[3]))
-                    finalStr += "You equilized the previous best score of " + nbFound + ".";
+                string finalStr = (answer == null) ? ("") : ("Time out, the answer was " + answer + "." + Environment.NewLine);
+                if (m_nbFound > Convert.ToInt32(datas[3]))
+                    finalStr += "Congratulation, you beat the previous best score of " + Convert.ToInt32(datas[3]) + " with a new score of " + m_nbFound + ".";
+                else if (m_nbFound == Convert.ToInt32(datas[3]))
+                    finalStr += "You equilized the previous best score of " + m_nbFound + ".";
                 else
-                    finalStr += "You didn't beat the current best score of " + Convert.ToInt32(datas[3]) + " with the score of " + nbFound + ".";
+                    finalStr += "You didn't beat the current best score of " + Convert.ToInt32(datas[3]) + " with the score of " + m_nbFound + ".";
                 await m_chan.SendMessageAsync(finalStr);
             }
 
@@ -95,16 +98,21 @@ namespace SanaraV2
 
             public IMessageChannel m_chan { private set; get; }
             protected IGuild m_guild { private set; get; }
-            public int m_score { protected set; get; }
+            //public int m_score { protected set; get; }
             public bool m_didLost { protected set; get; }
             private int m_refTime;
             protected DateTime m_time { set; get; }
             protected Character m_charac { private set; get; }
+
+            protected int m_nbAttempt;
+            protected int m_nbFound;
+            protected List<ulong> m_userIds;
+            protected string m_fileName;
         }
 
         public class Shiritori : Game
         {
-            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, shiritoriTimer)
+            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, shiritoriTimer, "shiritori.dat")
             {
                 m_currWord = null;
                 m_words = File.ReadAllLines("Saves/shiritoriWords.dat").ToList();
@@ -141,16 +149,13 @@ namespace SanaraV2
             //TODO Manage kanjis using Jisho API
             public override async void CheckCorrect(string userWord, IUser user)
             {
-                if (user.Id != m_charac._name)
-                {
-                    await m_chan.SendMessageAsync("I'm sorry but you're not concerned by this game.");
-                }
-                else if (m_time == DateTime.MinValue)
+                if (m_time == DateTime.MinValue)
                 {
                     await m_chan.SendMessageAsync("Please wait until I'm playing.");
                 }
                 else
                 {
+                    m_nbAttempt++;
                     userWord = LinguistModule.fromKatakana(LinguistModule.toHiragana(userWord));
                     foreach (char c in userWord)
                     {
@@ -204,11 +209,13 @@ namespace SanaraV2
                         return;
                     }
                     m_time = DateTime.MinValue;
+                    m_nbFound++;
+                    if (!m_userIds.Contains(user.Id))
+                        m_userIds.Add(user.Id);
                     m_words.Remove(m_words.Find(x => x.Split('$')[0] == userWord));
                     m_alreadySaid.Add(userWord);
                     m_currWord = userWord;
                     Post();
-                    m_score++;
                 }
             }
 
@@ -226,7 +233,7 @@ namespace SanaraV2
                     string[] insideWord = word.Split('$');
                     finalStr += "Here's a word you could have said: " + insideWord[0] + " (" + LinguistModule.fromHiragana(insideWord[0]) + ") - Meaning: " + insideWord[1] + Environment.NewLine;
                 }
-                finalStr += "You did a score of " + m_score + Environment.NewLine;
+                SaveServerScores(null);
                 await m_chan.SendMessageAsync(finalStr);
             }
 
@@ -238,7 +245,7 @@ namespace SanaraV2
 
         public class Kancolle : Game
         {
-            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, kancolleTimer)
+            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, kancolleTimer, "kancolle.dat")
             {
                 using (WebClient w = new WebClient())
                 {
@@ -281,9 +288,6 @@ namespace SanaraV2
                     }
                 }
                 m_toGuess = null;
-                m_shipAttempt = 0;
-                m_shipFound = 0;
-                m_userIds = new List<ulong>();
                 m_idImage = "-1";
             }
 
@@ -322,7 +326,7 @@ namespace SanaraV2
                 }
                 else
                 {
-                    m_shipAttempt++;
+                    m_nbAttempt++;
                     try
                     {
                         bool isSpace = true;
@@ -365,11 +369,11 @@ namespace SanaraV2
                                 if (m_idImage == code)
                                 {
                                     m_time = DateTime.MinValue;
+                                    m_nbFound++;
                                     if (!m_userIds.Contains(user.Id))
                                         m_userIds.Add(user.Id);
                                     await m_chan.SendMessageAsync("Congratulation, you found the right answer!");
                                     Post();
-                                    m_shipFound++;
                                 }
                                 else
                                 {
@@ -390,25 +394,19 @@ namespace SanaraV2
 #pragma warning disable CS1998
             public override async void Loose()
             {
-                SaveServerScores(m_shipFound, m_shipAttempt, "kancolle.dat", m_userIds, m_toGuess);
+                SaveServerScores(m_toGuess);
             }
 #pragma warning restore CS1998
 
             private string m_toGuess;
-            private int m_shipAttempt;
-            private int m_shipFound;
-            private List<ulong> m_userIds;
             private string m_idImage;
             private List<string> m_shipNames;
         }
 
         public class BooruGame : Game
         {
-            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, booruTimer)
+            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, booruTimer, "booru.dat")
             {
-                m_booruAttempt = 0;
-                m_booruFound = 0;
-                m_userIds = new List<ulong>();
                 m_toGuess = null;
                 m_allTags = new List<string>();
                 string[] allLines = File.ReadAllLines("Saves/BooruTriviaTags.dat");
@@ -440,10 +438,10 @@ namespace SanaraV2
                     await m_chan.SendMessageAsync("Please wait until I posted all images.");
                 else
                 {
-                    m_booruAttempt++;
+                    m_nbAttempt++;
                     if (Program.cleanWord(userWord) == Program.cleanWord(m_toGuess))
                     {
-                        m_booruFound++;
+                        m_nbFound++;
                         if (!m_userIds.Contains(user.Id))
                             m_userIds.Add(user.Id);
                         await m_chan.SendMessageAsync("You found the right answer.");
@@ -459,13 +457,10 @@ namespace SanaraV2
 #pragma warning disable CS1998
             public override async void Loose()
             {
-                SaveServerScores(m_booruFound, m_booruAttempt, "booru.dat", m_userIds, m_toGuess);
+                SaveServerScores(m_toGuess);
             }
 #pragma warning restore CS1998
-
-            private int m_booruAttempt;
-            private int m_booruFound;
-            private List<ulong> m_userIds;
+            
             private string m_toGuess;
             private List<string> m_allTags;
         }
