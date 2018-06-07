@@ -69,6 +69,9 @@ namespace SanaraV2
 
         public DateTime startTime;
 
+        public Dictionary<string, List<Sentences.TranslationData>> translations;
+        public Dictionary<ulong, string> guildLanguages;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -159,6 +162,56 @@ namespace SanaraV2
                     statsMonth.Add(0);
             #endregion StatsInit
 
+            #region TranslationIni
+            if (!Directory.Exists("Saves/Translations"))
+            {
+                Directory.CreateDirectory("Saves/Translations");
+            }
+            else if (Directory.Exists("../../Sanara-translations") && Directory.Exists("../../Sanara-translations/Translations"))
+            {
+                DeleteDirContent("Saves/Translations");
+                foreach (string d in Directory.GetDirectories("../../Sanara-translations/Translations"))
+                {
+                    DirectoryInfo di = new DirectoryInfo(d);
+                    File.Copy(d + "/terms.json", "Saves/Translations/" + di.Name + ".json");
+                }
+            }
+            translations = new Dictionary<string, List<Sentences.TranslationData>>();
+            foreach (string f in Directory.GetFiles("Saves/Translations"))
+            {
+                FileInfo fi = new FileInfo(f);
+                string lang = fi.Name.Split('.')[0];
+                string[] content = File.ReadAllLines(f);
+                foreach (string s in content)
+                {
+                    string part1 = "";
+                    string part2 = "";
+                    int partId = 0;
+                    foreach (char c in s)
+                    {
+                        if (c == '"')
+                            partId++;
+                        else
+                        {
+                            if (partId == 1)
+                                part1 += c;
+                            else if (partId == 3)
+                                part2 += c;
+                        }
+                    }
+                    if (part1 != "" && part2 != "")
+                    {
+                        if (!translations.ContainsKey(part1))
+                            translations.Add(part1, new List<Sentences.TranslationData>());
+                        List<Sentences.TranslationData> data = translations[part1];
+                        if (!data.Any(x => x.language == lang))
+                            data.Add(new Sentences.TranslationData(lang, part2));
+                    }
+                }
+            }
+            guildLanguages = new Dictionary<ulong, string>();
+            #endregion TranslationIni
+
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
             await commands.AddModuleAsync<LinguistModule>();
@@ -193,6 +246,17 @@ namespace SanaraV2
             });
 
             await Task.Delay(-1);
+        }
+
+        private void DeleteDirContent(string path)
+        {
+            foreach (string f in Directory.GetFiles(path))
+                File.Delete(f);
+            foreach (string d in Directory.GetDirectories(path))
+            {
+                DeleteDirContent(d);
+                Directory.Delete(d);
+            }
         }
 
         /// <summary>
@@ -336,6 +400,7 @@ namespace SanaraV2
             // Attempt game, attempt ship, ship found, bestScore, ids of people who help to have the best score
             if (!Directory.Exists("Saves/Users"))
                 Directory.CreateDirectory("Saves/Users");
+            guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
             foreach (IUser u in arg.Users)
             {
                 if (!File.Exists("Saves/Users/" + u.Id + ".dat"))

@@ -35,7 +35,7 @@ namespace SanaraV2
         public async Task SayHi()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync(Sentences.hiStr);
+            await ReplyAsync(Sentences.hiStr(Context.Guild.Id));
         }
 
         [Command("Who are you"), Summary("Answer with who she is"), Alias("Who are you ?", "Who are you?")]

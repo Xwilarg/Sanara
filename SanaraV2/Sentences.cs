@@ -15,11 +15,45 @@
 
 using Discord;
 using System;
+using System.IO;
 
 namespace SanaraV2
 {
+
     public static class Sentences
     {
+        public struct TranslationData
+        {
+            public TranslationData(string language, string content)
+            {
+                this.language = language;
+                this.content = content;
+            }
+
+            public string language;
+            public string content;
+        }
+
+        private static string GetTranslation(ulong guildId, string id, params string[] args)
+        {
+            string language = Program.p.guildLanguages[guildId];
+            if (Program.p.translations.ContainsKey(id))
+            {
+                TranslationData value = Program.p.translations[id].Find(x => x.language == language);
+                string elem;
+                if (value.language == null)
+                    elem = Program.p.translations[id].Find(x => x.language == "en").content;
+                else
+                    elem = value.content;
+                for (int i = 0; i < args.Length; i++)
+                {
+                    elem = elem.Replace("{" + i + "}", args[i]);
+                }
+                return (elem);
+            }
+            return ("An error occured in the translation submodule: The id " + id + " doesn't exist.");
+        }
+
         /// --------------------------- ID ---------------------------
         public readonly static ulong idPikyu = 352216646267437059; // Bot that collect informations for statistics
         public readonly static ulong myId = 329664361016721408;
@@ -51,7 +85,7 @@ namespace SanaraV2
 
         /// --------------------------- Communication ---------------------------
         public readonly static string introductionMsg = "Hi, my name is Sanara" + Environment.NewLine + "Nice to meet you everyone!";
-        public readonly static string hiStr = "Hi~";
+        public static string hiStr(ulong guildId) { return GetTranslation(guildId, "hi"); }
         public readonly static string whoIAmStr = "My name is Sanaya Miyuki(差成夜 深雪) but just call me Sanara." + Environment.NewLine
                                                 + "I'll do my best to learn new things to help you.";
         public readonly static string userNotExist = "This user does not exist.";
@@ -73,6 +107,7 @@ namespace SanaraV2
         { return ($"I created the new archive {currTime} to save my datas, thanks!"); }
         public readonly static string doneStr = "Done~";
         public static string copyingFiles = "Please let me some time so I can copy all my files.";
+        public static string needLanguage = "Please specify the language you want me to speak in (fr or en)";
 
         /// --------------------------- Linguist ---------------------------
         public readonly static string toHiraganaHelp = "Please give the word you want me to transcript in hiragana.";
@@ -96,7 +131,6 @@ namespace SanaraV2
 
         /// --------------------------- Code ---------------------------
         public readonly static string indenteHelp = "Please give the code you want to indente.";
-        public readonly static string codeHelp = "Please give the code you want to launch.";
 
         /// --------------------------- MyAnimeList ---------------------------
         public readonly static string mangaHelp = "Please give the manga you want informations about.";
@@ -107,7 +141,6 @@ namespace SanaraV2
         /// --------------------------- Youtube ---------------------------
         public readonly static string youtubeHelp = "Please give the keywords about the video you want.";
         public readonly static string youtubeNotFound = "I didn't find any video with this keyword.";
-        public readonly static string youtubeBadVideo = "The first thing I found wasn't a video.";
 
         /// --------------------------- Radio ---------------------------
         public readonly static string radioAlreadyStarted = "A radio is already started on this guild.";

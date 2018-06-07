@@ -63,6 +63,24 @@ namespace SanaraV2
             }
         }
 
+        [Command("Language"), Summary("Set the language of the bot for this server")]
+        public async Task setLanguage(string language = null)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Sentences.ownerId)
+            {
+                await ReplyAsync(Sentences.onlyMasterStr);
+            }
+            else if (language != "en" && language != "fr")
+                await ReplyAsync(Sentences.needLanguage);
+            else
+            {
+                p.guildLanguages[Context.User.Id] = language;
+                File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", language);
+                await ReplyAsync(Sentences.doneStr);
+            }
+        }
+
         [Command("Leave server"), Summary("Leave the server")]
         public async Task leave(string serverName = null)
         {
