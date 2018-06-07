@@ -28,7 +28,7 @@ namespace SanaraV2
         public async Task help()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync("", false, Sentences.help((Context.Channel as ITextChannel).IsNsfw));
+            await ReplyAsync("", false, Sentences.help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw));
         }
 
         [Command("Hi"), Summary("Answer with hi"), Alias("Hey", "Hello", "Hi!", "Hey!", "Hello!")]

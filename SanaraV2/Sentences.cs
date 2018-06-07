@@ -157,63 +157,35 @@ namespace SanaraV2
         public static string xkcdWrongId(ulong guildId, int max) { return (GetTranslation(guildId, "xkcdWrongId", max.ToString())); }
 
         /// --------------------------- Help ---------------------------
-        private readonly static string noCommandAvailable = "There is no command available for this module";
-        public static Embed help(bool isChanNsfw)
+        private static string noCommandAvailable(ulong guildId) { return (GetTranslation(guildId, "noCommandAvailable")); }
+        public static Embed help(ulong guildId, bool isChanNsfw)
         {
             EmbedBuilder embed = new EmbedBuilder
             {
-                Title = "Help",
+                Title = GetTranslation(guildId, "help"),
                 Color = Color.Purple
             };
-            embed.AddField("Anime/Manga Module",
-                "**Anime [name]:** Give informations about an anime" + Environment.NewLine +
-                "**Manga [code]:** Give informations about a manga");
-            embed.AddField("Booru Module",
-                "**Safebooru [tags]:** Request a random image from Safebooru (only SFW images)"
-                + ((isChanNsfw) ? (Environment.NewLine + "**Konachan [tags]:** Request a random image from Konachan (only wallpapers)"
-                                 + Environment.NewLine + "**Gelbooru [tags]:** Request a random image from Gelbooru (no particular rules)"
-                                 + Environment.NewLine + "**Rule34 [tags]:** Request a random image from Rule34 (mostly weird images)"
-                                 + Environment.NewLine + "**E621 [tags]:** Request a random image from E621 (mostly furries)") : ("")));
-            embed.AddField("Code Module",
-                "**Indente [code]:** Indente the code given");
-            embed.AddField("Communication Module",
-                "**Infos [user]:** Give informations about an user" + Environment.NewLine +
-                "**BotInfos:** Give informations about the bot");
-            embed.AddField("Debug Module",
-                "**Print debug:** Give general informations about the bot");
-            embed.AddField("Doujinshi Module",
-                ((isChanNsfw) ? ("**Doujinshi [tags]:** Request a doujinshi from Nhentai")
-                              : (noCommandAvailable)));
-            embed.AddField("Game Module",
-                "**Play shiritori:** Play the shiritori game (you need to find a japanese word beginning by the ending of the previous one)" + Environment.NewLine +
-                "**Play kancolle:** Play the KanColle guess game (you need to identify shipgirls by an image)"
-                + ((isChanNsfw) ? (Environment.NewLine + "**Play booru:** Play the booru game (you need to identify tag of Gelbooru images)") : ("")));
-            embed.AddField("Google Shortener Module",
-                ((isChanNsfw) ? ("**Random url:** Give a random URL from goo.gl")
-                              : (noCommandAvailable)));
-            embed.AddField("Kantai Collection Module",
-                "**Kancolle [shipgirl]:** Give informations about a shipgirl from KanColle wikia" + Environment.NewLine +
-                "**Drop [shipgirl]:** Give informations about where you can find a shipgirl in Kancolle" + Environment.NewLine +
-                "**Map [world] [level]:** Give informations about a map in Kancolle");
-            embed.AddField("Linguistic Module",
-                "**Hiragana [word]:** Transcript a word to hiragana" + Environment.NewLine +
-                "**Katakana [word]:** Transcript a word to katakana" + Environment.NewLine +
-                "**Romaji [word]:** Transcript a word to romaji" + Environment.NewLine +
-                "**Definition [word]:** Translate a word in both japanese and english" + Environment.NewLine +
-                "**Translation [language] [sentence]:** Translate a sentence in the language given" + Environment.NewLine);
-            embed.AddField("Radio Module",
-                "**Radio launch:** Make the bot join you in a vocal channel" + Environment.NewLine +
-                "**Radio add [YouTube url/keywords]:** Add a song to the playlist" + Environment.NewLine +
-                "**Radio playlist:** Display current playlist" + Environment.NewLine +
-                "**Radio skip:** Skip the song currently played" + Environment.NewLine +
-                "**Radio stop:** Stop the radio and leave the vocal channel");
-            embed.AddField("Settings Module", noCommandAvailable);
-            embed.AddField("Visual Novel Module",
-                "**Vn [visual novel]:** Give informations about a visual novel");
-            embed.AddField("Xkcd Module",
-                "**Xkcd [(optional) comic id]:** Give a random xkcd comic");
-            embed.AddField("YouTube Module",
-                "**Youtube [keywords]:** Give a YouTube video given some keywords");
+            embed.AddField(GetTranslation(guildId, "animeMangaModuleName"), GetTranslation(guildId, "animeMangaModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "booruModuleName"), GetTranslation(guildId, "booruModuleDescription")
+                + ((isChanNsfw) ? (GetTranslation(guildId, "booruModuleDescription2")) : ("")));
+            embed.AddField(GetTranslation(guildId, "codeModuleName"), GetTranslation(guildId, "codeModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "communicationModuleName"), GetTranslation(guildId, "communicationModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "debugModuleName"), GetTranslation(guildId, "debugModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "doujinshiModuleName"),
+                ((isChanNsfw) ? (GetTranslation(guildId, "doujinshiModuleDescription"))
+                              : (noCommandAvailable(guildId))));
+            embed.AddField(GetTranslation(guildId, "gameModuleName"), GetTranslation(guildId, "gameModuleDescription")
+                + ((isChanNsfw) ? (GetTranslation(guildId, "gameModuleDescription2")) : ("")));
+            embed.AddField(GetTranslation(guildId, "googleShortenerModuleName"),
+                ((isChanNsfw) ? (GetTranslation(guildId, "googleShortenerDescription"))
+                              : (noCommandAvailable(guildId))));
+            embed.AddField(GetTranslation(guildId, "kantaiCollectionModuleName"), GetTranslation(guildId, "kantaiCollectionModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "linguisticModuleName"), GetTranslation(guildId, "linguisticModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "radioModuleName"), GetTranslation(guildId, "radioModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "settingsModuleName"), noCommandAvailable(guildId));
+            embed.AddField(GetTranslation(guildId, "visualNovelModuleName"), GetTranslation(guildId, "visualNovelModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "xkcdModuleName"), GetTranslation(guildId, "xkcdModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "youtubeModuleName"), GetTranslation(guildId, "youtubeModuleDescription"));
             return (embed.Build());
         }
     }
