@@ -190,7 +190,7 @@
       <HintPath>..\packages\Validation.2.0.0.12319\lib\portable-windows8+net40+sl5+windowsphone8\Validation.dll</HintPath>
     </Reference>
     <Reference Include="VndbSharp">
-      <HintPath>..\..\Sanara\Sanara\VndbSharp.dll</HintPath>
+      <HintPath>..\SanaraV2\VndbSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
