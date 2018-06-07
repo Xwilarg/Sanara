@@ -191,9 +191,9 @@ namespace SanaraV2
                         await m_chan.SendMessageAsync("This word doesn't exist.");
                         return;
                     }
-                    if (userWord[0] != m_currWord[m_currWord.Length - 1])
+                    if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
                     {
-                        await m_chan.SendMessageAsync("Your word must begin by a " + m_currWord[m_currWord.Length - 1] + " (" + LinguistModule.fromHiragana(m_currWord[m_currWord.Length - 1].ToString()) + ").");
+                        await m_chan.SendMessageAsync("Your word must begin by a " + HiraganaToUpper(m_currWord[m_currWord.Length - 1]) + " (" + LinguistModule.fromHiragana(m_currWord[m_currWord.Length - 1].ToString()) + ").");
                         return;
                     }
                     if (m_alreadySaid.Contains(userWord))
@@ -219,10 +219,20 @@ namespace SanaraV2
                 }
             }
 
+            private char HiraganaToUpper(char current)
+            {
+                if (current == 'ゃ') return ('や');
+                if (current == 'ぃ') return ('い');
+                if (current == 'ゅ') return ('ゆ');
+                if (current == 'ぇ') return ('え');
+                if (current == 'ょ') return ('よ');
+                return (current);
+            }
+
             public override async void Loose() // TODO: Save score
             {
                 string finalStr = "You lost." + Environment.NewLine;
-                string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
+                string[] corrWords = m_words.Where(x => x[0] == HiraganaToUpper(m_currWord[m_currWord.Length - 1])).ToArray();
                 if (corrWords.Length == 0)
                 {
                     finalStr += "To be honest, I didn't know a word to answer too." + Environment.NewLine;
