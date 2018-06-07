@@ -67,17 +67,31 @@ namespace SanaraV2
         public async Task setLanguage(string language = null)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Sentences.ownerId)
+            if (Context.User.Id != Context.Guild.OwnerId)
             {
-                await ReplyAsync(Sentences.onlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Sentences.onlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
-            else if (language != "en" && language != "fr")
-                await ReplyAsync(Sentences.needLanguage);
             else
             {
-                p.guildLanguages[Context.User.Id] = language;
-                File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", language);
-                await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
+                string lang = null;
+                if (p.allLanguages.ContainsKey(language))
+                    lang = language;
+                foreach (var key in p.allLanguages)
+                {
+                    if (key.Value.Contains(language))
+                    {
+                        lang = key.Key;
+                        break;
+                    }
+                }
+                if (lang == null)
+                    await ReplyAsync(Sentences.needLanguage(Context.Guild.Id));
+                else
+                {
+                    p.guildLanguages[Context.Guild.Id] = lang;
+                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", lang);
+                    await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
+                }
             }
         }
 

@@ -71,6 +71,7 @@ namespace SanaraV2
 
         public Dictionary<string, List<Sentences.TranslationData>> translations;
         public Dictionary<ulong, string> guildLanguages;
+        public Dictionary<string, List<string>> allLanguages;
 
         private Program()
         {
@@ -163,6 +164,7 @@ namespace SanaraV2
             #endregion StatsInit
 
             #region TranslationIni
+            allLanguages = new Dictionary<string, List<string>>();
             if (!Directory.Exists("Saves/Translations"))
             {
                 Directory.CreateDirectory("Saves/Translations");
@@ -173,14 +175,15 @@ namespace SanaraV2
                 foreach (string d in Directory.GetDirectories("../../Sanara-translations/Translations"))
                 {
                     DirectoryInfo di = new DirectoryInfo(d);
-                    File.Copy(d + "/terms.json", "Saves/Translations/" + di.Name + ".json");
+                    File.Copy(d + "/terms.json", "Saves/Translations/terms-" + di.Name + ".json");
+                    File.Copy(d + "/infos.json", "Saves/Translations/infos-" + di.Name + ".json");
                 }
             }
             translations = new Dictionary<string, List<Sentences.TranslationData>>();
             foreach (string f in Directory.GetFiles("Saves/Translations"))
             {
                 FileInfo fi = new FileInfo(f);
-                string lang = fi.Name.Split('.')[0];
+                string lang = fi.Name.Split('.')[0].Split('-')[1];
                 string[] content = File.ReadAllLines(f);
                 foreach (string s in content)
                 {
@@ -201,11 +204,20 @@ namespace SanaraV2
                     }
                     if (part1 != "" && part2 != "")
                     {
-                        if (!translations.ContainsKey(part1))
-                            translations.Add(part1, new List<Sentences.TranslationData>());
-                        List<Sentences.TranslationData> data = translations[part1];
-                        if (!data.Any(x => x.language == lang))
-                            data.Add(new Sentences.TranslationData(lang, part2));
+                        if (fi.Name.StartsWith("terms"))
+                        {
+                            if (!translations.ContainsKey(part1))
+                                translations.Add(part1, new List<Sentences.TranslationData>());
+                            List<Sentences.TranslationData> data = translations[part1];
+                            if (!data.Any(x => x.language == lang))
+                                data.Add(new Sentences.TranslationData(lang, part2));
+                        }
+                        else
+                        {
+                            if (!allLanguages.ContainsKey(lang))
+                                allLanguages.Add(lang, new List<string>());
+                            allLanguages[lang].Add(part2);
+                        }
                     }
                 }
             }
@@ -684,7 +696,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Sentences.dontPm((arg.Channel as ITextChannel).GuildId));
+                    await context.Channel.SendMessageAsync(Sentences.dontPm(446053427714326528)); // Workaround because can't get id of null guild
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;

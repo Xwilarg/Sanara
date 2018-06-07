@@ -65,7 +65,8 @@ namespace SanaraV2
         {
             return (GetTranslation(guildId, "introductionError", "<@" + ownerId + ">", userId, userName));
         }
-        public static string onlyMasterStr(ulong guildId) { return (GetTranslation(guildId, "onlyMaster")); }
+        public static string onlyMasterStr(ulong guildId) { return (GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(ownerId).ToString())); }
+        public static string onlyOwnerStr(ulong guildId, ulong guildOwnerId) { return (GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(guildOwnerId).ToString())); }
         public static string needAttachFile(ulong guildId) { return (GetTranslation(guildId, "needAttachFile")); }
         public static string chanIsNotNsfw(ulong guildId) { return (GetTranslation(guildId, "chanIsNotNsfw")); }
         public static string nothingAfterXIterations(ulong guildId, int nbIterations) { return (GetTranslation(guildId, "nothingAfterXIterations", nbIterations.ToString())); }
@@ -105,7 +106,7 @@ namespace SanaraV2
         { return ( GetTranslation(guildId, "createArchive", currTime)); }
         public static string doneStr(ulong guildId) { return (GetTranslation(guildId, "done")); }
         public static string copyingFiles(ulong guildId) { return (GetTranslation(guildId, "copyingFiles")); }
-        public static string needLanguage = "Please specify the language you want me to speak in (fr or en)";
+        public static string needLanguage(ulong guildId) { return (GetTranslation(guildId, "needLanguage")); }
 
         /// --------------------------- Linguist ---------------------------
         public static string toHiraganaHelp(ulong guildId) { return (GetTranslation(guildId, "toHiraganaHelp")); }
