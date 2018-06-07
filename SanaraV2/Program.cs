@@ -73,6 +73,8 @@ namespace SanaraV2
         public Dictionary<ulong, string> guildLanguages;
         public Dictionary<string, List<string>> allLanguages;
 
+        public Dictionary<ulong, string> prefixs;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -223,6 +225,8 @@ namespace SanaraV2
             }
             guildLanguages = new Dictionary<ulong, string>();
             #endregion TranslationIni
+
+            prefixs = new Dictionary<ulong, string>();
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -413,6 +417,7 @@ namespace SanaraV2
             if (!Directory.Exists("Saves/Users"))
                 Directory.CreateDirectory("Saves/Users");
             guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
+            prefixs.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/prefix.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/prefix.dat")) : ("s."));
             foreach (IUser u in arg.Users)
             {
                 if (!File.Exists("Saves/Users/" + u.Id + ".dat"))
@@ -691,7 +696,8 @@ namespace SanaraV2
                     game.CheckCorrect(arg.Content, arg.Author);
             }
             int pos = 0;
-            if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || msg.HasStringPrefix("s.", ref pos))
+            string prefix = prefixs[(arg.Channel as ITextChannel).GuildId];
+            if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
             {
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)

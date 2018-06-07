@@ -107,6 +107,7 @@ namespace SanaraV2
         public static string doneStr(ulong guildId) { return (GetTranslation(guildId, "done")); }
         public static string copyingFiles(ulong guildId) { return (GetTranslation(guildId, "copyingFiles")); }
         public static string needLanguage(ulong guildId) { return (GetTranslation(guildId, "needLanguage")); }
+        public static string prefixRemoved(ulong guildId) { return (GetTranslation(guildId, "prefixRemoved")); }
 
         /// --------------------------- Linguist ---------------------------
         public static string toHiraganaHelp(ulong guildId) { return (GetTranslation(guildId, "toHiraganaHelp")); }
@@ -183,7 +184,7 @@ namespace SanaraV2
             embed.AddField(GetTranslation(guildId, "kantaiCollectionModuleName"), GetTranslation(guildId, "kantaiCollectionModuleDescription"));
             embed.AddField(GetTranslation(guildId, "linguisticModuleName"), GetTranslation(guildId, "linguisticModuleDescription"));
             embed.AddField(GetTranslation(guildId, "radioModuleName"), GetTranslation(guildId, "radioModuleDescription"));
-            embed.AddField(GetTranslation(guildId, "settingsModuleName"), noCommandAvailable(guildId));
+            embed.AddField(GetTranslation(guildId, "settingsModuleName"), GetTranslation(guildId, "settingsModuleName"));
             embed.AddField(GetTranslation(guildId, "visualNovelModuleName"), GetTranslation(guildId, "visualNovelModuleDescription"));
             embed.AddField(GetTranslation(guildId, "xkcdModuleName"), GetTranslation(guildId, "xkcdModuleDescription"));
             embed.AddField(GetTranslation(guildId, "youtubeModuleName"), GetTranslation(guildId, "youtubeModuleDescription"));

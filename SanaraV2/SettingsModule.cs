@@ -64,21 +64,24 @@ namespace SanaraV2
         }
 
         [Command("Language"), Summary("Set the language of the bot for this server")]
-        public async Task setLanguage(string language = null)
+        public async Task setLanguage(params string[] language)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
                 await ReplyAsync(Sentences.onlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
+            else if (language.Length == 0)
+                await ReplyAsync(Sentences.needLanguage(Context.Guild.Id));
             else
             {
+                string nextLanguage = Program.addArgs(language);
                 string lang = null;
-                if (p.allLanguages.ContainsKey(language))
-                    lang = language;
+                if (p.allLanguages.ContainsKey(nextLanguage))
+                    lang = nextLanguage;
                 foreach (var key in p.allLanguages)
                 {
-                    if (key.Value.Contains(language))
+                    if (key.Value.Contains(nextLanguage))
                     {
                         lang = key.Key;
                         break;
@@ -90,6 +93,32 @@ namespace SanaraV2
                 {
                     p.guildLanguages[Context.Guild.Id] = lang;
                     File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", lang);
+                    await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
+                }
+            }
+        }
+
+        [Command("Prefix"), Summary("Set the prefix of the bot for this server")]
+        public async Task setPrefix(params string[] command)
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Context.Guild.OwnerId)
+            {
+                await ReplyAsync(Sentences.onlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            else
+            {
+                if (command.Length == 0)
+                {
+                    p.prefixs[Context.Guild.Id] = "";
+                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", "");
+                    await ReplyAsync(Sentences.prefixRemoved(Context.Guild.Id));
+                }
+                else
+                {
+                    string prefix = Program.addArgs(command);
+                    p.prefixs[Context.Guild.Id] = prefix;
+                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", prefix);
                     await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
                 }
             }
