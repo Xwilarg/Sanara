@@ -165,7 +165,60 @@ namespace SanaraV2
                     statsMonth.Add(0);
             #endregion StatsInit
 
-            #region TranslationIni
+            UpdateLanguageFiles();
+            guildLanguages = new Dictionary<ulong, string>();
+
+            prefixs = new Dictionary<ulong, string>();
+
+            await commands.AddModuleAsync<CommunicationModule>();
+            await commands.AddModuleAsync<SettingsModule>();
+            await commands.AddModuleAsync<LinguistModule>();
+            await commands.AddModuleAsync<KancolleModule>();
+            await commands.AddModuleAsync<DebugModule>();
+            await commands.AddModuleAsync<BooruModule>();
+            await commands.AddModuleAsync<VndbModule>();
+            await commands.AddModuleAsync<NhentaiModule>();
+            await commands.AddModuleAsync<CodeModule>();
+            await commands.AddModuleAsync<MyAnimeListModule>();
+            await commands.AddModuleAsync<GameModule>();
+            await commands.AddModuleAsync<YoutubeModule>();
+            await commands.AddModuleAsync<GoogleShortenerModule>();
+            await commands.AddModuleAsync<RadioModule>();
+            await commands.AddModuleAsync<XKCDModule>();
+
+            client.MessageReceived += HandleCommandAsync;
+            client.GuildAvailable += GuildJoin;
+            client.UserJoined += UserJoin;
+            client.JoinedGuild += GuildJoin;
+
+            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
+            startTime = DateTime.Now;
+            await client.StartAsync();
+
+            var task = Task.Run(async () => {
+                for (;;)
+                {
+                    await Task.Delay(60000);
+                    UpdateStatus();
+                }
+            });
+
+            await Task.Delay(-1);
+        }
+
+        private void DeleteDirContent(string path)
+        {
+            foreach (string f in Directory.GetFiles(path))
+                File.Delete(f);
+            foreach (string d in Directory.GetDirectories(path))
+            {
+                DeleteDirContent(d);
+                Directory.Delete(d);
+            }
+        }
+
+        public void UpdateLanguageFiles()
+        {
             allLanguages = new Dictionary<string, List<string>>();
             if (!Directory.Exists("Saves/Translations"))
             {
@@ -222,56 +275,6 @@ namespace SanaraV2
                         }
                     }
                 }
-            }
-            guildLanguages = new Dictionary<ulong, string>();
-            #endregion TranslationIni
-
-            prefixs = new Dictionary<ulong, string>();
-
-            await commands.AddModuleAsync<CommunicationModule>();
-            await commands.AddModuleAsync<SettingsModule>();
-            await commands.AddModuleAsync<LinguistModule>();
-            await commands.AddModuleAsync<KancolleModule>();
-            await commands.AddModuleAsync<DebugModule>();
-            await commands.AddModuleAsync<BooruModule>();
-            await commands.AddModuleAsync<VndbModule>();
-            await commands.AddModuleAsync<NhentaiModule>();
-            await commands.AddModuleAsync<CodeModule>();
-            await commands.AddModuleAsync<MyAnimeListModule>();
-            await commands.AddModuleAsync<GameModule>();
-            await commands.AddModuleAsync<YoutubeModule>();
-            await commands.AddModuleAsync<GoogleShortenerModule>();
-            await commands.AddModuleAsync<RadioModule>();
-            await commands.AddModuleAsync<XKCDModule>();
-
-            client.MessageReceived += HandleCommandAsync;
-            client.GuildAvailable += GuildJoin;
-            client.UserJoined += UserJoin;
-            client.JoinedGuild += GuildJoin;
-
-            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
-            startTime = DateTime.Now;
-            await client.StartAsync();
-
-            var task = Task.Run(async () => {
-                for (;;)
-                {
-                    await Task.Delay(60000);
-                    UpdateStatus();
-                }
-            });
-
-            await Task.Delay(-1);
-        }
-
-        private void DeleteDirContent(string path)
-        {
-            foreach (string f in Directory.GetFiles(path))
-                File.Delete(f);
-            foreach (string d in Directory.GetDirectories(path))
-            {
-                DeleteDirContent(d);
-                Directory.Delete(d);
             }
         }
 

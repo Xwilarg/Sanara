@@ -124,6 +124,21 @@ namespace SanaraV2
             }
         }
 
+        [Command("Reload language"), Summary("Reload the language files")]
+        public async Task reloadLanguage()
+        {
+            p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Sentences.ownerId)
+            {
+                await ReplyAsync(Sentences.onlyMasterStr(Context.Guild.Id));
+            }
+            else
+            {
+                p.UpdateLanguageFiles();
+                await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
+            }
+        }
+
         [Command("Leave server"), Summary("Leave the server")]
         public async Task leave(string serverName = null)
         {
