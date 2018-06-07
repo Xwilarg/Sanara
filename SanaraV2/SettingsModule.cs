@@ -49,17 +49,17 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != 144851584478740481)
             {
-                await ReplyAsync(Sentences.onlyMasterStr);
+                await ReplyAsync(Sentences.onlyMasterStr(Context.Guild.Id));
             }
             else
             {
-                await ReplyAsync(Sentences.copyingFiles);
+                await ReplyAsync(Sentences.copyingFiles(Context.Guild.Id));
                 if (!Directory.Exists("Archives"))
                     Directory.CreateDirectory("Archives");
                 string currTime = DateTime.UtcNow.ToString("yy-MM-dd-HH-mm-ss");
                 Directory.CreateDirectory("Archives/" + currTime);
                 copyContent("Saves", "Archives/" + currTime);
-                await ReplyAsync(Sentences.createArchiveStr(currTime));
+                await ReplyAsync(Sentences.createArchiveStr(Context.Guild.Id, currTime));
             }
         }
 
@@ -69,7 +69,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Sentences.ownerId)
             {
-                await ReplyAsync(Sentences.onlyMasterStr);
+                await ReplyAsync(Sentences.onlyMasterStr(Context.Guild.Id));
             }
             else if (language != "en" && language != "fr")
                 await ReplyAsync(Sentences.needLanguage);
@@ -77,7 +77,7 @@ namespace SanaraV2
             {
                 p.guildLanguages[Context.User.Id] = language;
                 File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", language);
-                await ReplyAsync(Sentences.doneStr);
+                await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
             }
         }
 
@@ -87,7 +87,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Sentences.ownerId)
             {
-                await ReplyAsync(Sentences.onlyMasterStr);
+                await ReplyAsync(Sentences.onlyMasterStr(Context.Guild.Id));
             }
             else
             {
@@ -97,11 +97,11 @@ namespace SanaraV2
                 {
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper());
                     if (g == null)
-                        await ReplyAsync(Sentences.noCorrespondingGuild);
+                        await ReplyAsync(Sentences.noCorrespondingGuild(Context.Guild.Id));
                     else
                     {
                         await g.LeaveAsync();
-                        await ReplyAsync(Sentences.doneStr);
+                        await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
                     }
                 }
             }

@@ -37,7 +37,7 @@ namespace SanaraV2
         {
             if (words.Length == 0)
             {
-                await chan.SendMessageAsync(Sentences.youtubeHelp);
+                await chan.SendMessageAsync(Sentences.youtubeHelp((chan as ITextChannel).GuildId));
                 return (null);
             }
             var searchListRequest = Program.p.youtubeService.Search.List("snippet");
@@ -46,7 +46,7 @@ namespace SanaraV2
             var searchListResponse = await searchListRequest.ExecuteAsync();
             if (searchListResponse.Items.Count < maxResult)
             {
-                await chan.SendMessageAsync(Sentences.youtubeNotFound);
+                await chan.SendMessageAsync(Sentences.youtubeNotFound((chan as ITextChannel).GuildId));
                 return (null);
             }
             Google.Apis.YouTube.v3.Data.SearchResult sr = searchListResponse.Items[maxResult - 1];

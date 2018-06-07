@@ -28,7 +28,7 @@ namespace SanaraV2
         public async Task help()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-           await ReplyAsync("", false, Sentences.help((Context.Channel as ITextChannel).IsNsfw));
+            await ReplyAsync("", false, Sentences.help((Context.Channel as ITextChannel).IsNsfw));
         }
 
         [Command("Hi"), Summary("Answer with hi"), Alias("Hey", "Hello", "Hi!", "Hey!", "Hello!")]
@@ -42,7 +42,7 @@ namespace SanaraV2
         public async Task WhoAreYou()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync(Sentences.whoIAmStr);
+            await ReplyAsync(Sentences.whoIAmStr(Context.Guild.Id));
         }
 
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
@@ -57,7 +57,7 @@ namespace SanaraV2
                 user = await Program.GetUser(Program.addArgs(command), Context.Guild);
                 if (user == null)
                 {
-                    await ReplyAsync(Sentences.userNotExist);
+                    await ReplyAsync(Sentences.userNotExist(Context.Guild.Id));
                     return;
                 }
             }

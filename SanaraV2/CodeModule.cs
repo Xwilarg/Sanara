@@ -30,7 +30,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Code);
             if (arg.Length == 0)
             {
-                await ReplyAsync(Sentences.indenteHelp);
+                await ReplyAsync(Sentences.indenteHelp(Context.Guild.Id));
                 return;
             }
             List<string> code = new List<string>();

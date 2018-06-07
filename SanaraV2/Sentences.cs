@@ -49,6 +49,7 @@ namespace SanaraV2
                 {
                     elem = elem.Replace("{" + i + "}", args[i]);
                 }
+                elem = elem.Replace("\\n", Environment.NewLine);
                 return (elem);
             }
             return ("An error occured in the translation submodule: The id " + id + " doesn't exist.");
@@ -60,16 +61,15 @@ namespace SanaraV2
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------
-        public static string introductionError(string userId, string userName)
+        public static string introductionError(ulong guildId, string userId, string userName)
         {
-            return $"<@{ownerId}> The user " + userId + " named " + userName + " is corrupted in my database." + Environment.NewLine +
-                                "Please check that manually.";
+            return (GetTranslation(guildId, "introductionError", "<@" + ownerId + ">", userId, userName));
         }
-        public readonly static string onlyMasterStr = "I'm sorry but I only can receive that kind of order from Zirk.";
-        public readonly static string needAttachFile = "I need to be allowed to attach files for this.";
-        public readonly static string chanIsNotNsfw = "I can't take the risk to post NSFW content here. Please ask again in a NSFW channel.";
-        public static string nothingAfterXIterations(int nbIterations) { return ("I didn't find anything after " + nbIterations.ToString() + " iterations."); }
-        public static string tooManyRequests(string apiName) { return ("Seam like I exceed the number of requests on the " + apiName + " API. You should wait a bit before retrying."); }
+        public static string onlyMasterStr(ulong guildId) { return (GetTranslation(guildId, "onlyMaster")); }
+        public static string needAttachFile(ulong guildId) { return (GetTranslation(guildId, "needAttachFile")); }
+        public static string chanIsNotNsfw(ulong guildId) { return (GetTranslation(guildId, "chanIsNotNsfw")); }
+        public static string nothingAfterXIterations(ulong guildId, int nbIterations) { return (GetTranslation(guildId, "nothingAfterXIterations", nbIterations.ToString())); }
+        public static string tooManyRequests(ulong guildId, string apiName) { return (GetTranslation(guildId, "tooManyRequests", apiName)); }
         public static string tagsNotFound(string[] tags)
         {
             if (tags.Length == 1)
@@ -79,84 +79,82 @@ namespace SanaraV2
                 finalStr += "'" + tags[i] + "', ";
             return ("I didn't find anything with the tag '" + finalStr.Substring(0, finalStr.Length - 2) + " and '" + tags[tags.Length - 1] + "'.");
         }
-        public readonly static string noCorrespondingGuild = "I'm not in any guild with this name.";
-        public readonly static string betaFeature = "I'm sorry but this feature is currently in a closed testing phase.";
-        public readonly static string dontPm = "I'm sorry but due to some internal problems I can't answer to command in PM yet.";
+        public static string noCorrespondingGuild(ulong guildId) { return (GetTranslation(guildId, "noCorrespondingGuild")); }
+        public static string betaFeature(ulong guildId) { return (GetTranslation(guildId, "betaFeature")); }
+        public static string dontPm(ulong guildId) { return (GetTranslation(guildId, "dontPm")); }
 
         /// --------------------------- Communication ---------------------------
-        public readonly static string introductionMsg = "Hi, my name is Sanara" + Environment.NewLine + "Nice to meet you everyone!";
-        public static string hiStr(ulong guildId) { return GetTranslation(guildId, "hi"); }
-        public readonly static string whoIAmStr = "My name is Sanaya Miyuki(差成夜 深雪) but just call me Sanara." + Environment.NewLine
-                                                + "I'll do my best to learn new things to help you.";
-        public readonly static string userNotExist = "This user does not exist.";
+        public static string introductionMsg(ulong guildId) { return (GetTranslation(guildId, "introductionMsg")); }
+        public static string hiStr(ulong guildId) { return (GetTranslation(guildId, "hi")); }
+        public static string whoIAmStr(ulong guildId) { return (GetTranslation(guildId, "whoIAm")); }
+        public static string userNotExist(ulong guildId) { return (GetTranslation(guildId, "userNotExist")); }
 
         /// --------------------------- Booru ---------------------------
-        public readonly static string fileTooBig = "I wasn't able to post the file I found since it was bigger than 8 MB.";
-        public readonly static string prepareImage = "Please wait while I'm looking for what you requested.";
+        public static string fileTooBig(ulong guildId) { return (GetTranslation(guildId, "fileTooBig")); }
+        public static string prepareImage(ulong guildId) { return (GetTranslation(guildId, "prepareImage")); }
 
         /// --------------------------- Games ---------------------------
-        public readonly static string rulesShiritori = "I'll give you a word in japanese, for example りゅう (ryuu) and you'll have to find another word beginning by the last syllabe." + Environment.NewLine
-            + "(In this example, a word starting by う (u), for example うさぎ (usagi).)";
-        public readonly static string rulesKancolle = "I'll post an image of a shipgirl, you have to give her name.";
-        public readonly static string rulesBooru = "I'll post 3 images from Gelbooru, you have to identify the tag they have in common.";
-        public readonly static string invalidGameName = "I don't know any game with this name.";
-        public readonly static string gameAlreadyrunning = "A game is already running on this channel.";
+        public static string rulesShiritori(ulong guildId) { return (GetTranslation(guildId, "rulesShiritori")); }
+        public static string rulesKancolle(ulong guildId) { return (GetTranslation(guildId, "rulesKancolle")); }
+        public static string rulesBooru(ulong guildId) { return (GetTranslation(guildId, "rulesBooru")); }
+        public static string invalidGameName(ulong guildId) { return (GetTranslation(guildId, "invalidGameName")); }
+        public static string gameAlreadyRunning(ulong guildId) { return (GetTranslation(guildId, "gameAlreadyRunning")); }
 
         /// --------------------------- Settings ---------------------------
-        public static string createArchiveStr(string currTime)
-        { return ($"I created the new archive {currTime} to save my datas, thanks!"); }
-        public readonly static string doneStr = "Done~";
-        public static string copyingFiles = "Please let me some time so I can copy all my files.";
+        public static string createArchiveStr(ulong guildId, string currTime)
+        { return ( GetTranslation(guildId, "createArchive", currTime)); }
+        public static string doneStr(ulong guildId) { return (GetTranslation(guildId, "done")); }
+        public static string copyingFiles(ulong guildId) { return (GetTranslation(guildId, "copyingFiles")); }
         public static string needLanguage = "Please specify the language you want me to speak in (fr or en)";
 
         /// --------------------------- Linguist ---------------------------
-        public readonly static string toHiraganaHelp = "Please give the word you want me to transcript in hiragana.";
-        public readonly static string toRomajiHelp = "Please give the word you want me to transcript in romaji.";
-        public readonly static string toKatakanaHelp = "Please give the word you want me to transcript in katakana.";
-        public readonly static string japaneseHelp = "Please give the word you want me to translate.";
-        public readonly static string translateHelp = "Please give the language you want me to translate in followed by a sentence.";
-        public readonly static string invalidLanguage = "I don't know the language you gave.";
+        public static string toHiraganaHelp(ulong guildId) { return (GetTranslation(guildId, "toHiraganaHelp")); }
+        public static string toRomajiHelp(ulong guildId) { return (GetTranslation(guildId, "toRomajiHelp")); }
+        public static string toKatakanaHelp(ulong guildId) { return (GetTranslation(guildId, "toKatakanaHelp")); }
+        public static string japaneseHelp(ulong guildId) { return (GetTranslation(guildId, "japaneseHelp")); }
+        public static string translateHelp(ulong guildId) { return (GetTranslation(guildId, "translateHelp")); }
+        public static string invalidLanguage(ulong guildId) { return (GetTranslation(guildId, "invalidLanguage")); }
 
         /// --------------------------- KanColle---------------------------
-        public readonly static string kancolleHelp = "Please give the shipgirl you want informations about.";
-        public readonly static string shipgirlDontExist = "I didn't find any shipgirl with this name.";
-        public readonly static string dontDropOnMaps = "You can't drop this ship on maps.";
-        public readonly static string shipNotReferencedMap = "There is no data available for ship drop.";
-        public readonly static string shipNotReferencedConstruction = "There is no data available for ship construction.";
-        public readonly static string mapHelp = "You must give the number of the world then the number of the level.";
+        public static string kancolleHelp(ulong guildId) { return (GetTranslation(guildId, "kancolleHelp")); }
+        public static string shipgirlDontExist(ulong guildId) { return (GetTranslation(guildId, "shipgirlDontExist")); }
+        public static string dontDropOnMaps(ulong guildId) { return (GetTranslation(guildId, "dontDropOnMaps")); }
+        public static string shipNotReferencedMap(ulong guildId) { return (GetTranslation(guildId, "shipNotReferencedMap")); }
+        public static string shipNotReferencedConstruction(ulong guildId) { return (GetTranslation(guildId, "shipNotReferencedConstruction")); }
+        public static string mapHelp(ulong guildId) { return (GetTranslation(guildId, "mapHelp")); }
 
         /// --------------------------- VNDB ---------------------------
-        public readonly static string vndbHelp = "Please give the visual novel you want informations about.";
-        public readonly static string vndbNotFound = "I didn't find any visual novel with this name.";
+        public static string vndbHelp(ulong guildId) { return (GetTranslation(guildId, "vndbHelp")); }
+        public static string vndbNotFound(ulong guildId) { return (GetTranslation(guildId, "vndbNotFound")); }
 
         /// --------------------------- Code ---------------------------
-        public readonly static string indenteHelp = "Please give the code you want to indente.";
+        public static string indenteHelp(ulong guildId) { return (GetTranslation(guildId, "indenteHelp")); }
 
         /// --------------------------- MyAnimeList ---------------------------
-        public readonly static string mangaHelp = "Please give the manga you want informations about.";
-        public readonly static string animeHelp = "Please give the anime you want informations about.";
-        public readonly static string mangaNotFound = "I didn't find any manga with this name.";
-        public readonly static string animeNotFound = "I didn't find any anime with this name.";
+        public static string mangaHelp(ulong guildId) { return (GetTranslation(guildId, "mangaHelp")); }
+        public static string animeHelp(ulong guildId) { return (GetTranslation(guildId, "animeHelp")); }
+        public static string mangaNotFound(ulong guildId) { return (GetTranslation(guildId, "mangaNotFound")); }
+        public static string animeNotFound(ulong guildId) { return (GetTranslation(guildId, "animeNotFound")); }
 
         /// --------------------------- Youtube ---------------------------
-        public readonly static string youtubeHelp = "Please give the keywords about the video you want.";
-        public readonly static string youtubeNotFound = "I didn't find any video with this keyword.";
+        public static string youtubeHelp(ulong guildId) { return (GetTranslation(guildId, "youtubeHelp")); }
+        public static string youtubeNotFound(ulong guildId) { return (GetTranslation(guildId, "youtubeNotFound")); }
 
         /// --------------------------- Radio ---------------------------
-        public readonly static string radioAlreadyStarted = "A radio is already started on this guild.";
-        public readonly static string radioNeedChannel = "Please join a voice channel.";
-        public readonly static string radioNeedArg = "Please give the keywords about the song you want.";
-        public readonly static string radioNotStarted = "The radio isn't start.";
-        public readonly static string radioAlreadyInList = "This song is already in the playlist.";
-        public readonly static string radioTooMany = "There can't be more than 10 songs in the playlist.";
-        public readonly static string radioNoSong = "There is currently no song playing.";
-        public readonly static string cantDownload = "I'm sorry but I wasn't able to download this song.";
-        public static string songSkipped(string songName) { return (songName + " was skipped."); }
+        public static string radioAlreadyStarted(ulong guildId) { return (GetTranslation(guildId, "radioAlreadyStarted")); }
+        public static string radioNeedChannel(ulong guildId) { return (GetTranslation(guildId, "radioNeedChannel")); }
+        public static string radioNeedArg(ulong guildId) { return (GetTranslation(guildId, "radioNeedArg")); }
+        public static string radioNotStarted(ulong guildId) { return (GetTranslation(guildId, "radioNotStarted")); }
+        public static string radioAlreadyInList(ulong guildId) { return (GetTranslation(guildId, "radioAlreadyInList")); }
+        public static string radioTooMany(ulong guildId) { return (GetTranslation(guildId, "radioTooMany")); }
+        public static string radioNoSong(ulong guildId) { return (GetTranslation(guildId, "radioNoSong")); }
+        public static string cantDownload(ulong guildId) { return (GetTranslation(guildId, "cantDownload")); }
+        public static string songSkipped(ulong guildId, string songName) { return (GetTranslation(guildId, "songSkipped", songName)); }
 
 
         /// --------------------------- XKCD ---------------------------
-        public readonly static string xkcdWrongArg = "If you want a specific comic, please give its id.";
-        public static string xkcdWrongId(int max) { return ("The id given must be between 1 and " + max.ToString() + "."); }
+        public static string xkcdWrongArg(ulong guildId) { return (GetTranslation(guildId, "xkcdWrongArg")); }
+        public static string xkcdWrongId(ulong guildId, int max) { return (GetTranslation(guildId, "xkcdWrongId", max.ToString())); }
 
         /// --------------------------- Help ---------------------------
         private readonly static string noCommandAvailable = "There is no command available for this module";

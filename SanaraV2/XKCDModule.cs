@@ -23,12 +23,12 @@ namespace SanaraV2
                 }
                 catch (FormatException)
                 {
-                    await ReplyAsync(Sentences.xkcdWrongArg);
+                    await ReplyAsync(Sentences.xkcdWrongArg(Context.Guild.Id));
                     return;
                 }
                 catch (OverflowException)
                 {
-                    await ReplyAsync(Sentences.xkcdWrongArg);
+                    await ReplyAsync(Sentences.xkcdWrongArg(Context.Guild.Id));
                     return;
                 }
             }
@@ -43,7 +43,7 @@ namespace SanaraV2
                 {
                     if (myNb < 1 || myNb > nbMax)
                     {
-                        await ReplyAsync(Sentences.xkcdWrongId(nbMax));
+                        await ReplyAsync(Sentences.xkcdWrongId(Context.Guild.Id, nbMax));
                         return;
                     }
                     nb = (int)myNb;

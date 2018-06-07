@@ -34,7 +34,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.chanIsNotNsfw);
+                await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
                 return;
             }
             string tags = "";

@@ -38,7 +38,7 @@ namespace SanaraV2
                 || mapName[0][0] <= '0' || mapName[0][0] > '6' || mapName[1][0] <= '0' || mapName[1][0] > '6'
                 || (mapName[0][0] != '1' && mapName[1][0] == '6'))
             {
-                await ReplyAsync(Sentences.mapHelp);
+                await ReplyAsync(Sentences.mapHelp(Context.Guild.Id));
                 return;
             }
             using (WebClient wc = new WebClient())
@@ -81,7 +81,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             if (shipNameArr.Length == 0)
             {
-                await ReplyAsync(Sentences.kancolleHelp);
+                await ReplyAsync(Sentences.kancolleHelp(Context.Guild.Id));
                 return;
             }
             string shipName = Program.cleanWord(Program.addArgs(shipNameArr));
@@ -94,7 +94,7 @@ namespace SanaraV2
                 string shipContain = allShipsName.Find(x => Program.cleanWord(Program.getElementXml("\">", x, '<')) == shipName);
                 if (shipContain == null)
                 {
-                    await ReplyAsync(Sentences.shipgirlDontExist);
+                    await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                     return;
                 }
                 shipName = Program.getElementXml("<td>", shipContain, '<');
@@ -105,7 +105,7 @@ namespace SanaraV2
                 string shipgirl = shipgirls.ToList().Find(x => x.Contains(shipName));
                 string finalStr = "";
                 if (shipgirl == null)
-                    await ReplyAsync(Sentences.shipNotReferencedMap);
+                    await ReplyAsync(Sentences.shipNotReferencedMap(Context.Guild.Id));
                 else
                 {
                     string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
@@ -154,7 +154,7 @@ namespace SanaraV2
                         await ReplyAsync("Rarity: " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
                     else
-                        await ReplyAsync(Sentences.dontDropOnMaps);
+                        await ReplyAsync(Sentences.dontDropOnMaps(Context.Guild.Id));
                 }
                 wc.Headers.Add("User-Agent: Sanara");
                 html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLogList");
@@ -166,7 +166,7 @@ namespace SanaraV2
                 string[] htmlSplit = html.Split(new string[] { shipName }, StringSplitOptions.None);
                 if (htmlSplit.Length == 1)
                 {
-                    await ReplyAsync(Sentences.shipNotReferencedConstruction);
+                    await ReplyAsync(Sentences.shipNotReferencedConstruction(Context.Guild.Id));
                     return;
                 }
                 string[] allIds = htmlSplit[htmlSplit.Length - 2].Split(new string[] { "\",\"" }, StringSplitOptions.None);
@@ -192,7 +192,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             if (shipNameArr.Length == 0)
             {
-                await ReplyAsync(Sentences.kancolleHelp);
+                await ReplyAsync(Sentences.kancolleHelp(Context.Guild.Id));
                 return;
             }
             string shipName = Program.addArgs(shipNameArr);
@@ -213,14 +213,14 @@ namespace SanaraV2
                     string image = Program.getElementXml("\"thumbnail\":\"", json, '"');
                     if (Program.getElementXml("\"title\":\"", json, '"').ToUpper() != shipName.ToUpper())
                     {
-                        await ReplyAsync(Sentences.shipgirlDontExist);
+                        await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                         return;
                     }
                     url = "http://kancolle.wikia.com/wiki/" + Program.getElementXml("\"title\":\"", json, '"') + "?action=raw";
                     json = w.DownloadString(url);
                     if (Program.getElementXml("{{", json, '}') != "ShipPageHeader" && Program.getElementXml("{{", json, '}') != "Ship/Header")
                     {
-                        await ReplyAsync(Sentences.shipgirlDontExist);
+                        await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                         return;
                     }
                     int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
@@ -333,7 +333,7 @@ namespace SanaraV2
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
                 if (code.StatusCode == HttpStatusCode.NotFound)
-                    await ReplyAsync(Sentences.shipgirlDontExist);
+                    await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
             }
         }
     }

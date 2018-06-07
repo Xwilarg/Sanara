@@ -32,14 +32,14 @@ namespace SanaraV2
             string animeName = Program.addArgs(animeNameArr);
             if (animeName.Length == 0)
             {
-                await ReplyAsync(Sentences.animeHelp);
+                await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
                 return;
             }
             try
             {
                 string result = p.malClient.DownloadString("https://myanimelist.net/api/anime/search.xml?q=" + animeName.Replace(" ", "%20"));
                 if (!result.Contains("<entry>"))
-                    await ReplyAsync(Sentences.animeNotFound);
+                    await ReplyAsync(Sentences.animeNotFound(Context.Guild.Id));
                 else
                 {
                     EmbedBuilder b = parseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw);
@@ -52,7 +52,7 @@ namespace SanaraV2
                 if (code != null)
                 {
                     if (code.StatusCode == HttpStatusCode.Forbidden)
-                        await ReplyAsync(Sentences.tooManyRequests("MyAnimeList"));
+                        await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "MyAnimeList"));
                 }
                 else
                     await ReplyAsync("An unexpected error occured: " + ex.Message);
@@ -66,19 +66,19 @@ namespace SanaraV2
             string mangaName = Program.addArgs(mangaNameArr);
             if (mangaName.Length == 0)
             {
-                await ReplyAsync(Sentences.animeHelp);
+                await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
                 return;
             }
             try
             {
                 string result = p.malClient.DownloadString("https://myanimelist.net/api/manga/search.xml?q=" + mangaName.Replace(" ", "%20"));
                 if (!result.Contains("<entry>"))
-                    await ReplyAsync(Sentences.mangaNotFound);
+                    await ReplyAsync(Sentences.mangaNotFound(Context.Guild.Id));
                 else
                 {
                     EmbedBuilder b = parseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw);
                     if (b == null)
-                        await ReplyAsync(Sentences.chanIsNotNsfw);
+                        await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
                     else
                         await ReplyAsync("", false, b.Build());
                 }
@@ -87,7 +87,7 @@ namespace SanaraV2
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
                 if (code.StatusCode == HttpStatusCode.Forbidden)
-                    await ReplyAsync(Sentences.tooManyRequests("MyAnimeList"));
+                    await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "MyAnimeList"));
             }
         }
 

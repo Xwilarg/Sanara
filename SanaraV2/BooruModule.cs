@@ -316,17 +316,17 @@ namespace SanaraV2
         {
             if (!isSfw && !chan.IsNsfw)
             {
-                await chan.SendMessageAsync(Sentences.chanIsNotNsfw);
+                await chan.SendMessageAsync(Sentences.chanIsNotNsfw(chan.GuildId));
                 return;
             }
             IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
             if (!me.GuildPermissions.AttachFiles)
             {
-                await chan.SendMessageAsync(Sentences.needAttachFile);
+                await chan.SendMessageAsync(Sentences.needAttachFile(chan.GuildId));
                 return;
             }
             if (!isGame)
-                await chan.SendMessageAsync(Sentences.prepareImage);
+                await chan.SendMessageAsync(Sentences.prepareImage(chan.GuildId));
             string url = getBooruUrl(booru, tags);
             if (url == null)
                 await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
@@ -343,7 +343,7 @@ namespace SanaraV2
                     FileInfo file = new FileInfo(imageName);
                     Program.p.statsMonth[(int)booru.getId()] += file.Length;
                     if (file.Length >= 8000000)
-                        await chan.SendMessageAsync(Sentences.fileTooBig);
+                        await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
                     else
                     {
                         while (true)

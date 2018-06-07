@@ -393,7 +393,7 @@ namespace SanaraV2
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-                await chan.SendMessageAsync(Sentences.introductionMsg);
+                await chan.SendMessageAsync(Sentences.introductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
@@ -421,7 +421,7 @@ namespace SanaraV2
                     {
                         if (arg.Id.ToString() == File.ReadAllLines("Saves/sanaraDatas.dat")[2])
                         {
-                            await chan.SendMessageAsync(Sentences.introductionError(u.Id.ToString(), u.Username));
+                            await chan.SendMessageAsync(Sentences.introductionError(arg.Id, u.Id.ToString(), u.Username));
                         }
                     }
                 }
@@ -684,7 +684,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Sentences.dontPm);
+                    await context.Channel.SendMessageAsync(Sentences.dontPm((arg.Channel as ITextChannel).GuildId));
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;

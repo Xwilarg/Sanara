@@ -37,13 +37,13 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Vn);
             if (vns.Length == 0)
             {
-                await ReplyAsync(Sentences.vndbHelp);
+                await ReplyAsync(Sentences.vndbHelp(Context.Guild.Id));
                 return;
             }
             VisualNovel vn = await getVn(Program.addArgs(vns));
             if (vn == null || !Program.cleanWord(vn.Name).Contains(Program.cleanWord(Program.addArgs(vns))))
             {
-                await ReplyAsync(Sentences.vndbNotFound);
+                await ReplyAsync(Sentences.vndbNotFound(Context.Guild.Id));
                 return;
             }
             List<string> tmpDesc = vn.Description.Split('\n').ToList();

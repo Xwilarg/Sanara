@@ -34,7 +34,7 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
             if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.chanIsNotNsfw);
+                await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
             }
             else
             {
@@ -47,12 +47,12 @@ namespace SanaraV2
                 {
                     if (ex.HttpStatusCode == HttpStatusCode.Forbidden)
                     {
-                        await ReplyAsync(Sentences.tooManyRequests("goo.gl"));
+                        await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "goo.gl"));
                         return;
                     }
                 }
                 if (result == null)
-                    await ReplyAsync(Sentences.nothingAfterXIterations(500));
+                    await ReplyAsync(Sentences.nothingAfterXIterations(Context.Guild.Id, 500));
                 else
                 {
                     await ReplyAsync("I found something, here is the short URL: " + result.Item1 + Environment.NewLine

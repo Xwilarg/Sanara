@@ -471,14 +471,14 @@ namespace SanaraV2
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Game);
             if (p.games.Any(x => x.m_chan == Context.Channel))
             {
-                await ReplyAsync(Sentences.gameAlreadyrunning);
+                await ReplyAsync(Sentences.gameAlreadyRunning(Context.Guild.Id));
             }
             else
             {
                 string finalGameName = Program.addArgs(gameName);
                 if (finalGameName == null || (finalGameName.ToLower() != "shiritori" && finalGameName.ToLower() != "kancolle" && finalGameName.ToLower() != "booru"))
                 {
-                    await ReplyAsync(Sentences.invalidGameName);
+                    await ReplyAsync(Sentences.invalidGameName(Context.Guild.Id));
                 }
                 else
                 {
@@ -487,22 +487,22 @@ namespace SanaraV2
                     Game g = null;
                     if (finalGameName.ToLower() == "shiritori")
                     {
-                        await ReplyAsync(Sentences.rulesShiritori);
+                        await ReplyAsync(Sentences.rulesShiritori(Context.Guild.Id));
                         g = new Shiritori(Context.Channel, Context.Guild, Context.User);
                     }
                     else if (finalGameName.ToLower() == "kancolle")
                     {
-                        await ReplyAsync(Sentences.rulesKancolle);
+                        await ReplyAsync(Sentences.rulesKancolle(Context.Guild.Id));
                         g = new Kancolle(Context.Channel, Context.Guild, Context.User);
                     }
                     else if (finalGameName.ToLower() == "booru")
                     {
                         if (!(Context.Channel as ITextChannel).IsNsfw)
                         {
-                            await ReplyAsync(Sentences.chanIsNotNsfw);
+                            await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
                             return;
                         }
-                        await ReplyAsync(Sentences.rulesBooru);
+                        await ReplyAsync(Sentences.rulesBooru(Context.Guild.Id));
                         g = new BooruGame(Context.Channel, Context.Guild, Context.User);
                     }
                     p.games.Add(g);

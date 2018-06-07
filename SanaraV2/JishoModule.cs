@@ -33,7 +33,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toHiraganaHelp);
+                await ReplyAsync(Sentences.toHiraganaHelp(Context.Guild.Id));
             else
                 await ReplyAsync(toHiragana(fromKatakana(Program.addArgs(word))));
         }
@@ -43,7 +43,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toRomajiHelp);
+                await ReplyAsync(Sentences.toRomajiHelp(Context.Guild.Id));
             else
                 await ReplyAsync(fromKatakana(fromHiragana(Program.addArgs(word))));
         }
@@ -53,7 +53,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toKatakanaHelp);
+                await ReplyAsync(Sentences.toKatakanaHelp(Context.Guild.Id));
             else
                 await ReplyAsync(toKatakana(fromHiragana(Program.addArgs(word))));
         }
@@ -63,7 +63,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (words.Length < 2)
-                await ReplyAsync(Sentences.translateHelp);
+                await ReplyAsync(Sentences.translateHelp(Context.Guild.Id));
             else
             {
                 string language;
@@ -81,7 +81,7 @@ namespace SanaraV2
                     language = "de";
                 else
                 {
-                    await ReplyAsync(Sentences.invalidLanguage);
+                    await ReplyAsync(Sentences.invalidLanguage(Context.Guild.Id));
                     return;
                 }
                 List<string> newWords = words.ToList();
@@ -99,7 +99,7 @@ namespace SanaraV2
                 }
                 catch (GoogleApiException)
                 {
-                    await ReplyAsync(Sentences.invalidLanguage);
+                    await ReplyAsync(Sentences.invalidLanguage(Context.Guild.Id));
                     return;
                 }
             }
@@ -110,7 +110,7 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.japaneseHelp);
+                await ReplyAsync(Sentences.japaneseHelp(Context.Guild.Id));
             else
             {
                 foreach (string s in getAllKanjis(Program.addArgs(word)))
