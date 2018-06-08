@@ -125,6 +125,8 @@ namespace SanaraV2
                 {
                     m_currWord = "しりとり";
                     await m_chan.SendMessageAsync("しりとり (shiritori)");
+                    m_words.Remove(m_words.Find(x => x.Split('$')[0] == m_currWord));
+                    m_alreadySaid.Add(m_currWord);
                 }
                 else
                 {
