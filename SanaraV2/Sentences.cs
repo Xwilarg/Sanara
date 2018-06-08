@@ -36,7 +36,7 @@ namespace SanaraV2
 
         private static string GetTranslation(ulong guildId, string id, params string[] args)
         {
-            string language = Program.p.guildLanguages[guildId];
+            string language = (guildId == 0) ? ("en") : (Program.p.guildLanguages[guildId]);
             if (Program.p.translations.ContainsKey(id))
             {
                 TranslationData value = Program.p.translations[id].Find(x => x.language == language);
@@ -87,6 +87,7 @@ namespace SanaraV2
         /// --------------------------- Parts ---------------------------
         public static string andStr(ulong guildId) { return (GetTranslation(guildId, "and")); }
         public static string dateHourFormat(ulong guildId) { return (GetTranslation(guildId, "dateHourFormat")); }
+        public static string orStr(ulong guildId) { return (GetTranslation(guildId, "or")); }
 
         /// --------------------------- Communication ---------------------------
         public static string introductionMsg(ulong guildId) { return (GetTranslation(guildId, "introductionMsg")); }
@@ -161,6 +162,9 @@ namespace SanaraV2
         public static string japaneseHelp(ulong guildId) { return (GetTranslation(guildId, "japaneseHelp")); }
         public static string translateHelp(ulong guildId) { return (GetTranslation(guildId, "translateHelp")); }
         public static string invalidLanguage(ulong guildId) { return (GetTranslation(guildId, "invalidLanguage")); }
+        public static string giveJapaneseTranslations(ulong guildId, string word) { return (GetTranslation(guildId, "giveJapaneseTranslations", word)); }
+        public static string noJapaneseTranslation(ulong guildId, string word) { return (GetTranslation(guildId, "noJapaneseTranslation", word)); }
+        public static string meaning(ulong guildId) { return (GetTranslation(guildId, "meaning")); }
 
         /// --------------------------- KanColle---------------------------
         public static string kancolleHelp(ulong guildId) { return (GetTranslation(guildId, "kancolleHelp")); }
@@ -169,10 +173,30 @@ namespace SanaraV2
         public static string shipNotReferencedMap(ulong guildId) { return (GetTranslation(guildId, "shipNotReferencedMap")); }
         public static string shipNotReferencedConstruction(ulong guildId) { return (GetTranslation(guildId, "shipNotReferencedConstruction")); }
         public static string mapHelp(ulong guildId) { return (GetTranslation(guildId, "mapHelp")); }
+        public static string onlyNormalNodes(ulong guildId) { return (GetTranslation(guildId, "onlyNormalNodes")); }
+        public static string onlyBossNode(ulong guildId) { return (GetTranslation(guildId, "onlyBossNode")); }
+        public static string anyNode(ulong guildId) { return (GetTranslation(guildId, "anyNode")); }
+        public static string defaultNode(ulong guildId) { return (GetTranslation(guildId, "defaultNode")); }
+        public static string rarity(ulong guildId) { return (GetTranslation(guildId, "rarity")); }
+        public static string shipConstruction(ulong guildId) { return (GetTranslation(guildId, "shipConstruction")); }
+        public static string fuel(ulong guildId) { return (GetTranslation(guildId, "fuel")); }
+        public static string ammos(ulong guildId) { return (GetTranslation(guildId, "ammos")); }
+        public static string iron(ulong guildId) { return (GetTranslation(guildId, "iron")); }
+        public static string bauxite(ulong guildId) { return (GetTranslation(guildId, "bauxite")); }
+        public static string devMat(ulong guildId) { return (GetTranslation(guildId, "devMat")); }
+        public static string personality(ulong guildId) { return (GetTranslation(guildId, "personality")); }
+        public static string appearance(ulong guildId) { return (GetTranslation(guildId, "appearance")); }
+        public static string secondRemodel(ulong guildId) { return (GetTranslation(guildId, "secondRemodel")); }
+        public static string trivia(ulong guildId) { return (GetTranslation(guildId, "trivia")); }
 
         /// --------------------------- VNDB ---------------------------
         public static string vndbHelp(ulong guildId) { return (GetTranslation(guildId, "vndbHelp")); }
         public static string vndbNotFound(ulong guildId) { return (GetTranslation(guildId, "vndbNotFound")); }
+        public static string availableEnglish(ulong guildId) { return (GetTranslation(guildId, "availableEnglish")); }
+        public static string notAvailableEnglish(ulong guildId) { return (GetTranslation(guildId, "notAvailableEnglish")); }
+        public static string availableWindows(ulong guildId) { return (GetTranslation(guildId, "availableWindows")); }
+        public static string notAvailableWindows(ulong guildId) { return (GetTranslation(guildId, "notAvailableWindows")); }
+        public static string vndbRating(ulong guildId, string score) { return (GetTranslation(guildId, "vndbRating", score)); }
 
         /// --------------------------- Code ---------------------------
         public static string indenteHelp(ulong guildId) { return (GetTranslation(guildId, "indenteHelp")); }
@@ -182,6 +206,9 @@ namespace SanaraV2
         public static string animeHelp(ulong guildId) { return (GetTranslation(guildId, "animeHelp")); }
         public static string mangaNotFound(ulong guildId) { return (GetTranslation(guildId, "mangaNotFound")); }
         public static string animeNotFound(ulong guildId) { return (GetTranslation(guildId, "animeNotFound")); }
+        public static string animeInfos(ulong guildId, string type, string status, string episodes) { return (GetTranslation(guildId, "animeInfos", type, status, episodes)); }
+        public static string animeScore(ulong guildId, string score) { return (GetTranslation(guildId, "animeScore", score)); }
+        public static string synopsis(ulong guildId) { return (GetTranslation(guildId, "synopsis")); }
 
         /// --------------------------- Youtube ---------------------------
         public static string youtubeHelp(ulong guildId) { return (GetTranslation(guildId, "youtubeHelp")); }
@@ -197,6 +224,9 @@ namespace SanaraV2
         public static string radioNoSong(ulong guildId) { return (GetTranslation(guildId, "radioNoSong")); }
         public static string cantDownload(ulong guildId) { return (GetTranslation(guildId, "cantDownload")); }
         public static string songSkipped(ulong guildId, string songName) { return (GetTranslation(guildId, "songSkipped", songName)); }
+        public static string current(ulong guildId) { return (GetTranslation(guildId, "current")); }
+        public static string downloading(ulong guildId) { return (GetTranslation(guildId, "downloading")); }
+        public static string songAdded(ulong guildId, string song) { return (GetTranslation(guildId, "songAdded", song)); }
 
 
         /// --------------------------- XKCD ---------------------------

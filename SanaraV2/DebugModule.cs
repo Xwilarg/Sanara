@@ -77,7 +77,7 @@ namespace SanaraV2
             infosDebug += Environment.NewLine + Sentences.definition(Context.Guild.Id) + ": ";
             try
             {
-                if (LinguistModule.getAllKanjis("cat")[0].Contains("猫")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                if (LinguistModule.getAllKanjis("cat", 0)[0].Contains("猫")) infosDebug += Sentences.okStr(Context.Guild.Id);
                 else infosDebug += "Error";
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];

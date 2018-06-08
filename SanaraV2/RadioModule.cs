@@ -129,9 +129,9 @@ namespace SanaraV2
             {
                 if (m_process == null || m_process.HasExited)
                     return (Sentences.radioNoSong(guildId));
-                string finalStr = "🎵 Current: " + m_musics[0].title + Environment.NewLine;
+                string finalStr = "🎵 " + Sentences.current(guildId) + " " + m_musics[0].title + Environment.NewLine;
                 for (int i = 1; i < m_musics.Count; i++)
-                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" (Downloading...)") : ("")) + Environment.NewLine;
+                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.downloading(guildId)) : ("")) + Environment.NewLine;
                 return (finalStr);
             }
 
@@ -218,7 +218,7 @@ namespace SanaraV2
                     }
                     else
                     {
-                        await ReplyAsync(youtubeResult.Item2 + " was added to the list.");
+                        await ReplyAsync(Sentences.songAdded(Context.Guild.Id, youtubeResult.Item2));
                         DownloadAudio(video, radio, youtubeResult.Item1, Program.cleanWord(youtubeResult.Item2));
                     }
                 }

@@ -705,7 +705,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Sentences.dontPm(446053427714326528)); // Workaround because can't get id of null guild
+                    await context.Channel.SendMessageAsync(Sentences.dontPm(0));
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;

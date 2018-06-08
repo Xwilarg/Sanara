@@ -42,7 +42,7 @@ namespace SanaraV2
                     await ReplyAsync(Sentences.animeNotFound(Context.Guild.Id));
                 else
                 {
-                    EmbedBuilder b = parseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw);
+                    EmbedBuilder b = parseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
                     await ReplyAsync("", false, b.Build());
                 }
             }
@@ -76,7 +76,7 @@ namespace SanaraV2
                     await ReplyAsync(Sentences.mangaNotFound(Context.Guild.Id));
                 else
                 {
-                    EmbedBuilder b = parseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw);
+                    EmbedBuilder b = parseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
                     if (b == null)
                         await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
                     else
@@ -91,7 +91,7 @@ namespace SanaraV2
             }
         }
 
-        private EmbedBuilder parseContent(string result, string animeName, bool isNsfw) // TODO: Handle ratings
+        private EmbedBuilder parseContent(string result, string animeName, bool isNsfw, ulong guildId) // TODO: Handle ratings
         {
             string[] entries = result.Split(new string[] { "<entry>" }, StringSplitOptions.None);
             int index = 1;
@@ -125,10 +125,10 @@ namespace SanaraV2
             {
                 ImageUrl = Program.getElementXml("<image>", entries[index], '<'),
                 Description = "**" + title + "** (" + english + ")" + Environment.NewLine
-                + "or " + synonyms + Environment.NewLine + Environment.NewLine
-                + "The anime format is " + type + " and is currently " + status + " with " + episodes + " episodes." + Environment.NewLine
-                + "It got a score of " + score + "/10." + Environment.NewLine + Environment.NewLine
-                + "**Synopsis:**" + Environment.NewLine + synopsis,
+                + Sentences.orStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
+                + Sentences.animeInfos(guildId, type, status, episodes) + Environment.NewLine
+                + Sentences.animeScore(guildId, score) + Environment.NewLine + Environment.NewLine
+                + "**" + Sentences.synopsis(guildId) + "**" + Environment.NewLine + synopsis,
                 Color = Color.Green,
             };
             return (embed);

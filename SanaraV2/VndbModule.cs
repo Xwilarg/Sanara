@@ -64,10 +64,10 @@ namespace SanaraV2
                  { "VeryLong", "> 50 hours" }
              };
             string finalDesc = ((vn.OriginalName != null) ? ("**" + vn.OriginalName + "** (" + vn.Name + ")") : ("**" + vn.Name + "**")) + Environment.NewLine
-                 + ((vn.Languages.ToArray().Contains("en")) ? ("Available") : ("Not available")) + " in english." + Environment.NewLine
-                 + ((vn.Platforms.Contains("win")) ? ("Available") : ("Not available")) + " on Windows." + Environment.NewLine
+                 + ((vn.Languages.ToArray().Contains("en")) ? (Sentences.availableEnglish(Context.Guild.Id)) : (Sentences.notAvailableEnglish(Context.Guild.Id))) + Environment.NewLine
+                 + ((vn.Platforms.Contains("win")) ? (Sentences.availableWindows(Context.Guild.Id)) : (Sentences.notAvailableWindows(Context.Guild.Id))) + Environment.NewLine
                  + ((vn.Length != null) ? (vn.Length.ToString().Replace("Very", "Very ") + " (" + allLengths[vn.Length.ToString()] + ")" + Environment.NewLine) : (""))
-                 + "It's rate " + vn.Rating + "/10 on VNDB." + Environment.NewLine
+                 + Sentences.vndbRating(Context.Guild.Id, vn.Rating.ToString()) + Environment.NewLine
                  + ((vn.Released.Year != null) ? ("Released" + ((vn.Released.Month != null) ? ((vn.Released.Day != null) ? (" the " + vn.Released.Day + "/" + vn.Released.Month + "/" + vn.Released.Year) : (" in " + vn.Released.Month + "/" + vn.Released.Year)) : (" in " + vn.Released.Year))) : ("Not released yet.")) + Environment.NewLine
                  + Environment.NewLine + Environment.NewLine
                  + desc;

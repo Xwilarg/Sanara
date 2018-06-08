@@ -474,7 +474,7 @@ namespace SanaraV2
                 if (!doesContainTagMe)
                 {
                     finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                    finalStrCharacs[indexCharacFrom] += Sentences.andStr(guildId) + characs[characs.Count - 1];
+                    finalStrCharacs[indexCharacFrom] += " " + Sentences.andStr(guildId) + " " + characs[characs.Count - 1];
                 }
                 else
                 {
@@ -498,7 +498,7 @@ namespace SanaraV2
                 for (int i = 0; i < animeFrom.Count - 1; i++)
                     finalStrFrom[indexStrFrom] += animeFrom[i] + ", ";
                 finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom].Substring(0, finalStrFrom[indexStrFrom].Length - 2);
-                finalStrFrom[indexStrFrom] += Sentences.andStr(guildId) + animeFrom[animeFrom.Count - 1];
+                finalStrFrom[indexStrFrom] += " " + Sentences.andStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {
                     indexStrFrom++;

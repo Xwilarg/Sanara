@@ -113,7 +113,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.japaneseHelp(Context.Guild.Id));
             else
             {
-                foreach (string s in getAllKanjis(Program.addArgs(word)))
+                foreach (string s in getAllKanjis(Program.addArgs(word), 0))
                 {
                     await ReplyAsync(s);
                 }
@@ -127,7 +127,7 @@ namespace SanaraV2
             return (translation.TranslatedText);
         }
 
-        public static List<string> getAllKanjis(string word)
+        public static List<string> getAllKanjis(string word, ulong guildId)
         {
             string newWord = word.Replace(" ", "%20");
             string json;
@@ -137,9 +137,9 @@ namespace SanaraV2
                 json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + newWord.ToLower());
             }
             string[] url = Program.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
-            string finalStr = "Here are the japanese translations for " + word + ":" + Environment.NewLine + Environment.NewLine;
+            string finalStr = Sentences.giveJapaneseTranslations(guildId, word) + Environment.NewLine + Environment.NewLine;
             if (url[0] == "")
-                return new List<string>() { "I didn't find any japanase translation for " + word + "." };
+                return new List<string>() { Sentences.noJapaneseTranslation(guildId, word) + "." };
             else
             {
                 List<string> finalList = new List<string>();
@@ -156,7 +156,7 @@ namespace SanaraV2
                         : (Program.getElementXml("\"word\":\"", s, '"')
                         + ((Program.getElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Program.getElementXml("\"reading\":\"", s, '"') + " - " + fromHiragana(fromKatakana(Program.getElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
                     }
-                    finalStr += "Meaning: ";
+                    finalStr += Sentences.meaning(guildId);
                     string allMeanings = "";
                     foreach (string sm in meanings)
                     {

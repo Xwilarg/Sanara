@@ -125,19 +125,19 @@ namespace SanaraV2
                             switch (node[0])
                             {
                                 case '●':
-                                    finalStr += world + "-" + level + ": Only on normal nodes" + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.onlyNormalNodes(Context.Guild.Id) + Environment.NewLine;
                                     break;
 
                                 case '○':
-                                    finalStr += world + "-" + level + ": Only on boss node" + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.onlyBossNode(Context.Guild.Id) + Environment.NewLine;
                                     break;
 
                                 case '◎':
-                                    finalStr += world + "-" + level + ": Anywhere on the map" + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.anyNode(Context.Guild.Id) + Environment.NewLine;
                                     break;
 
                                 default:
-                                    finalStr += world + "-" + level + ": Findable on the map" + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.defaultNode(Context.Guild.Id) + Environment.NewLine;
                                     break;
                             }
                         }
@@ -151,7 +151,7 @@ namespace SanaraV2
                     if (finalStr.Length > 0)
                     {
                         string rarity = Program.getElementXml(">", cathegories[1], '<');
-                        await ReplyAsync("Rarity: " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
+                        await ReplyAsync(Sentences.rarity(Context.Guild.Id) + " " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
                     else
                         await ReplyAsync(Sentences.dontDropOnMaps(Context.Guild.Id));
@@ -175,12 +175,12 @@ namespace SanaraV2
                 html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
                 html = html.Split(new string[] { "flagship_order" }, StringSplitOptions.None)[0];
                 string[] allElements = html.Split(new string[] { "{\"item1\":" }, StringSplitOptions.None);
-                finalStr = "Ship Construction:" + Environment.NewLine;
+                finalStr = Sentences.shipConstruction(Context.Guild.Id) + Environment.NewLine;
                 for (int i = 1; i < ((allElements.Length > 6) ? (6) : (allElements.Length)); i++)
                 {
                     string[] ressources = allElements[i].Split(new string[] { ",\"" }, StringSplitOptions.None);
-                    finalStr += Program.getElementXml(":", ressources[7], '}') + "% -- Fuel: " + ressources[0] + ", Ammos: " + Program.getElementXml(":", ressources[1], '?') + ", Iron: " + Program.getElementXml(":", ressources[2], '?') + ", Bauxite: " + Program.getElementXml(":", ressources[3], '?')
-                         + ", Dev mat: " + Program.getElementXml(":", ressources[4], '?') + Environment.NewLine;
+                    finalStr += Program.getElementXml(":", ressources[7], '}') + "% -- " + Sentences.fuel(Context.Guild.Id) + " " + ressources[0] + ", " + Sentences.ammos(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[1], '?') + ", " + Sentences.iron(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[2], '?') + ", " + Sentences.bauxite(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[3], '?')
+                         + ", " + Sentences.devMat(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[4], '?') + Environment.NewLine;
                 }
                 await ReplyAsync(finalStr);
             }
@@ -238,7 +238,7 @@ namespace SanaraV2
                     {
                         if (s.Contains("Personality"))
                         {
-                            finalStr[0] += "**Personality**" + Environment.NewLine;
+                            finalStr[0] += "**" + Sentences.personality(Context.Guild.Id) + "**" + Environment.NewLine;
                             string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
                             foreach (string str in allExplanations)
                             {
@@ -253,7 +253,7 @@ namespace SanaraV2
                     {
                         if (s.Contains("Appearance"))
                         {
-                            finalStr[0] += Environment.NewLine + "**Appearance**" + Environment.NewLine;
+                            finalStr[0] += Environment.NewLine + "**" + Sentences.appearance(Context.Guild.Id) + "**" + Environment.NewLine;
                             string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
                             foreach (string str in allExplanations)
                             {
@@ -275,7 +275,7 @@ namespace SanaraV2
                     {
                         if (s.Contains("Second Remodel"))
                         {
-                            finalStr[0] += "**Second Remodel**" + Environment.NewLine;
+                            finalStr[0] += "**" + Sentences.secondRemodel(Context.Guild.Id) + "**" + Environment.NewLine;
                             string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
                             foreach (string str in allExplanations)
                             {
@@ -297,7 +297,7 @@ namespace SanaraV2
                     {
                         if (s.Contains("Trivia"))
                         {
-                            finalStr[currI] += Environment.NewLine + "**Trivia**" + Environment.NewLine;
+                            finalStr[currI] += Environment.NewLine + "**" + Sentences.trivia(Context.Guild.Id) + "**" + Environment.NewLine;
                             string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
                             foreach (string str in allExplanations)
                             {
