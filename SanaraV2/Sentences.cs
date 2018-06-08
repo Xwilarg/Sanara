@@ -84,15 +84,38 @@ namespace SanaraV2
         public static string betaFeature(ulong guildId) { return (GetTranslation(guildId, "betaFeature")); }
         public static string dontPm(ulong guildId) { return (GetTranslation(guildId, "dontPm")); }
 
+        /// --------------------------- Parts ---------------------------
+        public static string andStr(ulong guildId) { return (GetTranslation(guildId, "and")); }
+        public static string dateHourFormat(ulong guildId) { return (GetTranslation(guildId, "dateHourFormat")); }
+
         /// --------------------------- Communication ---------------------------
         public static string introductionMsg(ulong guildId) { return (GetTranslation(guildId, "introductionMsg")); }
         public static string hiStr(ulong guildId) { return (GetTranslation(guildId, "hi")); }
         public static string whoIAmStr(ulong guildId) { return (GetTranslation(guildId, "whoIAm")); }
         public static string userNotExist(ulong guildId) { return (GetTranslation(guildId, "userNotExist")); }
+        public static string username(ulong guildId) { return (GetTranslation(guildId, "username")); }
+        public static string nickname(ulong guildId) { return (GetTranslation(guildId, "nickname")); }
+        public static string accountCreation(ulong guildId) { return (GetTranslation(guildId, "accountCreation")); }
+        public static string guildJoined(ulong guildId) { return (GetTranslation(guildId, "guildJoined")); }
+        public static string creator(ulong guildId) { return (GetTranslation(guildId, "creator")); }
+        public static string uptime(ulong guildId) { return (GetTranslation(guildId, "uptime")); }
+        public static string website(ulong guildId) { return (GetTranslation(guildId, "website")); }
+        public static string officialGuild(ulong guildId) { return (GetTranslation(guildId, "officialGuild")); }
+        public static string roles(ulong guildId) { return (GetTranslation(guildId, "roles")); }
+        public static string noRole(ulong guildId) { return (GetTranslation(guildId, "noRole")); }
 
         /// --------------------------- Booru ---------------------------
         public static string fileTooBig(ulong guildId) { return (GetTranslation(guildId, "fileTooBig")); }
         public static string prepareImage(ulong guildId) { return (GetTranslation(guildId, "prepareImage")); }
+        public static string moreNotTagged(ulong guildId) { return (GetTranslation(guildId, "moreNotTagged")); }
+        public static string animeFromOriginal(ulong guildId) { return (GetTranslation(guildId, "animeFromOriginal")); }
+        public static string animeNotTagged(ulong guildId) { return (GetTranslation(guildId, "animeNotTagged")); }
+        public static string animeFrom(ulong guildId) { return (GetTranslation(guildId, "animeFrom")); }
+        public static string animeTagUnknowed(ulong guildId) { return (GetTranslation(guildId, "animeTagUnknowed")); }
+        public static string characterTagUnknowed(ulong guildId) { return (GetTranslation(guildId, "characterTagUnknowed")); }
+        public static string characterNotTagged(ulong guildId) { return (GetTranslation(guildId, "characterNotTagged")); }
+        public static string characterIs(ulong guildId) { return (GetTranslation(guildId, "characterIs")); }
+        public static string characterAre(ulong guildId) { return (GetTranslation(guildId, "characterAre")); }
 
         /// --------------------------- Games ---------------------------
         public static string rulesShiritori(ulong guildId) { return (GetTranslation(guildId, "rulesShiritori")); }
@@ -100,6 +123,28 @@ namespace SanaraV2
         public static string rulesBooru(ulong guildId) { return (GetTranslation(guildId, "rulesBooru")); }
         public static string invalidGameName(ulong guildId) { return (GetTranslation(guildId, "invalidGameName")); }
         public static string gameAlreadyRunning(ulong guildId) { return (GetTranslation(guildId, "gameAlreadyRunning")); }
+        public static string timeoutGame(ulong guildId, string answer) { return (GetTranslation(guildId, "timeoutGame", answer)); }
+        public static string newBestScore(ulong guildId, string lastScore, string newScore) { return (GetTranslation(guildId, "newBestScore", lastScore, newScore)); }
+        public static string equalizedScore(ulong guildId, string score) { return (GetTranslation(guildId, "equalizedScore", score)); }
+        public static string didntBeatScore(ulong guildId, string lastScore, string newScore) { return (GetTranslation(guildId, "didntBeatScore", lastScore, newScore)); }
+        public static string shiritoriNoWord(ulong guildId) { return (GetTranslation(guildId, "shiritoriNoWord")); }
+        public static string waitPlay(ulong guildId) { return (GetTranslation(guildId, "waitPlay")); }
+        public static string onlyHiraganaKatakanaRomaji(ulong guildId) { return (GetTranslation(guildId, "onlyHiraganaKatakanaRomaji")); }
+        public static string shiritoriNotNoun(ulong guildId) { return (GetTranslation(guildId, "shiritoriNotNoun")); }
+        public static string shiritoriDoesntExist(ulong guildId) { return (GetTranslation(guildId, "shiritoriDoesntExist")); }
+        public static string shiritoriMustBegin(ulong guildId, string beginHiragana, string beginRomaji) { return (GetTranslation(guildId, "shiritoriMustBegin", beginHiragana, beginRomaji)); }
+        public static string shiritoriAlreadySaid(ulong guildId) { return (GetTranslation(guildId, "shiritoriAlreadySaid")); }
+        public static string shiritoriEndWithN(ulong guildId) { return (GetTranslation(guildId, "shiritoriEndWithN")); }
+        public static string shiritoriNoMoreWord(ulong guildId) { return (GetTranslation(guildId, "shiritoriNoMoreWord")); }
+        public static string shiritoriSuggestion(ulong guildId, string suggestionHiragana, string suggestionRomaji, string suggestionTranslation) { return (GetTranslation(guildId, "shiritoriSuggestion", suggestionHiragana, suggestionRomaji, suggestionTranslation)); }
+        public static string waitImage(ulong guildId) { return (GetTranslation(guildId, "waitImage")); }
+        public static string kancolleGuessDontExist(ulong guildId) { return (GetTranslation(guildId, "kancolleGuessDontExist")); }
+        public static string guessGood(ulong guildId) { return (GetTranslation(guildId, "guessGood")); }
+        public static string kancolleGuessBad(ulong guildId, string attempt) { return (GetTranslation(guildId, "kancolleGuessBad", attempt)); }
+        public static string waitImages(ulong guildId) { return (GetTranslation(guildId, "waitImages")); }
+        public static string booruGuessClose(ulong guildId, string attempt) { return (GetTranslation(guildId, "booruGuessClose", attempt)); }
+        public static string booruGuessBad(ulong guildId, string attempt) { return (GetTranslation(guildId, "booruGuessBad", attempt)); }
+        public static string lostStr(ulong guildId) { return (GetTranslation(guildId, "lost")); }
 
         /// --------------------------- Settings ---------------------------
         public static string createArchiveStr(ulong guildId, string currTime)
@@ -157,6 +202,21 @@ namespace SanaraV2
         /// --------------------------- XKCD ---------------------------
         public static string xkcdWrongArg(ulong guildId) { return (GetTranslation(guildId, "xkcdWrongArg")); }
         public static string xkcdWrongId(ulong guildId, int max) { return (GetTranslation(guildId, "xkcdWrongId", max.ToString())); }
+
+        /// --------------------------- Debug ---------------------------
+        public static string general(ulong guildId) { return (GetTranslation(guildId, "general")); }
+        public static string creationDate(ulong guildId) { return (GetTranslation(guildId, "creationDate")); }
+        public static string messagesReceived(ulong guildId) { return (GetTranslation(guildId, "messagesReceived")); }
+        public static string userMoreMessages(ulong guildId, string username, string nbMsgs) { return (GetTranslation(guildId, "userMoreMessages", username, nbMsgs)); }
+        public static string userKnown(ulong guildId) { return (GetTranslation(guildId, "userKnown")); }
+        public static string alreadySpoke(ulong guildId, string nbSpoke) { return (GetTranslation(guildId, "alreadySpoke", nbSpoke)); }
+        public static string guildsAvailable(ulong guildId) { return (GetTranslation(guildId, "guildsAvailable")); }
+        public static string translation(ulong guildId) { return (GetTranslation(guildId, "translation")); }
+        public static string definition(ulong guildId) { return (GetTranslation(guildId, "definition")); }
+        public static string randomURL(ulong guildId) { return (GetTranslation(guildId, "randomURL")); }
+        public static string errorStr(ulong guildId) { return (GetTranslation(guildId, "error")); }
+        public static string okStr(ulong guildId) { return (GetTranslation(guildId, "ok")); }
+        public static string unitTests(ulong guildId) { return (GetTranslation(guildId, "unitTests")); }
 
         /// --------------------------- Help ---------------------------
         private static string noCommandAvailable(ulong guildId) { return (GetTranslation(guildId, "noCommandAvailable")); }

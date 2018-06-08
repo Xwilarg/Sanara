@@ -82,13 +82,13 @@ namespace SanaraV2
                     (Convert.ToInt32(datas[2]) + m_nbFound).ToString() + Environment.NewLine +
                     ((m_nbFound > Convert.ToInt32(datas[3])) ? (m_nbFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
                     allUsers);
-                string finalStr = (answer == null) ? ("") : ("Time out, the answer was " + answer + "." + Environment.NewLine);
+                string finalStr = (answer == null) ? ("") : (Sentences.timeoutGame(m_guild.Id, answer) + Environment.NewLine);
                 if (m_nbFound > Convert.ToInt32(datas[3]))
-                    finalStr += "Congratulation, you beat the previous best score of " + Convert.ToInt32(datas[3]) + " with a new score of " + m_nbFound + ".";
+                    finalStr += Sentences.newBestScore(m_guild.Id, Convert.ToInt32(datas[3]).ToString(), m_nbFound.ToString());
                 else if (m_nbFound == Convert.ToInt32(datas[3]))
-                    finalStr += "You equilized the previous best score of " + m_nbFound + ".";
+                    finalStr += Sentences.equalizedScore(m_guild.Id, m_nbFound.ToString());
                 else
-                    finalStr += "You didn't beat the current best score of " + Convert.ToInt32(datas[3]) + " with the score of " + m_nbFound + ".";
+                    finalStr += Sentences.didntBeatScore(m_guild.Id, Convert.ToInt32(datas[3]).ToString(), m_nbFound.ToString());
                 await m_chan.SendMessageAsync(finalStr);
             }
 
@@ -131,7 +131,7 @@ namespace SanaraV2
                     string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
                     if (corrWords.Length == 0)
                     {
-                        await m_chan.SendMessageAsync("I don't know any other word...");
+                        await m_chan.SendMessageAsync(Sentences.shiritoriNoWord(m_guild.Id));
                     }
                     else
                     {
@@ -151,7 +151,7 @@ namespace SanaraV2
             {
                 if (m_time == DateTime.MinValue)
                 {
-                    await m_chan.SendMessageAsync("Please wait until I'm playing.");
+                    await m_chan.SendMessageAsync(Sentences.waitPlay(m_guild.Id));
                 }
                 else
                 {
@@ -161,7 +161,7 @@ namespace SanaraV2
                     {
                         if (c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA)
                         {
-                            await m_chan.SendMessageAsync("Please only use hiragana, katakana or romaji.");
+                            await m_chan.SendMessageAsync(Sentences.onlyHiraganaKatakanaRomaji(m_guild.Id));
                             return;
                         }
                     }
@@ -180,7 +180,7 @@ namespace SanaraV2
                             isCorrect = true;
                             if (Program.getElementXml("parts_of_speech\":[\"", json, '"') != "Noun")
                             {
-                                await m_chan.SendMessageAsync("This word isn't a noun.");
+                                await m_chan.SendMessageAsync(Sentences.shiritoriNotNoun(m_guild.Id));
                                 return;
                             }
                             break;
@@ -188,23 +188,23 @@ namespace SanaraV2
                     }
                     if (!isCorrect)
                     {
-                        await m_chan.SendMessageAsync("This word doesn't exist.");
+                        await m_chan.SendMessageAsync(Sentences.shiritoriDoesntExist(m_guild.Id));
                         return;
                     }
                     if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
                     {
-                        await m_chan.SendMessageAsync("Your word must begin by a " + HiraganaToUpper(m_currWord[m_currWord.Length - 1]) + " (" + LinguistModule.fromHiragana(m_currWord[m_currWord.Length - 1].ToString()) + ").");
+                        await m_chan.SendMessageAsync(Sentences.shiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), LinguistModule.fromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
                         return;
                     }
                     if (m_alreadySaid.Contains(userWord))
                     {
-                        await m_chan.SendMessageAsync("This word was already said.");
+                        await m_chan.SendMessageAsync(Sentences.shiritoriAlreadySaid(m_guild.Id));
                         m_didLost = true;
                         return;
                     }
                     if (userWord[userWord.Length - 1] == 'ん')
                     {
-                        await m_chan.SendMessageAsync("Your word is finishing with a ん.");
+                        await m_chan.SendMessageAsync(Sentences.shiritoriEndWithN(m_guild.Id));
                         m_didLost = true;
                         return;
                     }
@@ -231,17 +231,17 @@ namespace SanaraV2
 
             public override async void Loose() // TODO: Save score
             {
-                string finalStr = "You lost." + Environment.NewLine;
+                string finalStr = Sentences.lostStr(m_guild.Id) + Environment.NewLine;
                 string[] corrWords = m_words.Where(x => x[0] == HiraganaToUpper(m_currWord[m_currWord.Length - 1])).ToArray();
                 if (corrWords.Length == 0)
                 {
-                    finalStr += "To be honest, I didn't know a word to answer too." + Environment.NewLine;
+                    finalStr += Sentences.shiritoriNoMoreWord(m_guild.Id) + Environment.NewLine;
                 }
                 else
                 {
                     string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                     string[] insideWord = word.Split('$');
-                    finalStr += "Here's a word you could have said: " + insideWord[0] + " (" + LinguistModule.fromHiragana(insideWord[0]) + ") - Meaning: " + insideWord[1] + Environment.NewLine;
+                    finalStr += Sentences.shiritoriSuggestion(m_guild.Id, insideWord[0], LinguistModule.fromHiragana(insideWord[0]), insideWord[1]) + Environment.NewLine;
                 }
                 SaveServerScores(null);
                 await m_chan.SendMessageAsync(finalStr);
@@ -332,7 +332,7 @@ namespace SanaraV2
             {
                 if (m_time == DateTime.MinValue)
                 {
-                    await m_chan.SendMessageAsync("Please wait until I posted the image.");
+                    await m_chan.SendMessageAsync(Sentences.waitImage(m_guild.Id));
                 }
                 else
                 {
@@ -367,7 +367,7 @@ namespace SanaraV2
                             json = w.DownloadString(url);
                             if (Program.getElementXml("{{", json, '}') != "ShipPageHeader")
                             {
-                                await m_chan.SendMessageAsync("There is no shipgirl with this name...");
+                                await m_chan.SendMessageAsync(Sentences.kancolleGuessDontExist(m_guild.Id));
                             }
                             else
                             {
@@ -382,12 +382,12 @@ namespace SanaraV2
                                     m_nbFound++;
                                     if (!m_userIds.Contains(user.Id))
                                         m_userIds.Add(user.Id);
-                                    await m_chan.SendMessageAsync("Congratulation, you found the right answer!");
+                                    await m_chan.SendMessageAsync(Sentences.guessGood(m_guild.Id));
                                     Post();
                                 }
                                 else
                                 {
-                                    await m_chan.SendMessageAsync("No, this is not " + newName + ".");
+                                    await m_chan.SendMessageAsync(Sentences.booruGuessBad(m_guild.Id, newName));
                                 }
                             }
                         }
@@ -396,7 +396,7 @@ namespace SanaraV2
                     {
                         HttpWebResponse code = ex.Response as HttpWebResponse;
                         if (code.StatusCode == HttpStatusCode.NotFound)
-                            await m_chan.SendMessageAsync("There is no shipgirl with this name...");
+                            await m_chan.SendMessageAsync(Sentences.kancolleGuessDontExist(m_guild.Id));
                     }
                 }
             }
@@ -445,7 +445,7 @@ namespace SanaraV2
             public override async void CheckCorrect(string userWord, IUser user)
             {
                 if (m_time == DateTime.MinValue)
-                    await m_chan.SendMessageAsync("Please wait until I posted all images.");
+                    await m_chan.SendMessageAsync(Sentences.waitImages(m_guild.Id));
                 else
                 {
                     m_nbAttempt++;
@@ -454,13 +454,13 @@ namespace SanaraV2
                         m_nbFound++;
                         if (!m_userIds.Contains(user.Id))
                             m_userIds.Add(user.Id);
-                        await m_chan.SendMessageAsync("You found the right answer.");
+                        await m_chan.SendMessageAsync(Sentences.guessGood(m_guild.Id));
                         Post();
                     }
                     else if (Program.cleanWord(userWord) != "" && (Program.cleanWord(m_toGuess).Contains(Program.cleanWord(userWord)) || Program.cleanWord(userWord).Contains(Program.cleanWord(m_toGuess))))
-                        await m_chan.SendMessageAsync("No, this is not " + userWord + " but you're close to the answer.");
+                        await m_chan.SendMessageAsync(Sentences.booruGuessClose(m_guild.Id, userWord));
                     else
-                        await m_chan.SendMessageAsync("No, this is not " + userWord + ".");
+                        await m_chan.SendMessageAsync(Sentences.booruGuessBad(m_guild.Id, userWord));
                 }
             }
 

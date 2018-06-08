@@ -88,20 +88,20 @@ namespace SanaraV2
                 ImageUrl = user.GetAvatarUrl(),
                 Color = Color.Purple
             };
-            embed.AddField("Username", user.ToString(), true);
+            embed.AddField(Sentences.username(Context.Guild.Id), user.ToString(), true);
             if (user.Nickname != null)
-                embed.AddField("Nickname", user.Nickname, true);
-            embed.AddField("Account creation", user.CreatedAt.ToString("dd/MM/yy HH:mm:ss"), true);
-            embed.AddField("Server joined", user.JoinedAt.Value.ToString("dd/MM/yy HH:mm:ss"), true);
+                embed.AddField(Sentences.nickname(Context.Guild.Id), user.Nickname, true);
+            embed.AddField(Sentences.accountCreation(Context.Guild.Id), user.CreatedAt.ToString(Sentences.dateHourFormat(Context.Guild.Id)), true);
+            embed.AddField(Sentences.guildJoined(Context.Guild.Id), user.JoinedAt.Value.ToString(Sentences.dateHourFormat(Context.Guild.Id)), true);
             if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
             {
-                embed.AddField("Creator", "Zirk#0001", true);
-                embed.AddField("Uptime", Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime)));
+                embed.AddField(Sentences.creator(Context.Guild.Id), "Zirk#0001", true);
+                embed.AddField(Sentences.uptime(Context.Guild.Id), Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime)));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
-                embed.AddField("Website", "https://zirk.eu/sanara.html");
-                embed.AddField("Official Discord", "https://discordapp.com/invite/H6wMRYV");
+                embed.AddField(Sentences.website(Context.Guild.Id), "https://zirk.eu/sanara.html");
+                embed.AddField(Sentences.officialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");
             }
-            embed.AddField("Roles", ((roles == "") ? ("Vous n'avez aucun rôle") : (roles)));
+            embed.AddField(Sentences.roles(Context.Guild.Id), ((roles == "") ? (Sentences.noRole(Context.Guild.Id)) : (roles)));
             await ReplyAsync("", false, embed.Build());
         }
     }

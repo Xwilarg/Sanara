@@ -31,7 +31,6 @@ namespace SanaraV2
             string infosDebug;
 
             // GENERAL
-            infosDebug = "**General**:" + Environment.NewLine;
             int userMet = 0;
             int userKnow = 0;
             string mostSpeakUser = "0";
@@ -52,33 +51,33 @@ namespace SanaraV2
                     }
                 }
             }
-            infosDebug += "Creator: Zirk#1001." + Environment.NewLine +
-            "Creation date: " + (await Context.Channel.GetUserAsync(Sentences.myId)).CreatedAt.ToString("dd/MM/yy HH:mm:ss") + Environment.NewLine +
-            "Messages received: " + totalMessages + "." + Environment.NewLine +
-            "(The user who sent me more messages is " + mostSpeakUser + " with " + nbMessages + " messages)." + Environment.NewLine +
-            "Users know: " + userMet + " (I already spoke with " + userKnow + " of them)." + Environment.NewLine +
-            "Guilds available: "+ p.client.Guilds.Count + "." + Environment.NewLine;
 
             EmbedBuilder embed = new EmbedBuilder()
             {
-                Description = infosDebug,
+                Title = Sentences.general(Context.Guild.Id),
                 Color = Color.Purple,
             };
 
+            embed.AddField(Sentences.creator(Context.Guild.Id), "Zirk#0001");
+            embed.AddField(Sentences.creationDate(Context.Guild.Id), (await Context.Channel.GetUserAsync(Sentences.myId)).CreatedAt.ToString(Sentences.dateHourFormat(Context.Guild.Id)));
+            embed.AddField(Sentences.messagesReceived(Context.Guild.Id), totalMessages + "\n" + Sentences.userMoreMessages(Context.Guild.Id, mostSpeakUser, nbMessages.ToString()));
+            embed.AddField(Sentences.userKnown(Context.Guild.Id), userMet + "\n" + Sentences.alreadySpoke(Context.Guild.Id, userKnow.ToString()));
+            embed.AddField(Sentences.guildsAvailable(Context.Guild.Id), p.client.Guilds.Count);
+
             await ReplyAsync("", false, embed.Build());
 
-            infosDebug = "**Linguistic Module:**" + Environment.NewLine + "Translation: ";
+            infosDebug = "**Linguistic Module:**" + Environment.NewLine + Sentences.translation(Context.Guild.Id) + ": ";
             try
             {
-                if (LinguistModule.getTranslation("cat", "fr", out _).Contains("chat")) infosDebug += "OK";
+                if (LinguistModule.getTranslation("cat", "fr", out _).Contains("chat")) infosDebug += Sentences.okStr(Context.Guild.Id);
                 else infosDebug += "Error";
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
             }
-            infosDebug += Environment.NewLine + "Definition: ";
+            infosDebug += Environment.NewLine + Sentences.definition(Context.Guild.Id) + ": ";
             try
             {
-                if (LinguistModule.getAllKanjis("cat")[0].Contains("猫")) infosDebug += "OK";
+                if (LinguistModule.getAllKanjis("cat")[0].Contains("猫")) infosDebug += Sentences.okStr(Context.Guild.Id);
                 else infosDebug += "Error";
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
@@ -87,32 +86,32 @@ namespace SanaraV2
             infosDebug += Environment.NewLine + Environment.NewLine + "**Booru Module:**" + Environment.NewLine + "Safebooru: ";
             try
             {
-                if (BooruModule.getBooruUrl(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += "OK";
-                else infosDebug += "Error";
+                if (BooruModule.getBooruUrl(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
             }
             infosDebug += Environment.NewLine + "Gelbooru: ";
             try
             {
-                if (BooruModule.getBooruUrl(new BooruModule.Gelbooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += "OK";
-                else infosDebug += "Error";
+                if (BooruModule.getBooruUrl(new BooruModule.Gelbooru(), new string[] { "hibiki_(kantai_collection)" }).StartsWith("https://")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
             }
             infosDebug += Environment.NewLine + "Konachan: ";
             try
             {
-                if (BooruModule.getBooruUrl(new BooruModule.Konachan(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += "OK";
-                else infosDebug += "Error";
+                if (BooruModule.getBooruUrl(new BooruModule.Konachan(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
             }
             infosDebug += Environment.NewLine + "Rule 34: ";
             try
             {
-                if (BooruModule.getBooruUrl(new BooruModule.Rule34(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += "OK";
-                else infosDebug += "Error";
+                if (BooruModule.getBooruUrl(new BooruModule.Rule34(), new string[] { "hibiki_(kancolle)" }).StartsWith("https://")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             } catch (Exception e) {
                 infosDebug += e.ToString().Split(':')[0];
             }
@@ -120,20 +119,20 @@ namespace SanaraV2
             infosDebug += Environment.NewLine + Environment.NewLine + "**Vn Module:**" + Environment.NewLine + "Vn: ";
             try
             {
-                if ((await VndbModule.getVn("Sunrider: Mask of Arcadius")).Name == "Sunrider: Mask of Arcadius") infosDebug += "OK";
-                else infosDebug += "Error";
+                if ((await VndbModule.getVn("Sunrider: Mask of Arcadius")).Name == "Sunrider: Mask of Arcadius") infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             }
             catch (Exception e)
             {
                 infosDebug += e.ToString().Split(':')[0];
             }
 
-            infosDebug += Environment.NewLine + Environment.NewLine + "**Google Shortener Module:**" + Environment.NewLine + "Random URL: ";
+            infosDebug += Environment.NewLine + Environment.NewLine + "**Google Shortener Module:**" + Environment.NewLine + Sentences.randomURL(Context.Guild.Id) + ": ";
             try
             {
                 Tuple<string, string> result = await GoogleShortenerModule.getUrl();
-                if (result == null || result.Item1.StartsWith("https://goo.gl/") || result.Item1.StartsWith("http://goo.gl/")) infosDebug += "OK";
-                else infosDebug += "Error";
+                if (result == null || result.Item1.StartsWith("https://goo.gl/") || result.Item1.StartsWith("http://goo.gl/")) infosDebug += Sentences.okStr(Context.Guild.Id);
+                else infosDebug += Sentences.errorStr(Context.Guild.Id);
             }
             catch (Exception e)
             {
@@ -142,7 +141,7 @@ namespace SanaraV2
 
             embed = new EmbedBuilder()
             {
-                Title = "Unit tests:",
+                Title = Sentences.unitTests(Context.Guild.Id),
                 Description = infosDebug,
                 Color = Color.Purple,
             };

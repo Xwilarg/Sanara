@@ -357,7 +357,7 @@ namespace SanaraV2
                         }
                         if (!isGame)
                         {
-                            List<string> finalStr = getTagsInfos(json, booru);
+                            List<string> finalStr = getTagsInfos(json, booru, chan.GuildId);
                             foreach (string s in finalStr)
                                 await chan.SendMessageAsync(s);
                         }
@@ -384,7 +384,7 @@ namespace SanaraV2
                 return (booru.getLink(getTags(tags), maxVal));
         }
 
-        private static List<string> getTagsInfos(string json, Booru booru)
+        private static List<string> getTagsInfos(string json, Booru booru, ulong guildId)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();
@@ -417,7 +417,7 @@ namespace SanaraV2
                     }
                 }
             }
-            return (writeTagsInfos(animeFrom, characs, artists));
+            return (writeTagsInfos(animeFrom, characs, artists, guildId));
         }
 
         private static string fixName(string original)
@@ -439,7 +439,7 @@ namespace SanaraV2
             return newName;
         }
 
-        private static List<string> writeTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists)
+        private static List<string> writeTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
         {
             List<string> finalMsg = new List<string>();
             for (int i = 0; i < artists.Count; i++)
@@ -474,7 +474,7 @@ namespace SanaraV2
                 if (!doesContainTagMe)
                 {
                     finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                    finalStrCharacs[indexCharacFrom] += " and " + characs[characs.Count - 1];
+                    finalStrCharacs[indexCharacFrom] += Sentences.andStr(guildId) + characs[characs.Count - 1];
                 }
                 else
                 {
@@ -482,10 +482,10 @@ namespace SanaraV2
                         || characs[characs.Count - 1] == "Copyright Request")
                     {
                         finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                        finalStrCharacs[indexCharacFrom] += " and some other character who weren't tag";
+                        finalStrCharacs[indexCharacFrom] += Sentences.characterNotTagged(guildId);
                     }
                     else
-                        finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + " and some other character who weren't tag";
+                        finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + Sentences.moreNotTagged(guildId);
                 }
             }
             List<string> finalStrFrom = new List<string>();
@@ -498,7 +498,7 @@ namespace SanaraV2
                 for (int i = 0; i < animeFrom.Count - 1; i++)
                     finalStrFrom[indexStrFrom] += animeFrom[i] + ", ";
                 finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom].Substring(0, finalStrFrom[indexStrFrom].Length - 2);
-                finalStrFrom[indexStrFrom] += " and " + animeFrom[animeFrom.Count - 1];
+                finalStrFrom[indexStrFrom] += Sentences.andStr(guildId) + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {
                     indexStrFrom++;
@@ -507,12 +507,12 @@ namespace SanaraV2
             }
             string finalStr;
             if (animeFrom.Count == 1 && animeFrom[0] == "Original")
-                finalStr = "It look like this image is an original content." + Environment.NewLine;
+                finalStr = Sentences.animeFromOriginal(guildId) + Environment.NewLine;
             else if (animeFrom.Count == 1 && (animeFrom[0] == "Tagme" || animeFrom[0] == "Source Request" || animeFrom[0] == "Copyright Request"))
-                finalStr = "It look like the source of this image wasn't tag." + Environment.NewLine;
+                finalStr = Sentences.animeNotTagged(guildId) + Environment.NewLine;
             else if (finalStrFrom[0] != "")
             {
-                finalStr = "I think this image is from ";
+                finalStr = Sentences.animeFrom(guildId);
                 foreach (string s in finalStrFrom)
                 {
                     if (finalStr.Length + s.Length > 1500)
@@ -525,13 +525,13 @@ namespace SanaraV2
                 finalStr += "." + Environment.NewLine;
             }
             else
-                finalStr = "I don't know where this image is from." + Environment.NewLine;
+                finalStr = Sentences.animeTagUnknowed(guildId) + Environment.NewLine;
             if (finalStrCharacs[0] == "")
-                finalStr += "I don't know who are the characters." + Environment.NewLine;
+                finalStr += Sentences.characterTagUnknowed(guildId) + Environment.NewLine;
             else if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
-                finalStr += "It look like the characters of this image weren't tag." + Environment.NewLine;
+                finalStr += Sentences.characterNotTagged(guildId) + Environment.NewLine;
             else if (characs.Count == 1)
-                finalStr += "I think the character is " + finalStrCharacs[0] + "." + Environment.NewLine;
+                finalStr += Sentences.characterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
             else
             {
                 if (finalStr.Length > 1500)
@@ -539,7 +539,7 @@ namespace SanaraV2
                     finalMsg.Add(finalStr);
                     finalStr = "";
                 }
-                finalStr += "I think the characters are ";
+                finalStr += Sentences.characterAre(guildId);
                 foreach (string s in finalStrCharacs)
                 {
                     if ((finalStr.Length + s.Length) > 1500)
