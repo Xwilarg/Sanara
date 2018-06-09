@@ -32,7 +32,9 @@ namespace SanaraV2
         public async Task randomPastebin()
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
-            if (!(Context.Channel as ITextChannel).IsNsfw)
+            if (p.service == null)
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+            else if (!(Context.Channel as ITextChannel).IsNsfw)
             {
                 await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
             }

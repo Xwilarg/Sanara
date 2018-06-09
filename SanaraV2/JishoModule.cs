@@ -62,7 +62,9 @@ namespace SanaraV2
         public async Task translation(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
-            if (words.Length < 2)
+            if (p.translationClient == null)
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+            else if (words.Length < 2)
                 await ReplyAsync(Sentences.translateHelp(Context.Guild.Id));
             else
             {

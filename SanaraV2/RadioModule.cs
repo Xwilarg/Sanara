@@ -189,6 +189,9 @@ namespace SanaraV2
         public async Task addRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            if (p.youtubeService == null)
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+            else
             if (words.Length == 0)
                 await ReplyAsync(Sentences.radioNeedArg(Context.Guild.Id));
             else if (p.radios.Any(x => x.m_guildId == Context.Guild.Id) && !p.radios.Find(x => x.m_guildId == Context.Guild.Id).CanAddMusic())
@@ -229,7 +232,10 @@ namespace SanaraV2
         public async Task launchRadio(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            await StartRadio(Context.Channel);
+            if (p.youtubeService == null)
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+            else
+                await StartRadio(Context.Channel);
         }
 
         [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist")]

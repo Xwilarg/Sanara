@@ -57,7 +57,7 @@ namespace SanaraV2
 
         /// --------------------------- ID ---------------------------
         public readonly static ulong idPikyu = 352216646267437059; // Bot that collect informations for statistics
-        public readonly static ulong myId = 329664361016721408;
+        public readonly static ulong myId = 455059707313258499;
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------
@@ -83,6 +83,7 @@ namespace SanaraV2
         public static string noCorrespondingGuild(ulong guildId) { return (GetTranslation(guildId, "noCorrespondingGuild")); }
         public static string betaFeature(ulong guildId) { return (GetTranslation(guildId, "betaFeature")); }
         public static string dontPm(ulong guildId) { return (GetTranslation(guildId, "dontPm")); }
+        public static string noApiKey(ulong guildId) { return (GetTranslation(guildId, "noApiKey")); }
 
         /// --------------------------- Parts ---------------------------
         public static string andStr(ulong guildId) { return (GetTranslation(guildId, "and")); }
@@ -269,7 +270,7 @@ namespace SanaraV2
             embed.AddField(GetTranslation(guildId, "gameModuleName"), GetTranslation(guildId, "gameModuleDescription")
                 + ((isChanNsfw) ? (GetTranslation(guildId, "gameModuleDescription2")) : ("")));
             embed.AddField(GetTranslation(guildId, "googleShortenerModuleName"),
-                ((isChanNsfw) ? (GetTranslation(guildId, "googleShortenerDescription"))
+                ((isChanNsfw) ? (GetTranslation(guildId, "googleShortenerModuleDescription"))
                               : (noCommandAvailable(guildId))));
             embed.AddField(GetTranslation(guildId, "kantaiCollectionModuleName"), GetTranslation(guildId, "kantaiCollectionModuleDescription"));
             embed.AddField(GetTranslation(guildId, "linguisticModuleName"), GetTranslation(guildId, "linguisticModuleDescription"));

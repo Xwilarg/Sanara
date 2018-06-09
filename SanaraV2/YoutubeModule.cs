@@ -28,9 +28,14 @@ namespace SanaraV2
         public async Task youtubeVideo(params string[] words)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
-            Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));
-            if (url != null)
-                await ReplyAsync(url.Item1);
+            if (p.youtubeService == null)
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+            else
+            {
+                Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));
+                if (url != null)
+                    await ReplyAsync(url.Item1);
+            }
         }
 
         public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan, int maxResult = 1)

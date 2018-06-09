@@ -94,24 +94,44 @@ namespace SanaraV2
             rand = new Random();
             relations = new List<Character>();
 
-            string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
-            malClient = new WebClient();
-            malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
-
-            credential = GoogleCredential.FromFile(@"Keys\Sanara-7430da57d6af.json");
-            translationClient = TranslationClient.Create(credential);
-
-            youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            if (File.Exists("Keys/malPwd.dat"))
             {
-                ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
-            });
+                string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
+                malClient = new WebClient();
+                malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
+            }
+            else
+                malClient = null;
+
+            if (File.Exists("Keys/Sanara-7430da57d6af.json"))
+            {
+                credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
+                translationClient = TranslationClient.Create(credential);
+            }
+            else
+                translationClient = null;
+
+            if (File.Exists("Keys/YoutubeAPIKey.dat"))
+            {
+                youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                {
+                    ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
+                });
+            }
+            else
+                youtubeService = null;
 
             radios = new List<RadioModule.RadioChannel>();
 
-            service = new UrlshortenerService(new BaseClientService.Initializer
+            if (File.Exists("Keys/URLShortenerAPIKey.dat"))
             {
-                ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
-            });
+                service = new UrlshortenerService(new BaseClientService.Initializer
+                {
+                    ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
+                });
+            }
+            else
+                service = null;
 
             #region StatsInit
             /// Stats at https://zirk.eu/sanara-stats.php
@@ -195,13 +215,17 @@ namespace SanaraV2
             startTime = DateTime.Now;
             await client.StartAsync();
 
-            var task = Task.Run(async () => {
-                for (;;)
+            if (File.Exists("Keys/websiteToken.dat"))
+            {
+                var task = Task.Run(async () =>
                 {
-                    await Task.Delay(60000);
-                    UpdateStatus();
-                }
-            });
+                    for (; ; )
+                    {
+                        await Task.Delay(60000);
+                        UpdateStatus();
+                    }
+                });
+            }
 
             await Task.Delay(-1);
         }

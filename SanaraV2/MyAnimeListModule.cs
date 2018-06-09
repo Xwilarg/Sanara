@@ -29,6 +29,11 @@ namespace SanaraV2
         public async Task mal(params string[] animeNameArr)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            if (p.malClient == null)
+            {
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                return;
+            }
             string animeName = Program.addArgs(animeNameArr);
             if (animeName.Length == 0)
             {
@@ -63,6 +68,11 @@ namespace SanaraV2
         public async Task malManga(params string[] mangaNameArr) // Stuck in loop ?
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            if (p.malClient == null)
+            {
+                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                return;
+            }
             string mangaName = Program.addArgs(mangaNameArr);
             if (mangaName.Length == 0)
             {
