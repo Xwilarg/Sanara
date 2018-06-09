@@ -278,7 +278,8 @@ namespace SanaraV2
             embed.AddField(GetTranslation(guildId, "settingsModuleName"), GetTranslation(guildId, "settingsModuleDescription"));
             embed.AddField(GetTranslation(guildId, "visualNovelModuleName"), GetTranslation(guildId, "visualNovelModuleDescription"));
             embed.AddField(GetTranslation(guildId, "xkcdModuleName"), GetTranslation(guildId, "xkcdModuleDescription"));
-            embed.AddField(GetTranslation(guildId, "youtubeModuleName"), GetTranslation(guildId, "youtubeModuleDescription"));
+            embed.AddField(GetTranslation(guildId, "youtubeModuleName"), GetTranslation(guildId, "youtubeModuleDescription") + Environment.NewLine + Environment.NewLine
+                + ((isChanNsfw) ? ("") : (GetTranslation(guildId, "nsfwForFull"))));
             return (embed.Build());
         }
     }
