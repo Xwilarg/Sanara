@@ -96,7 +96,7 @@ namespace SanaraV2
             if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
             {
                 embed.AddField(Sentences.creator(Context.Guild.Id), "Zirk#0001", true);
-                embed.AddField(Sentences.uptime(Context.Guild.Id), Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime)));
+                embed.AddField(Sentences.uptime(Context.Guild.Id), Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
                 embed.AddField(Sentences.website(Context.Guild.Id), "https://zirk.eu/sanara.html");
                 embed.AddField(Sentences.officialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");

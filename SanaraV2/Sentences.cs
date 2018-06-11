@@ -84,6 +84,10 @@ namespace SanaraV2
         public static string betaFeature(ulong guildId) { return (GetTranslation(guildId, "betaFeature")); }
         public static string dontPm(ulong guildId) { return (GetTranslation(guildId, "dontPm")); }
         public static string noApiKey(ulong guildId) { return (GetTranslation(guildId, "noApiKey")); }
+        public static string timeSeconds(ulong guildId, string seconds) { return (GetTranslation(guildId, "timeSeconds", seconds)); }
+        public static string timeMinutes(ulong guildId, string minutes, string seconds) { return (GetTranslation(guildId, "timeMinutes", minutes, seconds)); }
+        public static string timeHours(ulong guildId, string hours, string minutes, string seconds) { return (GetTranslation(guildId, "timeHours", hours, minutes, seconds)); }
+        public static string timeDays(ulong guildId, string days, string hours, string minutes, string seconds) { return (GetTranslation(guildId, "timeDays", days, hours, minutes, seconds)); }
 
         /// --------------------------- Parts ---------------------------
         public static string andStr(ulong guildId) { return (GetTranslation(guildId, "and")); }

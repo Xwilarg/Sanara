@@ -565,15 +565,15 @@ namespace SanaraV2
         /// </summary>
         /// <param name="ts">The TimeSpan to transform</param>
         /// <returns>The string wanted</returns>
-        public static string TimeSpanToString(TimeSpan ts)
+        public static string TimeSpanToString(TimeSpan ts, ulong guildId)
         {
-            string finalStr = ts.Seconds + " seconds";
+            string finalStr = Sentences.timeSeconds(guildId, ts.Seconds.ToString());
             if (ts.Days > 0)
-                finalStr = ts.Days + " days, " + ts.Hours + " hours, " + ts.Minutes + " minutes and " + finalStr;
+                finalStr = Sentences.timeDays(guildId, ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Hours > 0)
-                finalStr = ts.Hours + " hours, " + ts.Minutes + " minutes and " + finalStr;
+                finalStr = Sentences.timeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Minutes > 0)
-                finalStr = ts.Minutes + " minutes and " + finalStr;
+                finalStr = Sentences.timeMinutes(guildId, ts.Minutes.ToString(), finalStr);
             return (finalStr);
         }
 
