@@ -109,6 +109,8 @@ namespace SanaraV2
         public static string officialGuild(ulong guildId) { return (GetTranslation(guildId, "officialGuild")); }
         public static string roles(ulong guildId) { return (GetTranslation(guildId, "roles")); }
         public static string noRole(ulong guildId) { return (GetTranslation(guildId, "noRole")); }
+        public static string latestVersion(ulong guildId) { return (GetTranslation(guildId, "latestVersion")); }
+        public static string numberGuilds(ulong guildId) { return (GetTranslation(guildId, "numberGuilds")); }
 
         /// --------------------------- Booru ---------------------------
         public static string fileTooBig(ulong guildId) { return (GetTranslation(guildId, "fileTooBig")); }

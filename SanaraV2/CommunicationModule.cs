@@ -16,6 +16,8 @@
 using Discord;
 using Discord.Commands;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace SanaraV2
@@ -96,6 +98,8 @@ namespace SanaraV2
             if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
             {
                 embed.AddField(Sentences.creator(Context.Guild.Id), "Zirk#0001", true);
+                embed.AddField(Sentences.latestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Sentences.dateHourFormat(Context.Guild.Id)), true);
+                embed.AddField(Sentences.numberGuilds(Context.Guild.Id), p.client.Guilds.Count, true);
                 embed.AddField(Sentences.uptime(Context.Guild.Id), Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
                 embed.AddField(Sentences.website(Context.Guild.Id), "https://zirk.eu/sanara.html");
