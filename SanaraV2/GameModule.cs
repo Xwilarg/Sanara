@@ -36,18 +36,18 @@ namespace SanaraV2
 
         public abstract class Game
         {
-            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName)
+            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName, bool isEasy)
             {
                 m_chan = chan;
                 m_didLost = false;
-                m_refTime = refTime;
+                m_refTime = refTime * ((isEasy) ? (2) : (1));
                 m_time = DateTime.Now;
                 m_charac = Program.p.relations.Find(x => x._name == charac.Id);
                 m_guild = guild;
                 m_nbAttempt = 0;
                 m_nbFound = 0;
                 m_userIds = new List<ulong>();
-                m_fileName = fileName;
+                m_fileName = fileName + ((isEasy) ? ("-easy") : (""));
             }
 
             public bool IsGameLost()
@@ -98,7 +98,6 @@ namespace SanaraV2
 
             public IMessageChannel m_chan { private set; get; }
             protected IGuild m_guild { private set; get; }
-            //public int m_score { protected set; get; }
             public bool m_didLost { protected set; get; }
             private int m_refTime;
             protected DateTime m_time { set; get; }
@@ -112,7 +111,7 @@ namespace SanaraV2
 
         public class Shiritori : Game
         {
-            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, shiritoriTimer, "shiritori.dat")
+            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori.dat", isEasy)
             {
                 m_currWord = null;
                 m_words = File.ReadAllLines("Saves/shiritoriWords.dat").ToList();
@@ -157,6 +156,8 @@ namespace SanaraV2
                 }
                 else
                 {
+                    DateTime now = DateTime.Now;
+                    m_time = DateTime.MinValue;
                     m_nbAttempt++;
                     userWord = LinguistModule.fromKatakana(LinguistModule.toHiragana(userWord));
                     foreach (char c in userWord)
@@ -191,11 +192,13 @@ namespace SanaraV2
                     if (!isCorrect)
                     {
                         await m_chan.SendMessageAsync(Sentences.shiritoriDoesntExist(m_guild.Id));
+                        m_time = now;
                         return;
                     }
                     if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
                     {
                         await m_chan.SendMessageAsync(Sentences.shiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), LinguistModule.fromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
+                        m_time = now;
                         return;
                     }
                     if (m_alreadySaid.Contains(userWord))
@@ -210,7 +213,6 @@ namespace SanaraV2
                         m_didLost = true;
                         return;
                     }
-                    m_time = DateTime.MinValue;
                     m_nbFound++;
                     if (!m_userIds.Contains(user.Id))
                         m_userIds.Add(user.Id);
@@ -257,7 +259,7 @@ namespace SanaraV2
 
         public class Kancolle : Game
         {
-            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, kancolleTimer, "kancolle.dat")
+            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle.dat", isEasy)
             {
                 using (WebClient w = new WebClient())
                 {
@@ -417,7 +419,7 @@ namespace SanaraV2
 
         public class BooruGame : Game
         {
-            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac) : base(chan, guild, charac, booruTimer, "booru.dat")
+            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru.dat", isEasy)
             {
                 m_toGuess = null;
                 m_allTags = new List<string>();
@@ -482,32 +484,36 @@ namespace SanaraV2
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Game);
             if (p.games.Any(x => x.m_chan == Context.Channel))
-            {
                 await ReplyAsync(Sentences.gameAlreadyRunning(Context.Guild.Id));
-            }
+            else if (gameName.Length == 0)
+                await ReplyAsync(Sentences.invalidGameName(Context.Guild.Id));
             else
             {
-                string finalGameName = Program.addArgs(gameName);
-                if (finalGameName == null || (finalGameName.ToLower() != "shiritori" && finalGameName.ToLower() != "kancolle" && finalGameName.ToLower() != "booru"))
+                if (gameName[0].ToLower() != "shiritori" && gameName[0].ToLower() != "kancolle" && gameName[0].ToLower() != "booru")
                 {
                     await ReplyAsync(Sentences.invalidGameName(Context.Guild.Id));
+                }
+                else if (gameName.Length > 1 && gameName[1].ToLower() != "normal" && gameName[1].ToLower() != "easy")
+                {
+                    await ReplyAsync(Sentences.invalidDifficulty(Context.Guild.Id));
                 }
                 else
                 {
                     if (!p.gameThread.IsAlive)
                         p.gameThread.Start();
                     Game g = null;
-                    if (finalGameName.ToLower() == "shiritori")
+                    bool isEasy = (gameName.Length > 1 && gameName[1].ToLower() == "easy");
+                    if (gameName[0].ToLower() == "shiritori")
                     {
                         await ReplyAsync(Sentences.rulesShiritori(Context.Guild.Id));
-                        g = new Shiritori(Context.Channel, Context.Guild, Context.User);
+                        g = new Shiritori(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
-                    else if (finalGameName.ToLower() == "kancolle")
+                    else if (gameName[0].ToLower() == "kancolle")
                     {
                         await ReplyAsync(Sentences.rulesKancolle(Context.Guild.Id));
-                        g = new Kancolle(Context.Channel, Context.Guild, Context.User);
+                        g = new Kancolle(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
-                    else if (finalGameName.ToLower() == "booru")
+                    else if (gameName[0].ToLower() == "booru")
                     {
                         if (!(Context.Channel as ITextChannel).IsNsfw)
                         {
@@ -515,7 +521,7 @@ namespace SanaraV2
                             return;
                         }
                         await ReplyAsync(Sentences.rulesBooru(Context.Guild.Id));
-                        g = new BooruGame(Context.Channel, Context.Guild, Context.User);
+                        g = new BooruGame(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
                     p.games.Add(g);
                     g.Post();

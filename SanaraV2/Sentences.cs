@@ -151,6 +151,7 @@ namespace SanaraV2
         public static string booruGuessClose(ulong guildId, string attempt) { return (GetTranslation(guildId, "booruGuessClose", attempt)); }
         public static string booruGuessBad(ulong guildId, string attempt) { return (GetTranslation(guildId, "booruGuessBad", attempt)); }
         public static string lostStr(ulong guildId) { return (GetTranslation(guildId, "lost")); }
+        public static string invalidDifficulty(ulong guildId) { return (GetTranslation(guildId, "invalidDifficulty")); }
 
         /// --------------------------- Settings ---------------------------
         public static string createArchiveStr(ulong guildId, string currTime)
