@@ -273,7 +273,8 @@ namespace SanaraV2
                 ((isChanNsfw) ? (GetTranslation(guildId, "doujinshiModuleDescription"))
                               : (noCommandAvailable(guildId))));
             embed.AddField(GetTranslation(guildId, "gameModuleName"), GetTranslation(guildId, "gameModuleDescription")
-                + ((isChanNsfw) ? (GetTranslation(guildId, "gameModuleDescription2")) : ("")));
+                + ((isChanNsfw) ? (GetTranslation(guildId, "gameModuleDescription2")) : (""))
+                + Environment.NewLine + GetTranslation(guildId, "gameModuleDescription3"));
             embed.AddField(GetTranslation(guildId, "googleShortenerModuleName"),
                 ((isChanNsfw) ? (GetTranslation(guildId, "googleShortenerModuleDescription"))
                               : (noCommandAvailable(guildId))));
