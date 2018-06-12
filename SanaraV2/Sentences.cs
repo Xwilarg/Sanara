@@ -57,7 +57,7 @@ namespace SanaraV2
 
         /// --------------------------- ID ---------------------------
         public readonly static ulong idPikyu = 352216646267437059; // Bot that collect informations for statistics
-        public readonly static ulong myId = 455059707313258499;
+        public readonly static ulong myId = Program.p.client.CurrentUser.Id;
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------
