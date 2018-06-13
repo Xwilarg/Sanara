@@ -62,7 +62,7 @@ namespace SanaraV2
         public UrlshortenerService service;
 
         private List<int> commandModules; // Nb of command received per months (split by modules)
-        public List<long> statsMonth; // Total size of download for boorus per months
+        public List<long> statsMonth; // Total size of download for boorus per months followed by total of download for boorus per months
         private int commandReceived; // Nb of command received per hours
         private string lastHourSent;
         public string lastMonthSent;
@@ -173,15 +173,15 @@ namespace SanaraV2
                 if (content[1] == lastMonthSent)
                 {
                     string[] mods = content[0].Split('|');
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 10; i++)
                         statsMonth.Add(Convert.ToInt64(mods[i]));
                 }
                 else
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 10; i++)
                         statsMonth.Add(0);
             }
             else
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                     statsMonth.Add(0);
             #endregion StatsInit
 

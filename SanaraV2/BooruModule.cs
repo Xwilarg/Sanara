@@ -341,7 +341,11 @@ namespace SanaraV2
                     wc.Headers.Add("User-Agent: Sanara");
                     wc.DownloadFile(image, imageName);
                     FileInfo file = new FileInfo(imageName);
-                    Program.p.statsMonth[(int)booru.getId()] += file.Length;
+                    if (!isGame)
+                    {
+                        Program.p.statsMonth[(int)booru.getId()] += file.Length;
+                        Program.p.statsMonth[(int)booru.getId() + 5]++;
+                    }
                     if (file.Length >= 8000000)
                         await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
                     else
@@ -378,7 +382,7 @@ namespace SanaraV2
         public static string getBooruUrl(Booru booru, string[] tags)
         {
             int maxVal = booru.getNbMax(getTags(tags));
-            if (maxVal <= 0) // TODO: weird parsing sometimes (example hibiki_(kantai_collection) cut in half if not found)
+            if (maxVal <= 0)
                 return (null);
             else
                 return (booru.getLink(getTags(tags), maxVal));
