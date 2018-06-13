@@ -175,23 +175,32 @@ namespace SanaraV2
                         json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + userWord);
                     }
                     bool isCorrect = false;
+                    bool isNoun = false;
                     foreach (string s in Program.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
                     {
-                        string hiragana = Program.getElementXml("\"reading\":\"", s, '"');
+                        string hiragana = LinguistModule.toKatakana(Program.getElementXml("\"reading\":\"", s, '"'));
                         if (userWord == hiragana)
                         {
                             isCorrect = true;
-                            if (Program.getElementXml("parts_of_speech\":[\"", json, '"') != "Noun")
+                            foreach (string pos in Program.getElementXml("parts_of_speech\":[", json, ']').Split(','))
                             {
-                                await m_chan.SendMessageAsync(Sentences.shiritoriNotNoun(m_guild.Id));
-                                return;
+                                if (pos == "\"Noun\"")
+                                {
+                                    isNoun = true;
+                                    break;
+                                }
                             }
-                            break;
                         }
                     }
                     if (!isCorrect)
                     {
                         await m_chan.SendMessageAsync(Sentences.shiritoriDoesntExist(m_guild.Id));
+                        m_time = now;
+                        return;
+                    }
+                    if (!isNoun)
+                    {
+                        await m_chan.SendMessageAsync(Sentences.shiritoriNotNoun(m_guild.Id));
                         m_time = now;
                         return;
                     }
