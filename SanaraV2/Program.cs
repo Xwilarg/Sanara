@@ -685,36 +685,10 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
+            if (arg.Author.Id == Sentences.myId || arg.Author.IsBot)
+                return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
-            if (arg.Author.Id == 352216646267437059)
-            {
-                /// Get some informations about the bot for statistics purposes
-                if (arg.Content == "<@&330483872544587776> Please send me your informations for comparison.")
-                {
-                    List<ulong> users = new List<ulong>();
-                    foreach (var g in client.Guilds)
-                    {
-                        foreach (var g2 in g.Users)
-                        {
-                            if (!users.Contains(g2.Id))
-                            {
-                                users.Add(g2.Id);
-                            }
-                        }
-                    }
-                    int nbMsgs = 0;
-                    DateTime dt = DateTime.UtcNow;
-                    if (Directory.Exists("Saves/Stats/" + dt.Month.ToString()))
-                    {
-                        foreach (string s in Directory.GetFiles("Saves/Stats/" + dt.Month.ToString()))
-                        {
-                            nbMsgs += Convert.ToInt32(File.ReadAllText(s));
-                        }
-                    }
-                    await (((ITextChannel)(arg.Channel))).SendMessageAsync($"<@{Sentences.idPikyu}> Here are the compare informations: " + client.Guilds.Count + "|" + users.Count + "|" + getLenghtFolder("Saves") + "o|Zirk|" + nbMsgs);
-                }
-            }
             /// When playing games
             else if (arg.Author.Id != Sentences.myId)
             {
