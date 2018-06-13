@@ -205,6 +205,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<GoogleShortenerModule>();
             await commands.AddModuleAsync<RadioModule>();
             await commands.AddModuleAsync<XKCDModule>();
+            await commands.AddModuleAsync<ImageModule>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -219,7 +220,7 @@ namespace SanaraV2
             {
                 var task = Task.Run(async () =>
                 {
-                    for (; ; )
+                    for (;;)
                     {
                         await Task.Delay(60000);
                         UpdateStatus();
@@ -300,6 +301,14 @@ namespace SanaraV2
                     }
                 }
             }
+        }
+
+        public static string[] RemoveFirstArg(string[] args)
+        {
+            List<string> newArgs = new List<string>();
+            for (int i = 1; i < args.Length; i++)
+                newArgs.Add(args[i]);
+            return (newArgs.ToArray());
         }
 
         /// <summary>
@@ -551,6 +560,7 @@ namespace SanaraV2
             Doujinshi,
             Game,
             GoogleShortener,
+            Image,
             Kancolle,
             Linguistic,
             Radio,

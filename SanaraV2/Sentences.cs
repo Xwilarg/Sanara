@@ -255,6 +255,14 @@ namespace SanaraV2
         public static string okStr(ulong guildId) { return (GetTranslation(guildId, "ok")); }
         public static string unitTests(ulong guildId) { return (GetTranslation(guildId, "unitTests")); }
 
+        /// --------------------------- Image ---------------------------
+        public static string helpTransparency(ulong guildId) { return (GetTranslation(guildId, "helpTransparency")); }
+        public static string helpConvert(ulong guildId) { return (GetTranslation(guildId, "helpConvert")); }
+        public static string invalidColor(ulong guildId) { return (GetTranslation(guildId, "invalidColor")); }
+        public static string helpRgb(ulong guildId) { return (GetTranslation(guildId, "helpRgb")); }
+        public static string invalidStep(ulong guildId) { return (GetTranslation(guildId, "invalidStep")); }
+        public static string invalidFormat(ulong guildId) { return (GetTranslation(guildId, "invalidFormat")); }
+
         /// --------------------------- Help ---------------------------
         private static string noCommandAvailable(ulong guildId) { return (GetTranslation(guildId, "noCommandAvailable")); }
         public static Embed help(ulong guildId, bool isChanNsfw)
@@ -279,6 +287,7 @@ namespace SanaraV2
             embed.AddField(GetTranslation(guildId, "googleShortenerModuleName"),
                 ((isChanNsfw) ? (GetTranslation(guildId, "googleShortenerModuleDescription"))
                               : (noCommandAvailable(guildId))));
+            embed.AddField(GetTranslation(guildId, "imageModuleName"), GetTranslation(guildId, "imageModuleDescription"));
             embed.AddField(GetTranslation(guildId, "kantaiCollectionModuleName"), GetTranslation(guildId, "kantaiCollectionModuleDescription"));
             embed.AddField(GetTranslation(guildId, "linguisticModuleName"), GetTranslation(guildId, "linguisticModuleDescription"));
             embed.AddField(GetTranslation(guildId, "radioModuleName"), GetTranslation(guildId, "radioModuleDescription"));

@@ -266,7 +266,7 @@ namespace SanaraV2
         public async Task safebooruSearch(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
+            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             getImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true, false);
         }
 
@@ -274,7 +274,7 @@ namespace SanaraV2
         public async Task gelbooruSearch(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
+            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             getImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
@@ -282,7 +282,7 @@ namespace SanaraV2
         public async Task konachanSearch(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
+            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             getImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
@@ -290,7 +290,7 @@ namespace SanaraV2
         public async Task rule34Search(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
+            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             getImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
@@ -298,7 +298,7 @@ namespace SanaraV2
         public async Task e621Search(params string[] tags)
         {
             p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString();
+            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             getImage(new E621(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 #pragma warning restore CS1998
