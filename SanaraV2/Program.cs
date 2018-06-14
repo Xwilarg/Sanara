@@ -36,7 +36,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2
 {
-    partial class Program
+    public class Program
     {
         public static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
@@ -739,6 +739,27 @@ namespace SanaraV2
                         File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
                     File.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
                 }
+            }
+        }
+
+        public void GameThread()
+        {
+            while (Thread.CurrentThread.IsAlive) // TODO: Replace thread with async
+            {
+                try
+                {
+                    for (int i = p.games.Count - 1; i >= 0; i--)
+                    {
+                        if (p.games[i].IsGameLost())
+                        {
+                            p.games[i].Loose();
+                            p.games.RemoveAt(i);
+                        }
+                    }
+                }
+                catch (InvalidOperationException)
+                { }
+                Thread.Sleep(100);
             }
         }
 

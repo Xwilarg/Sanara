@@ -74,7 +74,7 @@ namespace SanaraV2
             bool isNsfw = (Context.Channel as ITextChannel).IsNsfw;
             EmbedBuilder embed = new EmbedBuilder()
             {
-                ImageUrl = ((vn.IsImageNsfw && isNsfw || !vn.IsImageNsfw) ? (vn.Image) : (null)),
+                ImageUrl = (((vn.IsImageNsfw && isNsfw) || !vn.IsImageNsfw) ? (vn.Image) : (null)),
                 Description = finalDesc,
                 Color = Color.Green
             };

@@ -19,7 +19,6 @@ using System.IO;
 
 namespace SanaraV2
 {
-
     public static class Sentences
     {
         public struct TranslationData
@@ -234,7 +233,6 @@ namespace SanaraV2
         public static string current(ulong guildId) { return (GetTranslation(guildId, "current")); }
         public static string downloading(ulong guildId) { return (GetTranslation(guildId, "downloading")); }
         public static string songAdded(ulong guildId, string song) { return (GetTranslation(guildId, "songAdded", song)); }
-
 
         /// --------------------------- XKCD ---------------------------
         public static string xkcdWrongArg(ulong guildId) { return (GetTranslation(guildId, "xkcdWrongArg")); }

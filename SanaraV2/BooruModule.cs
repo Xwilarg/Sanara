@@ -174,7 +174,6 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-
                     int nbMax = Convert.ToInt32(Program.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
                     if (nbMax > 20000)
                         return (20000 - 1);

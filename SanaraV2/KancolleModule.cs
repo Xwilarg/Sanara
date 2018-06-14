@@ -234,87 +234,10 @@ namespace SanaraV2
                     json = w.DownloadString(url);
                     string[] jsonInside = json.Split(new string[] { "\"title\"" }, StringSplitOptions.None);
                     int currI = 0;
-                    foreach (string s in jsonInside)
-                    {
-                        if (s.Contains("Personality"))
-                        {
-                            finalStr[0] += "**" + Sentences.personality(Context.Guild.Id) + "**" + Environment.NewLine;
-                            string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
-                            foreach (string str in allExplanations)
-                            {
-                                string per = Program.getElementXml("xt\":\"", str, '"');
-                                if (per != "")
-                                    finalStr[0] += per + Environment.NewLine;
-                            }
-                            break;
-                        }
-                    }
-                    foreach (string s in jsonInside)
-                    {
-                        if (s.Contains("Appearance"))
-                        {
-                            finalStr[0] += Environment.NewLine + "**" + Sentences.appearance(Context.Guild.Id) + "**" + Environment.NewLine;
-                            string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
-                            foreach (string str in allExplanations)
-                            {
-                                string per = Program.getElementXml("xt\":\"", str, '"');
-                                if (per != "")
-                                {
-                                    if (finalStr[currI].Length + per.Length > 1500)
-                                    {
-                                        currI++;
-                                        finalStr.Add("");
-                                    }
-                                    finalStr[currI] += per + Environment.NewLine;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    foreach (string s in jsonInside)
-                    {
-                        if (s.Contains("Second Remodel"))
-                        {
-                            finalStr[0] += "**" + Sentences.secondRemodel(Context.Guild.Id) + "**" + Environment.NewLine;
-                            string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
-                            foreach (string str in allExplanations)
-                            {
-                                string per = Program.getElementXml("xt\":\"", str, '"');
-                                if (per != "")
-                                {
-                                    if (finalStr[currI].Length + per.Length > 1500)
-                                    {
-                                        currI++;
-                                        finalStr.Add("");
-                                    }
-                                    finalStr[currI] += per + Environment.NewLine;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    foreach (string s in jsonInside)
-                    {
-                        if (s.Contains("Trivia"))
-                        {
-                            finalStr[currI] += Environment.NewLine + "**" + Sentences.trivia(Context.Guild.Id) + "**" + Environment.NewLine;
-                            string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
-                            foreach (string str in allExplanations)
-                            {
-                                string per = Program.getElementXml("xt\":\"", str, '"');
-                                if (per != "")
-                                {
-                                    if (finalStr[currI].Length + per.Length > 1500)
-                                    {
-                                        currI++;
-                                        finalStr.Add("");
-                                    }
-                                    finalStr[currI] += per + Environment.NewLine;
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    finalStr = GetKancolleInfo("Personality", ref currI, finalStr, jsonInside, Sentences.personality(Context.Guild.Id));
+                    finalStr = GetKancolleInfo("Appearance", ref currI, finalStr, jsonInside, Sentences.appearance(Context.Guild.Id));
+                    finalStr = GetKancolleInfo("Second Remodel", ref currI, finalStr, jsonInside, Sentences.secondRemodel(Context.Guild.Id));
+                    finalStr = GetKancolleInfo("Trivia", ref currI, finalStr, jsonInside, Sentences.trivia(Context.Guild.Id));
                     if (me.GuildPermissions.AttachFiles)
                         await Context.Channel.SendFileAsync("shipgirl" + currentTime + ".jpg");
                     foreach (string s in finalStr)
@@ -335,6 +258,33 @@ namespace SanaraV2
                 if (code.StatusCode == HttpStatusCode.NotFound)
                     await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
             }
+        }
+
+        private List<string> GetKancolleInfo(string categorie, ref int currI, List<string> finalStr, string[] jsonInside, string relatedSentence)
+        {
+            foreach (string s in jsonInside)
+            {
+                if (s.Contains(categorie))
+                {
+                    finalStr[currI] += Environment.NewLine + "**" + relatedSentence + "**" + Environment.NewLine;
+                    string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
+                    foreach (string str in allExplanations)
+                    {
+                        string per = Program.getElementXml("xt\":\"", str, '"');
+                        if (per != "")
+                        {
+                            if (finalStr[currI].Length + per.Length > 1500)
+                            {
+                                currI++;
+                                finalStr.Add("");
+                            }
+                            finalStr[currI] += per + Environment.NewLine;
+                        }
+                    }
+                    break;
+                }
+            }
+            return (finalStr);
         }
     }
 }

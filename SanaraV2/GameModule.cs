@@ -52,7 +52,7 @@ namespace SanaraV2
 
             public bool IsGameLost()
             {
-                return (m_didLost || m_time != DateTime.MinValue && m_time.AddSeconds(m_refTime).CompareTo(DateTime.Now) == -1);
+                return (m_didLost || (m_time != DateTime.MinValue && m_time.AddSeconds(m_refTime).CompareTo(DateTime.Now) == -1));
             }
 
             protected async void SaveServerScores(string answer)
@@ -263,7 +263,6 @@ namespace SanaraV2
             private string m_currWord;
             private List<string> m_words;
             private List<string> m_alreadySaid;
-
         }
 
         public class Kancolle : Game
@@ -535,29 +534,6 @@ namespace SanaraV2
                     p.games.Add(g);
                     g.Post();
                 }
-            }
-        }
-    }
-
-    partial class Program
-    {
-        public void GameThread()
-        {
-            while (Thread.CurrentThread.IsAlive) // TODO: Replace thread with async
-            {
-                try
-                {
-                    for (int i = p.games.Count - 1; i >= 0; i--)
-                    {
-                        if (p.games[i].IsGameLost())
-                        {
-                            p.games[i].Loose();
-                            p.games.RemoveAt(i);
-                        }
-                    }
-                } catch (InvalidOperationException)
-                { }
-                Thread.Sleep(100);
             }
         }
     }
