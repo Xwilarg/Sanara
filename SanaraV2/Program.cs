@@ -233,7 +233,6 @@ namespace SanaraV2
                     }
                 });
             }
-
             await Task.Delay(-1);
         }
 
@@ -669,8 +668,6 @@ namespace SanaraV2
                 commandReceived = 0;
                 for (int i = 0; i <= (int)Module.Youtube; i++)
                     commandModules[i] = 0;
-                values.Add("modules", await GetModulesStats());
-                values.Add("serverCount", client.Guilds.Count.ToString());
             }
             if (lastMonthSent != DateTime.Now.ToString("MM"))
             {
@@ -687,6 +684,8 @@ namespace SanaraV2
             values.Add("nbMsgs", commandReceived.ToString());
             values.Add("serverModules", finalStr);
             values.Add("monthStats", finalStrMonth);
+            values.Add("modules", await GetModulesStats());
+            values.Add("serverCount", client.Guilds.Count.ToString());
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
 
             try
