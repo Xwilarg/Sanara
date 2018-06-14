@@ -22,6 +22,8 @@ using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.DependencyInjection;
+using SharpRaven;
+using SharpRaven.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -75,6 +77,8 @@ namespace SanaraV2
 
         public Dictionary<ulong, string> prefixs;
 
+        RavenClient ravenClient;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -82,7 +86,7 @@ namespace SanaraV2
                 LogLevel = LogSeverity.Verbose,
             });
             client.Log += Log;
-            commands.Log += Log;
+            commands.Log += LogError;
         }
 
         private async Task MainAsync()
@@ -189,6 +193,8 @@ namespace SanaraV2
             guildLanguages = new Dictionary<ulong, string>();
 
             prefixs = new Dictionary<ulong, string>();
+
+            ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
@@ -793,6 +799,12 @@ namespace SanaraV2
             }
             Console.WriteLine(msg);
             Console.ForegroundColor = cc;
+            return Task.CompletedTask;
+        }
+
+        private Task LogError(LogMessage msg)
+        {
+            ravenClient.Capture(new SentryEvent(msg.Exception));
             return Task.CompletedTask;
         }
     }
