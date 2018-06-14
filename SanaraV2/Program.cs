@@ -238,7 +238,6 @@ namespace SanaraV2
             else
                 service = null;
 
-
             if (File.Exists("Keys/raven.dat"))
             {
                 ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
