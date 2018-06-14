@@ -100,6 +100,7 @@ namespace SanaraV2
                 }
             }
         }
+
         public static async Task<VisualNovel> getVn(string vnName)
         {
             Vndb client = new Vndb();

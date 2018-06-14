@@ -108,7 +108,6 @@ namespace SanaraV2
             await commands.AddModuleAsync<SettingsModule>();
             await commands.AddModuleAsync<LinguistModule>();
             await commands.AddModuleAsync<KancolleModule>();
-            await commands.AddModuleAsync<DebugModule>();
             await commands.AddModuleAsync<BooruModule>();
             await commands.AddModuleAsync<VndbModule>();
             await commands.AddModuleAsync<NhentaiModule>();

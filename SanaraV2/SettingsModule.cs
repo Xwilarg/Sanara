@@ -75,17 +75,7 @@ namespace SanaraV2
             else
             {
                 string nextLanguage = Utilities.addArgs(language);
-                string lang = null;
-                if (p.allLanguages.ContainsKey(nextLanguage))
-                    lang = nextLanguage;
-                foreach (var key in p.allLanguages)
-                {
-                    if (key.Value.Contains(nextLanguage))
-                    {
-                        lang = key.Key;
-                        break;
-                    }
-                }
+                string lang = Utilities.GetLanguage(nextLanguage);
                 if (lang == null)
                     await ReplyAsync(Sentences.needLanguage(Context.Guild.Id));
                 else
