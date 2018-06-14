@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord.Commands;
 using System;
 using System.Net;
@@ -356,7 +355,8 @@ namespace SanaraV2
                                 await chan.SendFileAsync(imageName);
                                 break;
                             }
-                            catch (RateLimitedException) { }
+                            catch (RateLimitedException)
+                            { }
                         }
                         if (!isGame)
                         {

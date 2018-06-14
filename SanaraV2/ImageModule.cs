@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord.Commands;
 using System;
 using System.Drawing;
@@ -242,7 +241,8 @@ namespace SanaraV2
         {
             switch (extension.ToLower())
             {
-                case "jpg": case "jpeg":
+                case "jpg":
+                case "jpeg":
                     return (ImageFormat.Jpeg);
                 case "png":
                     return (ImageFormat.Png);
@@ -256,7 +256,9 @@ namespace SanaraV2
                     return (ImageFormat.Gif);
                 case "icon":
                     return (ImageFormat.Icon);
-                case "memorybmp": case "memory bmp": case "memory_bmp":
+                case "memorybmp":
+                case "memory bmp":
+                case "memory_bmp":
                     return (ImageFormat.MemoryBmp);
                 case "tiff":
                     return (ImageFormat.Tiff);

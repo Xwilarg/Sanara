@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord.Commands;
 using System;
 using System.Collections.Generic;

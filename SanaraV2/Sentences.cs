@@ -12,10 +12,8 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord;
 using System;
-using System.IO;
 
 namespace SanaraV2
 {

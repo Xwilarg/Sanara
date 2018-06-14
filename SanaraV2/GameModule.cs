@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord;
 using Discord.Commands;
 using System;
@@ -21,7 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SanaraV2

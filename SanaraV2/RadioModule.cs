@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord;
 using Discord.Audio;
 using Discord.Commands;
@@ -162,11 +161,14 @@ namespace SanaraV2
                     } catch (OperationCanceledException) {
                         while (true)
                         {
-                            try {
+                            try
+                            {
                                 m_musics[0].DeleteThumbnail();
                                 File.Delete(m_musics[0].path);
                                 break;
-                            } catch (IOException) { }
+                            }
+                            catch (IOException)
+                            { }
                         }
                     }
                     await discord.FlushAsync();
