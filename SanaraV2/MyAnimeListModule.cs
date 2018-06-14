@@ -33,7 +33,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
                 return;
             }
-            string animeName = Program.addArgs(animeNameArr);
+            string animeName = Utilities.addArgs(animeNameArr);
             if (animeName.Length == 0)
             {
                 await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
@@ -72,7 +72,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
                 return;
             }
-            string mangaName = Program.addArgs(mangaNameArr);
+            string mangaName = Utilities.addArgs(mangaNameArr);
             if (mangaName.Length == 0)
             {
                 await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
@@ -106,33 +106,33 @@ namespace SanaraV2
             int index = 1;
             for (int i = 1; i < entries.Length; i++)
             {
-                if (Program.getElementXml("<title>", entries[i], '<').ToUpper() == animeName.ToUpper())
+                if (Utilities.getElementXml("<title>", entries[i], '<').ToUpper() == animeName.ToUpper())
                 {
                     index = i;
                     break;
                 }
             }
-            string id = Program.removeUnwantedSymboles(Program.getElementXml("<id>", entries[index], '<'));
+            string id = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<id>", entries[index], '<'));
             using (WebClient wc = new WebClient())
             {
                 string json = wc.DownloadString("https://myanimelist.net/anime/" + id);
-                if (!isNsfw && Program.getElementXml("<span class=\"dark_text\">Rating:</span>", json, '<').Contains("Rx"))
+                if (!isNsfw && Utilities.getElementXml("<span class=\"dark_text\">Rating:</span>", json, '<').Contains("Rx"))
                     return (null);
             }
-            string title = Program.removeUnwantedSymboles(Program.getElementXml("<title>", entries[index], '<'));
-            string english = Program.removeUnwantedSymboles(Program.getElementXml("<english>", entries[index], '<'));
-            string synonyms = Program.removeUnwantedSymboles(Program.getElementXml("<synonyms>", entries[index], '<'));
-            string episodes = Program.getElementXml("<episodes>", entries[index], '<');
+            string title = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<title>", entries[index], '<'));
+            string english = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<english>", entries[index], '<'));
+            string synonyms = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<synonyms>", entries[index], '<'));
+            string episodes = Utilities.getElementXml("<episodes>", entries[index], '<');
             if (episodes == "")
-                episodes = Program.getElementXml("<volumes>", entries[index], '<');
-            string type = Program.getElementXml("<type>", entries[index], '<');
-            string status = Program.getElementXml("<status>", entries[index], '<');
-            string score = Program.getElementXml("<score>", entries[index], '<');
-            string synopsis = Program.removeUnwantedSymboles(Program.getElementXml("<synopsis>", entries[index], '<'));
+                episodes = Utilities.getElementXml("<volumes>", entries[index], '<');
+            string type = Utilities.getElementXml("<type>", entries[index], '<');
+            string status = Utilities.getElementXml("<status>", entries[index], '<');
+            string score = Utilities.getElementXml("<score>", entries[index], '<');
+            string synopsis = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<synopsis>", entries[index], '<'));
             string currentTime = DateTime.Now.ToString("HHmmss") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             EmbedBuilder embed = new EmbedBuilder()
             {
-                ImageUrl = Program.getElementXml("<image>", entries[index], '<'),
+                ImageUrl = Utilities.getElementXml("<image>", entries[index], '<'),
                 Description = "**" + title + "** (" + english + ")" + Environment.NewLine
                 + Sentences.orStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
                 + Sentences.animeInfos(guildId, type, status, episodes) + Environment.NewLine

@@ -49,9 +49,9 @@ namespace SanaraV2
                 html = html.Split(new string[] { "typography-xl-optout" }, StringSplitOptions.None)[1];
                 string[] allLinks = html.Split(new string[] { "href=" }, StringSplitOptions.None);
                 int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
-                wc.DownloadFile(Program.getElementXml("\"", allLinks[1], '"'), "kancolleMap" + currentTime + "1.png");
-                wc.DownloadFile(Program.getElementXml("\"", allLinks[2], '"'), "kancolleMap" + currentTime + "2.png");
-                await ReplyAsync(Program.getElementXml("|en = ", htmlRaw, '\n'));
+                wc.DownloadFile(Utilities.getElementXml("\"", allLinks[1], '"'), "kancolleMap" + currentTime + "1.png");
+                wc.DownloadFile(Utilities.getElementXml("\"", allLinks[2], '"'), "kancolleMap" + currentTime + "2.png");
+                await ReplyAsync(Utilities.getElementXml("|en = ", htmlRaw, '\n'));
                 await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "1.png");
                 await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "2.png");
                 File.Delete("kancolleMap" + currentTime + "1.png");
@@ -83,20 +83,20 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.kancolleHelp(Context.Guild.Id));
                 return;
             }
-            string shipName = Program.cleanWord(Program.addArgs(shipNameArr));
+            string shipName = Utilities.cleanWord(Utilities.addArgs(shipNameArr));
             using (WebClient wc = new WebClient())
             {
                 wc.Encoding = Encoding.UTF8;
                 string html = wc.DownloadString("http://kancolle.wikia.com/wiki/Internals/Translations");
                 List<string> allShipsName = html.Split(new string[] { "<tr" }, StringSplitOptions.None).ToList();
                 allShipsName.RemoveAt(0);
-                string shipContain = allShipsName.Find(x => Program.cleanWord(Program.getElementXml("\">", x, '<')) == shipName);
+                string shipContain = allShipsName.Find(x => Utilities.cleanWord(Utilities.getElementXml("\">", x, '<')) == shipName);
                 if (shipContain == null)
                 {
                     await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                     return;
                 }
-                shipName = Program.getElementXml("<td>", shipContain, '<');
+                shipName = Utilities.getElementXml("<td>", shipContain, '<');
                 html = wc.DownloadString("https://wikiwiki.jp/kancolle/%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E9%80%86%E5%BC%95%E3%81%8D");
                 html = html.Split(new string[] { "<thead>" }, StringSplitOptions.None)[1];
                 html = html.Split(new string[] { "艦種別表" }, StringSplitOptions.None)[0];
@@ -118,7 +118,7 @@ namespace SanaraV2
                     int world = 1;
                     foreach (int i in toKeep)
                     {
-                        string node = Program.getElementXml(">", cathegories[i], '<');
+                        string node = Utilities.getElementXml(">", cathegories[i], '<');
                         if (node.Length > 0)
                         {
                             switch (node[0])
@@ -149,7 +149,7 @@ namespace SanaraV2
                     }
                     if (finalStr.Length > 0)
                     {
-                        string rarity = Program.getElementXml(">", cathegories[1], '<');
+                        string rarity = Utilities.getElementXml(">", cathegories[1], '<');
                         await ReplyAsync(Sentences.rarity(Context.Guild.Id) + " " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
                     else
@@ -178,8 +178,8 @@ namespace SanaraV2
                 for (int i = 1; i < ((allElements.Length > 6) ? (6) : (allElements.Length)); i++)
                 {
                     string[] ressources = allElements[i].Split(new string[] { ",\"" }, StringSplitOptions.None);
-                    finalStr += Program.getElementXml(":", ressources[7], '}') + "% -- " + Sentences.fuel(Context.Guild.Id) + " " + ressources[0] + ", " + Sentences.ammos(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[1], '?') + ", " + Sentences.iron(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[2], '?') + ", " + Sentences.bauxite(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[3], '?')
-                         + ", " + Sentences.devMat(Context.Guild.Id) + " " + Program.getElementXml(":", ressources[4], '?') + Environment.NewLine;
+                    finalStr += Utilities.getElementXml(":", ressources[7], '}') + "% -- " + Sentences.fuel(Context.Guild.Id) + " " + ressources[0] + ", " + Sentences.ammos(Context.Guild.Id) + " " + Utilities.getElementXml(":", ressources[1], '?') + ", " + Sentences.iron(Context.Guild.Id) + " " + Utilities.getElementXml(":", ressources[2], '?') + ", " + Sentences.bauxite(Context.Guild.Id) + " " + Utilities.getElementXml(":", ressources[3], '?')
+                         + ", " + Sentences.devMat(Context.Guild.Id) + " " + Utilities.getElementXml(":", ressources[4], '?') + Environment.NewLine;
                 }
                 await ReplyAsync(finalStr);
             }
@@ -194,7 +194,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.kancolleHelp(Context.Guild.Id));
                 return;
             }
-            string shipName = Program.addArgs(shipNameArr);
+            string shipName = Utilities.addArgs(shipNameArr);
             IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
             string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + shipName + "&limit=1";
             try
@@ -206,18 +206,18 @@ namespace SanaraV2
                     finalStr.Add("");
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     string json = w.DownloadString(url);
-                    string code = Program.getElementXml("\"id\":", json, ',');
+                    string code = Utilities.getElementXml("\"id\":", json, ',');
                     url = "http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + code;
                     json = w.DownloadString(url);
-                    string image = Program.getElementXml("\"thumbnail\":\"", json, '"');
-                    if (Program.getElementXml("\"title\":\"", json, '"').ToUpper() != shipName.ToUpper())
+                    string image = Utilities.getElementXml("\"thumbnail\":\"", json, '"');
+                    if (Utilities.getElementXml("\"title\":\"", json, '"').ToUpper() != shipName.ToUpper())
                     {
                         await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                         return;
                     }
-                    url = "http://kancolle.wikia.com/wiki/" + Program.getElementXml("\"title\":\"", json, '"') + "?action=raw";
+                    url = "http://kancolle.wikia.com/wiki/" + Utilities.getElementXml("\"title\":\"", json, '"') + "?action=raw";
                     json = w.DownloadString(url);
-                    if (Program.getElementXml("{{", json, '}') != "ShipPageHeader" && Program.getElementXml("{{", json, '}') != "Ship/Header")
+                    if (Utilities.getElementXml("{{", json, '}') != "ShipPageHeader" && Utilities.getElementXml("{{", json, '}') != "Ship/Header")
                     {
                         await ReplyAsync(Sentences.shipgirlDontExist(Context.Guild.Id));
                         return;
@@ -269,7 +269,7 @@ namespace SanaraV2
                     string[] allExplanations = s.Split(new string[] { "\"te" }, StringSplitOptions.None);
                     foreach (string str in allExplanations)
                     {
-                        string per = Program.getElementXml("xt\":\"", str, '"');
+                        string per = Utilities.getElementXml("xt\":\"", str, '"');
                         if (per != "")
                         {
                             if (finalStr[currI].Length + per.Length > 1500)

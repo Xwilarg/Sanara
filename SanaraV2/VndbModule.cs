@@ -39,8 +39,8 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.vndbHelp(Context.Guild.Id));
                 return;
             }
-            VisualNovel vn = await getVn(Program.addArgs(vns));
-            if (vn == null || !Program.cleanWord(vn.Name).Contains(Program.cleanWord(Program.addArgs(vns))))
+            VisualNovel vn = await getVn(Utilities.addArgs(vns));
+            if (vn == null || !Utilities.cleanWord(vn.Name).Contains(Utilities.cleanWord(Utilities.addArgs(vns))))
             {
                 await ReplyAsync(Sentences.vndbNotFound(Context.Guild.Id));
                 return;
@@ -117,14 +117,14 @@ namespace SanaraV2
             html = html.Split(new string[] { "<div class=\"mainbox browse vnbrowse\">" }, StringSplitOptions.None)[1];
             html = html.Split(new string[] { "</thead>" }, StringSplitOptions.None)[1];
             List<string> allVnsId = html.Split(new string[] { "href=\"/v" }, StringSplitOptions.None).ToList();
-            string cleanName = Program.cleanWord(vnName);
-            string name = allVnsId.Find(x => Program.cleanWord(x).Contains(cleanName));
+            string cleanName = Utilities.cleanWord(vnName);
+            string name = allVnsId.Find(x => Utilities.cleanWord(x).Contains(cleanName));
             try
             {
                 if (name == null)
-                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + allVnsId[1], '"'));
+                    id = Convert.ToUInt32(Utilities.getElementXml("a", "a" + allVnsId[1], '"'));
                 else
-                    id = Convert.ToUInt32(Program.getElementXml("a", "a" + name, '"'));
+                    id = Convert.ToUInt32(Utilities.getElementXml("a", "a" + name, '"'));
             }
             catch (FormatException)
             {

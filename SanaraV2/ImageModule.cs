@@ -100,14 +100,14 @@ namespace SanaraV2
             {
                 string extension = GetExtensionImage(word[0]);
                 string url = word[0];
-                word = Program.RemoveFirstArg(word);
-                ImageFormat newExtension = GetExtension(Program.addArgs(word));
+                word = Utilities.RemoveFirstArg(word);
+                ImageFormat newExtension = GetExtension(Utilities.addArgs(word));
                 if (extension == null || newExtension == null)
                 {
                     await ReplyAsync(Sentences.invalidFormat(Context.Guild.Id));
                     return;
                 }
-                string currName = "convert" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + Program.addArgs(word);
+                string currName = "convert" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + Utilities.addArgs(word);
                 using (WebClient wc = new WebClient())
                 {
                     using (MemoryStream stream = new MemoryStream(wc.DownloadData(url)))

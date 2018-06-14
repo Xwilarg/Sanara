@@ -216,6 +216,7 @@
     <Compile Include="RadioModule.cs" />
     <Compile Include="Sentences.cs" />
     <Compile Include="SettingsModule.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="VndbModule.cs" />
     <Compile Include="XKCDModule.cs" />
     <Compile Include="YoutubeModule.cs" />

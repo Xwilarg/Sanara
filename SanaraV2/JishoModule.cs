@@ -34,7 +34,7 @@ namespace SanaraV2
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toHiraganaHelp(Context.Guild.Id));
             else
-                await ReplyAsync(toHiragana(fromKatakana(Program.addArgs(word))));
+                await ReplyAsync(toHiragana(fromKatakana(Utilities.addArgs(word))));
         }
 
         [Command("Romaji"), Summary("To romaji")]
@@ -44,7 +44,7 @@ namespace SanaraV2
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toRomajiHelp(Context.Guild.Id));
             else
-                await ReplyAsync(fromKatakana(fromHiragana(Program.addArgs(word))));
+                await ReplyAsync(fromKatakana(fromHiragana(Utilities.addArgs(word))));
         }
 
         [Command("Katakana"), Summary("To romaji")]
@@ -54,7 +54,7 @@ namespace SanaraV2
             if (word.Length == 0)
                 await ReplyAsync(Sentences.toKatakanaHelp(Context.Guild.Id));
             else
-                await ReplyAsync(toKatakana(fromHiragana(Program.addArgs(word))));
+                await ReplyAsync(toKatakana(fromHiragana(Utilities.addArgs(word))));
         }
 
         [Command("Translation"), Summary("Translate a sentence")]
@@ -90,7 +90,7 @@ namespace SanaraV2
                 try
                 {
                     string sourceLanguage;
-                    string translation = getTranslation(Program.addArgs(newWords.ToArray()), language, out sourceLanguage);
+                    string translation = getTranslation(Utilities.addArgs(newWords.ToArray()), language, out sourceLanguage);
                     if (sourceLanguage == "en") sourceLanguage = "english";
                     else if (sourceLanguage == "fr") sourceLanguage = "french";
                     else if (sourceLanguage == "ja") sourceLanguage = "japanese";
@@ -114,7 +114,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.japaneseHelp(Context.Guild.Id));
             else
             {
-                foreach (string s in getAllKanjis(Program.addArgs(word), 0))
+                foreach (string s in getAllKanjis(Utilities.addArgs(word), 0))
                 {
                     await ReplyAsync(s);
                 }
@@ -137,7 +137,7 @@ namespace SanaraV2
                 wc.Encoding = Encoding.UTF8;
                 json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + newWord.ToLower());
             }
-            string[] url = Program.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
+            string[] url = Utilities.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
             string finalStr = Sentences.giveJapaneseTranslations(guildId, word) + Environment.NewLine + Environment.NewLine;
             if (url[0] == "")
                 return new List<string>() { Sentences.noJapaneseTranslation(guildId, word) + "." };
@@ -148,14 +148,14 @@ namespace SanaraV2
                 foreach (string str in url)
                 {
                     string[] urlResult = str.Split(new string[] { "},{" }, StringSplitOptions.None);
-                    string[] meanings = Program.getElementXml("english_definitions\":[", str, ']').Split(new string[] { "\",\"" }, StringSplitOptions.None);
+                    string[] meanings = Utilities.getElementXml("english_definitions\":[", str, ']').Split(new string[] { "\",\"" }, StringSplitOptions.None);
                     foreach (string s in urlResult)
                     {
-                        if (Program.getElementXml("\"reading\":\"", s, '"') == "" && Program.getElementXml("\"word\":\"", s, '"') == "")
+                        if (Utilities.getElementXml("\"reading\":\"", s, '"') == "" && Utilities.getElementXml("\"word\":\"", s, '"') == "")
                             continue;
-                        finalStr += ((Program.getElementXml("\"word\":\"", s, '"') == "") ? (Program.getElementXml("\"reading\":\"", s, '"') + " (" + fromKatakana(fromHiragana(Program.getElementXml("\"reading\":\"", s, '"') + ")")))
-                        : (Program.getElementXml("\"word\":\"", s, '"')
-                        + ((Program.getElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Program.getElementXml("\"reading\":\"", s, '"') + " - " + fromHiragana(fromKatakana(Program.getElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
+                        finalStr += ((Utilities.getElementXml("\"word\":\"", s, '"') == "") ? (Utilities.getElementXml("\"reading\":\"", s, '"') + " (" + fromKatakana(fromHiragana(Utilities.getElementXml("\"reading\":\"", s, '"') + ")")))
+                        : (Utilities.getElementXml("\"word\":\"", s, '"')
+                        + ((Utilities.getElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Utilities.getElementXml("\"reading\":\"", s, '"') + " - " + fromHiragana(fromKatakana(Utilities.getElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
                     }
                     finalStr += Sentences.meaning(guildId);
                     string allMeanings = "";

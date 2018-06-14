@@ -33,7 +33,7 @@ namespace SanaraV2
             {
                 try
                 {
-                    myNb = Convert.ToInt32(Program.addArgs(command));
+                    myNb = Convert.ToInt32(Utilities.addArgs(command));
                 }
                 catch (FormatException)
                 {
@@ -49,7 +49,7 @@ namespace SanaraV2
             using (WebClient wc = new WebClient())
             {
                 string json = wc.DownloadString("https://xkcd.com/info.0.json");
-                int nbMax = Convert.ToInt32(Program.getElementXml("\"num\":", json, ','));
+                int nbMax = Convert.ToInt32(Utilities.getElementXml("\"num\":", json, ','));
                 int nb;
                 if (myNb == null)
                     nb = p.rand.Next(nbMax) + 1;
@@ -63,7 +63,7 @@ namespace SanaraV2
                     nb = (int)myNb;
                 }
                 json = wc.DownloadString("https://xkcd.com/" + nb.ToString() + "/info.0.json");
-                string dlUrl = Program.getElementXml("\"img\": \"", json, '"');
+                string dlUrl = Utilities.getElementXml("\"img\": \"", json, '"');
                 string currName = "xkcd" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString() + "." + dlUrl.Split('.')[dlUrl.Split('.').Length - 1];
                 wc.DownloadFile(dlUrl, currName);
                 await Context.Channel.SendFileAsync(currName);

@@ -174,13 +174,13 @@ namespace SanaraV2
                     }
                     bool isCorrect = false;
                     bool isNoun = false;
-                    foreach (string s in Program.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
+                    foreach (string s in Utilities.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
                     {
-                        string hiragana = LinguistModule.toKatakana(Program.getElementXml("\"reading\":\"", s, '"'));
+                        string hiragana = LinguistModule.toKatakana(Utilities.getElementXml("\"reading\":\"", s, '"'));
                         if (userWord == hiragana)
                         {
                             isCorrect = true;
-                            foreach (string pos in Program.getElementXml("parts_of_speech\":[", json, ']').Split(','))
+                            foreach (string pos in Utilities.getElementXml("parts_of_speech\":[", json, ']').Split(','))
                             {
                                 if (pos == "\"Noun\"")
                                 {
@@ -320,14 +320,14 @@ namespace SanaraV2
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + m_toGuess + "&limit=1";
                     string json = w.DownloadString(url);
-                    string code = Program.getElementXml("\"id\":", json, ',');
+                    string code = Utilities.getElementXml("\"id\":", json, ',');
                     m_idImage = code;
                     url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + m_toGuess + "/Gallery&limit=1";
                     json = w.DownloadString(url);
-                    code = Program.getElementXml("\"id\":", json, ',');
+                    code = Utilities.getElementXml("\"id\":", json, ',');
                     url = "http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + code;
                     json = w.DownloadString(url);
-                    string image = Program.getElementXml("\"thumbnail\":\"", json, '"');
+                    string image = Utilities.getElementXml("\"thumbnail\":\"", json, '"');
                     image = image.Split(new string[] { ".jpg" }, StringSplitOptions.None)[0] + ".jpg";
                     image = image.Replace("\\", "");
                     int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
@@ -371,11 +371,11 @@ namespace SanaraV2
                         {
                             string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
                             string json = w.DownloadString(url);
-                            string code = Program.getElementXml("\"title\":\"", json, '"');
+                            string code = Utilities.getElementXml("\"title\":\"", json, '"');
                             url = "http://kancolle.wikia.com/wiki/" + code + "?action=raw";
                             url = url.Replace(' ', '_');
                             json = w.DownloadString(url);
-                            if (Program.getElementXml("{{", json, '}') != "ShipPageHeader")
+                            if (Utilities.getElementXml("{{", json, '}') != "ShipPageHeader")
                             {
                                 await m_chan.SendMessageAsync(Sentences.kancolleGuessDontExist(m_guild.Id));
                             }
@@ -385,7 +385,7 @@ namespace SanaraV2
                                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                                 url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
                                 json = w.DownloadString(url);
-                                code = Program.getElementXml("\"id\":", json, ',');
+                                code = Utilities.getElementXml("\"id\":", json, ',');
                                 if (m_idImage == code)
                                 {
                                     m_time = DateTime.MinValue;
@@ -459,7 +459,7 @@ namespace SanaraV2
                 else
                 {
                     m_nbAttempt++;
-                    if (Program.cleanWord(userWord) == Program.cleanWord(m_toGuess))
+                    if (Utilities.cleanWord(userWord) == Utilities.cleanWord(m_toGuess))
                     {
                         m_nbFound++;
                         if (!m_userIds.Contains(user.Id))
@@ -467,7 +467,7 @@ namespace SanaraV2
                         await m_chan.SendMessageAsync(Sentences.guessGood(m_guild.Id));
                         Post();
                     }
-                    else if (Program.cleanWord(userWord) != "" && (Program.cleanWord(m_toGuess).Contains(Program.cleanWord(userWord)) || Program.cleanWord(userWord).Contains(Program.cleanWord(m_toGuess))))
+                    else if (Utilities.cleanWord(userWord) != "" && (Utilities.cleanWord(m_toGuess).Contains(Utilities.cleanWord(userWord)) || Utilities.cleanWord(userWord).Contains(Utilities.cleanWord(m_toGuess))))
                         await m_chan.SendMessageAsync(Sentences.booruGuessClose(m_guild.Id, userWord));
                     else
                         await m_chan.SendMessageAsync(Sentences.booruGuessBad(m_guild.Id, userWord));

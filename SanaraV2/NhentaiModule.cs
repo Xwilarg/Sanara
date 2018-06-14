@@ -54,7 +54,7 @@ namespace SanaraV2
                 else
                     xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=8000");
             }
-            int page = p.rand.Next(Convert.ToInt32(Program.getElementXml("\"num_pages\":", xml, ','))) + 1;
+            int page = p.rand.Next(Convert.ToInt32(Utilities.getElementXml("\"num_pages\":", xml, ','))) + 1;
             using (WebClient w = new WebClient())
             {
                 w.Encoding = Encoding.UTF8;
@@ -77,7 +77,7 @@ namespace SanaraV2
                 string currBlock = "";
                 for (int i = ids.Length - 1; i >= 0; i--)
                 {
-                    currBlock = Program.getElementXml("id\":", ids[i], ',');
+                    currBlock = Utilities.getElementXml("id\":", ids[i], ',');
                     if (currBlock != "")
                     {
                         if (keywords.Length == 0)
@@ -90,7 +90,7 @@ namespace SanaraV2
                                 bool isOk = false;
                                 foreach (string s in ids[i - 1].Split(new string[] { "},{" }, StringSplitOptions.None))
                                 {
-                                    if (Program.getElementXml("\"name\":\"", s, '"').Contains(t))
+                                    if (Utilities.getElementXml("\"name\":\"", s, '"').Contains(t))
                                     {
                                         isOk = true;
                                         break;

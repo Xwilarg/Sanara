@@ -46,9 +46,9 @@ namespace SanaraV2
             public abstract string getLink(string tags, int maxNb);
             public abstract string getFileUrl(string json);
             public abstract string[] getTagInfo(string tag);
-            public virtual string getAllTags(string json) { return (Program.getElementXml("tags=\"", json, '"')); }
-            public virtual string getTagName(string json) { return (Program.getElementXml("name=\"", json, '"')); }
-            public virtual string getTagType(string json) { return (Program.getElementXml("type=\"", json, '"')); }
+            public virtual string getAllTags(string json) { return (Utilities.getElementXml("tags=\"", json, '"')); }
+            public virtual string getTagName(string json) { return (Utilities.getElementXml("name=\"", json, '"')); }
+            public virtual string getTagType(string json) { return (Utilities.getElementXml("type=\"", json, '"')); }
             public abstract BooruId getId();
         }
 
@@ -67,7 +67,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    return (Convert.ToInt32(Program.getElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1);
+                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1);
                 }
             }
 
@@ -78,7 +78,7 @@ namespace SanaraV2
 
             public override string getFileUrl(string json)
             {
-                return ("https://" + Program.getElementXml("file_url=\"//", json, '"'));
+                return ("https://" + Utilities.getElementXml("file_url=\"//", json, '"'));
             }
 
             public override string[] getTagInfo(string tag)
@@ -101,7 +101,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Program.getElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -116,7 +116,7 @@ namespace SanaraV2
 
             public override string getFileUrl(string json)
             {
-                return (Program.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.getElementXml("file_url=\"", json, '"'));
             }
 
             public override string[] getTagInfo(string tag)
@@ -139,7 +139,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    return (Convert.ToInt32(Program.getElementXml("posts count=\"", wc.DownloadString("https://www.konachan.com/post.xml?limit=1" + tags), '"')));
+                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://www.konachan.com/post.xml?limit=1" + tags), '"')));
                 }
             }
 
@@ -150,7 +150,7 @@ namespace SanaraV2
 
             public override string getFileUrl(string json)
             {
-                return (Program.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.getElementXml("file_url=\"", json, '"'));
             }
 
             public override string[] getTagInfo(string tag)
@@ -173,7 +173,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Program.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -188,7 +188,7 @@ namespace SanaraV2
 
             public override string getFileUrl(string json)
             {
-                return (Program.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.getElementXml("file_url=\"", json, '"'));
             }
 
             public override string[] getTagInfo(string tag)
@@ -212,7 +212,7 @@ namespace SanaraV2
                 using (WebClient wc = new WebClient())
                 {
                     wc.Headers.Add("User-Agent: Sanara");
-                    int nbMax = Convert.ToInt32(Program.getElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"')) - 1;
                     if (nbMax > 750)
                         return (750 - 1);
                     else
@@ -227,7 +227,7 @@ namespace SanaraV2
 
             public override string getFileUrl(string json)
             {
-                return (Program.getElementXml("<file_url>", json, '<'));
+                return (Utilities.getElementXml("<file_url>", json, '<'));
             }
 
             public override string[] getTagInfo(string tag)
@@ -241,16 +241,16 @@ namespace SanaraV2
 
             public override string getAllTags(string json)
             {
-                return (Program.getElementXml("<tags>", json, '<'));
+                return (Utilities.getElementXml("<tags>", json, '<'));
             }
 
             public override string getTagName(string json)
             {
-                return (Program.getElementXml("<name>", json, '<'));
+                return (Utilities.getElementXml("<name>", json, '<'));
             }
             public override string getTagType(string json)
             {
-                return (Program.getElementXml("<type type=\"integer\">", json, '<'));
+                return (Utilities.getElementXml("<type type=\"integer\">", json, '<'));
             }
 
             public override BooruId getId()
@@ -330,51 +330,62 @@ namespace SanaraV2
                 await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
             else
             {
-                using (WebClient wc = new WebClient())
-                {
-                    wc.Headers.Add("User-Agent: Sanara");
-                    string json = wc.DownloadString(url);
-                    string image = booru.getFileUrl(json);
-                    string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
-                    wc.Headers.Add("User-Agent: Sanara");
-                    wc.DownloadFile(image, imageName);
-                    FileInfo file = new FileInfo(imageName);
-                    if (!isGame)
-                    {
-                        Program.p.statsMonth[(int)booru.getId()] += file.Length;
-                        Program.p.statsMonth[(int)booru.getId() + 5]++;
-                    }
-                    if (file.Length >= 8000000)
-                        await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
-                    else
-                    {
-                        while (true)
-                        {
-                            try
-                            {
-                                await chan.SendFileAsync(imageName);
-                                break;
-                            }
-                            catch (RateLimitedException)
-                            { }
-                        }
-                        if (!isGame)
-                        {
-                            List<string> finalStr = getTagsInfos(json, booru, chan.GuildId);
-                            foreach (string s in finalStr)
-                                await chan.SendMessageAsync(s);
-                        }
-                    }
-                    File.Delete(imageName);
-                }
+                Tuple<string, string> dlData = DownloadImage(booru, currName, url);
+                FileInfo file = new FileInfo(dlData.Item1);
                 if (!isGame)
                 {
-                    string finalStrModule = "";
-                    foreach (long i in Program.p.statsMonth)
-                        finalStrModule += i + "|";
-                    finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
-                    File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + Program.p.lastMonthSent);
+                    Program.p.statsMonth[(int)booru.getId()] += file.Length;
+                    Program.p.statsMonth[(int)booru.getId() + 5]++;
                 }
+                if (file.Length >= 8000000)
+                    await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
+                else
+                {
+                    await PostImage(dlData.Item1, chan);
+                    if (!isGame)
+                    {
+                        List<string> finalStr = getTagsInfos(dlData.Item2, booru, chan.GuildId);
+                        foreach (string s in finalStr)
+                            await chan.SendMessageAsync(s);
+                    }
+                }
+                File.Delete(dlData.Item1);
+            }
+            if (!isGame)
+            {
+                string finalStrModule = "";
+                foreach (long i in Program.p.statsMonth)
+                    finalStrModule += i + "|";
+                finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
+                File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + Program.p.lastMonthSent);
+            }
+        }
+
+        private static Tuple<string, string> DownloadImage(Booru booru, string currName, string url)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                wc.Headers.Add("User-Agent: Sanara");
+                string json = wc.DownloadString(url);
+                string image = booru.getFileUrl(json);
+                string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
+                wc.Headers.Add("User-Agent: Sanara");
+                wc.DownloadFile(image, imageName);
+                return (new Tuple<string, string>(imageName, json));
+            }
+        }
+
+        private static async Task PostImage(string imageName, ITextChannel chan)
+        {
+            while (true)
+            {
+                try
+                {
+                    await chan.SendFileAsync(imageName);
+                    break;
+                }
+                catch (RateLimitedException)
+                { }
             }
         }
 

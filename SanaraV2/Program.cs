@@ -29,7 +29,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -97,47 +96,57 @@ namespace SanaraV2
             rand = new Random();
             relations = new List<Character>();
 
-            if (File.Exists("Keys/malPwd.dat"))
-            {
-                string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
-                malClient = new WebClient();
-                malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
-            }
-            else
-                malClient = null;
+            UpdateLanguageFiles();
+            guildLanguages = new Dictionary<ulong, string>();
 
-            if (File.Exists("Keys/Sanara-7430da57d6af.json"))
-            {
-                credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
-                translationClient = TranslationClient.Create(credential);
-            }
-            else
-                translationClient = null;
+            prefixs = new Dictionary<ulong, string>();
 
-            if (File.Exists("Keys/YoutubeAPIKey.dat"))
+            InitStats();
+            InitServices();
+
+            await commands.AddModuleAsync<CommunicationModule>();
+            await commands.AddModuleAsync<SettingsModule>();
+            await commands.AddModuleAsync<LinguistModule>();
+            await commands.AddModuleAsync<KancolleModule>();
+            await commands.AddModuleAsync<DebugModule>();
+            await commands.AddModuleAsync<BooruModule>();
+            await commands.AddModuleAsync<VndbModule>();
+            await commands.AddModuleAsync<NhentaiModule>();
+            await commands.AddModuleAsync<CodeModule>();
+            await commands.AddModuleAsync<MyAnimeListModule>();
+            await commands.AddModuleAsync<GameModule>();
+            await commands.AddModuleAsync<YoutubeModule>();
+            await commands.AddModuleAsync<GoogleShortenerModule>();
+            await commands.AddModuleAsync<RadioModule>();
+            await commands.AddModuleAsync<XKCDModule>();
+            await commands.AddModuleAsync<ImageModule>();
+
+            client.MessageReceived += HandleCommandAsync;
+            client.GuildAvailable += GuildJoin;
+            client.UserJoined += UserJoin;
+            client.JoinedGuild += GuildJoin;
+
+            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
+            startTime = DateTime.Now;
+            await client.StartAsync();
+
+            if (File.Exists("Keys/websiteToken.dat"))
             {
-                youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                var task = Task.Run(async () =>
                 {
-                    ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
+                    for (;;)
+                    {
+                        await Task.Delay(60000);
+                        UpdateStatus();
+                    }
                 });
             }
-            else
-                youtubeService = null;
+            await Task.Delay(-1);
+        }
 
-            radios = new List<RadioModule.RadioChannel>();
-
-            if (File.Exists("Keys/URLShortenerAPIKey.dat"))
-            {
-                service = new UrlshortenerService(new BaseClientService.Initializer
-                {
-                    ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
-                });
-            }
-            else
-                service = null;
-
-            #region StatsInit
-            /// Stats at https://zirk.eu/sanara-stats.php
+        /// Stats at https://zirk.eu/sanara-stats.php
+        private void InitStats()
+        {
             lastHourSent = DateTime.Now.ToString("HH");
             lastMonthSent = DateTime.Now.ToString("MM");
             if (File.Exists("Saves/CommandReceived.dat"))
@@ -186,53 +195,56 @@ namespace SanaraV2
             else
                 for (int i = 0; i < 10; i++)
                     statsMonth.Add(0);
-            #endregion StatsInit
+        }
 
-            UpdateLanguageFiles();
-            guildLanguages = new Dictionary<ulong, string>();
-
-            prefixs = new Dictionary<ulong, string>();
-
-            ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
-
-            await commands.AddModuleAsync<CommunicationModule>();
-            await commands.AddModuleAsync<SettingsModule>();
-            await commands.AddModuleAsync<LinguistModule>();
-            await commands.AddModuleAsync<KancolleModule>();
-            await commands.AddModuleAsync<DebugModule>();
-            await commands.AddModuleAsync<BooruModule>();
-            await commands.AddModuleAsync<VndbModule>();
-            await commands.AddModuleAsync<NhentaiModule>();
-            await commands.AddModuleAsync<CodeModule>();
-            await commands.AddModuleAsync<MyAnimeListModule>();
-            await commands.AddModuleAsync<GameModule>();
-            await commands.AddModuleAsync<YoutubeModule>();
-            await commands.AddModuleAsync<GoogleShortenerModule>();
-            await commands.AddModuleAsync<RadioModule>();
-            await commands.AddModuleAsync<XKCDModule>();
-            await commands.AddModuleAsync<ImageModule>();
-
-            client.MessageReceived += HandleCommandAsync;
-            client.GuildAvailable += GuildJoin;
-            client.UserJoined += UserJoin;
-            client.JoinedGuild += GuildJoin;
-
-            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
-            startTime = DateTime.Now;
-            await client.StartAsync();
-
-            if (File.Exists("Keys/websiteToken.dat"))
+        private void InitServices()
+        {
+            if (File.Exists("Keys/malPwd.dat"))
             {
-                var task = Task.Run(async () =>
+                string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
+                malClient = new WebClient();
+                malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
+            }
+            else
+                malClient = null;
+
+            if (File.Exists("Keys/Sanara-7430da57d6af.json"))
+            {
+                credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
+                translationClient = TranslationClient.Create(credential);
+            }
+            else
+                translationClient = null;
+
+            if (File.Exists("Keys/YoutubeAPIKey.dat"))
+            {
+                youtubeService = new YouTubeService(new BaseClientService.Initializer()
                 {
-                    for (;;)
-                    {
-                        await Task.Delay(60000);
-                        UpdateStatus();
-                    }
+                    ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
                 });
             }
-            await Task.Delay(-1);
+            else
+                youtubeService = null;
+
+            radios = new List<RadioModule.RadioChannel>();
+
+            if (File.Exists("Keys/URLShortenerAPIKey.dat"))
+            {
+                service = new UrlshortenerService(new BaseClientService.Initializer
+                {
+                    ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
+                });
+            }
+            else
+                service = null;
+
+
+            if (File.Exists("Keys/raven.dat"))
+            {
+                ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
+            }
+            else
+                ravenClient = null;
         }
 
         private void DeleteDirContent(string path)
@@ -246,9 +258,8 @@ namespace SanaraV2
             }
         }
 
-        public void UpdateLanguageFiles()
+        private void CopyLanguagesFiles()
         {
-            allLanguages = new Dictionary<string, List<string>>();
             if (!Directory.Exists("Saves/Translations"))
             {
                 Directory.CreateDirectory("Saves/Translations");
@@ -263,6 +274,12 @@ namespace SanaraV2
                     File.Copy(d + "/infos.json", "Saves/Translations/infos-" + di.Name + ".json");
                 }
             }
+        }
+
+        public void UpdateLanguageFiles()
+        {
+            allLanguages = new Dictionary<string, List<string>>();
+            CopyLanguagesFiles();
             translations = new Dictionary<string, List<Sentences.TranslationData>>();
             foreach (string f in Directory.GetFiles("Saves/Translations"))
             {
@@ -305,136 +322,6 @@ namespace SanaraV2
                     }
                 }
             }
-        }
-
-        public static string[] RemoveFirstArg(string[] args)
-        {
-            List<string> newArgs = new List<string>();
-            for (int i = 1; i < args.Length; i++)
-                newArgs.Add(args[i]);
-            return (newArgs.ToArray());
-        }
-
-        /// <summary>
-        /// When receiving string from website, sometimes you have to replace some stuffs on them.
-        /// </summary>
-        /// <param name="text">The string to deal with</param>
-        /// <returns></returns>
-        public static string removeUnwantedSymboles(string text)
-        {
-            text = text.Replace("[i]", "*");
-            text = text.Replace("[/i]", "*");
-            text = text.Replace("&lt;br /&gt;", Environment.NewLine);
-            text = text.Replace("mdash;", "—");
-            text = text.Replace("&quot;", "\"");
-            text = text.Replace("&amp;", "&");
-            text = text.Replace("&#039;", "'");
-            return (text);
-        }
-
-        /// <summary>
-        /// Every commands take a string[] in parameter so they can be called with any number of arguments.
-        /// This function transform it to a string adding spaces between each elements of the array
-        /// </summary>
-        /// <param name="args">The string[] to deal with</param>
-        /// <returns></returns>
-        public static string addArgs(string[] args)
-        {
-            if (args.Length == 0)
-                return (null);
-            string finalStr = args[0];
-            for (int i = 1; i < args.Length; i++)
-            {
-                finalStr += " " + args[i];
-            }
-            return (finalStr);
-        }
-
-        /// <summary>
-        /// For comparaisons between 2 string it's sometimes useful that you remove everything except number and letters
-        /// </summary>
-        /// <param name="word">The string to deal with</param>
-        /// <returns></returns>
-        public static string cleanWord(string word)
-        {
-            string finalStr = "";
-            foreach (char c in word)
-            {
-                if (char.IsLetterOrDigit(c))
-                    finalStr += char.ToUpper(c);
-            }
-            return (finalStr);
-        }
-
-        /// <summary>
-        /// Get an element in a string
-        /// </summary>
-        /// <param name="tag">The tag where we begin to take the element</param>
-        /// <param name="file">The string to search in</param>
-        /// <param name="stopCharac">The character after with we stop looking for</param>
-        /// <returns></returns>
-        public static string getElementXml(string tag, string file, char stopCharac)
-        {
-            string saveString = "";
-            int prog = 0;
-            char lastChar = ' ';
-            foreach (char c in file)
-            {
-                if (prog == tag.Length)
-                {
-                    if (c == stopCharac
-                        && ((stopCharac == '"' && lastChar != '\\') || stopCharac != '"'))
-                        break;
-                    saveString += c;
-                }
-                else
-                {
-                    if (c == tag[prog])
-                        prog++;
-                    else
-                        prog = 0;
-                }
-                lastChar = c;
-            }
-            return (saveString);
-        }
-
-        /// <summary>
-        /// Get a user by his username/nickname/id
-        /// </summary>
-        /// <param name="name">The name/id of the user</param>
-        /// <param name="guild">The guild the user is in</param>
-        /// <returns></returns>
-        public static async Task<IGuildUser> GetUser(string name, IGuild guild)
-        {
-            Match match = Regex.Match(name, "<@[!]?[0-9]{18}>");
-            if (match.Success)
-            {
-                try
-                {
-                    string val = "";
-                    foreach (char c in match.Value)
-                    {
-                        if (char.IsNumber(c))
-                            val += c;
-                    }
-                    return (await guild.GetUserAsync(Convert.ToUInt64(val)));
-                }
-                catch (Exception)
-                { }
-            }
-            try
-            {
-                return (await guild.GetUserAsync(Convert.ToUInt64(name)));
-            }
-            catch (Exception)
-            { }
-            foreach (IGuildUser user in await guild.GetUsersAsync())
-            {
-                if (user.Nickname == name || user.Username == name)
-                    return (user);
-            }
-            return (null);
         }
 
         private async Task GuildJoin(SocketGuild arg)
@@ -575,23 +462,6 @@ namespace SanaraV2
         }
 
         /// <summary>
-        /// Return a string given a TimeSpan
-        /// </summary>
-        /// <param name="ts">The TimeSpan to transform</param>
-        /// <returns>The string wanted</returns>
-        public static string TimeSpanToString(TimeSpan ts, ulong guildId)
-        {
-            string finalStr = Sentences.timeSeconds(guildId, ts.Seconds.ToString());
-            if (ts.Days > 0)
-                finalStr = Sentences.timeDays(guildId, ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
-            else if (ts.Hours > 0)
-                finalStr = Sentences.timeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
-            else if (ts.Minutes > 0)
-                finalStr = Sentences.timeMinutes(guildId, ts.Minutes.ToString(), finalStr);
-            return (finalStr);
-        }
-
-        /// <summary>
         /// Each commands call this functions that record datas about them
         /// </summary>
         /// <param name="u">User that sent the message</param>
@@ -632,26 +502,6 @@ namespace SanaraV2
                     break;
                 }
             }
-        }
-
-        /// <summary>
-        /// Get size of the given folder
-        /// </summary>
-        /// <param name="folder">folder which size need to be calculated</param>
-        /// <returns>the size of the folder</returns>
-        private long getLenghtFolder(string folder)
-        {
-            long currSize = 0;
-            foreach (string s in Directory.GetFiles(folder))
-            {
-                FileInfo fi = new FileInfo(s);
-                currSize += fi.Length;
-            }
-            foreach (string s in Directory.GetDirectories(folder))
-            {
-                currSize += getLenghtFolder(s);
-            }
-            return (currSize);
         }
 
         private async void UpdateStatus()
@@ -722,23 +572,26 @@ namespace SanaraV2
                 }
                 DateTime dt = DateTime.UtcNow;
                 var result = await commands.ExecuteAsync(context, pos);
-                // Count how many messages the bot receive
                 if (result.IsSuccess && !context.User.IsBot)
-                {
-                    commandReceived++;
-                    if (!Directory.Exists("Saves"))
-                        Directory.CreateDirectory("Saves");
-                    if (!Directory.Exists("Saves/Stats"))
-                        Directory.CreateDirectory("Saves/Stats");
-                    if (!Directory.Exists("Saves/Stats/" + dt.Month.ToString()))
-                        Directory.CreateDirectory("Saves/Stats/" + dt.Month.ToString());
-                    if (File.Exists("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat"))
-                        File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
-                    else
-                        File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
-                    File.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
-                }
+                    SaveCommand(dt);
             }
+        }
+
+        // Count how many messages the bot receive
+        private void SaveCommand(DateTime dt)
+        {
+            commandReceived++;
+            if (!Directory.Exists("Saves"))
+                Directory.CreateDirectory("Saves");
+            if (!Directory.Exists("Saves/Stats"))
+                Directory.CreateDirectory("Saves/Stats");
+            if (!Directory.Exists("Saves/Stats/" + dt.Month.ToString()))
+                Directory.CreateDirectory("Saves/Stats/" + dt.Month.ToString());
+            if (File.Exists("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat"))
+                File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
+            else
+                File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
+            File.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
         }
 
         public void GameThread()
@@ -823,7 +676,10 @@ namespace SanaraV2
 
         private Task LogError(LogMessage msg)
         {
-            ravenClient.Capture(new SentryEvent(msg.Exception));
+            if (ravenClient == null)
+                Log(msg);
+            else
+                ravenClient.Capture(new SentryEvent(msg.Exception));
             return Task.CompletedTask;
         }
     }

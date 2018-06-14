@@ -74,7 +74,7 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.needLanguage(Context.Guild.Id));
             else
             {
-                string nextLanguage = Program.addArgs(language);
+                string nextLanguage = Utilities.addArgs(language);
                 string lang = null;
                 if (p.allLanguages.ContainsKey(nextLanguage))
                     lang = nextLanguage;
@@ -115,7 +115,7 @@ namespace SanaraV2
                 }
                 else
                 {
-                    string prefix = Program.addArgs(command);
+                    string prefix = Utilities.addArgs(command);
                     p.prefixs[Context.Guild.Id] = prefix;
                     File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", prefix);
                     await ReplyAsync(Sentences.doneStr(Context.Guild.Id));

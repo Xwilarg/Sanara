@@ -44,7 +44,7 @@ namespace SanaraV2
                 return (null);
             }
             var searchListRequest = Program.p.youtubeService.Search.List("snippet");
-            searchListRequest.Q = Program.addArgs(words);
+            searchListRequest.Q = Utilities.addArgs(words);
             searchListRequest.MaxResults = maxResult;
             var searchListResponse = await searchListRequest.ExecuteAsync();
             if (searchListResponse.Items.Count < maxResult)

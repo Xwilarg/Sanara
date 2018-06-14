@@ -55,7 +55,7 @@ namespace SanaraV2
                 user = Context.User as IGuildUser;
             else
             {
-                user = await Program.GetUser(Program.addArgs(command), Context.Guild);
+                user = await Utilities.GetUser(Utilities.addArgs(command), Context.Guild);
                 if (user == null)
                 {
                     await ReplyAsync(Sentences.userNotExist(Context.Guild.Id));
@@ -99,7 +99,7 @@ namespace SanaraV2
                 embed.AddField(Sentences.creator(Context.Guild.Id), "Zirk#0001", true);
                 embed.AddField(Sentences.latestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Sentences.dateHourFormat(Context.Guild.Id)), true);
                 embed.AddField(Sentences.numberGuilds(Context.Guild.Id), p.client.Guilds.Count, true);
-                embed.AddField(Sentences.uptime(Context.Guild.Id), Program.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
+                embed.AddField(Sentences.uptime(Context.Guild.Id), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
                 embed.AddField(Sentences.website(Context.Guild.Id), "https://zirk.eu/sanara.html");
                 embed.AddField(Sentences.officialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");

@@ -214,7 +214,7 @@ namespace SanaraV2
                         await ReplyAsync(Sentences.radioAlreadyInList(Context.Guild.Id));
                         return;
                     }
-                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Program.cleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
+                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.cleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
                     YouTubeVideo video = GetYoutubeVideo(youtubeResult.Item1);
                     if (video == null)
                     {
@@ -224,7 +224,7 @@ namespace SanaraV2
                     else
                     {
                         await ReplyAsync(Sentences.songAdded(Context.Guild.Id, youtubeResult.Item2));
-                        DownloadAudio(video, radio, youtubeResult.Item1, Program.cleanWord(youtubeResult.Item2));
+                        DownloadAudio(video, radio, youtubeResult.Item1, Utilities.cleanWord(youtubeResult.Item2));
                     }
                 }
             }
