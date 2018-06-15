@@ -1,2 +1,9 @@
 language: csharp
 solution: SanaraV2.sln
+before_build:
+- nuget restore
+- choco install opencover.portable
+- choco install codecov
+test_script:
+- OpenCover.Console.exe -register:user -target:"xunit.console.x86.exe" -targetargs:".\Sanara-UnitTests\bin\Debug\Sanara-UnitTests.dll -noshadow" -filter:"+[SanaraV2*]* -[Sanara-UnitTests*]*" -output:".\coverage.xml"
+- codecov -f "coverage.xml"

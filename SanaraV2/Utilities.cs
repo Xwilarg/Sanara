@@ -59,12 +59,7 @@ namespace SanaraV2
         {
             if (args.Length == 0)
                 return (null);
-            string finalStr = args[0];
-            for (int i = 1; i < args.Length; i++)
-            {
-                finalStr += " " + args[i];
-            }
-            return (finalStr);
+            return (String.Join(" ", args));
         }
 
         /// <summary>
