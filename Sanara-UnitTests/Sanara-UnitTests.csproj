@@ -38,6 +38,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Discord.Net.Commands, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Discord.Net.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
