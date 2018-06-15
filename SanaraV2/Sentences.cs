@@ -236,21 +236,6 @@ namespace SanaraV2
         public static string xkcdWrongArg(ulong guildId) { return (GetTranslation(guildId, "xkcdWrongArg")); }
         public static string xkcdWrongId(ulong guildId, int max) { return (GetTranslation(guildId, "xkcdWrongId", max.ToString())); }
 
-        /// --------------------------- Debug ---------------------------
-        public static string general(ulong guildId) { return (GetTranslation(guildId, "general")); }
-        public static string creationDate(ulong guildId) { return (GetTranslation(guildId, "creationDate")); }
-        public static string messagesReceived(ulong guildId) { return (GetTranslation(guildId, "messagesReceived")); }
-        public static string userMoreMessages(ulong guildId, string username, string nbMsgs) { return (GetTranslation(guildId, "userMoreMessages", username, nbMsgs)); }
-        public static string userKnown(ulong guildId) { return (GetTranslation(guildId, "userKnown")); }
-        public static string alreadySpoke(ulong guildId, string nbSpoke) { return (GetTranslation(guildId, "alreadySpoke", nbSpoke)); }
-        public static string guildsAvailable(ulong guildId) { return (GetTranslation(guildId, "guildsAvailable")); }
-        public static string translation(ulong guildId) { return (GetTranslation(guildId, "translation")); }
-        public static string definition(ulong guildId) { return (GetTranslation(guildId, "definition")); }
-        public static string randomURL(ulong guildId) { return (GetTranslation(guildId, "randomURL")); }
-        public static string errorStr(ulong guildId) { return (GetTranslation(guildId, "error")); }
-        public static string okStr(ulong guildId) { return (GetTranslation(guildId, "ok")); }
-        public static string unitTests(ulong guildId) { return (GetTranslation(guildId, "unitTests")); }
-
         /// --------------------------- Image ---------------------------
         public static string helpTransparency(ulong guildId) { return (GetTranslation(guildId, "helpTransparency")); }
         public static string helpConvert(ulong guildId) { return (GetTranslation(guildId, "helpConvert")); }

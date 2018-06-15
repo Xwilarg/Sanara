@@ -164,5 +164,36 @@ namespace SanaraV2
                 finalStr = Sentences.timeMinutes(guildId, ts.Minutes.ToString(), finalStr);
             return (finalStr);
         }
+
+        /// <summary>
+        /// Get a language in 2 letters (ex: fr for french)
+        /// </summary>
+        /// <param name="languageName">Language string</param>
+        public static string GetLanguage(string languageName)
+        {
+            string lang = null;
+            if (Program.p.allLanguages.ContainsKey(languageName))
+                lang = languageName;
+            foreach (var key in Program.p.allLanguages)
+            {
+                if (key.Value.Contains(languageName))
+                {
+                    lang = key.Key;
+                    break;
+                }
+            }
+            return (lang);
+        }
+
+        /// <summary>
+        /// Get a language name from 2 letters (ex: french for fr)
+        /// </summary>
+        /// <param name="languageName">Language string</param>
+        public static string GetFullLanguage(string languageName)
+        {
+            if (Program.p.allLanguages.ContainsKey(languageName))
+                return (Program.p.allLanguages[languageName][0]);
+            return (languageName);
+        }
     }
 }

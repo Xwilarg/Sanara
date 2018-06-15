@@ -205,7 +205,6 @@
     <Compile Include="Character.cs" />
     <Compile Include="CodeModule.cs" />
     <Compile Include="CommunicationModule.cs" />
-    <Compile Include="DebugModule.cs" />
     <Compile Include="GameModule.cs" />
     <Compile Include="GoogleShortenerModule.cs" />
     <Compile Include="ImageModule.cs" />

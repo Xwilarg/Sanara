@@ -70,17 +70,9 @@ namespace SanaraV2
                 string language;
                 if (words[0].Length == 2)
                     language = words[0];
-                else if (words[0].ToLower() == "french" || words[0].ToLower() == "français")
-                    language = "fr";
-                else if (words[0].ToLower() == "japanese" || words[0].ToLower() == "日本語")
-                    language = "ja";
-                else if (words[0].ToLower() == "english")
-                    language = "en";
-                else if (words[0].ToLower() == "spanish" || words[0].ToLower() == "español")
-                    language = "es";
-                else if (words[0].ToLower() == "german" || words[0].ToLower() == "deutsch")
-                    language = "de";
                 else
+                    language = Utilities.GetLanguage(words[0].ToLower());
+                if (language == null)
                 {
                     await ReplyAsync(Sentences.invalidLanguage(Context.Guild.Id));
                     return;
@@ -91,11 +83,7 @@ namespace SanaraV2
                 {
                     string sourceLanguage;
                     string translation = getTranslation(Utilities.addArgs(newWords.ToArray()), language, out sourceLanguage);
-                    if (sourceLanguage == "en") sourceLanguage = "english";
-                    else if (sourceLanguage == "fr") sourceLanguage = "french";
-                    else if (sourceLanguage == "ja") sourceLanguage = "japanese";
-                    else if (sourceLanguage == "es") sourceLanguage = "spanish";
-                    else if (sourceLanguage == "de") sourceLanguage = "german";
+                    sourceLanguage = Utilities.GetFullLanguage(sourceLanguage.ToLower());
                     await ReplyAsync("From " + sourceLanguage + ":" + Environment.NewLine + "```" + Environment.NewLine + translation + Environment.NewLine + "```");
                 }
                 catch (GoogleApiException)
@@ -199,7 +187,118 @@ namespace SanaraV2
             string finalName = "";
             string finalStr = "";
             int doubleVoy = 0;
-            Dictionary<string, string> transcriptionArray = new Dictionary<string, string>()
+            for (int i = 0; i < name.Length; i++)
+            {
+                finalName = "";
+                doubleVoy--;
+                char curr = name[i];
+                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
+                if (curr == 'っ')
+                    doubleVoy = 2;
+                else
+                    finalName += Transcript(curr, next, ref i, HiraganaRomajiArray);
+                if (doubleVoy == 1 && curr != 'ん' && curr != 'ゔ' && curr != 'ゃ' && curr != 'ぃ' && curr != 'ゅ' && curr != 'ぇ' && curr != 'ょ'
+                     && curr != 'っ' && curr != 'あ' && curr != 'い' && curr != 'う' && curr != 'え' && curr != 'お')
+                {
+                    finalName = finalName[0] + finalName;
+                }
+                finalStr += finalName;
+                finalName = "";
+            }
+            finalStr += finalName;
+            return (finalStr);
+        }
+
+        public static string fromKatakana(string name)
+        {
+            string finalName = "";
+            string finalStr = "";
+            int doubleVoy = 0;
+            for (int i = 0; i < name.Length; i++)
+            {
+                finalName = "";
+                doubleVoy--;
+                char curr = name[i];
+                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
+                if (curr == 'ッ')
+                    doubleVoy = 2;
+                else if (curr == 'ー' && finalStr.Length > 0)
+                    finalName += finalStr.Substring(finalStr.Length - 1, 1);
+                else
+                    finalName += Transcript(curr, next, ref i, KatakanaRomajiArray);
+                if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
+                     && curr != 'ッ' && curr != 'ア' && curr != 'イ' && curr != 'ウ' && curr != 'エ' && curr != 'オ')
+                {
+                    finalName = finalName[0] + finalName;
+                }
+                finalStr += finalName;
+                finalName = "";
+            }
+            finalStr += finalName;
+            return (finalStr);
+        }
+
+        private static string TranscriptInvert(char curr, char next, char nnext, ref int i, Dictionary<string, string> transcriptionArray)
+        {
+            if (next != ' ')
+            {
+                if (nnext != ' ' && transcriptionArray.ContainsKey("" + curr + next + nnext))
+                {
+                    i++;
+                    return (transcriptionArray["" + curr + next + nnext]);
+                }
+                if (transcriptionArray.ContainsKey("" + curr + next))
+                    return (transcriptionArray["" + curr + next]);
+            }
+            i--;
+            if (transcriptionArray.ContainsKey("" + curr))
+                return (transcriptionArray["" + curr]);
+            return ("" + curr);
+        }
+
+        public static string toHiragana(string name)
+        {
+            string finalName = "";
+            name = name.ToLower();
+            for (int i = 0; i < name.Length; i += 2)
+            {
+                char curr = name[i];
+                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
+                char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
+                if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
+                    && curr == next)
+                {
+                    finalName += "っ";
+                    i--;
+                }
+                else
+                    finalName += TranscriptInvert(curr, next, nnext, ref i, RomajiHiraganaArray);
+            }
+            return (finalName);
+        }
+
+        public static string toKatakana(string name)
+        {
+            string finalName = "";
+            name = name.ToLower();
+            for (int i = 0; i < name.Length; i += 2)
+            {
+                char curr = name[i];
+                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
+                char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
+                if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
+                    && curr == next)
+                {
+                    finalName += "ッ";
+                    i--;
+                }
+                else
+                    finalName += TranscriptInvert(curr, next, nnext, ref i, RomajiKatakanaArray);
+            }
+            return (finalName);
+        }
+
+        static Dictionary<string, string> HiraganaRomajiArray = new Dictionary<string, string>()
             {
                 { "あ", "a" },
                 { "い", "i" },
@@ -336,34 +435,7 @@ namespace SanaraV2
                 { "ゔ", "vu" },
                 { "ん", "n" }
             };
-            for (int i = 0; i < name.Length; i++)
-            {
-                finalName = "";
-                doubleVoy--;
-                char curr = name[i];
-                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
-                if (curr == 'っ')
-                    doubleVoy = 2;
-                else
-                    finalName += Transcript(curr, next, ref i, transcriptionArray);
-                if (doubleVoy == 1 && curr != 'ん' && curr != 'ゔ' && curr != 'ゃ' && curr != 'ぃ' && curr != 'ゅ' && curr != 'ぇ' && curr != 'ょ'
-                     && curr != 'っ' && curr != 'あ' && curr != 'い' && curr != 'う' && curr != 'え' && curr != 'お')
-                {
-                    finalName = finalName[0] + finalName;
-                }
-                finalStr += finalName;
-                finalName = "";
-            }
-            finalStr += finalName;
-            return (finalStr);
-        }
-
-        public static string fromKatakana(string name)
-        {
-            string finalName = "";
-            string finalStr = "";
-            int doubleVoy = 0;
-            Dictionary<string, string> transcriptionArray = new Dictionary<string, string>()
+        static Dictionary<string, string> KatakanaRomajiArray = new Dictionary<string, string>()
             {
                 { "ア", "a" },
                 { "イ", "i" },
@@ -498,53 +570,7 @@ namespace SanaraV2
                 { "ヴ", "vu" },
                 { "ン", "n" }
             };
-            for (int i = 0; i < name.Length; i++)
-            {
-                finalName = "";
-                doubleVoy--;
-                char curr = name[i];
-                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
-                if (curr == 'ッ')
-                    doubleVoy = 2;
-                else if (curr == 'ー' && finalStr.Length > 0)
-                    finalName += finalStr.Substring(finalStr.Length - 1, 1);
-                else
-                    finalName += Transcript(curr, next, ref i, transcriptionArray);
-                if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
-                     && curr != 'ッ' && curr != 'ア' && curr != 'イ' && curr != 'ウ' && curr != 'エ' && curr != 'オ')
-                {
-                    finalName = finalName[0] + finalName;
-                }
-                finalStr += finalName;
-                finalName = "";
-            }
-            finalStr += finalName;
-            return (finalStr);
-        }
-
-        private static string TranscriptInvert(char curr, char next, char nnext, ref int i, Dictionary<string, string> transcriptionArray)
-        {
-            if (next != ' ')
-            {
-                if (nnext != ' ' && transcriptionArray.ContainsKey("" + curr + next + nnext))
-                {
-                    i++;
-                    return (transcriptionArray["" + curr + next + nnext]);
-                }
-                if (transcriptionArray.ContainsKey("" + curr + next))
-                    return (transcriptionArray["" + curr + next]);
-            }
-            i--;
-            if (transcriptionArray.ContainsKey("" + curr))
-                return (transcriptionArray["" + curr]);
-            return ("" + curr);
-        }
-
-        public static string toHiragana(string name)
-        {
-            string finalName = "";
-            name = name.ToLower();
-            Dictionary<string, string> transcriptionArray = new Dictionary<string, string>()
+        static Dictionary<string, string> RomajiHiraganaArray = new Dictionary<string, string>()
             {
                 { "a", "あ" },
                 { "i", "い" },
@@ -691,28 +717,7 @@ namespace SanaraV2
                 { "vu", "ゔ" },
                 { "n", "ん" }
             };
-            for (int i = 0; i < name.Length; i += 2)
-            {
-                char curr = name[i];
-                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
-                char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
-                if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
-                {
-                    finalName += "っ";
-                    i--;
-                }
-                else
-                    finalName += TranscriptInvert(curr, next, nnext, ref i, transcriptionArray);
-            }
-            return (finalName);
-        }
-
-        public static string toKatakana(string name)
-        {
-            string finalName = "";
-            name = name.ToLower();
-            Dictionary<string, string> transcriptionArray = new Dictionary<string, string>()
+        static Dictionary<string, string> RomajiKatakanaArray = new Dictionary<string, string>()
             {
                 { "a", "ア" },
                 { "i", "イ" },
@@ -863,21 +868,5 @@ namespace SanaraV2
                 { "vu", "ヴ" },
                 { "n", "ン" }
             };
-            for (int i = 0; i < name.Length; i += 2)
-            {
-                char curr = name[i];
-                char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
-                char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
-                if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
-                {
-                    finalName += "ッ";
-                    i--;
-                }
-                else
-                    finalName += TranscriptInvert(curr, next, nnext, ref i, transcriptionArray);
-            }
-            return (finalName);
-        }
     }
 }
