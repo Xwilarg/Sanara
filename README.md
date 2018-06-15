@@ -1,5 +1,5 @@
 [<img src="https://discordbots.org/api/widget/owner/329664361016721408.svg"/>](https://discordbots.org/bot/329664361016721408)<br/>
-[![Build Status](https://travis-ci.org/Xwilarg/Sanara.svg?branch=master)](https://travis-ci.org/Xwilarg/Sanara)<br/>
+[![Build status](https://ci.appveyor.com/api/projects/status/o67101qtad8drfit/branch/master?svg=true)](https://ci.appveyor.com/project/Xwilarg/sanara/branch/master)<br/>
 [![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)<br/>
 # Sanara
 
