@@ -67,7 +67,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1);
+                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')));
                 }
             }
 
@@ -101,7 +101,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -173,7 +173,7 @@ namespace SanaraV2
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -212,7 +212,7 @@ namespace SanaraV2
                 using (WebClient wc = new WebClient())
                 {
                     wc.Headers.Add("User-Agent: Sanara");
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"')) - 1;
+                    int nbMax = Convert.ToInt32(Utilities.getElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"'));
                     if (nbMax > 750)
                         return (750 - 1);
                     else
@@ -310,24 +310,32 @@ namespace SanaraV2
         /// <param name="currName">Temporary name of the file</param>
         /// <param name="isSfw">Is the channel safe for work ?</param>
         /// <param name="isGame">If the request from Game module (doesn't count dl for stats and don't get informations about tags)</param>
-        public static async void getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
+        public static async Task getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
         {
             if (!isSfw && !chan.IsNsfw)
             {
-                await chan.SendMessageAsync(Sentences.chanIsNotNsfw(chan.GuildId));
+                if (chan != null)
+                    await chan.SendMessageAsync(Sentences.chanIsNotNsfw(chan.GuildId));
                 return;
             }
-            IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
-            if (!me.GuildPermissions.AttachFiles)
+            if (chan != null)
             {
-                await chan.SendMessageAsync(Sentences.needAttachFile(chan.GuildId));
-                return;
+                IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
+                if (!me.GuildPermissions.AttachFiles)
+                {
+                    if (chan != null)
+                        await chan.SendMessageAsync(Sentences.needAttachFile(chan.GuildId));
+                    return;
+                }
+                if (!isGame)
+                    await chan.SendMessageAsync(Sentences.prepareImage(chan.GuildId));
             }
-            if (!isGame)
-                await chan.SendMessageAsync(Sentences.prepareImage(chan.GuildId));
             string url = getBooruUrl(booru, tags);
             if (url == null)
-                await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
+            {
+                if (chan != null)
+                    await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
+            }
             else
             {
                 Tuple<string, string> dlData = DownloadImage(booru, currName, url);
@@ -337,6 +345,8 @@ namespace SanaraV2
                     Program.p.statsMonth[(int)booru.getId()] += file.Length;
                     Program.p.statsMonth[(int)booru.getId() + 5]++;
                 }
+                if (chan == null)
+                    return;
                 if (file.Length >= 8000000)
                     await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
                 else
@@ -344,7 +354,7 @@ namespace SanaraV2
                     await PostImage(dlData.Item1, chan);
                     if (!isGame)
                     {
-                        List<string> finalStr = getTagsInfos(dlData.Item2, booru, chan.GuildId);
+                        List<string> finalStr = getTagsInfos(dlData.Item2, booru, (chan == null) ? (0) : (chan.GuildId));
                         foreach (string s in finalStr)
                             await chan.SendMessageAsync(s);
                     }
@@ -361,12 +371,17 @@ namespace SanaraV2
             }
         }
 
+        public static string DownloadJson(WebClient wc, string url)
+        {
+            wc.Headers.Add("User-Agent: Sanara");
+            return (wc.DownloadString(url));
+        }
+
         private static Tuple<string, string> DownloadImage(Booru booru, string currName, string url)
         {
             using (WebClient wc = new WebClient())
             {
-                wc.Headers.Add("User-Agent: Sanara");
-                string json = wc.DownloadString(url);
+                string json = DownloadJson(wc, url);
                 string image = booru.getFileUrl(json);
                 string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
                 wc.Headers.Add("User-Agent: Sanara");
@@ -398,7 +413,7 @@ namespace SanaraV2
                 return (booru.getLink(getTags(tags), maxVal));
         }
 
-        private static List<string> getTagsInfos(string json, Booru booru, ulong guildId)
+        public static List<string> getTagsInfos(string json, Booru booru, ulong guildId)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();

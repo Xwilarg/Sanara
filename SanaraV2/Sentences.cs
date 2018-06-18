@@ -33,7 +33,9 @@ namespace SanaraV2
 
         private static string GetTranslation(ulong guildId, string id, params string[] args)
         {
-            string language = (guildId == 0) ? ("en") : (Program.p.guildLanguages[guildId]);
+            if (guildId == 0) // GuildId is equal to 0 for unit tests
+                return ("");
+            string language = Program.p.guildLanguages[guildId];
             if (Program.p.translations.ContainsKey(id))
             {
                 TranslationData value = Program.p.translations[id].Find(x => x.language == language);
@@ -53,7 +55,7 @@ namespace SanaraV2
         }
 
         /// --------------------------- ID ---------------------------
-        public readonly static ulong myId = Program.p.client.CurrentUser.Id;
+        public readonly static ulong myId = (Program.p.client == null) ? (0) : (Program.p.client.CurrentUser.Id);
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------

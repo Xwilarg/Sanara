@@ -37,7 +37,7 @@ namespace SanaraV2
     public class Program
     {
         public static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+            => new Program().MainAsync(true).GetAwaiter().GetResult();
 
         public readonly DiscordSocketClient client;
         private readonly IServiceCollection map = new ServiceCollection();
@@ -87,7 +87,12 @@ namespace SanaraV2
             commands.Log += LogError;
         }
 
-        private async Task MainAsync()
+        public Program(bool unused) // For unit tests
+        {
+            MainAsync(false).GetAwaiter().GetResult();
+        }
+
+        private async Task MainAsync(bool launchBot)
         {
             p = this;
             games = new List<GameModule.Game>();
@@ -103,6 +108,9 @@ namespace SanaraV2
 
             InitStats();
             InitServices();
+
+            if (!launchBot)
+                return;
 
             await commands.AddModuleAsync<CommunicationModule>();
             await commands.AddModuleAsync<SettingsModule>();
