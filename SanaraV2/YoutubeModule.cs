@@ -23,11 +23,11 @@ namespace SanaraV2
     {
         Program p = Program.p;
         [Command("Youtube"), Summary("Get a random video given a playlist")]
-        public async Task youtubeVideo(params string[] words)
+        public async Task YoutubeVideo(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
             else
             {
                 Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));
@@ -40,16 +40,16 @@ namespace SanaraV2
         {
             if (words.Length == 0)
             {
-                await chan.SendMessageAsync(Sentences.youtubeHelp((chan as ITextChannel).GuildId));
+                await chan.SendMessageAsync(Sentences.YoutubeHelp((chan as ITextChannel).GuildId));
                 return (null);
             }
             var searchListRequest = Program.p.youtubeService.Search.List("snippet");
-            searchListRequest.Q = Utilities.addArgs(words);
+            searchListRequest.Q = Utilities.AddArgs(words);
             searchListRequest.MaxResults = maxResult;
             var searchListResponse = await searchListRequest.ExecuteAsync();
             if (searchListResponse.Items.Count < maxResult)
             {
-                await chan.SendMessageAsync(Sentences.youtubeNotFound((chan as ITextChannel).GuildId));
+                await chan.SendMessageAsync(Sentences.YoutubeNotFound((chan as ITextChannel).GuildId));
                 return (null);
             }
             Google.Apis.YouTube.v3.Data.SearchResult sr = searchListResponse.Items[maxResult - 1];

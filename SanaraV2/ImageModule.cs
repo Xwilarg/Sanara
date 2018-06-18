@@ -26,17 +26,17 @@ namespace SanaraV2
     {
         Program p = Program.p;
         [Command("Transparency", RunMode = RunMode.Async), Summary("Add transparency to the image given in parameter")]
-        public async Task transparency(params string[] word)
+        public async Task Transparency(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !IsLinkValid(word[0]))
-                await ReplyAsync(Sentences.helpTransparency(Context.Guild.Id));
+                await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
                 string extension = GetExtensionImage(word[0]);
                 if (extension == null)
                 {
-                    await ReplyAsync(Sentences.invalidFormat(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
                     return;
                 }
                 string currName = "transparency" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + ".png";
@@ -55,17 +55,17 @@ namespace SanaraV2
         }
 
         [Command("Negate", RunMode = RunMode.Async), Summary("Negate the image color")]
-        public async Task negate(params string[] word)
+        public async Task Negate(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !IsLinkValid(word[0]))
-                await ReplyAsync(Sentences.helpTransparency(Context.Guild.Id));
+                await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
                 string extension = GetExtensionImage(word[0]);
                 if (extension == null)
                 {
-                    await ReplyAsync(Sentences.invalidFormat(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
                     return;
                 }
                 string currName = "negate" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + extension;
@@ -91,23 +91,23 @@ namespace SanaraV2
         }
 
         [Command("Convert", RunMode = RunMode.Async), Summary("Convert an image to another format")]
-        public async Task convert(params string[] word)
+        public async Task ConvertImage(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length <= 1 || !IsLinkValid(word[0]))
-                await ReplyAsync(Sentences.helpConvert(Context.Guild.Id));
+                await ReplyAsync(Sentences.HelpConvert(Context.Guild.Id));
             else
             {
                 string extension = GetExtensionImage(word[0]);
                 string url = word[0];
                 word = Utilities.RemoveFirstArg(word);
-                ImageFormat newExtension = GetExtension(Utilities.addArgs(word));
+                ImageFormat newExtension = GetExtension(Utilities.AddArgs(word));
                 if (extension == null || newExtension == null)
                 {
-                    await ReplyAsync(Sentences.invalidFormat(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
                     return;
                 }
-                string currName = "convert" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + Utilities.addArgs(word);
+                string currName = "convert" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + Utilities.AddArgs(word);
                 using (WebClient wc = new WebClient())
                 {
                     using (MemoryStream stream = new MemoryStream(wc.DownloadData(url)))
@@ -122,10 +122,10 @@ namespace SanaraV2
         }
 
         [Command("Rgb", RunMode = RunMode.Async), Summary("Display a RGB color")]
-        public async Task rgb(params string[] word)
+        public async Task Rgb(params string[] word)
         {
             if (word.Length < 3)
-                await ReplyAsync(Sentences.helpRgb(Context.Guild.Id));
+                await ReplyAsync(Sentences.HelpRgb(Context.Guild.Id));
             else
             {
                 Bitmap bmp = new Bitmap(100, 100, PixelFormat.Format24bppRgb);
@@ -136,17 +136,17 @@ namespace SanaraV2
                 }
                 catch (ArgumentException)
                 {
-                    await ReplyAsync(Sentences.invalidColor(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
                     return;
                 }
                 catch (OverflowException)
                 {
-                    await ReplyAsync(Sentences.invalidColor(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
                     return;
                 }
                 catch (FormatException)
                 {
-                    await ReplyAsync(Sentences.invalidColor(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
                     return;
                 }
                 string currName = "rgb" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + ".png";
@@ -164,17 +164,17 @@ namespace SanaraV2
         }
 
         [Command("Epure", RunMode = RunMode.Async), Summary("Epure an image")]
-        public async Task epure(params string[] word)
+        public async Task Epure(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !IsLinkValid(word[0]))
-                await ReplyAsync(Sentences.helpTransparency(Context.Guild.Id));
+                await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
                 string extension = GetExtensionImage(word[0]);
                 if (extension == null)
                 {
-                    await ReplyAsync(Sentences.invalidFormat(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
                     return;
                 }
                 int step = 25;
@@ -185,18 +185,18 @@ namespace SanaraV2
                         step = Convert.ToInt32(word[1]);
                         if (step <= 0 || step > 255)
                         {
-                            await ReplyAsync(Sentences.invalidStep(Context.Guild.Id));
+                            await ReplyAsync(Sentences.InvalidStep(Context.Guild.Id));
                             return;
                         }
                     }
                     catch (OverflowException)
                     {
-                        await ReplyAsync(Sentences.invalidColor(Context.Guild.Id));
+                        await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
                         return;
                     }
                     catch (FormatException)
                     {
-                        await ReplyAsync(Sentences.invalidColor(Context.Guild.Id));
+                        await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
                         return;
                     }
                 }

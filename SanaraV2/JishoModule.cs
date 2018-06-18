@@ -28,43 +28,43 @@ namespace SanaraV2
     {
         Program p = Program.p;
         [Command("Hiragana"), Summary("To hiragana")]
-        public async Task toHiraganaCmd(params string[] word)
+        public async Task ToHiraganaCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toHiraganaHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.ToHiraganaHelp(Context.Guild.Id));
             else
-                await ReplyAsync(toHiragana(fromKatakana(Utilities.addArgs(word))));
+                await ReplyAsync(ToHiragana(FromKatakana(Utilities.AddArgs(word))));
         }
 
         [Command("Romaji"), Summary("To romaji")]
-        public async Task toRomajiCmd(params string[] word)
+        public async Task ToRomajiCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toRomajiHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.ToRomajiHelp(Context.Guild.Id));
             else
-                await ReplyAsync(fromKatakana(fromHiragana(Utilities.addArgs(word))));
+                await ReplyAsync(FromKatakana(FromHiragana(Utilities.AddArgs(word))));
         }
 
         [Command("Katakana"), Summary("To romaji")]
-        public async Task toKatakanaCmd(params string[] word)
+        public async Task ToKatakanaCmd(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.toKatakanaHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.ToKatakanaHelp(Context.Guild.Id));
             else
-                await ReplyAsync(toKatakana(fromHiragana(Utilities.addArgs(word))));
+                await ReplyAsync(ToKatakana(FromHiragana(Utilities.AddArgs(word))));
         }
 
         [Command("Translation"), Summary("Translate a sentence")]
-        public async Task translation(params string[] words)
+        public async Task Translation(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (p.translationClient == null)
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
             else if (words.Length < 2)
-                await ReplyAsync(Sentences.translateHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.TranslateHelp(Context.Guild.Id));
             else
             {
                 string language;
@@ -74,7 +74,7 @@ namespace SanaraV2
                     language = Utilities.GetLanguage(words[0].ToLower());
                 if (language == null)
                 {
-                    await ReplyAsync(Sentences.invalidLanguage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild.Id));
                     return;
                 }
                 List<string> newWords = words.ToList();
@@ -82,41 +82,41 @@ namespace SanaraV2
                 try
                 {
                     string sourceLanguage;
-                    string translation = getTranslation(Utilities.addArgs(newWords.ToArray()), language, out sourceLanguage);
+                    string translation = GetTranslation(Utilities.AddArgs(newWords.ToArray()), language, out sourceLanguage);
                     sourceLanguage = Utilities.GetFullLanguage(sourceLanguage.ToLower());
                     await ReplyAsync("From " + sourceLanguage + ":" + Environment.NewLine + "```" + Environment.NewLine + translation + Environment.NewLine + "```");
                 }
                 catch (GoogleApiException)
                 {
-                    await ReplyAsync(Sentences.invalidLanguage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild.Id));
                     return;
                 }
             }
         }
 
         [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word")]
-        public async Task meaning(params string[] word)
+        public async Task Meaning(params string[] word)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
-                await ReplyAsync(Sentences.japaneseHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.JapaneseHelp(Context.Guild.Id));
             else
             {
-                foreach (string s in getAllKanjis(Utilities.addArgs(word), 0))
+                foreach (string s in GetAllKanjis(Utilities.AddArgs(word), 0))
                 {
                     await ReplyAsync(s);
                 }
             }
         }
 
-        public static string getTranslation(string words, string language, out string sourceLanguage)
+        public static string GetTranslation(string words, string language, out string sourceLanguage)
         {
             TranslationResult translation = Program.p.translationClient.TranslateText(words, language);
             sourceLanguage = translation.DetectedSourceLanguage;
             return (translation.TranslatedText);
         }
 
-        public static List<string> getAllKanjis(string word, ulong guildId)
+        public static List<string> GetAllKanjis(string word, ulong guildId)
         {
             string newWord = word.Replace(" ", "%20");
             string json;
@@ -125,10 +125,10 @@ namespace SanaraV2
                 wc.Encoding = Encoding.UTF8;
                 json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + newWord.ToLower());
             }
-            string[] url = Utilities.getElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
-            string finalStr = Sentences.giveJapaneseTranslations(guildId, word) + Environment.NewLine + Environment.NewLine;
+            string[] url = Utilities.GetElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None);
+            string finalStr = Sentences.GiveJapaneseTranslations(guildId, word) + Environment.NewLine + Environment.NewLine;
             if (url[0] == "")
-                return new List<string>() { Sentences.noJapaneseTranslation(guildId, word) + "." };
+                return new List<string>() { Sentences.NoJapaneseTranslation(guildId, word) + "." };
             else
             {
                 List<string> finalList = new List<string>();
@@ -136,16 +136,16 @@ namespace SanaraV2
                 foreach (string str in url)
                 {
                     string[] urlResult = str.Split(new string[] { "},{" }, StringSplitOptions.None);
-                    string[] meanings = Utilities.getElementXml("english_definitions\":[", str, ']').Split(new string[] { "\",\"" }, StringSplitOptions.None);
+                    string[] meanings = Utilities.GetElementXml("english_definitions\":[", str, ']').Split(new string[] { "\",\"" }, StringSplitOptions.None);
                     foreach (string s in urlResult)
                     {
-                        if (Utilities.getElementXml("\"reading\":\"", s, '"') == "" && Utilities.getElementXml("\"word\":\"", s, '"') == "")
+                        if (Utilities.GetElementXml("\"reading\":\"", s, '"') == "" && Utilities.GetElementXml("\"word\":\"", s, '"') == "")
                             continue;
-                        finalStr += ((Utilities.getElementXml("\"word\":\"", s, '"') == "") ? (Utilities.getElementXml("\"reading\":\"", s, '"') + " (" + fromKatakana(fromHiragana(Utilities.getElementXml("\"reading\":\"", s, '"') + ")")))
-                        : (Utilities.getElementXml("\"word\":\"", s, '"')
-                        + ((Utilities.getElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Utilities.getElementXml("\"reading\":\"", s, '"') + " - " + fromHiragana(fromKatakana(Utilities.getElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
+                        finalStr += ((Utilities.GetElementXml("\"word\":\"", s, '"') == "") ? (Utilities.GetElementXml("\"reading\":\"", s, '"') + " (" + FromKatakana(FromHiragana(Utilities.GetElementXml("\"reading\":\"", s, '"') + ")")))
+                        : (Utilities.GetElementXml("\"word\":\"", s, '"')
+                        + ((Utilities.GetElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Utilities.GetElementXml("\"reading\":\"", s, '"') + " - " + FromHiragana(FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
                     }
-                    finalStr += Sentences.meaning(guildId);
+                    finalStr += Sentences.Meaning(guildId);
                     string allMeanings = "";
                     foreach (string sm in meanings)
                     {
@@ -182,7 +182,7 @@ namespace SanaraV2
             return ("" + curr);
         }
 
-        public static string fromHiragana(string name)
+        public static string FromHiragana(string name)
         {
             string finalName = "";
             string finalStr = "";
@@ -209,7 +209,7 @@ namespace SanaraV2
             return (finalStr);
         }
 
-        public static string fromKatakana(string name)
+        public static string FromKatakana(string name)
         {
             string finalName = "";
             string finalStr = "";
@@ -256,7 +256,7 @@ namespace SanaraV2
             return ("" + curr);
         }
 
-        public static string toHiragana(string name)
+        public static string ToHiragana(string name)
         {
             string finalName = "";
             name = name.ToLower();
@@ -277,7 +277,7 @@ namespace SanaraV2
             return (finalName);
         }
 
-        public static string toKatakana(string name)
+        public static string ToKatakana(string name)
         {
             string finalName = "";
             name = name.ToLower();
@@ -298,7 +298,7 @@ namespace SanaraV2
             return (finalName);
         }
 
-        static Dictionary<string, string> HiraganaRomajiArray = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> HiraganaRomajiArray = new Dictionary<string, string>()
             {
                 { "あ", "a" },
                 { "い", "i" },
@@ -435,7 +435,7 @@ namespace SanaraV2
                 { "ゔ", "vu" },
                 { "ん", "n" }
             };
-        static Dictionary<string, string> KatakanaRomajiArray = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> KatakanaRomajiArray = new Dictionary<string, string>()
             {
                 { "ア", "a" },
                 { "イ", "i" },
@@ -570,7 +570,7 @@ namespace SanaraV2
                 { "ヴ", "vu" },
                 { "ン", "n" }
             };
-        static Dictionary<string, string> RomajiHiraganaArray = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> RomajiHiraganaArray = new Dictionary<string, string>()
             {
                 { "a", "あ" },
                 { "i", "い" },
@@ -717,7 +717,7 @@ namespace SanaraV2
                 { "vu", "ゔ" },
                 { "n", "ん" }
             };
-        static Dictionary<string, string> RomajiKatakanaArray = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> RomajiKatakanaArray = new Dictionary<string, string>()
             {
                 { "a", "ア" },
                 { "i", "イ" },

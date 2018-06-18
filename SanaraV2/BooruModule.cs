@@ -28,7 +28,7 @@ namespace SanaraV2
     {
         Program p = Program.p;
 
-        private static string getTags(string[] tags)
+        private static string GetTags(string[] tags)
         {
             string finalTags = "&tags=";
             if (tags.Length > 0)
@@ -42,14 +42,14 @@ namespace SanaraV2
 
         public abstract class Booru
         {
-            public abstract int getNbMax(string tags);
-            public abstract string getLink(string tags, int maxNb);
-            public abstract string getFileUrl(string json);
-            public abstract string[] getTagInfo(string tag);
-            public virtual string getAllTags(string json) { return (Utilities.getElementXml("tags=\"", json, '"')); }
-            public virtual string getTagName(string json) { return (Utilities.getElementXml("name=\"", json, '"')); }
-            public virtual string getTagType(string json) { return (Utilities.getElementXml("type=\"", json, '"')); }
-            public abstract BooruId getId();
+            public abstract int GetNbMax(string tags);
+            public abstract string GetLink(string tags, int maxNb);
+            public abstract string GetFileUrl(string json);
+            public abstract string[] GetTagInfo(string tag);
+            public virtual string GetAllTags(string json) { return (Utilities.GetElementXml("tags=\"", json, '"')); }
+            public virtual string GetTagName(string json) { return (Utilities.GetElementXml("name=\"", json, '"')); }
+            public virtual string GetTagType(string json) { return (Utilities.GetElementXml("type=\"", json, '"')); }
+            public abstract BooruId GetId();
         }
 
         public enum BooruId
@@ -63,25 +63,25 @@ namespace SanaraV2
 
         public class Safebooru : Booru
         {
-            public override int getNbMax(string tags)
+            public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
                 {
-                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')));
+                    return (Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')));
                 }
             }
 
-            public override string getLink(string tags, int maxNb)
+            public override string GetLink(string tags, int maxNb)
             {
                 return ("https://safebooru.org/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
             }
 
-            public override string getFileUrl(string json)
+            public override string GetFileUrl(string json)
             {
-                return ("https://" + Utilities.getElementXml("file_url=\"//", json, '"'));
+                return ("https://" + Utilities.GetElementXml("file_url=\"//", json, '"'));
             }
 
-            public override string[] getTagInfo(string tag)
+            public override string[] GetTagInfo(string tag)
             {
                 using (WebClient wc = new WebClient())
                 {
@@ -89,7 +89,7 @@ namespace SanaraV2
                 }
             }
 
-            public override BooruId getId()
+            public override BooruId GetId()
             {
                 return (BooruId.Safebooru);
             }
@@ -97,11 +97,11 @@ namespace SanaraV2
 
         public class Gelbooru : Booru
         {
-            public override int getNbMax(string tags)
+            public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
+                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -109,17 +109,17 @@ namespace SanaraV2
                 }
             }
 
-            public override string getLink(string tags, int maxNb)
+            public override string GetLink(string tags, int maxNb)
             {
                 return ("https://gelbooru.com/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
             }
 
-            public override string getFileUrl(string json)
+            public override string GetFileUrl(string json)
             {
-                return (Utilities.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.GetElementXml("file_url=\"", json, '"'));
             }
 
-            public override string[] getTagInfo(string tag)
+            public override string[] GetTagInfo(string tag)
             {
                 using (WebClient wc = new WebClient())
                 {
@@ -127,7 +127,7 @@ namespace SanaraV2
                 }
             }
 
-            public override BooruId getId()
+            public override BooruId GetId()
             {
                 return (BooruId.Gelbooru);
             }
@@ -135,25 +135,25 @@ namespace SanaraV2
 
         public class Konachan : Booru
         {
-            public override int getNbMax(string tags)
+            public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
                 {
-                    return (Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://www.konachan.com/post.xml?limit=1" + tags), '"')));
+                    return (Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://www.konachan.com/post.xml?limit=1" + tags), '"')));
                 }
             }
 
-            public override string getLink(string tags, int maxNb)
+            public override string GetLink(string tags, int maxNb)
             {
                 return ("https://www.konachan.com/post.xml?page=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
             }
 
-            public override string getFileUrl(string json)
+            public override string GetFileUrl(string json)
             {
-                return (Utilities.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.GetElementXml("file_url=\"", json, '"'));
             }
 
-            public override string[] getTagInfo(string tag)
+            public override string[] GetTagInfo(string tag)
             {
                 using (WebClient wc = new WebClient())
                 {
@@ -161,7 +161,7 @@ namespace SanaraV2
                 }
             }
 
-            public override BooruId getId()
+            public override BooruId GetId()
             {
                 return (BooruId.Konachan);
             }
@@ -169,11 +169,11 @@ namespace SanaraV2
 
         public class Rule34 : Booru
         {
-            public override int getNbMax(string tags)
+            public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
                 {
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
+                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
                     if (nbMax > 20000)
                         return (20000 - 1);
                     else
@@ -181,17 +181,17 @@ namespace SanaraV2
                 }
             }
 
-            public override string getLink(string tags, int maxNb)
+            public override string GetLink(string tags, int maxNb)
             {
                 return ("https://rule34.xxx/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
             }
 
-            public override string getFileUrl(string json)
+            public override string GetFileUrl(string json)
             {
-                return (Utilities.getElementXml("file_url=\"", json, '"'));
+                return (Utilities.GetElementXml("file_url=\"", json, '"'));
             }
 
-            public override string[] getTagInfo(string tag)
+            public override string[] GetTagInfo(string tag)
             {
                 using (WebClient wc = new WebClient())
                 {
@@ -199,7 +199,7 @@ namespace SanaraV2
                 }
             }
 
-            public override BooruId getId()
+            public override BooruId GetId()
             {
                 return (BooruId.Rule34);
             }
@@ -207,12 +207,12 @@ namespace SanaraV2
 
         public class E621 : Booru
         {
-            public override int getNbMax(string tags)
+            public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
                 {
                     wc.Headers.Add("User-Agent: Sanara");
-                    int nbMax = Convert.ToInt32(Utilities.getElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"'));
+                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"'));
                     if (nbMax > 750)
                         return (750 - 1);
                     else
@@ -220,17 +220,17 @@ namespace SanaraV2
                 }
             }
 
-            public override string getLink(string tags, int maxNb)
+            public override string GetLink(string tags, int maxNb)
             {
                 return ("https://e621.net/post/index.xml?page=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
             }
 
-            public override string getFileUrl(string json)
+            public override string GetFileUrl(string json)
             {
-                return (Utilities.getElementXml("<file_url>", json, '<'));
+                return (Utilities.GetElementXml("<file_url>", json, '<'));
             }
 
-            public override string[] getTagInfo(string tag)
+            public override string[] GetTagInfo(string tag)
             {
                 using (WebClient wc = new WebClient())
                 {
@@ -239,67 +239,65 @@ namespace SanaraV2
                 }
             }
 
-            public override string getAllTags(string json)
+            public override string GetAllTags(string json)
             {
-                return (Utilities.getElementXml("<tags>", json, '<'));
+                return (Utilities.GetElementXml("<tags>", json, '<'));
             }
 
-            public override string getTagName(string json)
+            public override string GetTagName(string json)
             {
-                return (Utilities.getElementXml("<name>", json, '<'));
+                return (Utilities.GetElementXml("<name>", json, '<'));
             }
-            public override string getTagType(string json)
+            public override string GetTagType(string json)
             {
-                return (Utilities.getElementXml("<type type=\"integer\">", json, '<'));
+                return (Utilities.GetElementXml("<type type=\"integer\">", json, '<'));
             }
 
-            public override BooruId getId()
+            public override BooruId GetId()
             {
                 return (BooruId.E621);
             }
         }
 
-#pragma warning disable CS1998
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
-        public async Task safebooruSearch(params string[] tags)
+        public async Task SafebooruSearch(params string[] tags)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            getImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true, false);
+            await GetImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true, false);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
-        public async Task gelbooruSearch(params string[] tags)
+        public async Task GelbooruSearch(params string[] tags)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            getImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await GetImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
-        public async Task konachanSearch(params string[] tags)
+        public async Task KonachanSearch(params string[] tags)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            getImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await GetImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
-        public async Task rule34Search(params string[] tags)
+        public async Task Rule34Search(params string[] tags)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            getImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await GetImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
-        public async Task e621Search(params string[] tags)
+        public async Task E621Search(params string[] tags)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            getImage(new E621(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await GetImage(new E621(), tags, Context.Channel as ITextChannel, currName, false, false);
         }
-#pragma warning restore CS1998
 
         /// <summary>
         /// Get an image given various informations
@@ -310,12 +308,12 @@ namespace SanaraV2
         /// <param name="currName">Temporary name of the file</param>
         /// <param name="isSfw">Is the channel safe for work ?</param>
         /// <param name="isGame">If the request from Game module (doesn't count dl for stats and don't get informations about tags)</param>
-        public static async Task getImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
+        public static async Task GetImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
         {
             if (!isSfw && !chan.IsNsfw)
             {
                 if (chan != null)
-                    await chan.SendMessageAsync(Sentences.chanIsNotNsfw(chan.GuildId));
+                    await chan.SendMessageAsync(Sentences.ChanIsNotNsfw(chan.GuildId));
                 return;
             }
             if (chan != null)
@@ -324,17 +322,17 @@ namespace SanaraV2
                 if (!me.GuildPermissions.AttachFiles)
                 {
                     if (chan != null)
-                        await chan.SendMessageAsync(Sentences.needAttachFile(chan.GuildId));
+                        await chan.SendMessageAsync(Sentences.NeedAttachFile(chan.GuildId));
                     return;
                 }
                 if (!isGame)
-                    await chan.SendMessageAsync(Sentences.prepareImage(chan.GuildId));
+                    await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
             }
-            string url = getBooruUrl(booru, tags);
+            string url = GetBooruUrl(booru, tags);
             if (url == null)
             {
                 if (chan != null)
-                    await chan.SendMessageAsync(Sentences.tagsNotFound(tags));
+                    await chan.SendMessageAsync(Sentences.TagsNotFound(tags));
             }
             else
             {
@@ -342,19 +340,19 @@ namespace SanaraV2
                 FileInfo file = new FileInfo(dlData.Item1);
                 if (!isGame)
                 {
-                    Program.p.statsMonth[(int)booru.getId()] += file.Length;
-                    Program.p.statsMonth[(int)booru.getId() + 5]++;
+                    Program.p.statsMonth[(int)booru.GetId()] += file.Length;
+                    Program.p.statsMonth[(int)booru.GetId() + 5]++;
                 }
                 if (chan == null)
                     return;
                 if (file.Length >= 8000000)
-                    await chan.SendMessageAsync(Sentences.fileTooBig(chan.GuildId));
+                    await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
                 else
                 {
                     await PostImage(dlData.Item1, chan);
                     if (!isGame)
                     {
-                        List<string> finalStr = getTagsInfos(dlData.Item2, booru, (chan == null) ? (0) : (chan.GuildId));
+                        List<string> finalStr = GetTagsInfos(dlData.Item2, booru, (chan == null) ? (0) : (chan.GuildId));
                         foreach (string s in finalStr)
                             await chan.SendMessageAsync(s);
                     }
@@ -382,7 +380,7 @@ namespace SanaraV2
             using (WebClient wc = new WebClient())
             {
                 string json = DownloadJson(wc, url);
-                string image = booru.getFileUrl(json);
+                string image = booru.GetFileUrl(json);
                 string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
                 wc.Headers.Add("User-Agent: Sanara");
                 wc.DownloadFile(image, imageName);
@@ -404,30 +402,30 @@ namespace SanaraV2
             }
         }
 
-        public static string getBooruUrl(Booru booru, string[] tags)
+        public static string GetBooruUrl(Booru booru, string[] tags)
         {
-            int maxVal = booru.getNbMax(getTags(tags));
+            int maxVal = booru.GetNbMax(GetTags(tags));
             if (maxVal <= 0)
                 return (null);
             else
-                return (booru.getLink(getTags(tags), maxVal));
+                return (booru.GetLink(GetTags(tags), maxVal));
         }
 
-        public static List<string> getTagsInfos(string json, Booru booru, ulong guildId)
+        public static List<string> GetTagsInfos(string json, Booru booru, ulong guildId)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();
             List<string> artists = new List<string>();
-            string[] allTags = booru.getAllTags(json).Split(' ');
+            string[] allTags = booru.GetAllTags(json).Split(' ');
             using (WebClient w = new WebClient())
             {
                 foreach (string t in allTags)
                 {
-                    foreach (string s in booru.getTagInfo(t))
+                    foreach (string s in booru.GetTagInfo(t))
                     {
-                        if (booru.getTagName(s) == t)
+                        if (booru.GetTagName(s) == t)
                         {
-                            switch (booru.getTagType(s))
+                            switch (booru.GetTagType(s))
                             {
                                 case "1":
                                     artists.Add(t);
@@ -446,10 +444,10 @@ namespace SanaraV2
                     }
                 }
             }
-            return (writeTagsInfos(animeFrom, characs, artists, guildId));
+            return (WriteTagsInfos(animeFrom, characs, artists, guildId));
         }
 
-        private static string fixName(string original)
+        private static string FixName(string original)
         {
             original = Regex.Replace(original, @"\(([^\)]+)\)", "");
             string newName = "";
@@ -468,17 +466,16 @@ namespace SanaraV2
             return newName;
         }
 
-        private static List<string> writeTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
+        private static List<string> WriteTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
         {
             List<string> finalMsg = new List<string>();
             for (int i = 0; i < artists.Count; i++)
-                artists[i] = fixName(artists[i]);
+                artists[i] = FixName(artists[i]);
             for (int i = 0; i < characs.Count; i++)
-                characs[i] = fixName(characs[i]);
+                characs[i] = FixName(characs[i]);
             for (int i = 0; i < animeFrom.Count; i++)
-                animeFrom[i] = fixName(animeFrom[i]);
-            List<string> finalStrCharacs = new List<string>();
-            finalStrCharacs.Add("");
+                animeFrom[i] = FixName(animeFrom[i]);
+            List<string> finalStrCharacs = new List<string> { "" };
             int indexCharacFrom = 0;
             if (characs.Count == 1)
                 finalStrCharacs[indexCharacFrom] = characs[0];
@@ -503,7 +500,7 @@ namespace SanaraV2
                 if (!doesContainTagMe)
                 {
                     finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                    finalStrCharacs[indexCharacFrom] += " " + Sentences.andStr(guildId) + " " + characs[characs.Count - 1];
+                    finalStrCharacs[indexCharacFrom] += " " + Sentences.AndStr(guildId) + " " + characs[characs.Count - 1];
                 }
                 else
                 {
@@ -511,10 +508,10 @@ namespace SanaraV2
                         || characs[characs.Count - 1] == "Copyright Request")
                     {
                         finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                        finalStrCharacs[indexCharacFrom] += Sentences.characterNotTagged(guildId);
+                        finalStrCharacs[indexCharacFrom] += Sentences.CharacterNotTagged(guildId);
                     }
                     else
-                        finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + Sentences.moreNotTagged(guildId);
+                        finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + Sentences.MoreNotTagged(guildId);
                 }
             }
             List<string> finalStrFrom = new List<string>();
@@ -527,7 +524,7 @@ namespace SanaraV2
                 for (int i = 0; i < animeFrom.Count - 1; i++)
                     finalStrFrom[indexStrFrom] += animeFrom[i] + ", ";
                 finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom].Substring(0, finalStrFrom[indexStrFrom].Length - 2);
-                finalStrFrom[indexStrFrom] += " " + Sentences.andStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
+                finalStrFrom[indexStrFrom] += " " + Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {
                     indexStrFrom++;
@@ -536,12 +533,12 @@ namespace SanaraV2
             }
             string finalStr;
             if (animeFrom.Count == 1 && animeFrom[0] == "Original")
-                finalStr = Sentences.animeFromOriginal(guildId) + Environment.NewLine;
+                finalStr = Sentences.AnimeFromOriginal(guildId) + Environment.NewLine;
             else if (animeFrom.Count == 1 && (animeFrom[0] == "Tagme" || animeFrom[0] == "Source Request" || animeFrom[0] == "Copyright Request"))
-                finalStr = Sentences.animeNotTagged(guildId) + Environment.NewLine;
+                finalStr = Sentences.AnimeNotTagged(guildId) + Environment.NewLine;
             else if (finalStrFrom[0] != "")
             {
-                finalStr = Sentences.animeFrom(guildId);
+                finalStr = Sentences.AnimeFrom(guildId);
                 foreach (string s in finalStrFrom)
                 {
                     if (finalStr.Length + s.Length > 1500)
@@ -554,13 +551,13 @@ namespace SanaraV2
                 finalStr += "." + Environment.NewLine;
             }
             else
-                finalStr = Sentences.animeTagUnknowed(guildId) + Environment.NewLine;
+                finalStr = Sentences.AnimeTagUnknowed(guildId) + Environment.NewLine;
             if (finalStrCharacs[0] == "")
-                finalStr += Sentences.characterTagUnknowed(guildId) + Environment.NewLine;
+                finalStr += Sentences.CharacterTagUnknowed(guildId) + Environment.NewLine;
             else if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
-                finalStr += Sentences.characterNotTagged(guildId) + Environment.NewLine;
+                finalStr += Sentences.CharacterNotTagged(guildId) + Environment.NewLine;
             else if (characs.Count == 1)
-                finalStr += Sentences.characterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
+                finalStr += Sentences.CharacterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
             else
             {
                 if (finalStr.Length > 1500)
@@ -568,7 +565,7 @@ namespace SanaraV2
                     finalMsg.Add(finalStr);
                     finalStr = "";
                 }
-                finalStr += Sentences.characterAre(guildId);
+                finalStr += Sentences.CharacterAre(guildId);
                 foreach (string s in finalStrCharacs)
                 {
                     if ((finalStr.Length + s.Length) > 1500)

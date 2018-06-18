@@ -110,7 +110,7 @@ namespace SanaraV2
             {
                 if (m_process == null)
                     return (false);
-                await chan.SendMessageAsync(Sentences.songSkipped((chan as ITextChannel).GuildId, m_musics[0].title));
+                await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, m_musics[0].title));
                 m_process.Kill();
                 return (true);
             }
@@ -127,10 +127,10 @@ namespace SanaraV2
             public string GetPlaylist(ulong guildId)
             {
                 if (m_process == null || m_process.HasExited)
-                    return (Sentences.radioNoSong(guildId));
-                string finalStr = "🎵 " + Sentences.current(guildId) + " " + m_musics[0].title + Environment.NewLine;
+                    return (Sentences.RadioNoSong(guildId));
+                string finalStr = "🎵 " + Sentences.Current(guildId) + " " + m_musics[0].title + Environment.NewLine;
                 for (int i = 1; i < m_musics.Count; i++)
-                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.downloading(guildId)) : ("")) + Environment.NewLine;
+                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + Environment.NewLine;
                 return (finalStr);
             }
 
@@ -179,7 +179,7 @@ namespace SanaraV2
                 Play();
             }
 
-            private IVoiceChannel m_chan;
+            private readonly IVoiceChannel m_chan;
             private IMessageChannel m_msgChan;
             private List<Song> m_musics;
             public ulong m_guildId { private set; get; }
@@ -188,16 +188,16 @@ namespace SanaraV2
         }
 
         [Command("Add radio", RunMode = RunMode.Async), Summary("Add songs to the radio"), Alias("Radio add")]
-        public async Task addRadio(params string[] words)
+        public async Task AddRadio(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
             else
             if (words.Length == 0)
-                await ReplyAsync(Sentences.radioNeedArg(Context.Guild.Id));
+                await ReplyAsync(Sentences.RadioNeedArg(Context.Guild.Id));
             else if (p.radios.Any(x => x.m_guildId == Context.Guild.Id) && !p.radios.Find(x => x.m_guildId == Context.Guild.Id).CanAddMusic())
-                await ReplyAsync(Sentences.radioTooMany(Context.Guild.Id));
+                await ReplyAsync(Sentences.RadioTooMany(Context.Guild.Id));
             else
             {
                 if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
@@ -211,57 +211,57 @@ namespace SanaraV2
                     RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
                     if (radio.ContainMusic(youtubeResult.Item1))
                     {
-                        await ReplyAsync(Sentences.radioAlreadyInList(Context.Guild.Id));
+                        await ReplyAsync(Sentences.RadioAlreadyInList(Context.Guild.Id));
                         return;
                     }
-                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.cleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
+                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
                     YouTubeVideo video = GetYoutubeVideo(youtubeResult.Item1);
                     if (video == null)
                     {
                         radio.RemoveSong(youtubeResult.Item1);
-                        await ReplyAsync(Sentences.cantDownload(Context.Guild.Id));
+                        await ReplyAsync(Sentences.CantDownload(Context.Guild.Id));
                     }
                     else
                     {
-                        await ReplyAsync(Sentences.songAdded(Context.Guild.Id, youtubeResult.Item2));
-                        DownloadAudio(video, radio, youtubeResult.Item1, Utilities.cleanWord(youtubeResult.Item2));
+                        await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, youtubeResult.Item2));
+                        DownloadAudio(video, radio, youtubeResult.Item1, Utilities.CleanWord(youtubeResult.Item2));
                     }
                 }
             }
         }
 
         [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio launch")]
-        public async Task launchRadio(params string[] words)
+        public async Task LaunchRadio(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
             else
                 await StartRadio(Context.Channel);
         }
 
         [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist")]
-        public async Task listRadio(params string[] words)
+        public async Task ListRadio(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
-                await ReplyAsync(Sentences.radioNotStarted(Context.Guild.Id));
+                await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
             else
                 await ReplyAsync(p.radios.Find(x => x.m_guildId == Context.Guild.Id).GetPlaylist(Context.Guild.Id));
         }
 
         [Command("Skip radio", RunMode = RunMode.Async), Summary("Skip the current song"), Alias("Radio skip")]
-        public async Task skipRadio(params string[] words)
+        public async Task SkipRadio(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
-                await ReplyAsync(Sentences.radioNotStarted(Context.Guild.Id));
+                await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
             else
             {
                 bool suceed = await radio.Skip(Context.Channel);
                 if (!suceed)
-                    await ReplyAsync(Sentences.radioNoSong(Context.Guild.Id));
+                    await ReplyAsync(Sentences.RadioNoSong(Context.Guild.Id));
             }
         }
 
@@ -269,13 +269,13 @@ namespace SanaraV2
         {
             if (p.radios.Any(x => x.m_guildId == Context.Guild.Id))
             {
-                await chan.SendMessageAsync(Sentences.radioAlreadyStarted(Context.Guild.Id));
+                await chan.SendMessageAsync(Sentences.RadioAlreadyStarted(Context.Guild.Id));
                 return (true);
             }
             IGuildUser guildUser = Context.User as IGuildUser;
             if (guildUser.VoiceChannel == null)
             {
-                await chan.SendMessageAsync(Sentences.radioNeedChannel(Context.Guild.Id));
+                await chan.SendMessageAsync(Sentences.RadioNeedChannel(Context.Guild.Id));
                 return (false);
             }
             IAudioClient audioClient = await guildUser.VoiceChannel.ConnectAsync();
@@ -284,17 +284,17 @@ namespace SanaraV2
         }
 
         [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop")]
-        public async Task stopRadio(params string[] words)
+        public async Task StopRadio(params string[] words)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
-                await ReplyAsync(Sentences.radioNotStarted(Context.Guild.Id));
+                await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
             else
             {
                 await radio.Stop();
                 p.radios.Remove(radio);
-                await ReplyAsync(Sentences.doneStr(Context.Guild.Id));
+                await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
             }
         }
 

@@ -25,38 +25,37 @@ namespace SanaraV2
         Program p = Program.p;
 
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
-        public async Task mal(params string[] animeNameArr)
+        public async Task Mal(params string[] animeNameArr)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
                 return;
             }
-            string animeName = Utilities.addArgs(animeNameArr);
+            string animeName = Utilities.AddArgs(animeNameArr);
             if (animeName.Length == 0)
             {
-                await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.AnimeHelp(Context.Guild.Id));
                 return;
             }
             try
             {
                 string result = p.malClient.DownloadString("https://myanimelist.net/api/anime/search.xml?q=" + animeName.Replace(" ", "%20"));
                 if (!result.Contains("<entry>"))
-                    await ReplyAsync(Sentences.animeNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.AnimeNotFound(Context.Guild.Id));
                 else
                 {
-                    EmbedBuilder b = parseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
+                    EmbedBuilder b = ParseContent(result, animeName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
                     await ReplyAsync("", false, b.Build());
                 }
             }
             catch (WebException ex)
             {
-                HttpWebResponse code = ex.Response as HttpWebResponse;
-                if (code != null)
+                if (ex.Response is HttpWebResponse code)
                 {
                     if (code.StatusCode == HttpStatusCode.Forbidden)
-                        await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                        await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
                 }
                 else
                     await ReplyAsync("An unexpected error occured: " + ex.Message);
@@ -64,30 +63,30 @@ namespace SanaraV2
         }
 
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
-        public async Task malManga(params string[] mangaNameArr) // Stuck in loop ?
+        public async Task MalManga(params string[] mangaNameArr) // Stuck in loop ?
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
                 return;
             }
-            string mangaName = Utilities.addArgs(mangaNameArr);
+            string mangaName = Utilities.AddArgs(mangaNameArr);
             if (mangaName.Length == 0)
             {
-                await ReplyAsync(Sentences.animeHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.AnimeHelp(Context.Guild.Id));
                 return;
             }
             try
             {
                 string result = p.malClient.DownloadString("https://myanimelist.net/api/manga/search.xml?q=" + mangaName.Replace(" ", "%20"));
                 if (!result.Contains("<entry>"))
-                    await ReplyAsync(Sentences.mangaNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.MangaNotFound(Context.Guild.Id));
                 else
                 {
-                    EmbedBuilder b = parseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
+                    EmbedBuilder b = ParseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
                     if (b == null)
-                        await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
+                        await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
                     else
                         await ReplyAsync("", false, b.Build());
                 }
@@ -96,48 +95,48 @@ namespace SanaraV2
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
                 if (code.StatusCode == HttpStatusCode.Forbidden)
-                    await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                    await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
             }
         }
 
-        private EmbedBuilder parseContent(string result, string animeName, bool isNsfw, ulong guildId) // TODO: Handle ratings
+        private EmbedBuilder ParseContent(string result, string animeName, bool isNsfw, ulong guildId) // TODO: Handle ratings
         {
             string[] entries = result.Split(new string[] { "<entry>" }, StringSplitOptions.None);
             int index = 1;
             for (int i = 1; i < entries.Length; i++)
             {
-                if (Utilities.getElementXml("<title>", entries[i], '<').ToUpper() == animeName.ToUpper())
+                if (Utilities.GetElementXml("<title>", entries[i], '<').ToUpper() == animeName.ToUpper())
                 {
                     index = i;
                     break;
                 }
             }
-            string id = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<id>", entries[index], '<'));
+            string id = Utilities.RemoveUnwantedSymboles(Utilities.GetElementXml("<id>", entries[index], '<'));
             using (WebClient wc = new WebClient())
             {
                 string json = wc.DownloadString("https://myanimelist.net/anime/" + id);
-                if (!isNsfw && Utilities.getElementXml("<span class=\"dark_text\">Rating:</span>", json, '<').Contains("Rx"))
+                if (!isNsfw && Utilities.GetElementXml("<span class=\"dark_text\">Rating:</span>", json, '<').Contains("Rx"))
                     return (null);
             }
-            string title = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<title>", entries[index], '<'));
-            string english = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<english>", entries[index], '<'));
-            string synonyms = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<synonyms>", entries[index], '<'));
-            string episodes = Utilities.getElementXml("<episodes>", entries[index], '<');
+            string title = Utilities.RemoveUnwantedSymboles(Utilities.GetElementXml("<title>", entries[index], '<'));
+            string english = Utilities.RemoveUnwantedSymboles(Utilities.GetElementXml("<english>", entries[index], '<'));
+            string synonyms = Utilities.RemoveUnwantedSymboles(Utilities.GetElementXml("<synonyms>", entries[index], '<'));
+            string episodes = Utilities.GetElementXml("<episodes>", entries[index], '<');
             if (episodes == "")
-                episodes = Utilities.getElementXml("<volumes>", entries[index], '<');
-            string type = Utilities.getElementXml("<type>", entries[index], '<');
-            string status = Utilities.getElementXml("<status>", entries[index], '<');
-            string score = Utilities.getElementXml("<score>", entries[index], '<');
-            string synopsis = Utilities.removeUnwantedSymboles(Utilities.getElementXml("<synopsis>", entries[index], '<'));
+                episodes = Utilities.GetElementXml("<volumes>", entries[index], '<');
+            string type = Utilities.GetElementXml("<type>", entries[index], '<');
+            string status = Utilities.GetElementXml("<status>", entries[index], '<');
+            string score = Utilities.GetElementXml("<score>", entries[index], '<');
+            string synopsis = Utilities.RemoveUnwantedSymboles(Utilities.GetElementXml("<synopsis>", entries[index], '<'));
             string currentTime = DateTime.Now.ToString("HHmmss") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
             EmbedBuilder embed = new EmbedBuilder()
             {
-                ImageUrl = Utilities.getElementXml("<image>", entries[index], '<'),
+                ImageUrl = Utilities.GetElementXml("<image>", entries[index], '<'),
                 Description = "**" + title + "** (" + english + ")" + Environment.NewLine
-                + Sentences.orStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
-                + Sentences.animeInfos(guildId, type, status, episodes) + Environment.NewLine
-                + Sentences.animeScore(guildId, score) + Environment.NewLine + Environment.NewLine
-                + "**" + Sentences.synopsis(guildId) + "**" + Environment.NewLine + synopsis,
+                + Sentences.OrStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
+                + Sentences.AnimeInfos(guildId, type, status, episodes) + Environment.NewLine
+                + Sentences.AnimeScore(guildId, score) + Environment.NewLine + Environment.NewLine
+                + "**" + Sentences.Synopsis(guildId) + "**" + Environment.NewLine + synopsis,
                 Color = Color.Green,
             };
             return (embed);

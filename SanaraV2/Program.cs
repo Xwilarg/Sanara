@@ -209,8 +209,9 @@ namespace SanaraV2
             if (File.Exists("Keys/malPwd.dat"))
             {
                 string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
-                malClient = new WebClient();
-                malClient.Credentials = new NetworkCredential(malCredentials[0], malCredentials[1]);
+                malClient = new WebClient {
+                    Credentials = new NetworkCredential(malCredentials[0], malCredentials[1])
+                };
             }
             else
                 malClient = null;
@@ -333,7 +334,7 @@ namespace SanaraV2
         private async Task GuildJoin(SocketGuild arg)
         {
             string currTime = DateTime.UtcNow.ToString("ddMMyyHHmmss");
-            ITextChannel chan = returnChannel(arg.Channels.ToList(), arg.Id);
+            ITextChannel chan = ReturnChannel(arg.Channels.ToList(), arg.Id);
             if (!Directory.Exists("Saves"))
                 Directory.CreateDirectory("Saves");
             if (!File.Exists("Saves/sanaraDatas.dat"))
@@ -342,7 +343,7 @@ namespace SanaraV2
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-                await chan.SendMessageAsync(Sentences.introductionMsg(arg.Id));
+                await chan.SendMessageAsync(Sentences.IntroductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
@@ -364,14 +365,14 @@ namespace SanaraV2
                         if (!relations.Any(x => x._name == Convert.ToUInt64(File.ReadAllLines("Saves/Users/" + u.Id + ".dat")[1])))
                         {
                             relations.Add(new Character());
-                            relations[relations.Count - 1].saveAndParseInfos(File.ReadAllLines("Saves/Users/" + u.Id + ".dat"));
+                            relations[relations.Count - 1].SaveAndParseInfos(File.ReadAllLines("Saves/Users/" + u.Id + ".dat"));
                         }
                     }
                     catch (IndexOutOfRangeException)
                     {
                         if (arg.Id.ToString() == File.ReadAllLines("Saves/sanaraDatas.dat")[2])
                         {
-                            await chan.SendMessageAsync(Sentences.introductionError(arg.Id, u.Id.ToString(), u.Username));
+                            await chan.SendMessageAsync(Sentences.IntroductionError(arg.Id, u.Id.ToString(), u.Username));
                         }
                     }
                 }
@@ -473,7 +474,7 @@ namespace SanaraV2
         /// <param name="u">User that sent the message</param>
         /// <param name="serverId">The ID of the current guild</param>
         /// <param name="m">The module that was called (see above)</param>
-        public void doAction(IUser u, ulong serverId, Module m)
+        public void DoAction(IUser u, ulong serverId, Module m)
         {
             if (!u.IsBot)
             {
@@ -503,8 +504,8 @@ namespace SanaraV2
             {
                 if (u.Id == c._name)
                 {
-                    c.increaseNbMessage();
-                    c.meet();
+                    c.IncreaseNbMessage();
+                    c.Meet();
                     break;
                 }
             }
@@ -573,7 +574,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Sentences.dontPm(0));
+                    await context.Channel.SendMessageAsync(Sentences.DontPm(0));
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;
@@ -628,7 +629,7 @@ namespace SanaraV2
         /// <param name="s"></param>
         /// <param name="serverId"></param>
         /// <returns></returns>
-        private ITextChannel returnChannel(List<SocketGuildChannel> s, ulong serverId)
+        private ITextChannel ReturnChannel(List<SocketGuildChannel> s, ulong serverId)
         {
             foreach (IChannel c in s)
             {

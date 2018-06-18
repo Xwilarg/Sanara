@@ -31,18 +31,18 @@ namespace SanaraV2
         Program p = Program.p;
 
         [Command("Vn", RunMode = RunMode.Async)]
-        public async Task vndb(params string[] vns)
+        public async Task Vndb(params string[] vns)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Vn);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Vn);
             if (vns.Length == 0)
             {
-                await ReplyAsync(Sentences.vndbHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.VndbHelp(Context.Guild.Id));
                 return;
             }
-            VisualNovel vn = await getVn(Utilities.addArgs(vns));
-            if (vn == null || !Utilities.cleanWord(vn.Name).Contains(Utilities.cleanWord(Utilities.addArgs(vns))))
+            VisualNovel vn = await GetVn(Utilities.AddArgs(vns));
+            if (vn == null || !Utilities.CleanWord(vn.Name).Contains(Utilities.CleanWord(Utilities.AddArgs(vns))))
             {
-                await ReplyAsync(Sentences.vndbNotFound(Context.Guild.Id));
+                await ReplyAsync(Sentences.VndbNotFound(Context.Guild.Id));
                 return;
             }
             List<string> tmpDesc = vn.Description.Split('\n').ToList();
@@ -63,10 +63,10 @@ namespace SanaraV2
                  { "VeryLong", "> 50 hours" }
              };
             string finalDesc = ((vn.OriginalName != null) ? ("**" + vn.OriginalName + "** (" + vn.Name + ")") : ("**" + vn.Name + "**")) + Environment.NewLine
-                 + ((vn.Languages.ToArray().Contains("en")) ? (Sentences.availableEnglish(Context.Guild.Id)) : (Sentences.notAvailableEnglish(Context.Guild.Id))) + Environment.NewLine
-                 + ((vn.Platforms.Contains("win")) ? (Sentences.availableWindows(Context.Guild.Id)) : (Sentences.notAvailableWindows(Context.Guild.Id))) + Environment.NewLine
+                 + ((vn.Languages.ToArray().Contains("en")) ? (Sentences.AvailableEnglish(Context.Guild.Id)) : (Sentences.NotAvailableEnglish(Context.Guild.Id))) + Environment.NewLine
+                 + ((vn.Platforms.Contains("win")) ? (Sentences.AvailableWindows(Context.Guild.Id)) : (Sentences.NotAvailableWindows(Context.Guild.Id))) + Environment.NewLine
                  + ((vn.Length != null) ? (vn.Length.ToString().Replace("Very", "Very ") + " (" + allLengths[vn.Length.ToString()] + ")" + Environment.NewLine) : (""))
-                 + Sentences.vndbRating(Context.Guild.Id, vn.Rating.ToString()) + Environment.NewLine
+                 + Sentences.VndbRating(Context.Guild.Id, vn.Rating.ToString()) + Environment.NewLine
                  + ((vn.Released.Year != null) ? ("Released" + ((vn.Released.Month != null) ? ((vn.Released.Day != null) ? (" the " + vn.Released.Day + "/" + vn.Released.Month + "/" + vn.Released.Year) : (" in " + vn.Released.Month + "/" + vn.Released.Year)) : (" in " + vn.Released.Year))) : ("Not released yet.")) + Environment.NewLine
                  + Environment.NewLine + Environment.NewLine
                  + desc;
@@ -101,7 +101,7 @@ namespace SanaraV2
             }
         }
 
-        public static async Task<VisualNovel> getVn(string vnName)
+        public static async Task<VisualNovel> GetVn(string vnName)
         {
             Vndb client = new Vndb();
 
@@ -118,14 +118,14 @@ namespace SanaraV2
             html = html.Split(new string[] { "<div class=\"mainbox browse vnbrowse\">" }, StringSplitOptions.None)[1];
             html = html.Split(new string[] { "</thead>" }, StringSplitOptions.None)[1];
             List<string> allVnsId = html.Split(new string[] { "href=\"/v" }, StringSplitOptions.None).ToList();
-            string cleanName = Utilities.cleanWord(vnName);
-            string name = allVnsId.Find(x => Utilities.cleanWord(x).Contains(cleanName));
+            string cleanName = Utilities.CleanWord(vnName);
+            string name = allVnsId.Find(x => Utilities.CleanWord(x).Contains(cleanName));
             try
             {
                 if (name == null)
-                    id = Convert.ToUInt32(Utilities.getElementXml("a", "a" + allVnsId[1], '"'));
+                    id = Convert.ToUInt32(Utilities.GetElementXml("a", "a" + allVnsId[1], '"'));
                 else
-                    id = Convert.ToUInt32(Utilities.getElementXml("a", "a" + name, '"'));
+                    id = Convert.ToUInt32(Utilities.GetElementXml("a", "a" + name, '"'));
             }
             catch (FormatException)
             {

@@ -28,12 +28,12 @@ namespace SanaraV2
         Program p = Program.p;
 
         [Command("Doujinshi", RunMode = RunMode.Async), Summary("Give a random doujinshi using nhentai API")]
-        public async Task getNhentai(params string[] keywords)
+        public async Task GetNhentai(params string[] keywords)
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
+                await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
                 return;
             }
             string tags = "";
@@ -54,7 +54,7 @@ namespace SanaraV2
                 else
                     xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=8000");
             }
-            int page = p.rand.Next(Convert.ToInt32(Utilities.getElementXml("\"num_pages\":", xml, ','))) + 1;
+            int page = p.rand.Next(Convert.ToInt32(Utilities.GetElementXml("\"num_pages\":", xml, ','))) + 1;
             using (WebClient w = new WebClient())
             {
                 w.Encoding = Encoding.UTF8;
@@ -68,7 +68,7 @@ namespace SanaraV2
             if (allDoujinshi.Count == 0)
             {
                 string[] allTags = tags.Split(new string[] { "+" }, StringSplitOptions.RemoveEmptyEntries);
-                await ReplyAsync(Sentences.tagsNotFound(allTags));
+                await ReplyAsync(Sentences.TagsNotFound(allTags));
             }
             else
             {
@@ -77,7 +77,7 @@ namespace SanaraV2
                 string currBlock = "";
                 for (int i = ids.Length - 1; i >= 0; i--)
                 {
-                    currBlock = Utilities.getElementXml("id\":", ids[i], ',');
+                    currBlock = Utilities.GetElementXml("id\":", ids[i], ',');
                     if (currBlock != "")
                     {
                         if (keywords.Length == 0)
@@ -90,7 +90,7 @@ namespace SanaraV2
                                 bool isOk = false;
                                 foreach (string s in ids[i - 1].Split(new string[] { "},{" }, StringSplitOptions.None))
                                 {
-                                    if (Utilities.getElementXml("\"name\":\"", s, '"').Contains(t))
+                                    if (Utilities.GetElementXml("\"name\":\"", s, '"').Contains(t))
                                     {
                                         isOk = true;
                                         break;
@@ -105,7 +105,7 @@ namespace SanaraV2
                             if (finalOk == "")
                                 await ReplyAsync("https://nhentai.net/g/" + currBlock);
                             else
-                                await ReplyAsync(Sentences.tagsNotFound(new string[] { finalOk }));
+                                await ReplyAsync(Sentences.TagsNotFound(new string[] { finalOk }));
                         }
                         break;
                     }

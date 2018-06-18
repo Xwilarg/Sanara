@@ -38,7 +38,7 @@ namespace SanaraV2
         /// When receiving string from website, sometimes you have to replace some stuffs on them.
         /// </summary>
         /// <param name="text">The string to deal with</param>
-        public static string removeUnwantedSymboles(string text)
+        public static string RemoveUnwantedSymboles(string text)
         {
             text = text.Replace("[i]", "*");
             text = text.Replace("[/i]", "*");
@@ -55,7 +55,7 @@ namespace SanaraV2
         /// This function transform it to a string adding spaces between each elements of the array
         /// </summary>
         /// <param name="args">The string[] to deal with</param>
-        public static string addArgs(string[] args)
+        public static string AddArgs(string[] args)
         {
             if (args.Length == 0)
                 return (null);
@@ -66,7 +66,7 @@ namespace SanaraV2
         /// For comparaisons between 2 string it's sometimes useful that you remove everything except number and letters
         /// </summary>
         /// <param name="word">The string to deal with</param>
-        public static string cleanWord(string word)
+        public static string CleanWord(string word)
         {
             string finalStr = "";
             foreach (char c in word)
@@ -84,7 +84,7 @@ namespace SanaraV2
         /// <param name="file">The string to search in</param>
         /// <param name="stopCharac">The character after with we stop looking for</param>
         /// <returns></returns>
-        public static string getElementXml(string tag, string file, char stopCharac)
+        public static string GetElementXml(string tag, string file, char stopCharac)
         {
             string saveString = "";
             int prog = 0;
@@ -155,13 +155,13 @@ namespace SanaraV2
         /// <returns>The string wanted</returns>
         public static string TimeSpanToString(TimeSpan ts, ulong guildId)
         {
-            string finalStr = Sentences.timeSeconds(guildId, ts.Seconds.ToString());
+            string finalStr = Sentences.TimeSeconds(guildId, ts.Seconds.ToString());
             if (ts.Days > 0)
-                finalStr = Sentences.timeDays(guildId, ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
+                finalStr = Sentences.TimeDays(guildId, ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Hours > 0)
-                finalStr = Sentences.timeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
+                finalStr = Sentences.TimeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Minutes > 0)
-                finalStr = Sentences.timeMinutes(guildId, ts.Minutes.ToString(), finalStr);
+                finalStr = Sentences.TimeMinutes(guildId, ts.Minutes.ToString(), finalStr);
             return (finalStr);
         }
 

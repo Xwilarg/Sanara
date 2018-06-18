@@ -28,32 +28,32 @@ namespace SanaraV2
         Program p = Program.p;
 
         [Command("Random url", RunMode = RunMode.Async), Summary("Give a random url from goo.gl")]
-        public async Task randomPastebin()
+        public async Task RandomPastebin()
         {
-            p.doAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
             if (p.service == null)
-                await ReplyAsync(Sentences.noApiKey(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
             else if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.chanIsNotNsfw(Context.Guild.Id));
+                await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
             }
             else
             {
                 Tuple<string, string> result = null;
                 try
                 {
-                    result = await getUrl();
+                    result = await GetUrl();
                 }
                 catch (GoogleApiException ex)
                 {
                     if (ex.HttpStatusCode == HttpStatusCode.Forbidden)
                     {
-                        await ReplyAsync(Sentences.tooManyRequests(Context.Guild.Id, "goo.gl"));
+                        await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "goo.gl"));
                         return;
                     }
                 }
                 if (result == null)
-                    await ReplyAsync(Sentences.nothingAfterXIterations(Context.Guild.Id, 500));
+                    await ReplyAsync(Sentences.NothingAfterXIterations(Context.Guild.Id, 500));
                 else
                 {
                     await ReplyAsync("I found something, here is the short URL: " + result.Item1 + Environment.NewLine
@@ -62,7 +62,7 @@ namespace SanaraV2
             }
         }
 
-        public static async Task<Tuple<string, string> > getUrl()
+        public static async Task<Tuple<string, string> > GetUrl()
         {
             string result = "";
             string shortResult = "";

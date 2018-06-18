@@ -12,25 +12,25 @@ namespace Sanara_UnitTests
         [Fact]
         public void ToKatakana()
         {
-           Assert.True(LinguistModule.toKatakana(LinguistModule.fromHiragana("oranji じゅいす")) == "オランジ ジュイス");
+           Assert.True(LinguistModule.ToKatakana(LinguistModule.FromHiragana("oranji じゅいす")) == "オランジ ジュイス");
         }
 
         [Fact]
         public void ToHiragana()
         {
-            Assert.True(LinguistModule.toHiragana(LinguistModule.fromKatakana("oranji ジュイス")) == "おらんじ じゅいす");
+            Assert.True(LinguistModule.ToHiragana(LinguistModule.FromKatakana("oranji ジュイス")) == "おらんじ じゅいす");
         }
 
         [Fact]
         public void ToRomaji()
         {
-            Assert.True(LinguistModule.fromHiragana(LinguistModule.fromKatakana("おらんじ ジュイス")) == "oranji juisu");
+            Assert.True(LinguistModule.FromHiragana(LinguistModule.FromKatakana("おらんじ ジュイス")) == "oranji juisu");
         }
 
         [Fact]
         public async void Vn()
         {
-            Assert.True((await VndbModule.getVn("hoshizora no memoria wish upon a shooting star")).Id == 1474);
+            Assert.True((await VndbModule.GetVn("hoshizora no memoria wish upon a shooting star")).Id == 1474);
         }
 
         [Fact]
@@ -38,16 +38,16 @@ namespace Sanara_UnitTests
         {
             new SanaraV2.Program(true);
             Directory.GetFiles(".", "booruImage.*").ToList().ForEach(delegate(string path) { File.Delete(path); } );
-            await BooruModule.getImage(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, null, "booruImage", true, false);
+            await BooruModule.GetImage(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, null, "booruImage", true, false);
             Assert.True(Directory.GetFiles(".", "booruImage.*").Length == 1);
         }
 
         private string[] DownloadBooru(BooruModule.Booru b, string[] tags)
         {
             new SanaraV2.Program(true);
-            string url = BooruModule.getBooruUrl(b, tags);
+            string url = BooruModule.GetBooruUrl(b, tags);
             Assert.True(url != null);
-            return (Utilities.addArgs(BooruModule.getTagsInfos(BooruModule.DownloadJson(new WebClient(), url), b, 0).ToArray()).Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.None));
+            return (Utilities.AddArgs(BooruModule.GetTagsInfos(BooruModule.DownloadJson(new WebClient(), url), b, 0).ToArray()).Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.None));
         }
 
         [Fact]

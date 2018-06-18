@@ -29,15 +29,15 @@ namespace SanaraV2
             _nbMessage = 0;
             _name = name;
             _nameStr = nameStr;
-            File.WriteAllText("Saves/Users/" + _name + ".dat", returnInformationsRaw(false));
+            File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(false));
         }
 
-        private string returnInformationsRaw(bool increaseMsg)
+        private string ReturnInformationsRaw(bool increaseMsg)
         {
-            return (_nameStr + Environment.NewLine + _name + Environment.NewLine + _firstMeet + Environment.NewLine + (Convert.ToInt32(getNbMessage()) + 1).ToString());
+            return (_nameStr + Environment.NewLine + _name + Environment.NewLine + _firstMeet + Environment.NewLine + (Convert.ToInt32(GetNbMessage()) + 1).ToString());
         }
 
-        public void saveAndParseInfos(string[] infos)
+        public void SaveAndParseInfos(string[] infos)
         {
             try
             {
@@ -49,28 +49,28 @@ namespace SanaraV2
             { }
         }
 
-        public void meet()
+        public void Meet()
         {
             if (_firstMeet == "No")
             {
                 _firstMeet = DateTime.UtcNow.ToString("ddMMyyHHmmss");
 
-                File.WriteAllText("Saves/Users/" + _name + ".dat", returnInformationsRaw(false));
+                File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(false));
             }
         }
 
-        public void increaseNbMessage()
+        public void IncreaseNbMessage()
         {
             _nbMessage++;
-            File.WriteAllText("Saves/Users/" + _name + ".dat", returnInformationsRaw(true));
+            File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(true));
         }
 
-        public string getFirstMeet()
+        public string GetFirstMeet()
         {
             return (File.ReadAllLines("Saves/Users/" + _name + ".dat")[2]);
         }
 
-        public int getNbMessage()
+        public int GetNbMessage()
         {
             return (Convert.ToInt32(File.ReadAllLines("Saves/Users/" + _name + ".dat")[3]));
         }
