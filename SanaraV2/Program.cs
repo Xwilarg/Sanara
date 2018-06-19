@@ -20,6 +20,7 @@ using Google.Apis.Services;
 using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
+using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
 using SharpRaven;
 using SharpRaven.Data;
@@ -75,7 +76,8 @@ namespace SanaraV2
 
         public Dictionary<ulong, string> prefixs;
 
-        RavenClient ravenClient;
+        private RavenClient ravenClient;
+        public ImageAnnotatorClient visionClient;
 
         private Program()
         {
@@ -202,6 +204,14 @@ namespace SanaraV2
             else
                 for (int i = 0; i < 10; i++)
                     statsMonth.Add(0);
+
+            if (File.Exists("Keys/visionAPI.json"))
+            {
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
+                visionClient = ImageAnnotatorClient.Create();
+            }
+            else
+                visionClient = null;
         }
 
         private void InitServices()

@@ -29,11 +29,11 @@ namespace SanaraV2
         public async Task Transparency(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
-            if (word.Length == 0 || !IsLinkValid(word[0]))
+            if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
-                string extension = GetExtensionImage(word[0]);
+                string extension = Utilities.GetExtensionImage(word[0]);
                 if (extension == null)
                 {
                     await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
@@ -58,11 +58,11 @@ namespace SanaraV2
         public async Task Negate(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
-            if (word.Length == 0 || !IsLinkValid(word[0]))
+            if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
-                string extension = GetExtensionImage(word[0]);
+                string extension = Utilities.GetExtensionImage(word[0]);
                 if (extension == null)
                 {
                     await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
@@ -94,14 +94,14 @@ namespace SanaraV2
         public async Task ConvertImage(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
-            if (word.Length <= 1 || !IsLinkValid(word[0]))
+            if (word.Length <= 1 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpConvert(Context.Guild.Id));
             else
             {
-                string extension = GetExtensionImage(word[0]);
+                string extension = Utilities.GetExtensionImage(word[0]);
                 string url = word[0];
                 word = Utilities.RemoveFirstArg(word);
-                ImageFormat newExtension = GetExtension(Utilities.AddArgs(word));
+                ImageFormat newExtension = Utilities.GetImage(Utilities.AddArgs(word));
                 if (extension == null || newExtension == null)
                 {
                     await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
@@ -167,11 +167,11 @@ namespace SanaraV2
         public async Task Epure(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
-            if (word.Length == 0 || !IsLinkValid(word[0]))
+            if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
             {
-                string extension = GetExtensionImage(word[0]);
+                string extension = Utilities.GetExtensionImage(word[0]);
                 if (extension == null)
                 {
                     await ReplyAsync(Sentences.InvalidFormat(Context.Guild.Id));
@@ -225,62 +225,6 @@ namespace SanaraV2
         private Color GetClosestColor(Color orrColor, int step)
         {
             return (Color.FromArgb(255, (orrColor.R * step / 255) * (255 / step), (orrColor.G * step / 255) * (255 / step), (orrColor.B * step / 255) * (255 / step)));
-        }
-
-        private string GetExtensionImage(string fileName)
-        {
-            string[] file = fileName.Split('.');
-            string extension = file[file.Length - 1];
-            if (GetExtension(extension) != null)
-                return (extension);
-            else
-                return (null);
-        }
-
-        private ImageFormat GetExtension(string extension)
-        {
-            switch (extension.ToLower())
-            {
-                case "jpg":
-                case "jpeg":
-                    return (ImageFormat.Jpeg);
-                case "png":
-                    return (ImageFormat.Png);
-                case "bmp":
-                    return (ImageFormat.Bmp);
-                case "emf":
-                    return (ImageFormat.Emf);
-                case "exif":
-                    return (ImageFormat.Exif);
-                case "gif":
-                    return (ImageFormat.Gif);
-                case "icon":
-                    return (ImageFormat.Icon);
-                case "memorybmp":
-                case "memory bmp":
-                case "memory_bmp":
-                    return (ImageFormat.MemoryBmp);
-                case "tiff":
-                    return (ImageFormat.Tiff);
-                case "wmf":
-                    return (ImageFormat.Wmf);
-                default:
-                    return (null);
-            }
-        }
-
-        public bool IsLinkValid(string url)
-        {
-            try
-            {
-                WebRequest request = WebRequest.Create(url);
-                request.Method = "HEAD";
-                request.GetResponse();
-                return (true);
-            }
-            catch (WebException)
-            { }
-            return (false);
         }
     }
 }

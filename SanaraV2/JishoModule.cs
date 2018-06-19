@@ -21,6 +21,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using Google;
 using Google.Cloud.Translation.V2;
+using Google.Cloud.Vision.V1;
+using Grpc.Core;
 
 namespace SanaraV2
 {
@@ -57,7 +59,7 @@ namespace SanaraV2
                 await ReplyAsync(ToKatakana(FromHiragana(Utilities.AddArgs(word))));
         }
 
-        [Command("Translation"), Summary("Translate a sentence")]
+        [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence")]
         public async Task Translation(params string[] words)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
@@ -82,7 +84,29 @@ namespace SanaraV2
                 try
                 {
                     string sourceLanguage;
-                    string translation = GetTranslation(Utilities.AddArgs(newWords.ToArray()), language, out sourceLanguage);
+                    string translation;
+                    if (newWords.Count == 1 && Utilities.GetExtensionImage(newWords[0]) != null && Utilities.IsLinkValid(newWords[0]))
+                    {
+                        if (p.visionClient == null)
+                        {
+                            await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                            return;
+                        }
+                        while (true)
+                        {
+                            try
+                            {
+                                Image image = await Image.FetchFromUriAsync(newWords[0]);
+                                TextAnnotation response = await p.visionClient.DetectDocumentTextAsync(image);
+                                translation = GetTranslation(response.Text, language, out sourceLanguage);
+                                break;
+                            }
+                            catch (RpcException)
+                            { }
+                        }
+                    }
+                    else
+                        translation = GetTranslation(Utilities.AddArgs(newWords.ToArray()), language, out sourceLanguage);
                     sourceLanguage = Utilities.GetFullLanguage(sourceLanguage.ToLower());
                     await ReplyAsync("From " + sourceLanguage + ":" + Environment.NewLine + "```" + Environment.NewLine + translation + Environment.NewLine + "```");
                 }
