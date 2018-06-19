@@ -30,19 +30,37 @@ namespace SanaraV2
     {
         Program p = Program.p;
         [Command("Map", RunMode = RunMode.Async), Summary("Get informations about a map")]
-        public async Task Map(params string[] mapName)
+        public async Task Map(params string[] command)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
-            if (mapName.Length != 2 || mapName[0].Length != 1 || mapName[1].Length != 1
-                || mapName[0][0] <= '0' || mapName[0][0] > '6' || mapName[1][0] <= '0' || mapName[1][0] > '6'
-                || (mapName[0][0] != '1' && mapName[1][0] == '6'))
-            {
+            if (IsMapInvalid(command))
                 await ReplyAsync(Sentences.MapHelp(Context.Guild.Id));
-                return;
+            else
+            {
+                string mapIntro, mapDraw, mapName;
+                string infos = GetMapInfos(command[0][0], command[1][0], out mapIntro, out mapDraw, out mapName);
+                await ReplyAsync(mapName);
+                await Context.Channel.SendFileAsync(mapIntro);
+                await Context.Channel.SendFileAsync(mapDraw);
+                File.Delete(mapIntro);
+                File.Delete(mapDraw);
+                await ReplyAsync(GetBranchingRules(infos));
             }
+        }
+
+        public static bool IsMapInvalid(string[] mapName)
+        {
+            return (mapName.Length != 2 || mapName[0].Length != 1 || mapName[1].Length != 1
+                || mapName[0][0] <= '0' || mapName[0][0] > '6' || mapName[1][0] <= '0' || mapName[1][0] > '6'
+                || (mapName[0][0] != '1' && mapName[1][0] == '6'));
+        }
+
+        public static string GetMapInfos(char world, char level, out string mapIntro, out string mapDraw, out string mapName)
+        {
             using (WebClient wc = new WebClient())
             {
-                string url = "http://kancolle.wikia.com/wiki/World_" + mapName[0][0] + "/" + mapName[0][0] + "-" + mapName[1][0];
+
+                string url = "http://kancolle.wikia.com/wiki/World_" + world + "/" + world + "-" + level;
                 string html = wc.DownloadString(url);
                 wc.Encoding = Encoding.UTF8;
                 string htmlRaw = wc.DownloadString(url + "?action=raw");
@@ -50,28 +68,31 @@ namespace SanaraV2
                 string[] allLinks = html.Split(new string[] { "href=" }, StringSplitOptions.None);
                 int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
                 wc.DownloadFile(Utilities.GetElementXml("\"", allLinks[1], '"'), "kancolleMap" + currentTime + "1.png");
+                mapIntro = "kancolleMap" + currentTime + "1.png";
                 wc.DownloadFile(Utilities.GetElementXml("\"", allLinks[2], '"'), "kancolleMap" + currentTime + "2.png");
-                await ReplyAsync(Utilities.GetElementXml("|en = ", htmlRaw, '\n'));
-                await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "1.png");
-                await Context.Channel.SendFileAsync("kancolleMap" + currentTime + "2.png");
-                File.Delete("kancolleMap" + currentTime + "1.png");
-                File.Delete("kancolleMap" + currentTime + "2.png");
-                string branchingRules;
-                if (htmlRaw.Contains("{{MapBranchingTable"))
-                    branchingRules = htmlRaw.Split(new string[] { "{{MapBranchingTable" }, StringSplitOptions.None)[1];
-                else
-                    branchingRules = htmlRaw.Split(new string[] { "{{Map/Branching" }, StringSplitOptions.None)[1];
-                string[] allBranches = branchingRules.Split(new string[] { "}}" }, StringSplitOptions.None)[0].Split('\n');
-                string finalStr = "";
-                foreach (string currBranch in allBranches)
-                {
-                    if (currBranch.Length == 0 || currBranch.StartsWith("|title") || currBranch.StartsWith("|id"))
-                        continue;
-                    string line = currBranch.Substring(1, currBranch.Length - 1);
-                    finalStr += line + Environment.NewLine;
-                }
-                await ReplyAsync(finalStr);
+                mapDraw = "kancolleMap" + currentTime + "2.png";
+                mapName = Utilities.GetElementXml("|en = ", htmlRaw, '\n');
+                return (htmlRaw);
             }
+        }
+
+        public static string GetBranchingRules(string infos)
+        {
+            string branchingRules;
+            if (infos.Contains("{{MapBranchingTable"))
+                branchingRules = infos.Split(new string[] { "{{MapBranchingTable" }, StringSplitOptions.None)[1];
+            else
+                branchingRules = infos.Split(new string[] { "{{Map/Branching" }, StringSplitOptions.None)[1];
+            string[] allBranches = branchingRules.Split(new string[] { "}}" }, StringSplitOptions.None)[0].Split('\n');
+            string finalStr = "";
+            foreach (string currBranch in allBranches)
+            {
+                if (currBranch.Length == 0 || currBranch.StartsWith("|title") || currBranch.StartsWith("|id"))
+                    continue;
+                string line = currBranch.Substring(1, currBranch.Length - 1);
+                finalStr += line + Environment.NewLine;
+            }
+            return (finalStr);
         }
 
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
