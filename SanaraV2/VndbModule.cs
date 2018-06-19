@@ -45,6 +45,43 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.VndbNotFound(Context.Guild.Id));
                 return;
             }
+            bool isNsfw = (Context.Channel as ITextChannel).IsNsfw;
+            await ReplyAsync("", false, GetEmbed(vn, Context.Guild.Id, isNsfw));
+            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
+            if (me.GuildPermissions.AttachFiles)
+            {
+                foreach (string image in GetImages(vn, Context.Guild.Id, Context.User.Id, isNsfw))
+                {
+                    await Context.Channel.SendFileAsync(image);
+                    File.Delete(image);
+                }
+            }
+        }
+
+        public static List<string> GetImages(VisualNovel vn, ulong guildId, ulong userId, bool isNsfw)
+        {
+            List<string> images = new List<string>();
+            int counter = 0;
+            foreach (ScreenshotMetadata image in vn.Screenshots.ToArray())
+            {
+                if ((!isNsfw && !image.IsNsfw) || isNsfw)
+                {
+                    using (WebClient wc = new WebClient())
+                    {
+                        string currName = "vn" + DateTime.Now.ToString("HHmmssfff") + guildId + userId + "." + image.Url.Split('.')[image.Url.Split('.').Length - 1];
+                        wc.DownloadFile(image.Url, currName);
+                        images.Add(currName);
+                        counter++;
+                        if (counter == 1)
+                            break;
+                    }
+                }
+            }
+            return (images);
+        }
+
+        public static Embed GetEmbed(VisualNovel vn, ulong guildId, bool isNsfw)
+        {
             List<string> tmpDesc = vn.Description.Split('\n').ToList();
             Console.WriteLine(tmpDesc.Count);
             if (tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
@@ -62,43 +99,20 @@ namespace SanaraV2
                  { "Long", "30 - 50 hours" },
                  { "VeryLong", "> 50 hours" }
              };
-            string finalDesc = ((vn.OriginalName != null) ? ("**" + vn.OriginalName + "** (" + vn.Name + ")") : ("**" + vn.Name + "**")) + Environment.NewLine
-                 + ((vn.Languages.ToArray().Contains("en")) ? (Sentences.AvailableEnglish(Context.Guild.Id)) : (Sentences.NotAvailableEnglish(Context.Guild.Id))) + Environment.NewLine
-                 + ((vn.Platforms.Contains("win")) ? (Sentences.AvailableWindows(Context.Guild.Id)) : (Sentences.NotAvailableWindows(Context.Guild.Id))) + Environment.NewLine
+            string finalDesc = ((vn.Languages.ToArray().Contains("en")) ? (Sentences.AvailableEnglish(guildId)) : (Sentences.NotAvailableEnglish(guildId))) + Environment.NewLine
+                 + ((vn.Platforms.Contains("win")) ? (Sentences.AvailableWindows(guildId)) : (Sentences.NotAvailableWindows(guildId))) + Environment.NewLine
                  + ((vn.Length != null) ? (vn.Length.ToString().Replace("Very", "Very ") + " (" + allLengths[vn.Length.ToString()] + ")" + Environment.NewLine) : (""))
-                 + Sentences.VndbRating(Context.Guild.Id, vn.Rating.ToString()) + Environment.NewLine
-                 + ((vn.Released.Year != null) ? ("Released" + ((vn.Released.Month != null) ? ((vn.Released.Day != null) ? (" the " + vn.Released.Day + "/" + vn.Released.Month + "/" + vn.Released.Year) : (" in " + vn.Released.Month + "/" + vn.Released.Year)) : (" in " + vn.Released.Year))) : ("Not released yet.")) + Environment.NewLine
+                 + Sentences.VndbRating(guildId, vn.Rating.ToString()) + Environment.NewLine
+                 + ((vn.Released.Year != null) ? ("Released" + ((vn.Released.Month != null) ? ((vn.Released.Day != null) ? (" the " + vn.Released.Day + "/" + vn.Released.Month + "/" + vn.Released.Year) : (" in " + vn.Released.Month + "/" + vn.Released.Year)) : (" in " + vn.Released.Year)) + ".") : ("Not released yet.")) + Environment.NewLine
                  + Environment.NewLine + Environment.NewLine
                  + desc;
-            bool isNsfw = (Context.Channel as ITextChannel).IsNsfw;
-            EmbedBuilder embed = new EmbedBuilder()
+            return (new EmbedBuilder()
             {
+                Title = ((vn.OriginalName != null) ? (vn.OriginalName + " (" + vn.Name + ")") : (vn.Name)),
                 ImageUrl = (((vn.IsImageNsfw && isNsfw) || !vn.IsImageNsfw) ? (vn.Image) : (null)),
                 Description = finalDesc,
                 Color = Color.Green
-            };
-            await ReplyAsync("", false, embed.Build());
-            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
-            if (me.GuildPermissions.AttachFiles)
-            {
-                int counter = 0;
-                foreach (ScreenshotMetadata image in vn.Screenshots.ToArray())
-                {
-                    if ((!isNsfw && !image.IsNsfw) || isNsfw)
-                    {
-                        using (WebClient wc = new WebClient())
-                        {
-                            string currName = "vn" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString() + "." + image.Url.Split('.')[image.Url.Split('.').Length - 1];
-                            wc.DownloadFile(image.Url, currName);
-                            await Context.Channel.SendFileAsync(currName);
-                            File.Delete(currName);
-                            counter++;
-                            if (counter == 1)
-                                break;
-                        }
-                    }
-                }
-            }
+            }.Build());
         }
 
         public static async Task<VisualNovel> GetVn(string vnName)

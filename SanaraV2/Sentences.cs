@@ -34,7 +34,7 @@ namespace SanaraV2
         private static string GetTranslation(ulong guildId, string id, params string[] args)
         {
             if (guildId == 0) // GuildId is equal to 0 for unit tests
-                return ("");
+                return (id);
             string language = Program.p.guildLanguages[guildId];
             if (Program.p.translations.ContainsKey(id))
             {
