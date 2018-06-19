@@ -683,9 +683,8 @@ namespace SanaraV2
 
         private Task LogError(LogMessage msg)
         {
-            if (ravenClient == null)
-                Log(msg);
-            else
+            Log(msg);
+            if (ravenClient != null)
                 ravenClient.Capture(new SentryEvent(msg.Exception));
             return Task.CompletedTask;
         }

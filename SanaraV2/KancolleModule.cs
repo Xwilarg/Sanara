@@ -104,6 +104,29 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
                 return;
             }
+            string shipName = GetShipName(shipNameArr);
+            if (shipName == null)
+            {
+                await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                return;
+            }
+            DropMapError error;
+            string dropMap = GetDropMap(shipName, Context.Guild.Id, out error);
+            if (error == DropMapError.DontDrop)
+                await ReplyAsync(Sentences.DontDropOnMaps(Context.Guild.Id));
+            else if (error == DropMapError.NotReferenced)
+                await ReplyAsync(Sentences.ShipNotReferencedMap(Context.Guild.Id));
+            else
+                await ReplyAsync(dropMap);
+            string dropConstruction = GetDropConstruction(shipName, Context.Guild.Id);
+            if (dropConstruction == null)
+                await ReplyAsync(Sentences.ShipNotReferencedConstruction(Context.Guild.Id));
+            else
+                await ReplyAsync(dropConstruction);
+        }
+
+        public static string GetShipName(string[] shipNameArr)
+        {
             string shipName = Utilities.CleanWord(Utilities.AddArgs(shipNameArr));
             using (WebClient wc = new WebClient())
             {
@@ -113,19 +136,34 @@ namespace SanaraV2
                 allShipsName.RemoveAt(0);
                 string shipContain = allShipsName.Find(x => Utilities.CleanWord(Utilities.GetElementXml("\">", x, '<')) == shipName);
                 if (shipContain == null)
-                {
-                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
-                    return;
-                }
-                shipName = Utilities.GetElementXml("<td>", shipContain, '<');
-                html = wc.DownloadString("https://wikiwiki.jp/kancolle/%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E9%80%86%E5%BC%95%E3%81%8D");
+                    return (null);
+                return (Utilities.GetElementXml("<td>", shipContain, '<'));
+            }
+        }
+
+        public enum DropMapError
+        {
+            NoError,
+            NotReferenced,
+            DontDrop
+        }
+
+        public static string GetDropMap(string shipName, ulong guildId, out DropMapError error)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                wc.Encoding = Encoding.UTF8;
+                string html = wc.DownloadString("https://wikiwiki.jp/kancolle/%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E9%80%86%E5%BC%95%E3%81%8D");
                 html = html.Split(new string[] { "<thead>" }, StringSplitOptions.None)[1];
                 html = html.Split(new string[] { "艦種別表" }, StringSplitOptions.None)[0];
                 string[] shipgirls = html.Split(new string[] { "<tr>" }, StringSplitOptions.None);
                 string shipgirl = shipgirls.ToList().Find(x => x.Contains(shipName));
                 string finalStr = "";
                 if (shipgirl == null)
-                    await ReplyAsync(Sentences.ShipNotReferencedMap(Context.Guild.Id));
+                {
+                    error = DropMapError.NotReferenced;
+                    return (null);
+                }
                 else
                 {
                     string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
@@ -145,19 +183,19 @@ namespace SanaraV2
                             switch (node[0])
                             {
                                 case '●':
-                                    finalStr += world + "-" + level + ": " + Sentences.OnlyNormalNodes(Context.Guild.Id) + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.OnlyNormalNodes(guildId) + Environment.NewLine;
                                     break;
 
                                 case '○':
-                                    finalStr += world + "-" + level + ": " + Sentences.OnlyBossNode(Context.Guild.Id) + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.OnlyBossNode(guildId) + Environment.NewLine;
                                     break;
 
                                 case '◎':
-                                    finalStr += world + "-" + level + ": " + Sentences.AnyNode(Context.Guild.Id) + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.AnyNode(guildId) + Environment.NewLine;
                                     break;
 
                                 default:
-                                    finalStr += world + "-" + level + ": " + Sentences.DefaultNode(Context.Guild.Id) + Environment.NewLine;
+                                    finalStr += world + "-" + level + ": " + Sentences.DefaultNode(guildId) + Environment.NewLine;
                                     break;
                             }
                         }
@@ -171,13 +209,22 @@ namespace SanaraV2
                     if (finalStr.Length > 0)
                     {
                         string rarity = Utilities.GetElementXml(">", cathegories[1], '<');
-                        await ReplyAsync(Sentences.Rarity(Context.Guild.Id) + " " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
+                        error = DropMapError.NoError;
+                        return (Sentences.Rarity(guildId) + " " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
-                    else
-                        await ReplyAsync(Sentences.DontDropOnMaps(Context.Guild.Id));
+                    error = DropMapError.DontDrop;
+                    return (null);
                 }
+            }
+        }
+
+        public static string GetDropConstruction(string shipName, ulong guildId) // shipName in kanji
+        {
+            using (WebClient wc = new WebClient())
+            {
+                wc.Encoding = Encoding.UTF8;
                 wc.Headers.Add("User-Agent: Sanara");
-                html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLogList");
+                string html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLogList");
                 html = Regex.Replace(
                         html,
                         @"\\[Uu]([0-9A-Fa-f]{4})",
@@ -185,24 +232,21 @@ namespace SanaraV2
                             (char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
                 string[] htmlSplit = html.Split(new string[] { shipName }, StringSplitOptions.None);
                 if (htmlSplit.Length == 1)
-                {
-                    await ReplyAsync(Sentences.ShipNotReferencedConstruction(Context.Guild.Id));
-                    return;
-                }
+                    return (null);
                 string[] allIds = htmlSplit[htmlSplit.Length - 2].Split(new string[] { "\",\"" }, StringSplitOptions.None);
                 wc.Headers.Add("User-Agent: Sanara");
                 html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
                 html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
                 html = html.Split(new string[] { "flagship_order" }, StringSplitOptions.None)[0];
                 string[] allElements = html.Split(new string[] { "{\"item1\":" }, StringSplitOptions.None);
-                finalStr = Sentences.ShipConstruction(Context.Guild.Id) + Environment.NewLine;
+                string finalStr = Sentences.ShipConstruction(guildId) + Environment.NewLine;
                 for (int i = 1; i < ((allElements.Length > 6) ? (6) : (allElements.Length)); i++)
                 {
                     string[] ressources = allElements[i].Split(new string[] { ",\"" }, StringSplitOptions.None);
-                    finalStr += Utilities.GetElementXml(":", ressources[7], '}') + "% -- " + Sentences.Fuel(Context.Guild.Id) + " " + ressources[0] + ", " + Sentences.Ammos(Context.Guild.Id) + " " + Utilities.GetElementXml(":", ressources[1], '?') + ", " + Sentences.Iron(Context.Guild.Id) + " " + Utilities.GetElementXml(":", ressources[2], '?') + ", " + Sentences.Bauxite(Context.Guild.Id) + " " + Utilities.GetElementXml(":", ressources[3], '?')
-                         + ", " + Sentences.DevMat(Context.Guild.Id) + " " + Utilities.GetElementXml(":", ressources[4], '?') + Environment.NewLine;
+                    finalStr += Utilities.GetElementXml(":", ressources[7], '}') + "% -- " + Sentences.Fuel(guildId) + " " + ressources[0] + ", " + Sentences.Ammos(guildId) + " " + Utilities.GetElementXml(":", ressources[1], '?') + ", " + Sentences.Iron(guildId) + " " + Utilities.GetElementXml(":", ressources[2], '?') + ", " + Sentences.Bauxite(guildId) + " " + Utilities.GetElementXml(":", ressources[3], '?')
+                         + ", " + Sentences.DevMat(guildId) + " " + Utilities.GetElementXml(":", ressources[4], '?') + Environment.NewLine;
                 }
-                await ReplyAsync(finalStr);
+                return (finalStr);
             }
         }
 

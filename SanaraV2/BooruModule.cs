@@ -73,7 +73,7 @@ namespace SanaraV2
 
             public override string GetLink(string tags, int maxNb)
             {
-                return ("https://safebooru.org/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
+                return ("https://safebooru.org/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
             }
 
             public override string GetFileUrl(string json)
@@ -111,7 +111,7 @@ namespace SanaraV2
 
             public override string GetLink(string tags, int maxNb)
             {
-                return ("https://gelbooru.com/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
+                return ("https://gelbooru.com/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
             }
 
             public override string GetFileUrl(string json)
@@ -183,7 +183,7 @@ namespace SanaraV2
 
             public override string GetLink(string tags, int maxNb)
             {
-                return ("https://rule34.xxx/index.php?page=dapi&s=post&q=index&pid=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
+                return ("https://rule34.xxx/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
             }
 
             public override string GetFileUrl(string json)

@@ -15,7 +15,7 @@ namespace Sanara_UnitTests
         [Fact]
         public void ToKatakana()
         {
-           Assert.Equal("オランジ ジュイス", LinguistModule.ToKatakana(LinguistModule.FromHiragana("oranji じゅいす")));
+            Assert.Equal("オランジ ジュイス", LinguistModule.ToKatakana(LinguistModule.FromHiragana("oranji じゅいす")));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Sanara_UnitTests
         public async void Booru()
         {
             new SanaraV2.Program(true);
-            Directory.GetFiles(".", "booruImage.*").ToList().ForEach(delegate(string path) { File.Delete(path); } );
+            Directory.GetFiles(".", "booruImage.*").ToList().ForEach(delegate (string path) { File.Delete(path); });
             await BooruModule.GetImage(new BooruModule.Safebooru(), new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, null, "booruImage", true, false);
             Assert.Single(Directory.GetFiles(".", "booruImage.*"));
         }
@@ -159,6 +159,40 @@ namespace Sanara_UnitTests
             Assert.Contains("B/resource -> C/resource,D", branchs);
             Assert.Contains("E/resource -> F/battle", branchs);
             Assert.Contains("E/resource -> G/battle", branchs);
+        }
+
+        [Fact]
+        public void InvalidShipName()
+        {
+            Assert.Null(KancolleModule.GetShipName(new string[] { "awawawawawawawa" }));
+        }
+
+        [Fact]
+        public void InvalidDropConstruction()
+        {
+            Assert.Null(KancolleModule.GetDropConstruction(KancolleModule.GetShipName(new string[] { "u511" }), 0));
+        }
+
+        [Fact]
+        public void DropConstruction()
+        {
+            Assert.NotNull(KancolleModule.GetDropConstruction(KancolleModule.GetShipName(new string[] { "Akitsu", "Maru" }), 0));
+        }
+
+        [Fact]
+        public void InvalidDropMap()
+        {
+            KancolleModule.DropMapError error;
+            KancolleModule.GetDropMap(KancolleModule.GetShipName(new string[] { "Taihou" }), 0, out error);
+            Assert.Equal(KancolleModule.DropMapError.DontDrop, error);
+        }
+
+        [Fact]
+        public void DropMap()
+        {
+            KancolleModule.DropMapError error;
+            KancolleModule.GetDropMap(KancolleModule.GetShipName(new string[] { "Ikazuchi" }), 0, out error);
+            Assert.Equal(KancolleModule.DropMapError.NoError, error);
         }
     }
 }
