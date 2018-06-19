@@ -83,7 +83,6 @@ namespace SanaraV2
         public static Embed GetEmbed(VisualNovel vn, ulong guildId, bool isNsfw)
         {
             List<string> tmpDesc = vn.Description.Split('\n').ToList();
-            Console.WriteLine(tmpDesc.Count);
             if (tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
                 tmpDesc.RemoveAt(tmpDesc.Count - 1);
             string desc = "";
