@@ -120,9 +120,9 @@ namespace SanaraV2
             await commands.AddModuleAsync<KancolleModule>();
             await commands.AddModuleAsync<BooruModule>();
             await commands.AddModuleAsync<VndbModule>();
-            await commands.AddModuleAsync<NhentaiModule>();
+            await commands.AddModuleAsync<DoujinshiModule>();
             await commands.AddModuleAsync<CodeModule>();
-            await commands.AddModuleAsync<MyAnimeListModule>();
+            await commands.AddModuleAsync<AnimeMangaModule>();
             await commands.AddModuleAsync<GameModule>();
             await commands.AddModuleAsync<YoutubeModule>();
             await commands.AddModuleAsync<GoogleShortenerModule>();

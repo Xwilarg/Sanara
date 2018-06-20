@@ -48,6 +48,10 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Return if a map is valid or not
+        /// </summary>
+        /// <param name="mapName">Array containing world (in first string) and level (in the second one)</param>
         public static bool IsMapInvalid(string[] mapName)
         {
             return (mapName.Length != 2 || mapName[0].Length != 1 || mapName[1].Length != 1
@@ -55,6 +59,15 @@ namespace SanaraV2
                 || (mapName[0][0] != '1' && mapName[1][0] == '6'));
         }
 
+        /// <summary>
+        /// Get informations about a map
+        /// </summary>
+        /// <param name="world">The world the map belong in</param>
+        /// <param name="level">The level the map belong in</param>
+        /// <param name="mapIntro">Return the image of the map</param>
+        /// <param name="mapDraw">Return the image of the branching of the map</param>
+        /// <param name="mapName">Return the name of the map</param>
+        /// <returns>Return the informations about the map</returns>
         public static string GetMapInfos(char world, char level, out string mapIntro, out string mapDraw, out string mapName)
         {
             using (WebClient wc = new WebClient())
@@ -76,6 +89,10 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Return informations about the branching rule of the map
+        /// </summary>
+        /// <param name="infos">string containing informations to parse</param>
         public static string GetBranchingRules(string infos)
         {
             string branchingRules;
@@ -125,6 +142,10 @@ namespace SanaraV2
                 await ReplyAsync(dropConstruction);
         }
 
+        /// <summary>
+        /// Return ship name in kanji
+        /// </summary>
+        /// <param name="shipNameArr">Ship name in romaji</param>
         public static string GetShipName(string[] shipNameArr)
         {
             string shipName = Utilities.CleanWord(Utilities.AddArgs(shipNameArr));
@@ -148,6 +169,12 @@ namespace SanaraV2
             DontDrop
         }
 
+        /// <summary>
+        /// Return the drop on maps for a ship
+        /// </summary>
+        /// <param name="shipName">Name of the ship</param>
+        /// <param name="guildId">Guild ID was sent from</param>
+        /// <param name="error">If the research fail, return the error in this param</param>
         public static string GetDropMap(string shipName, ulong guildId, out DropMapError error)
         {
             using (WebClient wc = new WebClient())
@@ -218,6 +245,11 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Return the drop on construction for a ship
+        /// </summary>
+        /// <param name="shipName">Name of the ship</param>
+        /// <param name="guildId">Guild ID the message was sent from</param>
         public static string GetDropConstruction(string shipName, ulong guildId) // shipName in kanji
         {
             using (WebClient wc = new WebClient())
@@ -261,71 +293,124 @@ namespace SanaraV2
             }
             string shipName = Utilities.AddArgs(shipNameArr);
             IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
-            string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + shipName + "&limit=1";
+            string id, thumbnail;
+            if (!GetShipInfos(shipName, out id, out thumbnail))
+            {
+                await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                return;
+            }
+            string thumbnailPath = null;
+            List<string> finalStr = FillKancolleInfos(id, Context.Guild.Id);
+            if (me.GuildPermissions.AttachFiles)
+            {
+                thumbnailPath = DownloadShipThumbnail(thumbnail);
+                await Context.Channel.SendFileAsync(thumbnailPath);
+            }
+            foreach (string s in finalStr)
+                await ReplyAsync(s);
+            if (me.GuildPermissions.AttachFiles)
+                File.Delete(thumbnailPath);
+        }
+
+        /// <summary>
+        /// Return informations about a ship
+        /// </summary>
+        /// <param name="shipId">ID of the ship</param>
+        public static List<string> FillKancolleInfos(string shipId, ulong guildId)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                wc.Encoding = Encoding.UTF8;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                List<string> finalStr = new List<string>() {
+                    ""
+                };
+                string url = "http://kancolle.wikia.com/api/v1/Articles/AsSimpleJson?id=" + shipId;
+                string json = wc.DownloadString(url);
+                string[] jsonInside = json.Split(new string[] { "\"title\"" }, StringSplitOptions.None);
+                int currI = 0;
+                GetKancolleInfo("Personality", ref currI, ref finalStr, jsonInside, Sentences.Personality(guildId));
+                GetKancolleInfo("Appearance", ref currI, ref finalStr, jsonInside, Sentences.Appearance(guildId));
+                GetKancolleInfo("Second Remodel", ref currI, ref finalStr, jsonInside, Sentences.SecondRemodel(guildId));
+                GetKancolleInfo("Trivia", ref currI, ref finalStr, jsonInside, Sentences.Trivia(guildId));
+                GetKancolleInfo("In-game", ref currI, ref finalStr, jsonInside, Sentences.InGame(guildId));
+                GetKancolleInfo("Historical", ref currI, ref finalStr, jsonInside, Sentences.Historical(guildId));
+                for (int i = 0; i < finalStr.Count; i++)
+                    finalStr[i] = Regex.Replace(finalStr[i], @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
+                return (finalStr);
+            }
+        }
+
+        /// <summary>
+        /// Download ship thumbnail given an URL
+        /// </summary>
+        /// <param name="fullUrl">The cropped URL given byGetShipInfos</param>
+        /// <returns>The path to the file downloaded</returns>
+        public static string DownloadShipThumbnail(string fullUrl)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                wc.Encoding = Encoding.UTF8;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
+                string shipName = "shipgirl" + currentTime + ".jpg";
+                wc.DownloadFile(fullUrl, shipName);
+                return (shipName);
+            }
+        }
+
+        /// <summary>
+        /// Return informations about a ship
+        /// </summary>
+        /// <param name="shipName">Name of the ship</param>
+        /// <param name="id">Return the id of the ship on KanColle wikia</param>
+        /// <param name="thumbnail">Return the thumbnail of the ship</param>
+        public static bool GetShipInfos(string shipName, out string id, out string thumbnail)
+        {
             try
             {
                 using (WebClient w = new WebClient())
                 {
                     w.Encoding = Encoding.UTF8;
-                    List<string> finalStr = new List<string> { "" };
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    string json = w.DownloadString(url);
-                    string code = Utilities.GetElementXml("\"id\":", json, ',');
-                    url = "http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + code;
-                    json = w.DownloadString(url);
-                    string image = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
-                    if (Utilities.GetElementXml("\"title\":\"", json, '"').ToUpper() != shipName.ToUpper())
-                    {
-                        await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
-                        return;
-                    }
-                    url = "http://kancolle.wikia.com/wiki/" + Utilities.GetElementXml("\"title\":\"", json, '"') + "?action=raw";
+                    List<string> finalStr = new List<string> { "" };
+                    string json = w.DownloadString("https://kancolle.wikia.com/api/v1/Search/List?query=" + shipName + "&limit=1");
+                    id = Utilities.GetElementXml("\"id\":", json, ',');
+                    string title = Utilities.GetElementXml("\"title\":\"", json, '"');
+                    json = w.DownloadString("http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + id);
+                    thumbnail = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
+                    thumbnail = thumbnail.Split(new string[] { ".jpg" }, StringSplitOptions.None)[0] + ".jpg";
+                    thumbnail = thumbnail.Replace("\\", "");
+                    if (title.ToUpper() != shipName.ToUpper())
+                        return (false);
+                    string url = "http://kancolle.wikia.com/wiki/" + title + "?action=raw";
                     json = w.DownloadString(url);
                     if (Utilities.GetElementXml("{{", json, '}') != "ShipPageHeader" && Utilities.GetElementXml("{{", json, '}') != "Ship/Header")
-                    {
-                        await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
-                        return;
-                    }
-                    int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
-                    if (me.GuildPermissions.AttachFiles)
-                    {
-                        image = image.Split(new string[] { ".jpg" }, StringSplitOptions.None)[0] + ".jpg";
-                        image = image.Replace("\\", "");
-                        w.DownloadFile(image, "shipgirl" + currentTime + ".jpg");
-                    }
-                    url = "http://kancolle.wikia.com/api/v1/Articles/AsSimpleJson?id=" + code;
-                    json = w.DownloadString(url);
-                    string[] jsonInside = json.Split(new string[] { "\"title\"" }, StringSplitOptions.None);
-                    int currI = 0;
-                    finalStr = GetKancolleInfo("Personality", ref currI, finalStr, jsonInside, Sentences.Personality(Context.Guild.Id));
-                    finalStr = GetKancolleInfo("Appearance", ref currI, finalStr, jsonInside, Sentences.Appearance(Context.Guild.Id));
-                    finalStr = GetKancolleInfo("Second Remodel", ref currI, finalStr, jsonInside, Sentences.SecondRemodel(Context.Guild.Id));
-                    finalStr = GetKancolleInfo("Trivia", ref currI, finalStr, jsonInside, Sentences.Trivia(Context.Guild.Id));
-                    finalStr = GetKancolleInfo("In-game", ref currI, finalStr, jsonInside, Sentences.InGame(Context.Guild.Id));
-                    finalStr = GetKancolleInfo("Historical", ref currI, finalStr, jsonInside, Sentences.Historical(Context.Guild.Id));
-                    if (me.GuildPermissions.AttachFiles)
-                        await Context.Channel.SendFileAsync("shipgirl" + currentTime + ".jpg");
-                    foreach (string s in finalStr)
-                    {
-                        await ReplyAsync(Regex.Replace(
-                        s,
-                        @"\\[Uu]([0-9A-Fa-f]{4})",
-                        m => char.ToString(
-                            (char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)))); // Replace \\u1313 by \u1313
-                    }
-                    if (me.GuildPermissions.AttachFiles)
-                        File.Delete("shipgirl" + currentTime + ".jpg");
+                        return (false);
+                    return (true);
                 }
             }
             catch (WebException ex)
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
+                id = null;
+                thumbnail = null;
                 if (code.StatusCode == HttpStatusCode.NotFound)
-                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                    return (false);
+                else
+                    throw ex;
             }
         }
 
-        private List<string> GetKancolleInfo(string categorie, ref int currI, List<string> finalStr, string[] jsonInside, string relatedSentence)
+        /// <summary>
+        /// Return  informations about a ship on a categorie from KanColle wikia
+        /// </summary>
+        /// <param name="categorie">Name of the categorie on the JSON</param>
+        /// <param name="currI">Counter for finalStr</param>
+        /// <param name="finalStr">List containing the informations</param>
+        /// <param name="jsonInside">Informations to parse</param>
+        /// <param name="relatedSentence">Name of the categorie to display</param>
+        private static void GetKancolleInfo(string categorie, ref int currI, ref List<string> finalStr, string[] jsonInside, string relatedSentence)
         {
             foreach (string s in jsonInside)
             {
@@ -349,7 +434,6 @@ namespace SanaraV2
                     break;
                 }
             }
-            return (finalStr);
         }
     }
 }

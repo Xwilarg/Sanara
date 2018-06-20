@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2
 {
-    public class NhentaiModule : ModuleBase
+    public class DoujinshiModule : ModuleBase
     {
         Program p = Program.p;
 

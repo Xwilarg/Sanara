@@ -219,26 +219,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BooruModule.cs" />
+    <Compile Include="NSFW\BooruModule.cs" />
     <Compile Include="Character.cs" />
-    <Compile Include="CodeModule.cs" />
-    <Compile Include="CommunicationModule.cs" />
-    <Compile Include="GameModule.cs" />
-    <Compile Include="GoogleShortenerModule.cs" />
-    <Compile Include="ImageModule.cs" />
-    <Compile Include="JishoModule.cs" />
-    <Compile Include="KancolleModule.cs" />
-    <Compile Include="MyAnimeListModule.cs" />
-    <Compile Include="NhentaiModule.cs" />
+    <Compile Include="Tools\CodeModule.cs" />
+    <Compile Include="Tools\CommunicationModule.cs" />
+    <Compile Include="Entertainment\GameModule.cs" />
+    <Compile Include="Entertainment\GoogleShortenerModule.cs" />
+    <Compile Include="Tools\ImageModule.cs" />
+    <Compile Include="Tools\LinguistModule.cs" />
+    <Compile Include="GamesInfo\KancolleModule.cs" />
+    <Compile Include="Entertainment\AnimeMangaModule.cs" />
+    <Compile Include="NSFW\DoujinshiModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RadioModule.cs" />
+    <Compile Include="Entertainment\RadioModule.cs" />
     <Compile Include="Sentences.cs" />
-    <Compile Include="SettingsModule.cs" />
+    <Compile Include="Tools\SettingsModule.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="VndbModule.cs" />
-    <Compile Include="XKCDModule.cs" />
-    <Compile Include="YoutubeModule.cs" />
+    <Compile Include="Entertainment\VndbModule.cs" />
+    <Compile Include="Entertainment\XKCDModule.cs" />
+    <Compile Include="Entertainment\YoutubeModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

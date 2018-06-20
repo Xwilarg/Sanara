@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2
 {
-    public class MyAnimeListModule : ModuleBase
+    public class AnimeMangaModule : ModuleBase
     {
         Program p = Program.p;
 

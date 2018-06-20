@@ -194,5 +194,40 @@ namespace Sanara_UnitTests
             KancolleModule.GetDropMap(KancolleModule.GetShipName(new string[] { "Ikazuchi" }), 0, out error);
             Assert.Equal(KancolleModule.DropMapError.NoError, error);
         }
+
+        [Fact]
+        public void WrongShipInfos()
+        {
+            Assert.False(KancolleModule.GetShipInfos("awawawawawawa", out _, out _));
+        }
+
+        [Fact]
+        public void ShipInfos()
+        {
+            string id, thumbnail;
+            Assert.True(KancolleModule.GetShipInfos("Ikazuchi", out id, out thumbnail));
+            Assert.Equal("2524", id);
+            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", thumbnail);
+        }
+
+        [Fact]
+        public void DownloadThumbnail()
+        {
+            string thumbnail;
+            Assert.True(KancolleModule.GetShipInfos("Hibiki", out _, out thumbnail));
+            string fileName = KancolleModule.DownloadShipThumbnail(thumbnail);
+            Assert.True(File.Exists(fileName));
+        }
+
+        [Fact]
+        public void FillKancolleInfos()
+        {
+            string id;
+            KancolleModule.GetShipInfos("Ryuujou", out id, out _);
+            string infos = Utilities.AddArgs(KancolleModule.FillKancolleInfos(id, 0).ToArray());
+            Assert.Contains("**personality**", infos);
+            Assert.Contains("**appearance**", infos);
+            Assert.Contains("**trivia**", infos);
+        }
     }
 }
