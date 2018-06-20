@@ -134,6 +134,7 @@ namespace SanaraV2
             client.GuildAvailable += GuildJoin;
             client.UserJoined += UserJoin;
             client.JoinedGuild += GuildJoin;
+            client.Disconnected += Disconnected;
 
             await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
             startTime = DateTime.Now;
@@ -151,6 +152,11 @@ namespace SanaraV2
                 });
             }
             await Task.Delay(-1);
+        }
+
+        private Task Disconnected(Exception e)
+        {
+            throw e;
         }
 
         /// Stats at https://zirk.eu/sanara-stats.php
