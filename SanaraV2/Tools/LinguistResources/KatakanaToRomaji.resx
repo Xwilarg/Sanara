@@ -1,0 +1,516 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ア" xml:space="preserve">
+    <value>a</value>
+  </data>
+  <data name="イ" xml:space="preserve">
+    <value>i</value>
+  </data>
+  <data name="イェ" xml:space="preserve">
+    <value>yi</value>
+  </data>
+  <data name="ウ" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="ウィ" xml:space="preserve">
+    <value>wi</value>
+  </data>
+  <data name="ウェ" xml:space="preserve">
+    <value>we</value>
+  </data>
+  <data name="エ" xml:space="preserve">
+    <value>e</value>
+  </data>
+  <data name="オ" xml:space="preserve">
+    <value>o</value>
+  </data>
+  <data name="カ" xml:space="preserve">
+    <value>ka</value>
+  </data>
+  <data name="ガ" xml:space="preserve">
+    <value>ga</value>
+  </data>
+  <data name="キ" xml:space="preserve">
+    <value>ki</value>
+  </data>
+  <data name="キィ" xml:space="preserve">
+    <value>kyi</value>
+  </data>
+  <data name="キェ" xml:space="preserve">
+    <value>kye</value>
+  </data>
+  <data name="キャ" xml:space="preserve">
+    <value>kya</value>
+  </data>
+  <data name="キュ" xml:space="preserve">
+    <value>kyu</value>
+  </data>
+  <data name="キョ" xml:space="preserve">
+    <value>kyo</value>
+  </data>
+  <data name="ギ" xml:space="preserve">
+    <value>gi</value>
+  </data>
+  <data name="ギィ" xml:space="preserve">
+    <value>gyi</value>
+  </data>
+  <data name="ギェ" xml:space="preserve">
+    <value>gye</value>
+  </data>
+  <data name="ギャ" xml:space="preserve">
+    <value>gya</value>
+  </data>
+  <data name="ギュ" xml:space="preserve">
+    <value>gyu</value>
+  </data>
+  <data name="ギョ" xml:space="preserve">
+    <value>gyo</value>
+  </data>
+  <data name="ク" xml:space="preserve">
+    <value>ku</value>
+  </data>
+  <data name="グ" xml:space="preserve">
+    <value>gu</value>
+  </data>
+  <data name="ケ" xml:space="preserve">
+    <value>ke</value>
+  </data>
+  <data name="ゲ" xml:space="preserve">
+    <value>ge</value>
+  </data>
+  <data name="コ" xml:space="preserve">
+    <value>ko</value>
+  </data>
+  <data name="ゴ" xml:space="preserve">
+    <value>go</value>
+  </data>
+  <data name="サ" xml:space="preserve">
+    <value>sa</value>
+  </data>
+  <data name="ザ" xml:space="preserve">
+    <value>za</value>
+  </data>
+  <data name="シ" xml:space="preserve">
+    <value>shi</value>
+  </data>
+  <data name="シェ" xml:space="preserve">
+    <value>she</value>
+  </data>
+  <data name="シャ" xml:space="preserve">
+    <value>sha</value>
+  </data>
+  <data name="シュ" xml:space="preserve">
+    <value>shu</value>
+  </data>
+  <data name="ショ" xml:space="preserve">
+    <value>sho</value>
+  </data>
+  <data name="ジ" xml:space="preserve">
+    <value>ji</value>
+  </data>
+  <data name="ジィ" xml:space="preserve">
+    <value>ji</value>
+  </data>
+  <data name="ジェ" xml:space="preserve">
+    <value>je</value>
+  </data>
+  <data name="ジャ" xml:space="preserve">
+    <value>ja</value>
+  </data>
+  <data name="ジュ" xml:space="preserve">
+    <value>ju</value>
+  </data>
+  <data name="ジョ" xml:space="preserve">
+    <value>jo</value>
+  </data>
+  <data name="ス" xml:space="preserve">
+    <value>su</value>
+  </data>
+  <data name="ズ" xml:space="preserve">
+    <value>zu</value>
+  </data>
+  <data name="セ" xml:space="preserve">
+    <value>se</value>
+  </data>
+  <data name="ゼ" xml:space="preserve">
+    <value>ze</value>
+  </data>
+  <data name="ソ" xml:space="preserve">
+    <value>so</value>
+  </data>
+  <data name="ゾ" xml:space="preserve">
+    <value>zo</value>
+  </data>
+  <data name="タ" xml:space="preserve">
+    <value>ta</value>
+  </data>
+  <data name="ダ" xml:space="preserve">
+    <value>da</value>
+  </data>
+  <data name="チ" xml:space="preserve">
+    <value>chi</value>
+  </data>
+  <data name="チィ" xml:space="preserve">
+    <value>chi</value>
+  </data>
+  <data name="チェ" xml:space="preserve">
+    <value>che</value>
+  </data>
+  <data name="チャ" xml:space="preserve">
+    <value>cha</value>
+  </data>
+  <data name="チュ" xml:space="preserve">
+    <value>chu</value>
+  </data>
+  <data name="チョ" xml:space="preserve">
+    <value>cho</value>
+  </data>
+  <data name="ツ" xml:space="preserve">
+    <value>tsu</value>
+  </data>
+  <data name="ヅ" xml:space="preserve">
+    <value>zu</value>
+  </data>
+  <data name="テ" xml:space="preserve">
+    <value>te</value>
+  </data>
+  <data name="デ" xml:space="preserve">
+    <value>de</value>
+  </data>
+  <data name="ト" xml:space="preserve">
+    <value>to</value>
+  </data>
+  <data name="ド" xml:space="preserve">
+    <value>do</value>
+  </data>
+  <data name="ナ" xml:space="preserve">
+    <value>na</value>
+  </data>
+  <data name="ニ" xml:space="preserve">
+    <value>ni</value>
+  </data>
+  <data name="ニィ" xml:space="preserve">
+    <value>nyi</value>
+  </data>
+  <data name="ニェ" xml:space="preserve">
+    <value>nye</value>
+  </data>
+  <data name="ニャ" xml:space="preserve">
+    <value>nya</value>
+  </data>
+  <data name="ニュ" xml:space="preserve">
+    <value>nyu</value>
+  </data>
+  <data name="ニョ" xml:space="preserve">
+    <value>nyo</value>
+  </data>
+  <data name="ヌ" xml:space="preserve">
+    <value>nu</value>
+  </data>
+  <data name="ネ" xml:space="preserve">
+    <value>ne</value>
+  </data>
+  <data name="ノ" xml:space="preserve">
+    <value>no</value>
+  </data>
+  <data name="ハ" xml:space="preserve">
+    <value>ha</value>
+  </data>
+  <data name="バ" xml:space="preserve">
+    <value>ba</value>
+  </data>
+  <data name="パ" xml:space="preserve">
+    <value>pa</value>
+  </data>
+  <data name="ヒ" xml:space="preserve">
+    <value>hi</value>
+  </data>
+  <data name="ヒィ" xml:space="preserve">
+    <value>hyi</value>
+  </data>
+  <data name="ヒェ" xml:space="preserve">
+    <value>hye</value>
+  </data>
+  <data name="ヒャ" xml:space="preserve">
+    <value>hya</value>
+  </data>
+  <data name="ヒュ" xml:space="preserve">
+    <value>hyu</value>
+  </data>
+  <data name="ヒョ" xml:space="preserve">
+    <value>hyo</value>
+  </data>
+  <data name="ビ" xml:space="preserve">
+    <value>bi</value>
+  </data>
+  <data name="ビィ" xml:space="preserve">
+    <value>byi</value>
+  </data>
+  <data name="ビェ" xml:space="preserve">
+    <value>bye</value>
+  </data>
+  <data name="ビャ" xml:space="preserve">
+    <value>bya</value>
+  </data>
+  <data name="ビュ" xml:space="preserve">
+    <value>byu</value>
+  </data>
+  <data name="ビョ" xml:space="preserve">
+    <value>byo</value>
+  </data>
+  <data name="ピ" xml:space="preserve">
+    <value>pi</value>
+  </data>
+  <data name="ピィ" xml:space="preserve">
+    <value>pyi</value>
+  </data>
+  <data name="ピェ" xml:space="preserve">
+    <value>pye</value>
+  </data>
+  <data name="ピャ" xml:space="preserve">
+    <value>pya</value>
+  </data>
+  <data name="ピュ" xml:space="preserve">
+    <value>pyu</value>
+  </data>
+  <data name="ピョ" xml:space="preserve">
+    <value>pyo</value>
+  </data>
+  <data name="フ" xml:space="preserve">
+    <value>hu</value>
+  </data>
+  <data name="ブ" xml:space="preserve">
+    <value>bu</value>
+  </data>
+  <data name="プ" xml:space="preserve">
+    <value>pu</value>
+  </data>
+  <data name="ヘ" xml:space="preserve">
+    <value>he</value>
+  </data>
+  <data name="ベ" xml:space="preserve">
+    <value>be</value>
+  </data>
+  <data name="ペ" xml:space="preserve">
+    <value>pe</value>
+  </data>
+  <data name="ホ" xml:space="preserve">
+    <value>ho</value>
+  </data>
+  <data name="ボ" xml:space="preserve">
+    <value>bo</value>
+  </data>
+  <data name="ポ" xml:space="preserve">
+    <value>po</value>
+  </data>
+  <data name="マ" xml:space="preserve">
+    <value>ma</value>
+  </data>
+  <data name="ミ" xml:space="preserve">
+    <value>mi</value>
+  </data>
+  <data name="ミィ" xml:space="preserve">
+    <value>myi</value>
+  </data>
+  <data name="ミェ" xml:space="preserve">
+    <value>mye</value>
+  </data>
+  <data name="ミャ" xml:space="preserve">
+    <value>mya</value>
+  </data>
+  <data name="ミュ" xml:space="preserve">
+    <value>myu</value>
+  </data>
+  <data name="ミョ" xml:space="preserve">
+    <value>myo</value>
+  </data>
+  <data name="ム" xml:space="preserve">
+    <value>mu</value>
+  </data>
+  <data name="メ" xml:space="preserve">
+    <value>me</value>
+  </data>
+  <data name="モ" xml:space="preserve">
+    <value>mo</value>
+  </data>
+  <data name="ヤ" xml:space="preserve">
+    <value>ya</value>
+  </data>
+  <data name="ユ" xml:space="preserve">
+    <value>yu</value>
+  </data>
+  <data name="ヨ" xml:space="preserve">
+    <value>yo</value>
+  </data>
+  <data name="ラ" xml:space="preserve">
+    <value>ra</value>
+  </data>
+  <data name="リ" xml:space="preserve">
+    <value>ri</value>
+  </data>
+  <data name="リィ" xml:space="preserve">
+    <value>ryi</value>
+  </data>
+  <data name="リェ" xml:space="preserve">
+    <value>rye</value>
+  </data>
+  <data name="リャ" xml:space="preserve">
+    <value>rya</value>
+  </data>
+  <data name="リュ" xml:space="preserve">
+    <value>ryu</value>
+  </data>
+  <data name="リョ" xml:space="preserve">
+    <value>ryo</value>
+  </data>
+  <data name="ル" xml:space="preserve">
+    <value>ru</value>
+  </data>
+  <data name="レ" xml:space="preserve">
+    <value>re</value>
+  </data>
+  <data name="ロ" xml:space="preserve">
+    <value>ro</value>
+  </data>
+  <data name="ワ" xml:space="preserve">
+    <value>wa</value>
+  </data>
+  <data name="ヲ" xml:space="preserve">
+    <value>wo</value>
+  </data>
+  <data name="ン" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="ヴ" xml:space="preserve">
+    <value>vu</value>
+  </data>
+  <data name="ヴァ" xml:space="preserve">
+    <value>va</value>
+  </data>
+  <data name="ヴィ" xml:space="preserve">
+    <value>vi</value>
+  </data>
+  <data name="ヴェ" xml:space="preserve">
+    <value>ve</value>
+  </data>
+  <data name="ヴォ" xml:space="preserve">
+    <value>vo</value>
+  </data>
+</root>

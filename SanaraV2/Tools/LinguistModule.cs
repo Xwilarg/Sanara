@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord.Commands;
+using SanaraV2.Tools.LinguistResources;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -23,6 +24,7 @@ using Google;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Grpc.Core;
+using System.Resources;
 
 namespace SanaraV2
 {
@@ -194,20 +196,21 @@ namespace SanaraV2
             }
         }
 
-        private static string Transcript(char curr, char next, ref int i, Dictionary<string, string> transcriptionArray)
+        private static string Transcript(char curr, char next, ref int i, ResourceManager transcriptionArray)
         {
-            if (next != ' ' && transcriptionArray.ContainsKey("" + curr + next))
+            if (next != ' ' && transcriptionArray.GetString("" + curr + next) != null)
             {
                 i++;
-                return (transcriptionArray["" + curr + next]);
+                return (transcriptionArray.GetString("" + curr + next));
             }
-            if (transcriptionArray.ContainsKey("" + curr))
-                return (transcriptionArray["" + curr]);
+            if (transcriptionArray.GetString("" + curr) != null)
+                return (transcriptionArray.GetString("" + curr));
             return ("" + curr);
         }
 
         public static string FromHiragana(string name)
         {
+            ResourceManager manager = HiraganaToRomaji.ResourceManager;
             string finalName = "";
             string finalStr = "";
             int doubleVoy = 0;
@@ -220,7 +223,7 @@ namespace SanaraV2
                 if (curr == 'っ')
                     doubleVoy = 2;
                 else
-                    finalName += Transcript(curr, next, ref i, HiraganaRomajiArray);
+                    finalName += Transcript(curr, next, ref i, manager);
                 if (doubleVoy == 1 && curr != 'ん' && curr != 'ゔ' && curr != 'ゃ' && curr != 'ぃ' && curr != 'ゅ' && curr != 'ぇ' && curr != 'ょ'
                      && curr != 'っ' && curr != 'あ' && curr != 'い' && curr != 'う' && curr != 'え' && curr != 'お')
                 {
@@ -235,6 +238,7 @@ namespace SanaraV2
 
         public static string FromKatakana(string name)
         {
+            ResourceManager manager = KatakanaToRomaji.ResourceManager;
             string finalName = "";
             string finalStr = "";
             int doubleVoy = 0;
@@ -249,7 +253,7 @@ namespace SanaraV2
                 else if (curr == 'ー' && finalStr.Length > 0)
                     finalName += finalStr.Substring(finalStr.Length - 1, 1);
                 else
-                    finalName += Transcript(curr, next, ref i, KatakanaRomajiArray);
+                    finalName += Transcript(curr, next, ref i, manager);
                 if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
                      && curr != 'ッ' && curr != 'ア' && curr != 'イ' && curr != 'ウ' && curr != 'エ' && curr != 'オ')
                 {
@@ -262,26 +266,29 @@ namespace SanaraV2
             return (finalStr);
         }
 
-        private static string TranscriptInvert(char curr, char next, char nnext, ref int i, Dictionary<string, string> transcriptionArray)
+        private static string TranscriptInvert(char curr, char next, char nnext, ref int i, ResourceManager transcriptionArray)
         {
             if (next != ' ')
             {
-                if (nnext != ' ' && transcriptionArray.ContainsKey("" + curr + next + nnext))
+                if (nnext != ' ' && transcriptionArray.GetString("" + curr + next + nnext) != null)
                 {
                     i++;
-                    return (transcriptionArray["" + curr + next + nnext]);
+                    return (transcriptionArray.GetString("" + curr + next + nnext));
                 }
-                if (transcriptionArray.ContainsKey("" + curr + next))
-                    return (transcriptionArray["" + curr + next]);
+                if (curr == 'd' && next == 'o')
+                        return (transcriptionArray.GetString("_do"));
+                if (transcriptionArray.GetString("" + curr + next) != null)
+                    return (transcriptionArray.GetString("" + curr + next));
             }
             i--;
-            if (transcriptionArray.ContainsKey("" + curr))
-                return (transcriptionArray["" + curr]);
+            if (transcriptionArray.GetString("" + curr) != null)
+                return (transcriptionArray.GetString("" + curr));
             return ("" + curr);
         }
 
         public static string ToHiragana(string name)
         {
+            ResourceManager manager = RomajiToHiragana.ResourceManager;
             string finalName = "";
             name = name.ToLower();
             for (int i = 0; i < name.Length; i += 2)
@@ -296,13 +303,14 @@ namespace SanaraV2
                     i--;
                 }
                 else
-                    finalName += TranscriptInvert(curr, next, nnext, ref i, RomajiHiraganaArray);
+                    finalName += TranscriptInvert(curr, next, nnext, ref i, manager);
             }
             return (finalName);
         }
 
         public static string ToKatakana(string name)
         {
+            ResourceManager manager = RomajiToKatakana.ResourceManager;
             string finalName = "";
             name = name.ToLower();
             for (int i = 0; i < name.Length; i += 2)
@@ -317,580 +325,9 @@ namespace SanaraV2
                     i--;
                 }
                 else
-                    finalName += TranscriptInvert(curr, next, nnext, ref i, RomajiKatakanaArray);
+                    finalName += TranscriptInvert(curr, next, nnext, ref i, manager);
             }
             return (finalName);
         }
-
-        private static readonly Dictionary<string, string> HiraganaRomajiArray = new Dictionary<string, string>()
-            {
-                { "あ", "a" },
-                { "い", "i" },
-                { "う", "u" },
-                { "え", "e" },
-                { "お", "o" },
-                { "か", "ka" },
-                { "きゃ", "kya" },
-                { "きぃ", "kyi" },
-                { "きゅ", "kyu" },
-                { "きぇ", "kye" },
-                { "きょ", "kyo" },
-                { "き", "ki" },
-                { "く", "ku" },
-                { "け", "ke" },
-                { "こ", "ko" },
-                { "が", "ga" },
-                { "ぎゃ", "gya" },
-                { "ぎぃ", "gyi" },
-                { "ぎゅ", "gyu" },
-                { "ぎぇ", "gye" },
-                { "ぎょ", "gyo" },
-                { "ぎ", "gi" },
-                { "ぐ", "gu" },
-                { "げ", "ge" },
-                { "ご", "go" },
-                { "さ", "sa" },
-                { "しゃ", "sha" },
-                { "しゅ", "shu" },
-                { "しぇ", "she" },
-                { "しょ", "sho" },
-                { "し", "shi" },
-                { "す", "su" },
-                { "せ", "se" },
-                { "そ", "so" },
-                { "ざ", "za" },
-                { "じゃ", "ja" },
-                { "じぃ", "ji" },
-                { "じゅ", "ju" },
-                { "じぇ", "je" },
-                { "じょ", "jo" },
-                { "じ", "ji" },
-                { "ず", "zu" },
-                { "ぜ", "ze" },
-                { "ぞ", "zo" },
-                { "た", "ta" },
-                { "ちゃ", "cha" },
-                { "ちぃ", "chi" },
-                { "ちゅ", "chu" },
-                { "ちぇ", "che" },
-                { "ちょ", "cho" },
-                { "ち", "chi" },
-                { "つ", "tsu" },
-                { "て", "te" },
-                { "と", "to" },
-                { "だ", "da" },
-                { "ぢゃ", "ja" },
-                { "ぢぃ", "ji" },
-                { "ぢゅ", "ju" },
-                { "ぢぇ", "je" },
-                { "ぢょ", "jo" },
-                { "ぢ", "dji" },
-                { "づ", "dzu" },
-                { "で", "de" },
-                { "ど", "do" },
-                { "な", "na" },
-                { "にゃ", "nya" },
-                { "にぃ", "nyi" },
-                { "にゅ", "nyu" },
-                { "にぇ", "nye" },
-                { "にょ", "nyo" },
-                { "に", "ni" },
-                { "ぬ", "nu" },
-                { "ね", "ne" },
-                { "の", "no" },
-                { "は", "ha" },
-                { "ひゃ", "hya" },
-                { "ひぃ", "hyi" },
-                { "ひゅ", "hyu" },
-                { "ひぇ", "hye" },
-                { "ひょ", "hyo" },
-                { "ひ", "hi" },
-                { "ふ", "fu" },
-                { "へ", "he" },
-                { "ほ", "ho" },
-                { "ば", "ba" },
-                { "びゃ", "bya" },
-                { "びぃ", "byi" },
-                { "びゅ", "byu" },
-                { "びぇ", "bye" },
-                { "びょ", "byo" },
-                { "び", "bi" },
-                { "ぶ", "bu" },
-                { "べ", "be" },
-                { "ぼ", "bo" },
-                { "ぱ", "pa" },
-                { "ぴゃ", "pya" },
-                { "ぴぃ", "pyi" },
-                { "ぴゅ", "pyu" },
-                { "ぴぇ", "pye" },
-                { "ぴょ", "pyo" },
-                { "ぴ", "pi" },
-                { "ぷ", "pu" },
-                { "ぺ", "pe" },
-                { "ぽ", "po" },
-                { "ま", "ma" },
-                { "みゃ", "mya" },
-                { "みぃ", "myi" },
-                { "みゅ", "myu" },
-                { "みぇ", "mye" },
-                { "みょ", "myo" },
-                { "み", "mi" },
-                { "む", "mu" },
-                { "め", "me" },
-                { "も", "mo" },
-                { "や", "ya" },
-                { "ゆ", "yu" },
-                { "いぇ", "ye" },
-                { "よ", "yo" },
-                { "ら", "ra" },
-                { "りゃ", "rya" },
-                { "りぃ", "ryi" },
-                { "りゅ", "ryu" },
-                { "りぇ", "rye" },
-                { "りょ", "ryo" },
-                { "り", "ri" },
-                { "る", "ru" },
-                { "れ", "re" },
-                { "ろ", "ro" },
-                { "わ", "wa" },
-                { "ゐ", "wi" },
-                { "ゑ", "we" },
-                { "を", "wo" },
-                { "ゔ", "vu" },
-                { "ん", "n" }
-            };
-        private static readonly Dictionary<string, string> KatakanaRomajiArray = new Dictionary<string, string>()
-            {
-                { "ア", "a" },
-                { "イ", "i" },
-                { "ウ", "u" },
-                { "エ", "e" },
-                { "オ", "o" },
-                { "カ", "ka" },
-                { "キャ", "kya" },
-                { "キィ", "kyi" },
-                { "キュ", "kyu" },
-                { "キェ", "kye" },
-                { "キョ", "kyo" },
-                { "キ", "ki" },
-                { "ク", "ku" },
-                { "ケ", "ke" },
-                { "コ", "ko" },
-                { "ガ", "ga" },
-                { "ギャ", "gya" },
-                { "ギィ", "gyi" },
-                { "ギュ", "gyu" },
-                { "ギェ", "gye" },
-                { "ギョ", "gyo" },
-                { "ギ", "gi" },
-                { "グ", "gu" },
-                { "ゲ", "ge" },
-                { "ゴ", "go" },
-                { "サ", "sa" },
-                { "シャ", "sha" },
-                { "シュ", "shu" },
-                { "シェ", "she" },
-                { "ショ", "sho" },
-                { "シ", "shi" },
-                { "ス", "su" },
-                { "セ", "se" },
-                { "ソ", "so" },
-                { "ザ", "za" },
-                { "ジャ", "ja" },
-                { "ジィ", "ji" },
-                { "ジュ", "ju" },
-                { "ジェ", "je" },
-                { "ジョ", "jo" },
-                { "ジ", "dji" },
-                { "ズ", "zu" },
-                { "ゼ", "ze" },
-                { "ゾ", "zo" },
-                { "タ", "ta" },
-                { "チャ", "cha" },
-                { "チィ", "chi" },
-                { "チュ", "chu" },
-                { "チェ", "che" },
-                { "チョ", "cho" },
-                { "チ", "chi" },
-                { "ツ", "tsu" },
-                { "テ", "te" },
-                { "ト", "to" },
-                { "ダ", "da" },
-                { "ヅ", "dzu" },
-                { "デ", "de" },
-                { "ド", "do" },
-                { "ナ", "na" },
-                { "ニャ", "nya" },
-                { "ニィ", "nyi" },
-                { "ニュ", "nyu" },
-                { "ニェ", "nye" },
-                { "ニョ", "nyo" },
-                { "ニ", "ni" },
-                { "ヌ", "nu" },
-                { "ネ", "ne" },
-                { "ノ", "no" },
-                { "ハ", "ha" },
-                { "ヒャ", "hya" },
-                { "ヒィ", "hyi" },
-                { "ヒュ", "hyu" },
-                { "ヒェ", "hye" },
-                { "ヒョ", "hyo" },
-                { "ヒ", "hi" },
-                { "フ", "hu" },
-                { "ヘ", "he" },
-                { "ホ", "ho" },
-                { "バ", "ba" },
-                { "ビャ", "bya" },
-                { "ビィ", "byi" },
-                { "ビュ", "byu" },
-                { "ビェ", "bye" },
-                { "ビョ", "byo" },
-                { "ビ", "bi" },
-                { "ブ", "bu" },
-                { "ベ", "be" },
-                { "ボ", "bo" },
-                { "パ", "pa" },
-                { "ピャ", "pya" },
-                { "ピィ", "pyi" },
-                { "ピュ", "pyu" },
-                { "ピェ", "pye" },
-                { "ピョ", "pyo" },
-                { "ピ", "pi" },
-                { "プ", "pu" },
-                { "ペ", "pe" },
-                { "ポ", "po" },
-                { "マ", "ma" },
-                { "ミャ", "mya" },
-                { "ミィ", "myi" },
-                { "ミュ", "myu" },
-                { "ミェ", "mye" },
-                { "ミョ", "myo" },
-                { "ミ", "mi" },
-                { "ム", "mu" },
-                { "メ", "me" },
-                { "モ", "mo" },
-                { "ヤ", "ya" },
-                { "イェ", "ye" },
-                { "ユ", "yu" },
-                { "ヨ", "yo" },
-                { "ラ", "ra" },
-                { "リャ", "rya" },
-                { "リィ", "ryi" },
-                { "リュ", "ryu" },
-                { "リェ", "rye" },
-                { "リョ", "ryo" },
-                { "リ", "ri" },
-                { "ル", "ru" },
-                { "レ", "re" },
-                { "ロ", "ro" },
-                { "ワ", "wa" },
-                { "ウィ", "wi" },
-                { "ウェ", "we" },
-                { "ヲ", "wo" },
-                { "ヴァ", "va" },
-                { "ヴィ", "vi" },
-                { "ヴェ", "ve" },
-                { "ヴォ", "vo" },
-                { "ヴ", "vu" },
-                { "ン", "n" }
-            };
-        private static readonly Dictionary<string, string> RomajiHiraganaArray = new Dictionary<string, string>()
-            {
-                { "a", "あ" },
-                { "i", "い" },
-                { "u", "う" },
-                { "e", "え" },
-                { "o", "お" },
-                { "ka", "か" },
-                { "kya", "きゃ" },
-                { "kyi", "きぃ" },
-                { "kyu", "きゅ" },
-                { "kye", "きぇ" },
-                { "kyo", "じょ" },
-                { "ki", "き" },
-                { "ku", "く" },
-                { "ke", "け" },
-                { "ko", "こ" },
-                { "ga", "が" },
-                { "gya", "ぎゃ" },
-                { "gyi", "ぎぃ" },
-                { "gyu", "ぎゅ" },
-                { "gye", "ぎぇ" },
-                { "gyo", "ぎょ" },
-                { "gi", "ぎ" },
-                { "gu", "ぐ" },
-                { "ge", "げ" },
-                { "go", "ご" },
-                { "sa", "さ" },
-                { "shi", "し" },
-                { "sha", "しゃ" },
-                { "shu", "しゅ" },
-                { "she", "しぇ" },
-                { "sho", "しょ" },
-                { "su", "す" },
-                { "se", "せ" },
-                { "so", "そ" },
-                { "za", "ざ" },
-                { "ji", "じ" },
-                { "dji", "じ" },
-                { "jya", "じゃ" },
-                { "jyi", "じぃ" },
-                { "jyu", "じゅ" },
-                { "jye", "じぇ" },
-                { "jyo", "じょ" },
-                { "ja", "じゃ" },
-                { "ju", "じゅ" },
-                { "je", "じぇ" },
-                { "jo", "じょ" },
-                { "dja", "じゃ" },
-                { "dju", "じゅ" },
-                { "dje", "じぇ" },
-                { "djo", "じょ" },
-                { "zu", "ず" },
-                { "ze", "ぜ" },
-                { "zo", "ぞ" },
-                { "ta", "た" },
-                { "tya", "ちゃ" },
-                { "tyi", "ちぃ" },
-                { "tyu", "ちゅ" },
-                { "tye", "ちぇ" },
-                { "tyo", "ちょ" },
-                { "chi", "ち" },
-                { "cha", "ちゃ" },
-                { "chu", "ちゅ" },
-                { "che", "ちぇ" },
-                { "cho", "ちょ" },
-                { "tsu", "つ" },
-                { "te", "て" },
-                { "to", "と" },
-                { "dya", "ぢゃ" },
-                { "dyi", "ぢぃ" },
-                { "dyu", "ぢゅ" },
-                { "dye", "ぢぇ" },
-                { "dyo", "ぢょ" },
-                { "dzu", "づ" },
-                { "de", "で" },
-                { "do", "ど" },
-                { "na", "な" },
-                { "nya", "にゃ" },
-                { "nyi", "にぃ" },
-                { "nyu", "にゅ" },
-                { "nye", "にぇ" },
-                { "nyo", "にょ" },
-                { "ni", "に" },
-                { "nu", "ぬ" },
-                { "ne", "ね" },
-                { "no", "の" },
-                { "ha", "は" },
-                { "hya", "ひゃ" },
-                { "hyi", "ひぃ" },
-                { "hyu", "ひゅ" },
-                { "hye", "ひぇ" },
-                { "hyo", "ひょ" },
-                { "hi", "ひ" },
-                { "fu", "ふ" },
-                { "he", "へ" },
-                { "ho", "ほ" },
-                { "ba", "ば" },
-                { "bya", "びゃ" },
-                { "byi", "びぃ" },
-                { "byu", "びゅ" },
-                { "bye", "びぇ" },
-                { "byo", "びょ" },
-                { "bi", "び" },
-                { "bu", "ぶ" },
-                { "be", "べ" },
-                { "bo", "ぼ" },
-                { "pa", "ぱ" },
-                { "pya", "ぴゃ" },
-                { "pyi", "ぴぃ" },
-                { "pyu", "ぴゅ" },
-                { "pye", "ぴぇ" },
-                { "pyo", "ぴょ" },
-                { "pi", "ぴ" },
-                { "pu", "ぷ" },
-                { "pe", "ぺ" },
-                { "po", "ぽ" },
-                { "ma", "ま" },
-                { "mya", "みゃ" },
-                { "myi", "みぃ" },
-                { "myu", "みゅ" },
-                { "mye", "みぇ" },
-                { "myo", "みょ" },
-                { "mi", "み" },
-                { "mu", "む" },
-                { "me", "め" },
-                { "mo", "も" },
-                { "ya", "や" },
-                { "yu", "ゆ" },
-                { "yo", "よ" },
-                { "ra", "ら" },
-                { "rya", "りゃ" },
-                { "ryi", "りぃ" },
-                { "ryu", "りゅ" },
-                { "rye", "りぇ" },
-                { "ryo", "りょ" },
-                { "ri", "り" },
-                { "ru", "る" },
-                { "re", "れ" },
-                { "ro", "ろ" },
-                { "wa", "わ" },
-                { "wi", "ゐ" },
-                { "we", "ゑ" },
-                { "wo", "を" },
-                { "vu", "ゔ" },
-                { "n", "ん" }
-            };
-        private static readonly Dictionary<string, string> RomajiKatakanaArray = new Dictionary<string, string>()
-            {
-                { "a", "ア" },
-                { "i", "イ" },
-                { "u", "ウ" },
-                { "e", "エ" },
-                { "o", "オ" },
-                { "ka", "カ" },
-                { "kya", "キャ" },
-                { "kyi", "キィ" },
-                { "kyu", "キュ" },
-                { "kye", "キェ" },
-                { "kyo", "キョ" },
-                { "ki", "キ" },
-                { "ku", "ク" },
-                { "ke", "ケ" },
-                { "ko", "コ" },
-                { "ga", "ガ" },
-                { "gya", "ギャ" },
-                { "gyi", "ギィ" },
-                { "gyu", "ギュ" },
-                { "gye", "ギェ" },
-                { "gyo", "ギョ" },
-                { "gi", "ギ" },
-                { "gu", "グ" },
-                { "ge", "ゲ" },
-                { "go", "ゴ" },
-                { "sa", "サ" },
-                { "shi", "シ" },
-                { "sha", "シャ" },
-                { "shu", "シュ" },
-                { "she", "シェ" },
-                { "sho", "ショ" },
-                { "su", "ス" },
-                { "se", "セ" },
-                { "so", "ソ" },
-                { "za", "ザ" },
-                { "ji", "ジ" },
-                { "dji", "ジ" },
-                { "jya", "ジャ" },
-                { "jyi", "ジィ" },
-                { "jyu", "ジュ" },
-                { "jye", "ジェ" },
-                { "jyo", "ジョ" },
-                { "ja", "ジャ" },
-                { "ju", "ジュ" },
-                { "je", "ジェ" },
-                { "jo", "ジョ" },
-                { "dja", "ジャ" },
-                { "dju", "ジュ" },
-                { "dje", "ジェ" },
-                { "djo", "ジョ" },
-                { "zu", "ズ" },
-                { "ze", "ゼ" },
-                { "zo", "ゾ" },
-                { "ta", "タ" },
-                { "tya", "チャ" },
-                { "tyi", "チィ" },
-                { "tyu", "チュ" },
-                { "tye", "チェ" },
-                { "tyo", "チョ" },
-                { "chi", "チ" },
-                { "cha", "チャ" },
-                { "chu", "チュ" },
-                { "che", "チェ" },
-                { "cho", "チョ" },
-                { "tsu", "ツ" },
-                { "te", "テ" },
-                { "to", "ト" },
-                { "dya", "ヂャ" },
-                { "dyi", "ヂィ" },
-                { "dyu", "ヂュ" },
-                { "dye", "ヂェ" },
-                { "dyo", "ヂョ" },
-                { "dzu", "ズ" },
-                { "de", "デ" },
-                { "do", "ド" },
-                { "na", "ナ" },
-                { "nya", "ニャ" },
-                { "nyi", "ニィ" },
-                { "nyu", "ニュ" },
-                { "nye", "ニェ" },
-                { "nyo", "ニョ" },
-                { "ni", "ニ" },
-                { "nu", "ヌ" },
-                { "ne", "ネ" },
-                { "no", "ノ" },
-                { "ha", "ハ" },
-                { "hya", "ヒャ" },
-                { "hyi", "ヒィ" },
-                { "hyu", "ヒュ" },
-                { "hye", "ヒェ" },
-                { "hyo", "ヒョ" },
-                { "hi", "ヒ" },
-                { "fu", "フ" },
-                { "he", "ヘ" },
-                { "ho", "ホ" },
-                { "ba", "バ" },
-                { "bya", "ビャ" },
-                { "byi", "ビィ" },
-                { "byu", "ビュ" },
-                { "bye", "ビェ" },
-                { "byo", "ビョ" },
-                { "bi", "ビ" },
-                { "bu", "ブ" },
-                { "be", "ベ" },
-                { "bo", "ボ" },
-                { "pa", "パ" },
-                { "pya", "ピャ" },
-                { "pyi", "ピィ" },
-                { "pyu", "ピュ" },
-                { "pye", "ピェ" },
-                { "pyo", "ピョ" },
-                { "pi", "ピ" },
-                { "pu", "プ" },
-                { "pe", "ペ" },
-                { "po", "ポ" },
-                { "ma", "マ" },
-                { "mya", "ミャ" },
-                { "myi", "ミィ" },
-                { "myu", "ミュ" },
-                { "mye", "ミェ" },
-                { "myo", "ミョ" },
-                { "mi", "ミ" },
-                { "mu", "ム" },
-                { "me", "メ" },
-                { "mo", "モ" },
-                { "ya", "ヤ" },
-                { "yu", "ユ" },
-                { "yo", "ヨ" },
-                { "ra", "ラ" },
-                { "rya", "リャ" },
-                { "ryi", "リィ" },
-                { "ryu", "リュ" },
-                { "rye", "リェ" },
-                { "ryo", "リョ" },
-                { "ri", "リ" },
-                { "ru", "ル" },
-                { "re", "レ" },
-                { "ro", "ロ" },
-                { "wa", "ワ" },
-                { "wi", "ウィ" },
-                { "we", "ウェ" },
-                { "wo", "ヲ" },
-                { "va", "ヴァ" },
-                { "vi", "ヴィ" },
-                { "ve", "ヴェ" },
-                { "vo", "ヴォ" },
-                { "vu", "ヴ" },
-                { "n", "ン" }
-            };
     }
 }
