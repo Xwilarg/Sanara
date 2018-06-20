@@ -156,7 +156,8 @@ namespace SanaraV2
 
         private Task Disconnected(Exception e)
         {
-            throw e;
+            Environment.Exit(1);
+            return Task.CompletedTask;
         }
 
         /// Stats at https://zirk.eu/sanara-stats.php

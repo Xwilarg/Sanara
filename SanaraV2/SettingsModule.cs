@@ -153,5 +153,15 @@ namespace SanaraV2
                 }
             }
         }
+
+        [Command("Exit"), Summary("Exit the program")]
+        public async Task Exit(string serverName = null)
+        {
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Sentences.ownerId)
+                await ReplyAsync(Sentences.OnlyMasterStr(Context.Guild.Id));
+            else
+                Environment.Exit(0);
+        }
     }
 }

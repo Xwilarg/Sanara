@@ -301,6 +301,8 @@ namespace SanaraV2
                     finalStr = GetKancolleInfo("Appearance", ref currI, finalStr, jsonInside, Sentences.Appearance(Context.Guild.Id));
                     finalStr = GetKancolleInfo("Second Remodel", ref currI, finalStr, jsonInside, Sentences.SecondRemodel(Context.Guild.Id));
                     finalStr = GetKancolleInfo("Trivia", ref currI, finalStr, jsonInside, Sentences.Trivia(Context.Guild.Id));
+                    finalStr = GetKancolleInfo("In-game", ref currI, finalStr, jsonInside, Sentences.InGame(Context.Guild.Id));
+                    finalStr = GetKancolleInfo("Historical", ref currI, finalStr, jsonInside, Sentences.Historical(Context.Guild.Id));
                     if (me.GuildPermissions.AttachFiles)
                         await Context.Channel.SendFileAsync("shipgirl" + currentTime + ".jpg");
                     foreach (string s in finalStr)

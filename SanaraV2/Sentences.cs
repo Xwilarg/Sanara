@@ -194,6 +194,8 @@ namespace SanaraV2
         public static string Appearance(ulong guildId) { return (GetTranslation(guildId, "appearance")); }
         public static string SecondRemodel(ulong guildId) { return (GetTranslation(guildId, "secondRemodel")); }
         public static string Trivia(ulong guildId) { return (GetTranslation(guildId, "trivia")); }
+        public static string InGame(ulong guildId) { return (GetTranslation(guildId, "inGame")); }
+        public static string Historical(ulong guildId) { return (GetTranslation(guildId, "historical")); }
 
         /// --------------------------- VNDB ---------------------------
         public static string VndbHelp(ulong guildId) { return (GetTranslation(guildId, "vndbHelp")); }
