@@ -335,9 +335,7 @@ namespace SanaraV2
                 GetKancolleInfo("Trivia", ref currI, ref finalStr, jsonInside, Sentences.Trivia(guildId));
                 GetKancolleInfo("In-game", ref currI, ref finalStr, jsonInside, Sentences.InGame(guildId));
                 GetKancolleInfo("Historical", ref currI, ref finalStr, jsonInside, Sentences.Historical(guildId));
-                for (int i = 0; i < finalStr.Count; i++)
-                    finalStr[i] = Regex.Replace(finalStr[i], @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
-                return (finalStr);
+                return (finalStr.Select(x => Regex.Replace(x, @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)))).ToList());
             }
         }
 

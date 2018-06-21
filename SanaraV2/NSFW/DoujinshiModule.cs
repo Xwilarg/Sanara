@@ -54,13 +54,7 @@ namespace SanaraV2
             wrongTag = null;
             string tags = "";
             if (keywords.Length != 0)
-            {
-                foreach (string s in keywords)
-                {
-                    tags += s + "+";
-                }
-                tags = tags.Substring(0, tags.Length - 1);
-            }
+                tags = String.Join("+", keywords);
             string xml;
             using (WebClient w = new WebClient())
             {
@@ -91,10 +85,10 @@ namespace SanaraV2
                 for (int i = ids.Length - 1; i >= 0; i--)
                 {
                     currBlock = Utilities.GetElementXml("\"id\":", ids[i], ',');
-                    if (currBlock[currBlock.Length - 1] == '"')
-                        return GetDoujinshi(keywords, out wrongTag);
                     if (currBlock != "")
                     {
+                        if (currBlock[currBlock.Length - 1] == '"')
+                            return GetDoujinshi(keywords, out wrongTag);
                         if (keywords.Length == 0)
                         {
                             return ("https://nhentai.net/g/" + currBlock);

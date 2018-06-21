@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Discord.Net;
+using System.Linq;
 
 namespace SanaraV2
 {
@@ -34,8 +35,8 @@ namespace SanaraV2
             if (tags.Length > 0)
             {
                 finalTags += tags[0];
-                for (int i = 1; i < tags.Length; i++)
-                    finalTags += "+" + tags[i];
+                if (tags.Length > 1)
+                    finalTags += "+" + String.Join("+", tags.Skip(1));
             }
             return (finalTags);
         }
@@ -360,13 +361,7 @@ namespace SanaraV2
                 File.Delete(dlData.Item1);
             }
             if (!isGame)
-            {
-                string finalStrModule = "";
-                foreach (long i in Program.p.statsMonth)
-                    finalStrModule += i + "|";
-                finalStrModule = finalStrModule.Substring(0, finalStrModule.Length - 1);
-                File.WriteAllText("Saves/MonthModules.dat", finalStrModule + Environment.NewLine + Program.p.lastMonthSent);
-            }
+                File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
         }
 
         public static string DownloadJson(WebClient wc, string url)
@@ -469,24 +464,16 @@ namespace SanaraV2
         private static List<string> WriteTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
         {
             List<string> finalMsg = new List<string>();
-            for (int i = 0; i < artists.Count; i++)
-                artists[i] = FixName(artists[i]);
-            for (int i = 0; i < characs.Count; i++)
-                characs[i] = FixName(characs[i]);
-            for (int i = 0; i < animeFrom.Count; i++)
-                animeFrom[i] = FixName(animeFrom[i]);
+            artists = artists.Select(x => FixName(x)).ToList();
+            characs = characs.Select(x => FixName(x)).ToList();
+            animeFrom = animeFrom.Select(x => FixName(x)).ToList();
             List<string> finalStrCharacs = new List<string> { "" };
             int indexCharacFrom = 0;
             if (characs.Count == 1)
                 finalStrCharacs[indexCharacFrom] = characs[0];
             else if (characs.Count > 1)
             {
-                bool doesContainTagMe = false;
-                foreach (string s in characs)
-                {
-                    if (s == "Tagme" || s == "Character Request")
-                        doesContainTagMe = true;
-                }
+                bool doesContainTagMe = characs.Any(x => x == "Tagme" || x == "Character Request");
                 for (int i = 0; i < characs.Count - 1; i++)
                 {
                     if (finalStrCharacs[indexCharacFrom].Length > 1500)
@@ -521,9 +508,8 @@ namespace SanaraV2
                 finalStrFrom[indexStrFrom] = animeFrom[0];
             else if (animeFrom.Count > 1)
             {
-                for (int i = 0; i < animeFrom.Count - 1; i++)
-                    finalStrFrom[indexStrFrom] += animeFrom[i] + ", ";
-                finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom].Substring(0, finalStrFrom[indexStrFrom].Length - 2);
+                finalStrFrom[indexStrFrom] = String.Join(", ", animeFrom.Take(animeFrom.Count - 1));
+                finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom];
                 finalStrFrom[indexStrFrom] += " " + Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {

@@ -127,12 +127,8 @@ namespace SanaraV2
             if (word.Length == 0)
                 await ReplyAsync(Sentences.JapaneseHelp(Context.Guild.Id));
             else
-            {
                 foreach (string s in GetAllKanjis(Utilities.AddArgs(word), 0))
-                {
                     await ReplyAsync(s);
-                }
-            }
         }
 
         public static string GetTranslation(string words, string language, out string sourceLanguage)
@@ -172,12 +168,8 @@ namespace SanaraV2
                         + ((Utilities.GetElementXml("\"reading\":\"", s, '"') == "") ? ("") : (" (" + Utilities.GetElementXml("\"reading\":\"", s, '"') + " - " + FromHiragana(FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"') + ")")))))) + Environment.NewLine;
                     }
                     finalStr += Sentences.Meaning(guildId);
-                    string allMeanings = "";
-                    foreach (string sm in meanings)
-                    {
-                        allMeanings += sm + " / ";
-                    }
-                    finalStr += allMeanings.Substring(1, allMeanings.Length - 5);
+                    string allMeanings = String.Join(" / ", meanings);
+                    finalStr += allMeanings.Substring(1, allMeanings.Length - 2);
                     if (counter == 4)
                         break;
                     else

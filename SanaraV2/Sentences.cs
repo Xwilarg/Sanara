@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using System;
+using System.Linq;
 
 namespace SanaraV2
 {
@@ -73,10 +74,8 @@ namespace SanaraV2
         {
             if (tags.Length == 1)
                 return ("I didn't find anything with the tag '" + tags[0] + "'.");
-            string finalStr = "";
-            for (int i = 0; i < tags.Length - 1; i++)
-                finalStr += "'" + tags[i] + "', ";
-            return ("I didn't find anything with the tag '" + finalStr.Substring(0, finalStr.Length - 2) + " and '" + tags[tags.Length - 1] + "'.");
+            string finalStr = String.Join(", ", tags.ToList().Skip(1).Select(x => "'" + x + "'"));
+            return ("I didn't find anything with the tag '" + finalStr + " and '" + tags[tags.Length - 1] + "'.");
         }
         public static string NoCorrespondingGuild(ulong guildId) { return (GetTranslation(guildId, "noCorrespondingGuild")); }
         public static string BetaFeature(ulong guildId) { return (GetTranslation(guildId, "betaFeature")); }

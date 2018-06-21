@@ -85,11 +85,7 @@ namespace SanaraV2
             List<string> tmpDesc = vn.Description.Split('\n').ToList();
             if (tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
                 tmpDesc.RemoveAt(tmpDesc.Count - 1);
-            string desc = "";
-            foreach (string s in tmpDesc)
-            {
-                desc += s + Environment.NewLine;
-            }
+            string desc = String.Join(Environment.NewLine, tmpDesc);
             Dictionary<string, string> allLengths = new Dictionary<string, string>()
              {
                  { "VeryShort", "< 2 hours" },

@@ -63,10 +63,7 @@ namespace SanaraV2
                 string allUsers = "";
                 if (m_nbFound > Convert.ToInt32(datas[3]))
                 {
-                    foreach (ulong u in m_userIds)
-                    {
-                        allUsers += u.ToString() + "|";
-                    }
+                    allUsers = String.Join("|", m_userIds.Select(x => x.ToString()));
                     if (allUsers != "")
                         allUsers = allUsers.Substring(0, allUsers.Length - 1);
                 }
@@ -158,13 +155,11 @@ namespace SanaraV2
                     m_time = DateTime.MinValue;
                     m_nbAttempt++;
                     userWord = LinguistModule.FromKatakana(LinguistModule.ToHiragana(userWord));
-                    foreach (char c in userWord)
+                    if (userWord.Any(c => c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                     {
-                        if (c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA)
-                        {
-                            await m_chan.SendMessageAsync(Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
-                            return;
-                        }
+                        m_time = now;
+                        await m_chan.SendMessageAsync(Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
+                        return;
                     }
                     string json;
                     using (WebClient wc = new WebClient())

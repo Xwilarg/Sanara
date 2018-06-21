@@ -81,9 +81,7 @@ namespace SanaraV2
                 if (!Directory.Exists("Saves/Radio/" + m_guildId))
                     Directory.CreateDirectory("Saves/Radio/" + m_guildId);
                 foreach (string file in Directory.GetFiles("Saves/Radio/" + m_guildId))
-                {
                     File.Delete(file);
-                }
             }
 
             public void StopDownloading(string url)
