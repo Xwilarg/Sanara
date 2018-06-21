@@ -239,7 +239,25 @@ namespace Sanara_UnitTests
         [Fact]
         public void Doujinshi()
         {
+            new SanaraV2.Program(true);
             string url = DoujinshiModule.GetDoujinshi(new string[] { }, out _);
+            Assert.NotNull(url);
+            Assert.True(Utilities.IsLinkValid(url));
+        }
+
+        [Fact]
+        public void DoujinshiInvalid()
+        {
+            new SanaraV2.Program(true);
+            string url = DoujinshiModule.GetDoujinshi(new string[] { "awawawawawawawa" }, out _);
+            Assert.Null(url);
+        }
+
+        [Fact]
+        public void Tags()
+        {
+            new SanaraV2.Program(true);
+            string url = DoujinshiModule.GetDoujinshi(new string[] { "kantai", "collection", "color" }, out _);
             Assert.NotNull(url);
             Assert.True(Utilities.IsLinkValid(url));
         }
