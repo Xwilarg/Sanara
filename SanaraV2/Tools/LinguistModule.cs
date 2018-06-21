@@ -127,7 +127,7 @@ namespace SanaraV2
             if (word.Length == 0)
                 await ReplyAsync(Sentences.JapaneseHelp(Context.Guild.Id));
             else
-                foreach (string s in GetAllKanjis(Utilities.AddArgs(word), 0))
+                foreach (string s in GetAllKanjis(Utilities.AddArgs(word), Context.Guild.Id))
                     await ReplyAsync(s);
         }
 
@@ -315,6 +315,12 @@ namespace SanaraV2
                 {
                     finalName += "ッ";
                     i--;
+                }
+                else if ((next == 'a' || next == 'i' || next == 'u' || next == 'e' || next == 'o')
+                   && next == nnext)
+                {
+                    finalName += TranscriptInvert(curr, next, nnext, ref i, manager) + "ー";
+                    i++;
                 }
                 else
                     finalName += TranscriptInvert(curr, next, nnext, ref i, manager);

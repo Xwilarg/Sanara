@@ -261,5 +261,11 @@ namespace Sanara_UnitTests
             Assert.NotNull(url);
             Assert.True(Utilities.IsLinkValid(url));
         }
+
+        [Fact]
+        public void Definition()
+        {
+            Assert.Contains("そら", Utilities.AddArgs(LinguistModule.GetAllKanjis("sky", 0).ToArray()));
+        }
     }
 }
