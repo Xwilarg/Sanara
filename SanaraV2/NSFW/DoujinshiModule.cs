@@ -49,7 +49,6 @@ namespace SanaraV2
                 await ReplyAsync(finalStr);
         }
 
-
         public static string GetDoujinshi(string[] keywords, out string wrongTag)
         {
             wrongTag = null;
@@ -92,6 +91,8 @@ namespace SanaraV2
                 for (int i = ids.Length - 1; i >= 0; i--)
                 {
                     currBlock = Utilities.GetElementXml("\"id\":", ids[i], ',');
+                    if (currBlock[currBlock.Length - 1] == '"')
+                        return GetDoujinshi(keywords, out wrongTag);
                     if (currBlock != "")
                     {
                         if (keywords.Length == 0)
