@@ -33,7 +33,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async void VnDescription()
         {
-            Embed e = VndbModule.GetEmbed(await VndbModule.GetVn("hoshizora no memoria wish upon a shooting star"), 0, true);
+            Embed e = VnModule.GetEmbed(await VnModule.GetVn("hoshizora no memoria wish upon a shooting star"), 0, true);
             Assert.True(e.Title == "星空のメモリア-Wish upon a shooting star- (Hoshizora no Memoria -Wish upon a Shooting Star-)");
             string[] description = e.Description.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             Assert.Equal("availableEnglish", description[0]);
@@ -49,7 +49,7 @@ namespace Sanara_UnitTests
         public async void VnGetImage()
         {
             Directory.GetFiles(".", "vn*").ToList().ForEach(delegate (string path) { if (!path.EndsWith(".dll")) File.Delete(path); });
-            List<string> images = VndbModule.GetImages(await VndbModule.GetVn("Rondo Duo Yoake no Fortissimo Punyu Puri ff"), 0, 0, true);
+            List<string> images = VnModule.GetImages(await VnModule.GetVn("Rondo Duo Yoake no Fortissimo Punyu Puri ff"), 0, 0, true);
             List<string> results = Directory.GetFiles(".", "vn*").ToList();
             results.RemoveAll(x => x.EndsWith(".dll"));
             Assert.Single(results);
@@ -228,6 +228,20 @@ namespace Sanara_UnitTests
             Assert.Contains("**personality**", infos);
             Assert.Contains("**appearance**", infos);
             Assert.Contains("**trivia**", infos);
+        }
+
+        [Fact]
+        public void IsLinkValid()
+        {
+            Assert.True(Utilities.IsLinkValid("http://www.google.com"));
+        }
+
+        [Fact]
+        public void Doujinshi()
+        {
+            string url = DoujinshiModule.GetDoujinshi(new string[] { }, out _);
+            Assert.NotNull(url);
+            Assert.True(Utilities.IsLinkValid(url));
         }
     }
 }

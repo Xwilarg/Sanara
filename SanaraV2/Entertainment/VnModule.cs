@@ -26,7 +26,7 @@ using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2
 {
-    public class VndbModule : ModuleBase
+    public class VnModule : ModuleBase
     {
         Program p = Program.p;
 

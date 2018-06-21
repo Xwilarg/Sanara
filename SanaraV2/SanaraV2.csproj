@@ -256,7 +256,7 @@
     </Compile>
     <Compile Include="Tools\SettingsModule.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="Entertainment\VndbModule.cs" />
+    <Compile Include="Entertainment\VnModule.cs" />
     <Compile Include="Entertainment\XKCDModule.cs" />
     <Compile Include="Entertainment\YoutubeModule.cs" />
   </ItemGroup>
