@@ -258,7 +258,7 @@ namespace Sanara_UnitTests
         {
             new SanaraV2.Program(true);
             string url = DoujinshiModule.GetDoujinshi(new string[] { "kantai", "collection", "color" }, out _);
-            Assert.NotNull(url);
+            Assert.NotNull(url); /// TODO: Sometimes null
             Assert.True(Utilities.IsLinkValid(url));
         }
 
@@ -266,6 +266,18 @@ namespace Sanara_UnitTests
         public void Definition()
         {
             Assert.Contains("そら", Utilities.AddArgs(LinguistModule.GetAllKanjis("sky", 0).ToArray()));
+        }
+
+        [Fact]
+        public void Code()
+        {
+            string[] code = CodeModule.IndenteCode("for (int i = 0; i < 5; i++) { if (i % 2 == 0) a++; }".Split(' ')).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            Assert.Equal(5, code.Length);
+            Assert.Equal("for (int i = 0; i < 5; i++)", code[0]);
+            Assert.Equal("{", code[1]);
+            Assert.Equal("\tif (i % 2 == 0)", code[2]);
+            Assert.Equal("\t\ta++;", code[3]);
+            Assert.Equal("}", code[4]);
         }
     }
 }

@@ -32,9 +32,15 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.IndenteHelp(Context.Guild.Id));
                 return;
             }
+            await ReplyAsync(IndenteCode(arg));
+        }
+
+        public static string IndenteCode(string[] arg)
+        {
             List<string> code = new List<string>();
             string curr = "";
             bool inCond = false;
+            int parenthesis = 0;
             foreach (string s in arg)
             {
                 if (s.StartsWith("```"))
@@ -43,7 +49,7 @@ namespace SanaraV2
                     code.Add(curr);
                     curr = "";
                 }
-                else if (s[s.Length - 1] == ';')
+                else if (s[s.Length - 1] == ';' && parenthesis <= 0)
                 {
                     curr += s;
                     code.Add(curr);
@@ -69,7 +75,12 @@ namespace SanaraV2
                 }
                 else
                     curr += s + ' ';
+                if (s[0] == '(')
+                    parenthesis++;
+                else if (s[0] == ')')
+                    parenthesis--;
             }
+            code.Add(curr);
             string finalStr = "";
             int currIndente = 0;
             bool tmpIdent = false;
@@ -83,14 +94,14 @@ namespace SanaraV2
                     tmpIdent = true;
                     for (int i = 0; i < currIndente; i++)
                         finalStr += '\t';
-                    finalStr += line + Environment.NewLine;
+                    finalStr += line.Trim() + Environment.NewLine;
                     continue;
                 }
                 else if (line[0] == '{')
                 {
                     for (int i = 0; i < currIndente; i++)
                         finalStr += '\t';
-                    finalStr += line + Environment.NewLine;
+                    finalStr += line.Trim() + Environment.NewLine;
                     currIndente++;
                     tmpIdent = false;
                     continue;
@@ -104,10 +115,10 @@ namespace SanaraV2
                     finalStr += '\t';
                 if (tmpIdent)
                     finalStr += '\t';
-                finalStr += line + Environment.NewLine;
+                finalStr += line.Trim() + Environment.NewLine;
                 tmpIdent = false;
             }
-            await ReplyAsync(finalStr);
+            return (finalStr);
         }
     }
 }
