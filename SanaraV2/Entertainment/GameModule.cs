@@ -62,15 +62,9 @@ namespace SanaraV2
                     datas = new string[] { "0", "0", "0", "0", "0" };
                 string allUsers = "";
                 if (m_nbFound > Convert.ToInt32(datas[3]))
-                {
                     allUsers = String.Join("|", m_userIds.Select(x => x.ToString()));
-                    if (allUsers != "")
-                        allUsers = allUsers.Substring(0, allUsers.Length - 1);
-                }
                 else
-                {
                     allUsers = datas[4];
-                }
                 File.WriteAllText("Saves/Servers/" + m_guild.Id + "/" + m_fileName,
                     (Convert.ToInt32(datas[0]) + 1).ToString() + Environment.NewLine +
                     (Convert.ToInt32(datas[1]) + m_nbAttempt).ToString() + Environment.NewLine +
