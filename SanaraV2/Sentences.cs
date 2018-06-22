@@ -121,6 +121,8 @@ namespace SanaraV2
         public static string CharacterNotTagged(ulong guildId) { return (GetTranslation(guildId, "characterNotTagged")); }
         public static string CharacterIs(ulong guildId) { return (GetTranslation(guildId, "characterIs")); }
         public static string CharacterAre(ulong guildId) { return (GetTranslation(guildId, "characterAre")); }
+        public static string ArtistFrom(ulong guildId) { return (GetTranslation(guildId, "artistFrom")); }
+        public static string ArtistNotTagged(ulong guildId) { return (GetTranslation(guildId, "artistNotTagged")); }
 
         /// --------------------------- Games ---------------------------
         public static string RulesShiritori(ulong guildId) { return (GetTranslation(guildId, "rulesShiritori")); }

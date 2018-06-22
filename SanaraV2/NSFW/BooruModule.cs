@@ -509,7 +509,6 @@ namespace SanaraV2
             else if (animeFrom.Count > 1)
             {
                 finalStrFrom[indexStrFrom] = String.Join(", ", animeFrom.Take(animeFrom.Count - 1));
-                finalStrFrom[indexStrFrom] = finalStrFrom[indexStrFrom];
                 finalStrFrom[indexStrFrom] += " " + Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {
@@ -563,6 +562,19 @@ namespace SanaraV2
                 }
                 finalStr += "." + Environment.NewLine;
             }
+            if (artists.Count > 0)
+            {
+                finalStr += Sentences.ArtistFrom(guildId);
+                if (artists.Count > 1)
+                {
+                    finalStr += String.Join(", ", artists.Take(artists.Count - 1));
+                    finalStr += " " + Sentences.AndStr(guildId) + " " + artists[artists.Count - 1];
+                }
+                else
+                    finalStr += artists[0];
+            }
+            else
+                finalMsg.Add(Sentences.ArtistNotTagged(guildId));
             finalMsg.Add(finalStr);
             return (finalMsg);
         }
