@@ -81,7 +81,23 @@ namespace SanaraV2
                 await m_chan.SendMessageAsync(finalStr);
             }
 
-            public abstract void Post();
+            public void Post()
+            {
+                _ = Task.Run(async delegate() {
+                    bool isMsg;
+                    foreach (string msg in GetPost(out isMsg))
+                    {
+                        if (isMsg)
+                            await m_chan.SendMessageAsync(msg);
+                        else
+                        {
+                            await m_chan.SendFileAsync(msg);
+                            File.Delete(msg);
+                        }
+                    }
+                });
+            }
+            public abstract string[] GetPost(out bool isMsg);
             public abstract void CheckCorrect(string userWord, IUser user);
             public abstract void Loose();
 
@@ -107,33 +123,32 @@ namespace SanaraV2
                 m_alreadySaid = new List<string>();
             }
 
-            public override async void Post()
+            public override string[] GetPost(out bool isMsg)
             {
+                isMsg = true;
                 if (m_currWord == null)
                 {
                     m_currWord = "しりとり";
-                    await m_chan.SendMessageAsync("しりとり (shiritori)");
                     m_words.Remove(m_words.Find(x => x.Split('$')[0] == m_currWord));
                     m_alreadySaid.Add(m_currWord);
+                    return (new string[] { "しりとり (shiritori)" });
                 }
                 else
                 {
                     string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
                     if (corrWords.Length == 0)
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriNoWord(m_guild.Id));
-                    }
+                        return (new string[] { Sentences.ShiritoriNoWord(m_guild.Id) }); // TODO what happen then ?
                     else
                     {
                         string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                         string[] insideWord = word.Split('$');
-                        await m_chan.SendMessageAsync(insideWord[0] + " (" + LinguistModule.FromHiragana(insideWord[0]) + ") - Meaning: " + insideWord[1]);
                         m_words.Remove(word);
                         m_alreadySaid.Add(insideWord[0]);
                         m_currWord = insideWord[0];
+                        m_time = DateTime.Now;
+                        return (new string[] { insideWord[0] + " (" + LinguistModule.FromHiragana(LinguistModule.FromKatakana(insideWord[0])) + ") - Meaning: " + insideWord[1] });
                     }
                 }
-                m_time = DateTime.Now;
             }
 
             //TODO Manage kanjis using Jisho API
@@ -148,7 +163,7 @@ namespace SanaraV2
                     DateTime now = DateTime.Now;
                     m_time = DateTime.MinValue;
                     m_nbAttempt++;
-                    userWord = LinguistModule.FromKatakana(LinguistModule.ToHiragana(userWord));
+                    userWord = LinguistModule.ToHiragana(LinguistModule.FromKatakana(userWord));
                     if (userWord.Any(c => c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                     {
                         m_time = now;
@@ -165,7 +180,7 @@ namespace SanaraV2
                     bool isNoun = false;
                     foreach (string s in Utilities.GetElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
                     {
-                        string hiragana = LinguistModule.ToKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"'));
+                        string hiragana = LinguistModule.ToHiragana(LinguistModule.FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"')));
                         if (userWord == hiragana)
                         {
                             isCorrect = true;
@@ -229,22 +244,20 @@ namespace SanaraV2
                 return (current);
             }
 
-            public override async void Loose() // TODO: Save score
+            public override async void Loose()
             {
                 string finalStr = Sentences.LostStr(m_guild.Id) + Environment.NewLine;
                 string[] corrWords = m_words.Where(x => x[0] == HiraganaToUpper(m_currWord[m_currWord.Length - 1])).ToArray();
                 if (corrWords.Length == 0)
-                {
                     finalStr += Sentences.ShiritoriNoMoreWord(m_guild.Id) + Environment.NewLine;
-                }
                 else
                 {
                     string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                     string[] insideWord = word.Split('$');
                     finalStr += Sentences.ShiritoriSuggestion(m_guild.Id, insideWord[0], LinguistModule.FromHiragana(insideWord[0]), insideWord[1]) + Environment.NewLine;
                 }
-                SaveServerScores(null);
                 await m_chan.SendMessageAsync(finalStr);
+                SaveServerScores(null);
             }
 
             private string m_currWord;
@@ -300,8 +313,9 @@ namespace SanaraV2
                 m_idImage = "-1";
             }
 
-            public override async void Post() // TODO: sometimes post wrong images
+            public override string[] GetPost(out bool isMsg) // TODO: sometimes post wrong images
             {
+                isMsg = false;
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
                 using (WebClient w = new WebClient())
                 {
@@ -321,9 +335,8 @@ namespace SanaraV2
                     image = image.Replace("\\", "");
                     int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
                     w.DownloadFile(image, "shipgirlquizz" + currentTime + ".jpg");
-                    await m_chan.SendFileAsync("shipgirlquizz" + currentTime + ".jpg");
-                    File.Delete("shipgirlquizz" + currentTime + ".jpg");
                     m_time = DateTime.Now;
+                    return (new string[] { "shipgirlquizz" + currentTime + ".jpg" });
                 }
             }
             
@@ -427,16 +440,19 @@ namespace SanaraV2
                 }
                 m_time = DateTime.MinValue;
             }
-            
-            public override async void Post()
+
+            public override string[] GetPost(out bool isMsg)
             {
+                isMsg = false;
                 m_time = DateTime.MinValue;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
                 string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + m_guild.Id.ToString();
-                await BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "1", false, true);
-                await BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "2", false, true);
-                await BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }, m_chan as ITextChannel, currName + "3", false, true);
                 m_time = DateTime.Now;
+                return (new string[] {
+                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
+                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
+                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess })
+                });
             }
 
             public override async void CheckCorrect(string userWord, IUser user)

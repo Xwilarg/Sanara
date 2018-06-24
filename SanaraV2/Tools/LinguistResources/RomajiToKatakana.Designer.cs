@@ -214,6 +214,15 @@ namespace SanaraV2.Tools.LinguistResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ダ.
+        /// </summary>
+        internal static string da {
+            get {
+                return ResourceManager.GetString("da", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to デ.
         /// </summary>
         internal static string de {

@@ -55,24 +55,7 @@ namespace SanaraV2
             string tags = "";
             if (keywords.Length != 0)
                 tags = String.Join("+", keywords);
-            string xml;
-            using (WebClient w = new WebClient())
-            {
-                w.Encoding = Encoding.UTF8;
-                if (keywords.Length == 0)
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/all?page=0");
-                else
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=8000");
-            }
-            int page = Program.p.rand.Next(Convert.ToInt32(Utilities.GetElementXml("\"num_pages\":", xml, ','))) + 1;
-            using (WebClient w = new WebClient())
-            {
-                w.Encoding = Encoding.UTF8;
-                if (keywords.Length == 0)
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/all?page=" + page);
-                else
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=" + page);
-            }
+            string xml = GetXml(keywords, tags);
             List<string> allDoujinshi = xml.Split(new string[] { "title" }, StringSplitOptions.None).ToList();
             allDoujinshi.RemoveAt(0);
             if (allDoujinshi.Count == 0)
@@ -124,6 +107,28 @@ namespace SanaraV2
                     }
                 }
                 return (null);
+            }
+        }
+
+        private static string GetXml(string[] keywords, string tags)
+        {
+            string xml;
+            using (WebClient w = new WebClient())
+            {
+                w.Encoding = Encoding.UTF8;
+                if (keywords.Length == 0)
+                    xml = w.DownloadString("https://nhentai.net/api/galleries/all?page=0");
+                else
+                    xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=8000");
+            }
+            int page = Program.p.rand.Next(Convert.ToInt32(Utilities.GetElementXml("\"num_pages\":", xml, ','))) + 1;
+            using (WebClient w = new WebClient())
+            {
+                w.Encoding = Encoding.UTF8;
+                if (keywords.Length == 0)
+                    return (w.DownloadString("https://nhentai.net/api/galleries/all?page=" + page));
+                else
+                    return (w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=" + page));
             }
         }
     }

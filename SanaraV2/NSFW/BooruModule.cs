@@ -43,6 +43,10 @@ namespace SanaraV2
 
         public abstract class Booru
         {
+            protected Booru(bool isSfw)
+            {
+                this.isSfw = isSfw;
+            }
             public abstract int GetNbMax(string tags);
             public abstract string GetLink(string tags, int maxNb);
             public abstract string GetFileUrl(string json);
@@ -51,6 +55,7 @@ namespace SanaraV2
             public virtual string GetTagName(string json) { return (Utilities.GetElementXml("name=\"", json, '"')); }
             public virtual string GetTagType(string json) { return (Utilities.GetElementXml("type=\"", json, '"')); }
             public abstract BooruId GetId();
+            public bool isSfw { private set; get; }
         }
 
         public enum BooruId
@@ -64,6 +69,9 @@ namespace SanaraV2
 
         public class Safebooru : Booru
         {
+            public Safebooru() : base(true)
+            { }
+
             public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
@@ -98,6 +106,9 @@ namespace SanaraV2
 
         public class Gelbooru : Booru
         {
+            public Gelbooru() : base(false)
+            { }
+
             public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
@@ -136,6 +147,9 @@ namespace SanaraV2
 
         public class Konachan : Booru
         {
+            public Konachan() : base(false)
+            { }
+
             public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
@@ -170,6 +184,9 @@ namespace SanaraV2
 
         public class Rule34 : Booru
         {
+            public Rule34() : base(false)
+            { }
+
             public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
@@ -208,6 +225,9 @@ namespace SanaraV2
 
         public class E621 : Booru
         {
+            public E621() : base(false)
+            { }
+
             public override int GetNbMax(string tags)
             {
                 using (WebClient wc = new WebClient())
@@ -265,7 +285,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await GetImage(new Safebooru(), tags, Context.Channel as ITextChannel, currName, true, false);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -273,7 +293,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await GetImage(new Gelbooru(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -281,7 +301,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await GetImage(new Konachan(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
@@ -289,7 +309,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await GetImage(new Rule34(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
@@ -297,103 +317,95 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await GetImage(new E621(), tags, Context.Channel as ITextChannel, currName, false, false);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags);
         }
 
-        /// <summary>
-        /// Get an image given various informations
-        /// </summary>
-        /// <param name="booru">Which booru is concerned (see above)</param>
-        /// <param name="tags">Tags that need to be contain on the image</param>
-        /// <param name="chan">Channel the image will be post in</param>
-        /// <param name="currName">Temporary name of the file</param>
-        /// <param name="isSfw">Is the channel safe for work ?</param>
-        /// <param name="isGame">If the request from Game module (doesn't count dl for stats and don't get informations about tags)</param>
-        public static async Task GetImage(Booru booru, string[] tags, ITextChannel chan, string currName, bool isSfw, bool isGame)
+        private static async Task PostImage(Booru booru, ITextChannel chan, string[] tags)
         {
-            if (!isSfw && !chan.IsNsfw)
+            if (!booru.isSfw && !chan.IsNsfw)
             {
-                if (chan != null)
-                    await chan.SendMessageAsync(Sentences.ChanIsNotNsfw(chan.GuildId));
+                await chan.SendMessageAsync(Sentences.ChanIsNotNsfw(chan.GuildId));
                 return;
             }
-            if (chan != null)
+            IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
+            if (!me.GuildPermissions.AttachFiles)
             {
-                IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
-                if (!me.GuildPermissions.AttachFiles)
-                {
-                    if (chan != null)
-                        await chan.SendMessageAsync(Sentences.NeedAttachFile(chan.GuildId));
-                    return;
-                }
-                if (!isGame)
-                    await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
+                if (chan != null)
+                    await chan.SendMessageAsync(Sentences.NeedAttachFile(chan.GuildId));
+                return;
             }
+            await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
+            string fileName = booru.GetId().ToString() + DateTime.Now.ToString("HHmmssfff") + chan.Id + Program.p.rand.Next(int.MaxValue);
+            long fileSize;
+            string json;
+            DownloadFile(ref fileName, out fileSize, GetImageUrl(booru, tags, out json));
+            Program.p.statsMonth[(int)booru.GetId()] += fileSize;
+            Program.p.statsMonth[(int)booru.GetId() + 5]++;
+            if (fileSize >= 8000000)
+                await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
+            else
+            {
+                while (true)
+                {
+                    try
+                    {
+                        await chan.SendFileAsync(fileName);
+                        break;
+                    }
+                    catch (RateLimitedException)
+                    { }
+                }
+                File.Delete(fileName);
+                List<string> finalStr = GetTagsInfos(json, booru, (chan == null) ? (0) : (chan.GuildId));
+                foreach (string s in finalStr)
+                    await chan.SendMessageAsync(s);
+                File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
+            }
+        }
+
+        public static string GetImage(Booru booru, string[] tags)
+        {
+            string fileName = booru.GetId().ToString() + DateTime.Now.ToString("HHmmssfff") + Program.p.rand.Next(int.MaxValue);
+            long fileSize;
+            DownloadFile(ref fileName, out fileSize, GetImageUrl(booru, tags, out _));
+            if (fileSize >= 8000000)
+                return (null);
+            else
+                return (fileName);
+        }
+
+        public static string GetImageUrl(Booru booru, string[] tags, out string json)
+        {
             string url = GetBooruUrl(booru, tags);
             if (url == null)
             {
-                if (chan != null)
-                    await chan.SendMessageAsync(Sentences.TagsNotFound(tags));
+                json = null;
+                return (Sentences.TagsNotFound(tags));
             }
             else
-            {
-                Tuple<string, string> dlData = DownloadImage(booru, currName, url);
-                FileInfo file = new FileInfo(dlData.Item1);
-                if (!isGame)
-                {
-                    Program.p.statsMonth[(int)booru.GetId()] += file.Length;
-                    Program.p.statsMonth[(int)booru.GetId() + 5]++;
-                }
-                if (chan == null)
-                    return;
-                if (file.Length >= 8000000)
-                    await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
-                else
-                {
-                    await PostImage(dlData.Item1, chan);
-                    if (!isGame)
-                    {
-                        List<string> finalStr = GetTagsInfos(dlData.Item2, booru, (chan == null) ? (0) : (chan.GuildId));
-                        foreach (string s in finalStr)
-                            await chan.SendMessageAsync(s);
-                    }
-                }
-                File.Delete(dlData.Item1);
-            }
-            if (!isGame)
-                File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
+                return (GetFileUrl(booru, url, out json));
         }
 
-        public static string DownloadJson(WebClient wc, string url)
-        {
-            wc.Headers.Add("User-Agent: Sanara");
-            return (wc.DownloadString(url));
-        }
-
-        private static Tuple<string, string> DownloadImage(Booru booru, string currName, string url)
+        public static void DownloadFile(ref string fileName, out long fileSize, string url)
         {
             using (WebClient wc = new WebClient())
             {
-                string json = DownloadJson(wc, url);
-                string image = booru.GetFileUrl(json);
-                string imageName = currName + "." + image.Split('.')[image.Split('.').Length - 1];
+                fileName += "." + url.Split('.')[url.Split('.').Length - 1];
                 wc.Headers.Add("User-Agent: Sanara");
-                wc.DownloadFile(image, imageName);
-                return (new Tuple<string, string>(imageName, json));
+                wc.DownloadFile(url, fileName);
+                FileInfo file = new FileInfo(fileName);
+                fileSize = file.Length;
             }
         }
 
-        private static async Task PostImage(string imageName, ITextChannel chan)
+        private static string GetFileUrl(Booru booru, string url, out string json)
         {
-            while (true)
+            using (WebClient wc = new WebClient())
             {
-                try
-                {
-                    await chan.SendFileAsync(imageName);
-                    break;
-                }
-                catch (RateLimitedException)
-                { }
+                wc.Headers.Add("User-Agent: Sanara");
+                json = wc.DownloadString(url);
+                string image = booru.GetFileUrl(json);
+                return (image);
             }
         }
 
