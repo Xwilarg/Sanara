@@ -7,6 +7,11 @@ using System.Linq;
 using Discord;
 using System;
 using System.Collections.Generic;
+using SanaraV2.GamesInfo;
+using SanaraV2.NSFW;
+using SanaraV2.Base;
+using SanaraV2.Entertainment;
+using SanaraV2.Tools;
 
 namespace Sanara_UnitTests
 {

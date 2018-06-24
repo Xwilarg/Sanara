@@ -21,7 +21,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class GoogleShortenerModule : ModuleBase
     {
@@ -32,10 +32,10 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
             if (p.service == null)
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
             }
             else
             {
@@ -48,12 +48,12 @@ namespace SanaraV2
                 {
                     if (ex.HttpStatusCode == HttpStatusCode.Forbidden)
                     {
-                        await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "goo.gl"));
+                        await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "goo.gl"));
                         return;
                     }
                 }
                 if (result == null)
-                    await ReplyAsync(Sentences.NothingAfterXIterations(Context.Guild.Id, 500));
+                    await ReplyAsync(Base.Sentences.NothingAfterXIterations(Context.Guild.Id, 500));
                 else
                 {
                     await ReplyAsync("I found something, here is the short URL: " + result.Item1 + Environment.NewLine

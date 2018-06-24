@@ -14,10 +14,11 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class YoutubeModule : ModuleBase
     {
@@ -27,7 +28,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else
             {
                 Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));

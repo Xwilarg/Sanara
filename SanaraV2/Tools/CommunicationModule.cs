@@ -14,12 +14,13 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Tools
 {
     public class CommunicationModule : ModuleBase
     {
@@ -69,7 +70,7 @@ namespace SanaraV2
         public async Task BotInfos(params string[] command)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await InfosUser(await Context.Channel.GetUserAsync(Sentences.myId) as IGuildUser);
+            await InfosUser(await Context.Channel.GetUserAsync(Base.Sentences.myId) as IGuildUser);
         }
 
         public async Task InfosUser(IGuildUser user)
@@ -92,12 +93,12 @@ namespace SanaraV2
             embed.AddField(Sentences.Username(Context.Guild.Id), user.ToString(), true);
             if (user.Nickname != null)
                 embed.AddField(Sentences.Nickname(Context.Guild.Id), user.Nickname, true);
-            embed.AddField(Sentences.AccountCreation(Context.Guild.Id), user.CreatedAt.ToString(Sentences.DateHourFormat(Context.Guild.Id)), true);
-            embed.AddField(Sentences.GuildJoined(Context.Guild.Id), user.JoinedAt.Value.ToString(Sentences.DateHourFormat(Context.Guild.Id)), true);
-            if (user == (await Context.Channel.GetUserAsync(Sentences.myId)))
+            embed.AddField(Sentences.AccountCreation(Context.Guild.Id), user.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
+            embed.AddField(Sentences.GuildJoined(Context.Guild.Id), user.JoinedAt.Value.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
+            if (user == (await Context.Channel.GetUserAsync(Base.Sentences.myId)))
             {
                 embed.AddField(Sentences.Creator(Context.Guild.Id), "Zirk#0001", true);
-                embed.AddField(Sentences.LatestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Sentences.DateHourFormat(Context.Guild.Id)), true);
+                embed.AddField(Sentences.LatestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
                 embed.AddField(Sentences.NumberGuilds(Context.Guild.Id), p.client.Guilds.Count, true);
                 embed.AddField(Sentences.Uptime(Context.Guild.Id), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");

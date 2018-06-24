@@ -14,11 +14,12 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class AnimeMangaModule : ModuleBase
     {
@@ -30,7 +31,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
                 return;
             }
             string animeName = Utilities.AddArgs(animeNameArr);
@@ -55,7 +56,7 @@ namespace SanaraV2
                 if (ex.Response is HttpWebResponse code)
                 {
                     if (code.StatusCode == HttpStatusCode.Forbidden)
-                        await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                        await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
                 }
                 else
                     await ReplyAsync("An unexpected error occured: " + ex.Message);
@@ -68,7 +69,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
                 return;
             }
             string mangaName = Utilities.AddArgs(mangaNameArr);
@@ -86,7 +87,7 @@ namespace SanaraV2
                 {
                     EmbedBuilder b = ParseContent(result, mangaName, (Context.Channel as ITextChannel).IsNsfw, Context.Guild.Id);
                     if (b == null)
-                        await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                     else
                         await ReplyAsync("", false, b.Build());
                 }
@@ -95,7 +96,7 @@ namespace SanaraV2
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
                 if (code.StatusCode == HttpStatusCode.Forbidden)
-                    await ReplyAsync(Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                    await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
             }
         }
 
@@ -133,7 +134,7 @@ namespace SanaraV2
             {
                 ImageUrl = Utilities.GetElementXml("<image>", entries[index], '<'),
                 Description = "**" + title + "** (" + english + ")" + Environment.NewLine
-                + Sentences.OrStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
+                + Base.Sentences.OrStr(guildId) + " " + synonyms + Environment.NewLine + Environment.NewLine
                 + Sentences.AnimeInfos(guildId, type, status, episodes) + Environment.NewLine
                 + Sentences.AnimeScore(guildId, score) + Environment.NewLine + Environment.NewLine
                 + "**" + Sentences.Synopsis(guildId) + "**" + Environment.NewLine + synopsis,

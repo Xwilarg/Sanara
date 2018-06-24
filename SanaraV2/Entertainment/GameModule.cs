@@ -14,6 +14,9 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
+using SanaraV2.NSFW;
+using SanaraV2.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +25,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class GameModule : ModuleBase
     {
@@ -526,7 +529,7 @@ namespace SanaraV2
                     {
                         if (!(Context.Channel as ITextChannel).IsNsfw)
                         {
-                            await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                            await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                             return;
                         }
                         await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));

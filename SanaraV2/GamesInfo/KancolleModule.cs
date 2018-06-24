@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,7 +25,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.GamesInfo
 {
     public class KancolleModule : ModuleBase
     {
@@ -292,7 +293,7 @@ namespace SanaraV2
                 return;
             }
             string shipName = Utilities.AddArgs(shipNameArr);
-            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
+            IGuildUser me = await Context.Guild.GetUserAsync(Base.Sentences.myId);
             string id, thumbnail;
             if (!GetShipInfos(shipName, out id, out thumbnail))
             {
@@ -333,6 +334,8 @@ namespace SanaraV2
                 GetKancolleInfo("Appearance", ref currI, ref finalStr, jsonInside, Sentences.Appearance(guildId));
                 GetKancolleInfo("Second Remodel", ref currI, ref finalStr, jsonInside, Sentences.SecondRemodel(guildId));
                 GetKancolleInfo("Trivia", ref currI, ref finalStr, jsonInside, Sentences.Trivia(guildId));
+                GetKancolleInfo("Libeccio CG", ref currI, ref finalStr, jsonInside, "Libeccio CG"); // TODO: Find a better way to handle categories
+                GetKancolleInfo("Libeccio as a ship", ref currI, ref finalStr, jsonInside, "Libeccio as a ship");
                 GetKancolleInfo("In-game", ref currI, ref finalStr, jsonInside, Sentences.InGame(guildId));
                 GetKancolleInfo("Historical", ref currI, ref finalStr, jsonInside, Sentences.Historical(guildId));
                 return (finalStr.Select(x => Regex.Replace(x, @"\\[Uu]([0-9A-Fa-f]{4})", m => char.ToString((char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier)))).ToList());

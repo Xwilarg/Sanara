@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -20,7 +21,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Tools
 {
     public class ImageModule : ModuleBase
     {

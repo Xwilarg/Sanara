@@ -17,6 +17,7 @@ using Discord.Audio;
 using Discord.Commands;
 using MediaToolkit;
 using MediaToolkit.Model;
+using SanaraV2.Base;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,7 +27,7 @@ using System.Net;
 using System.Threading.Tasks;
 using VideoLibrary;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class RadioModule : ModuleBase
     {
@@ -190,7 +191,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else
             if (words.Length == 0)
                 await ReplyAsync(Sentences.RadioNeedArg(Context.Guild.Id));
@@ -212,7 +213,7 @@ namespace SanaraV2
                         await ReplyAsync(Sentences.RadioAlreadyInList(Context.Guild.Id));
                         return;
                     }
-                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Sentences.myId), Context.Guild.Id.ToString());
+                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Base.Sentences.myId), Context.Guild.Id.ToString());
                     YouTubeVideo video = GetYoutubeVideo(youtubeResult.Item1);
                     if (video == null)
                     {
@@ -233,7 +234,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else
                 await StartRadio(Context.Channel);
         }
@@ -292,7 +293,7 @@ namespace SanaraV2
             {
                 await radio.Stop();
                 p.radios.Remove(radio);
-                await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
             }
         }
 

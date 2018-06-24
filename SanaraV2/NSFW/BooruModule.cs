@@ -22,8 +22,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Discord.Net;
 using System.Linq;
+using SanaraV2.Base;
 
-namespace SanaraV2
+namespace SanaraV2.NSFW
 {
     public class BooruModule : ModuleBase
     {
@@ -324,14 +325,14 @@ namespace SanaraV2
         {
             if (!booru.isSfw && !chan.IsNsfw)
             {
-                await chan.SendMessageAsync(Sentences.ChanIsNotNsfw(chan.GuildId));
+                await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
                 return;
             }
-            IGuildUser me = await chan.Guild.GetUserAsync(Sentences.myId);
+            IGuildUser me = await chan.Guild.GetUserAsync(Base.Sentences.myId);
             if (!me.GuildPermissions.AttachFiles)
             {
                 if (chan != null)
-                    await chan.SendMessageAsync(Sentences.NeedAttachFile(chan.GuildId));
+                    await chan.SendMessageAsync(Base.Sentences.NeedAttachFile(chan.GuildId));
                 return;
             }
             await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
@@ -380,7 +381,7 @@ namespace SanaraV2
             if (url == null)
             {
                 json = null;
-                return (Sentences.TagsNotFound(tags));
+                return (Base.Sentences.TagsNotFound(tags));
             }
             else
                 return (GetFileUrl(booru, url, out json));
@@ -510,7 +511,7 @@ namespace SanaraV2
                 if (!doesContainTagMe)
                 {
                     finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                    finalStrCharacs[indexCharacFrom] += " " + Sentences.AndStr(guildId) + " " + characs[characs.Count - 1];
+                    finalStrCharacs[indexCharacFrom] += " " + Base.Sentences.AndStr(guildId) + " " + characs[characs.Count - 1];
                 }
                 else
                 {
@@ -563,7 +564,7 @@ namespace SanaraV2
             else if (animeFrom.Count > 1)
             {
                 finalStrFrom[indexStrFrom] = String.Join(", ", animeFrom.Take(animeFrom.Count - 1));
-                finalStrFrom[indexStrFrom] += " " + Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
+                finalStrFrom[indexStrFrom] += " " + Base.Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
                 if (finalStrFrom[indexStrFrom].Length > 1500)
                 {
                     indexStrFrom++;
@@ -602,7 +603,7 @@ namespace SanaraV2
                 if (artists.Count > 1)
                 {
                     finalStr += String.Join(", ", artists.Take(artists.Count - 1));
-                    finalStr += " " + Sentences.AndStr(guildId) + " " + artists[artists.Count - 1];
+                    finalStr += " " + Base.Sentences.AndStr(guildId) + " " + artists[artists.Count - 1];
                 }
                 else
                     finalStr += artists[0];

@@ -14,12 +14,13 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Tools
 {
     public class SettingsModule : ModuleBase
     {
@@ -48,7 +49,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != 144851584478740481)
             {
-                await ReplyAsync(Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             }
             else
             {
@@ -68,7 +69,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
-                await ReplyAsync(Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
             else if (language.Length == 0)
                 await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
@@ -82,7 +83,7 @@ namespace SanaraV2
                 {
                     p.guildLanguages[Context.Guild.Id] = lang;
                     File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", lang);
-                    await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }
         }
@@ -93,7 +94,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
-                await ReplyAsync(Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
             else
             {
@@ -108,7 +109,7 @@ namespace SanaraV2
                     string prefix = Utilities.AddArgs(command);
                     p.prefixs[Context.Guild.Id] = prefix;
                     File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", prefix);
-                    await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }
         }
@@ -117,14 +118,14 @@ namespace SanaraV2
         public async Task ReloadLanguage()
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Sentences.ownerId)
+            if (Context.User.Id != Base.Sentences.ownerId)
             {
-                await ReplyAsync(Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             }
             else
             {
                 p.UpdateLanguageFiles();
-                await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
             }
         }
 
@@ -132,9 +133,9 @@ namespace SanaraV2
         public async Task Leave(string serverName = null)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Sentences.ownerId)
+            if (Context.User.Id != Base.Sentences.ownerId)
             {
-                await ReplyAsync(Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             }
             else
             {
@@ -144,11 +145,11 @@ namespace SanaraV2
                 {
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper());
                     if (g == null)
-                        await ReplyAsync(Sentences.NoCorrespondingGuild(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
                     else
                     {
                         await g.LeaveAsync();
-                        await ReplyAsync(Sentences.DoneStr(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                     }
                 }
             }
@@ -158,8 +159,8 @@ namespace SanaraV2
         public async Task Exit(string serverName = null)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Sentences.ownerId)
-                await ReplyAsync(Sentences.OnlyMasterStr(Context.Guild.Id));
+            if (Context.User.Id != Base.Sentences.ownerId)
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             else
                 Environment.Exit(0);
         }

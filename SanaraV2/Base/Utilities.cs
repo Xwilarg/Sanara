@@ -19,7 +19,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.Base
 {
     public static class Utilities
     {

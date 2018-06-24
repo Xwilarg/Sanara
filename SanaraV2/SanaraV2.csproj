@@ -219,6 +219,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entertainment\Sentences.cs" />
+    <Compile Include="GamesInfo\Sentences.cs" />
+    <Compile Include="NSFW\Sentences.cs" />
     <Compile Include="Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -238,7 +241,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entertainment\RadioModule.cs" />
-    <Compile Include="Sentences.cs" />
+    <Compile Include="Base\Sentences.cs" />
     <Compile Include="Tools\LinguistResources\KatakanaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -254,8 +257,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>RomajiToKatakana.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Sentences.cs" />
     <Compile Include="Tools\SettingsModule.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Base\Translation.cs" />
+    <Compile Include="Base\Utilities.cs" />
     <Compile Include="Entertainment\VnModule.cs" />
     <Compile Include="Entertainment\XKCDModule.cs" />
     <Compile Include="Entertainment\YoutubeModule.cs" />

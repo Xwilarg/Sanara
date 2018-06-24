@@ -22,6 +22,11 @@ using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
+using SanaraV2.Base;
+using SanaraV2.Entertainment;
+using SanaraV2.GamesInfo;
+using SanaraV2.NSFW;
+using SanaraV2.Tools;
 using SharpRaven;
 using SharpRaven.Data;
 using System;
@@ -70,7 +75,7 @@ namespace SanaraV2
 
         public DateTime startTime;
 
-        public Dictionary<string, List<Sentences.TranslationData>> translations;
+        public Dictionary<string, List<Translation.TranslationData>> translations;
         public Dictionary<ulong, string> guildLanguages;
         public Dictionary<string, List<string>> allLanguages;
 
@@ -304,7 +309,7 @@ namespace SanaraV2
         {
             allLanguages = new Dictionary<string, List<string>>();
             CopyLanguagesFiles();
-            translations = new Dictionary<string, List<Sentences.TranslationData>>();
+            translations = new Dictionary<string, List<Translation.TranslationData>>();
             foreach (string f in Directory.GetFiles("Saves/Translations"))
             {
                 FileInfo fi = new FileInfo(f);
@@ -332,10 +337,10 @@ namespace SanaraV2
                         if (fi.Name.StartsWith("terms"))
                         {
                             if (!translations.ContainsKey(part1))
-                                translations.Add(part1, new List<Sentences.TranslationData>());
-                            List<Sentences.TranslationData> data = translations[part1];
+                                translations.Add(part1, new List<Translation.TranslationData>());
+                            List<Translation.TranslationData> data = translations[part1];
                             if (!data.Any(x => x.language == lang))
-                                data.Add(new Sentences.TranslationData(lang, part2));
+                                data.Add(new Translation.TranslationData(lang, part2));
                         }
                         else
                         {
@@ -360,7 +365,7 @@ namespace SanaraV2
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-                await chan.SendMessageAsync(Sentences.IntroductionMsg(arg.Id));
+                await chan.SendMessageAsync(Tools.Sentences.IntroductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
@@ -389,7 +394,7 @@ namespace SanaraV2
                     {
                         if (arg.Id.ToString() == File.ReadAllLines("Saves/sanaraDatas.dat")[2])
                         {
-                            await chan.SendMessageAsync(Sentences.IntroductionError(arg.Id, u.Id.ToString(), u.Username));
+                            await chan.SendMessageAsync(Base.Sentences.IntroductionError(arg.Id, u.Id.ToString(), u.Username));
                         }
                     }
                 }
@@ -573,12 +578,12 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.Id == Sentences.myId || arg.Author.IsBot)
+            if (arg.Author.Id == Base.Sentences.myId || arg.Author.IsBot)
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
             /// When playing games
-            else if (arg.Author.Id != Sentences.myId)
+            else if (arg.Author.Id != Base.Sentences.myId)
             {
                 GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
                 if (game != null)
@@ -591,7 +596,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Sentences.DontPm(0));
+                    await context.Channel.SendMessageAsync(Base.Sentences.DontPm(0));
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;

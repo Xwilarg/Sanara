@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ using VndbSharp;
 using VndbSharp.Models;
 using VndbSharp.Models.VisualNovel;
 
-namespace SanaraV2
+namespace SanaraV2.Entertainment
 {
     public class VnModule : ModuleBase
     {
@@ -47,7 +48,7 @@ namespace SanaraV2
             }
             bool isNsfw = (Context.Channel as ITextChannel).IsNsfw;
             await ReplyAsync("", false, GetEmbed(vn, Context.Guild.Id, isNsfw));
-            IGuildUser me = await Context.Guild.GetUserAsync(Sentences.myId);
+            IGuildUser me = await Context.Guild.GetUserAsync(Base.Sentences.myId);
             if (me.GuildPermissions.AttachFiles)
             {
                 foreach (string image in GetImages(vn, Context.Guild.Id, Context.User.Id, isNsfw))

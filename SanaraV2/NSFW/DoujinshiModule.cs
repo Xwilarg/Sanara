@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using SanaraV2.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanaraV2
+namespace SanaraV2.NSFW
 {
     public class DoujinshiModule : ModuleBase
     {
@@ -33,7 +34,7 @@ namespace SanaraV2
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             if (!(Context.Channel as ITextChannel).IsNsfw)
             {
-                await ReplyAsync(Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                 return;
             }
             string errorTag;
@@ -41,9 +42,9 @@ namespace SanaraV2
             if (finalStr == null)
             {
                 if (errorTag == null)
-                    await ReplyAsync(Sentences.TagsNotFound(keywords));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(keywords));
                 else
-                    await ReplyAsync(Sentences.TagsNotFound(new string[] { errorTag }));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(new string[] { errorTag }));
             }
             else
                 await ReplyAsync(finalStr);

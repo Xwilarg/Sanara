@@ -25,8 +25,9 @@ using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Grpc.Core;
 using System.Resources;
+using SanaraV2.Base;
 
-namespace SanaraV2
+namespace SanaraV2.Tools
 {
     public class LinguistModule : ModuleBase
     {
@@ -66,7 +67,7 @@ namespace SanaraV2
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (p.translationClient == null)
-                await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else if (words.Length < 2)
                 await ReplyAsync(Sentences.TranslateHelp(Context.Guild.Id));
             else
@@ -91,7 +92,7 @@ namespace SanaraV2
                     {
                         if (p.visionClient == null)
                         {
-                            await ReplyAsync(Sentences.NoApiKey(Context.Guild.Id));
+                            await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
                             return;
                         }
                         while (true)
