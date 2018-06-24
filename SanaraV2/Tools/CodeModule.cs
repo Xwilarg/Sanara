@@ -32,10 +32,52 @@ namespace SanaraV2
                 await ReplyAsync(Sentences.IndenteHelp(Context.Guild.Id));
                 return;
             }
-            await ReplyAsync(IndenteCode(arg));
+            await ReplyAsync(IndenteCode(ParseCode(arg)));
         }
 
-        public static string IndenteCode(string[] arg)
+        public static string IndenteCode(List<string> code)
+        {
+            string finalStr = "";
+            int currIndente = 0;
+            bool tmpIdent = false;
+            foreach (string s in code)
+            {
+                if (s == "")
+                    continue;
+                string line = s;
+                if (line.StartsWith("for") || line.StartsWith("while") || line.StartsWith("if") || line.StartsWith("else") || s.StartsWith("catch"))
+                {
+                    tmpIdent = true;
+                    for (int i = 0; i < currIndente; i++)
+                        finalStr += '\t';
+                    finalStr += line.Trim() + Environment.NewLine;
+                    continue;
+                }
+                else if (line[0] == '{')
+                {
+                    for (int i = 0; i < currIndente; i++)
+                        finalStr += '\t';
+                    finalStr += line.Trim() + Environment.NewLine;
+                    currIndente++;
+                    tmpIdent = false;
+                    continue;
+                }
+                else if (line[0] == '}')
+                {
+                    currIndente--;
+                    tmpIdent = false;
+                }
+                for (int i = 0; i < currIndente; i++)
+                    finalStr += '\t';
+                if (tmpIdent)
+                    finalStr += '\t';
+                finalStr += line.Trim() + Environment.NewLine;
+                tmpIdent = false;
+            }
+            return (finalStr);
+        }
+
+        public static List<string> ParseCode(string[] arg)
         {
             List<string> code = new List<string>();
             string curr = "";
@@ -81,44 +123,7 @@ namespace SanaraV2
                     parenthesis--;
             }
             code.Add(curr);
-            string finalStr = "";
-            int currIndente = 0;
-            bool tmpIdent = false;
-            foreach (string s in code)
-            {
-                if (s == "")
-                    continue;
-                string line = s;
-                if (line.StartsWith("for") || line.StartsWith("while") || line.StartsWith("if") || line.StartsWith("else") || s.StartsWith("catch"))
-                {
-                    tmpIdent = true;
-                    for (int i = 0; i < currIndente; i++)
-                        finalStr += '\t';
-                    finalStr += line.Trim() + Environment.NewLine;
-                    continue;
-                }
-                else if (line[0] == '{')
-                {
-                    for (int i = 0; i < currIndente; i++)
-                        finalStr += '\t';
-                    finalStr += line.Trim() + Environment.NewLine;
-                    currIndente++;
-                    tmpIdent = false;
-                    continue;
-                }
-                else if (line[0] == '}')
-                {
-                    currIndente--;
-                    tmpIdent = false;
-                }
-                for (int i = 0; i < currIndente; i++)
-                    finalStr += '\t';
-                if (tmpIdent)
-                    finalStr += '\t';
-                finalStr += line.Trim() + Environment.NewLine;
-                tmpIdent = false;
-            }
-            return (finalStr);
+            return (code);
         }
     }
 }

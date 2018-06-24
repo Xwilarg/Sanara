@@ -207,7 +207,7 @@ namespace Sanara_UnitTests
             string id, thumbnail;
             Assert.True(KancolleModule.GetShipInfos("Ikazuchi", out id, out thumbnail));
             Assert.Equal("2524", id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", thumbnail);
+            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/b/b4/DD_Ikazuchi_Kai_236_Card.jpg", thumbnail);
         }
 
         [Fact]
@@ -271,7 +271,7 @@ namespace Sanara_UnitTests
         [Fact]
         public void Code()
         {
-            string[] code = CodeModule.IndenteCode("for (int i = 0; i < 5; i++) { if (i % 2 == 0) a++; }".Split(' ')).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] code = CodeModule.IndenteCode(CodeModule.ParseCode("for (int i = 0; i < 5; i++) { if (i % 2 == 0) a++; }".Split(' '))).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             Assert.Equal(5, code.Length);
             Assert.Equal("for (int i = 0; i < 5; i++)", code[0]);
             Assert.Equal("{", code[1]);

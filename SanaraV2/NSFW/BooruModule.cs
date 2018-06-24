@@ -467,6 +467,17 @@ namespace SanaraV2
             artists = artists.Select(x => FixName(x)).ToList();
             characs = characs.Select(x => FixName(x)).ToList();
             animeFrom = animeFrom.Select(x => FixName(x)).ToList();
+
+            string finalStr = "";
+            finalStr += GetAnimes(animeFrom, guildId, ref finalMsg);
+            finalStr += GetCharacs(characs, guildId, ref finalMsg);
+            finalStr += GetArtists(artists, guildId);
+            finalMsg.Add(finalStr);
+            return (finalMsg);
+        }
+
+        private static string GetCharacs(List<string> characs, ulong guildId, ref List<string> finalMsg)
+        {
             List<string> finalStrCharacs = new List<string> { "" };
             int indexCharacFrom = 0;
             if (characs.Count == 1)
@@ -501,6 +512,37 @@ namespace SanaraV2
                         finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + Sentences.MoreNotTagged(guildId);
                 }
             }
+            string finalStr = "";
+            if (finalStrCharacs[0] == "")
+                finalStr += Sentences.CharacterTagUnknowed(guildId) + Environment.NewLine;
+            else if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
+                finalStr += Sentences.CharacterNotTagged(guildId) + Environment.NewLine;
+            else if (characs.Count == 1)
+                finalStr += Sentences.CharacterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
+            else
+            {
+                if (finalStr.Length > 1500)
+                {
+                    finalMsg.Add(finalStr);
+                    finalStr = "";
+                }
+                finalStr += Sentences.CharacterAre(guildId);
+                foreach (string s in finalStrCharacs)
+                {
+                    if ((finalStr.Length + s.Length) > 1500)
+                    {
+                        finalMsg.Add(finalStr);
+                        finalStr = "";
+                    }
+                    finalStr += s;
+                }
+                finalStr += "." + Environment.NewLine;
+            }
+            return (finalStr);
+        }
+
+        private static string GetAnimes(List<string> animeFrom, ulong guildId, ref List<string> finalMsg)
+        {
             List<string> finalStrFrom = new List<string>();
             int indexStrFrom = 0;
             finalStrFrom.Add("");
@@ -537,34 +579,14 @@ namespace SanaraV2
             }
             else
                 finalStr = Sentences.AnimeTagUnknowed(guildId) + Environment.NewLine;
-            if (finalStrCharacs[0] == "")
-                finalStr += Sentences.CharacterTagUnknowed(guildId) + Environment.NewLine;
-            else if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
-                finalStr += Sentences.CharacterNotTagged(guildId) + Environment.NewLine;
-            else if (characs.Count == 1)
-                finalStr += Sentences.CharacterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
-            else
-            {
-                if (finalStr.Length > 1500)
-                {
-                    finalMsg.Add(finalStr);
-                    finalStr = "";
-                }
-                finalStr += Sentences.CharacterAre(guildId);
-                foreach (string s in finalStrCharacs)
-                {
-                    if ((finalStr.Length + s.Length) > 1500)
-                    {
-                        finalMsg.Add(finalStr);
-                        finalStr = "";
-                    }
-                    finalStr += s;
-                }
-                finalStr += "." + Environment.NewLine;
-            }
+            return (finalStr);
+        }
+
+        private static string GetArtists(List<string> artists, ulong guildId)
+        {
             if (artists.Count > 0)
             {
-                finalStr += Sentences.ArtistFrom(guildId);
+                string finalStr = Sentences.ArtistFrom(guildId);
                 if (artists.Count > 1)
                 {
                     finalStr += String.Join(", ", artists.Take(artists.Count - 1));
@@ -572,11 +594,10 @@ namespace SanaraV2
                 }
                 else
                     finalStr += artists[0];
+                return (finalStr);
             }
             else
-                finalMsg.Add(Sentences.ArtistNotTagged(guildId));
-            finalMsg.Add(finalStr);
-            return (finalMsg);
+                return (Sentences.ArtistNotTagged(guildId));
         }
     }
 }
