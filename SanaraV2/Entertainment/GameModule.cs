@@ -33,7 +33,7 @@ namespace SanaraV2.Entertainment
 
         public static readonly int shiritoriTimer = 10;
         public static readonly int kancolleTimer = 10;
-        public static readonly int booruTimer = 45;
+        public static readonly int booruTimer = 30;
 
         public abstract class Game
         {
@@ -43,7 +43,7 @@ namespace SanaraV2.Entertainment
                 m_didLost = false;
                 m_refTime = refTime * ((isEasy) ? (2) : (1));
                 m_time = DateTime.Now;
-                m_charac = Program.p.relations.Find(x => x._name == charac.Id);
+                m_charac = (charac != null) ? (Program.p.relations.Find(x => x._name == charac.Id)) : (null);
                 m_guild = guild;
                 m_nbAttempt = 0;
                 m_nbFound = 0;
@@ -87,8 +87,10 @@ namespace SanaraV2.Entertainment
             public void Post()
             {
                 _ = Task.Run(async delegate() {
+                    m_time = DateTime.MinValue;
                     bool isMsg;
-                    foreach (string msg in GetPost(out isMsg))
+                    string[] allMsgs = GetPost(out isMsg);
+                    foreach (string msg in allMsgs)
                     {
                         if (isMsg)
                             await m_chan.SendMessageAsync(msg);
@@ -98,10 +100,33 @@ namespace SanaraV2.Entertainment
                             File.Delete(msg);
                         }
                     }
+                    m_time = DateTime.Now;
                 });
             }
             public abstract string[] GetPost(out bool isMsg);
-            public abstract void CheckCorrect(string userWord, IUser user);
+            public async Task CheckCorrect(string userWord, IUser user)
+            {
+                if (m_time == DateTime.MinValue)
+                {
+                    await m_chan.SendMessageAsync(Sentences.WaitImage(m_guild.Id));
+                    return;
+                }
+                bool sayCorrect;
+                string msg = GetCheckCorrect(userWord, out sayCorrect);
+                if (msg == null)
+                {
+                    m_time = DateTime.MinValue;
+                    m_nbFound++;
+                    if (!m_userIds.Contains(user.Id))
+                        m_userIds.Add(user.Id);
+                    if (sayCorrect)
+                        await m_chan.SendMessageAsync(Sentences.GuessGood(m_guild.Id));
+                    Post();
+                }
+                else
+                    await m_chan.SendMessageAsync(msg);
+            }
+            public abstract string GetCheckCorrect(string userWord, out bool sayCorrect);
             public abstract void Loose();
 
             public IMessageChannel m_chan { private set; get; }
@@ -136,105 +161,83 @@ namespace SanaraV2.Entertainment
                     m_alreadySaid.Add(m_currWord);
                     return (new string[] { "しりとり (shiritori)" });
                 }
-                else
-                {
-                    string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
-                    if (corrWords.Length == 0)
-                        return (new string[] { Sentences.ShiritoriNoWord(m_guild.Id) }); // TODO what happen then ?
-                    else
-                    {
-                        string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
-                        string[] insideWord = word.Split('$');
-                        m_words.Remove(word);
-                        m_alreadySaid.Add(insideWord[0]);
-                        m_currWord = insideWord[0];
-                        m_time = DateTime.Now;
-                        return (new string[] { insideWord[0] + " (" + LinguistModule.FromHiragana(LinguistModule.FromKatakana(insideWord[0])) + ") - Meaning: " + insideWord[1] });
-                    }
-                }
+                string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
+                if (corrWords.Length == 0)
+                    return (new string[] { Sentences.ShiritoriNoWord(m_guild.Id) }); // TODO what happen then
+                string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
+                string[] insideWord = word.Split('$');
+                m_words.Remove(word);
+                m_alreadySaid.Add(insideWord[0]);
+                m_currWord = insideWord[0];
+                return (new string[] { insideWord[0] + " (" + LinguistModule.FromHiragana(LinguistModule.FromKatakana(insideWord[0])) + ") - Meaning: " + insideWord[1] });
             }
 
             //TODO Manage kanjis using Jisho API
-            public override async void CheckCorrect(string userWord, IUser user)
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
-                if (m_time == DateTime.MinValue)
+                sayCorrect = false;
+                DateTime now = DateTime.Now;
+                m_time = DateTime.MinValue;
+                m_nbAttempt++;
+                userWord = LinguistModule.ToHiragana(LinguistModule.FromKatakana(userWord));
+                if (userWord.Any(c => c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 {
-                    await m_chan.SendMessageAsync(Sentences.WaitPlay(m_guild.Id));
+                    m_time = now;
+                    return (Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
                 }
-                else
+                string json;
+                using (WebClient wc = new WebClient())
                 {
-                    DateTime now = DateTime.Now;
-                    m_time = DateTime.MinValue;
-                    m_nbAttempt++;
-                    userWord = LinguistModule.ToHiragana(LinguistModule.FromKatakana(userWord));
-                    if (userWord.Any(c => c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
+                    wc.Encoding = Encoding.UTF8;
+                    json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + userWord);
+                }
+                bool isCorrect = false;
+                bool isNoun = false;
+                foreach (string s in Utilities.GetElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
+                {
+                    string hiragana = LinguistModule.ToHiragana(LinguistModule.FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"')));
+                    if (userWord == hiragana)
                     {
-                        m_time = now;
-                        await m_chan.SendMessageAsync(Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
-                        return;
-                    }
-                    string json;
-                    using (WebClient wc = new WebClient())
-                    {
-                        wc.Encoding = Encoding.UTF8;
-                        json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + userWord);
-                    }
-                    bool isCorrect = false;
-                    bool isNoun = false;
-                    foreach (string s in Utilities.GetElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
-                    {
-                        string hiragana = LinguistModule.ToHiragana(LinguistModule.FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"')));
-                        if (userWord == hiragana)
+                        isCorrect = true;
+                        foreach (string pos in Utilities.GetElementXml("parts_of_speech\":[", json, ']').Split(','))
                         {
-                            isCorrect = true;
-                            foreach (string pos in Utilities.GetElementXml("parts_of_speech\":[", json, ']').Split(','))
+                            if (pos == "\"Noun\"")
                             {
-                                if (pos == "\"Noun\"")
-                                {
-                                    isNoun = true;
-                                    break;
-                                }
+                                isNoun = true;
+                                break;
                             }
                         }
                     }
-                    if (!isCorrect)
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriDoesntExist(m_guild.Id));
-                        m_time = now;
-                        return;
-                    }
-                    if (!isNoun)
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriNotNoun(m_guild.Id));
-                        m_time = now;
-                        return;
-                    }
-                    if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), LinguistModule.FromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
-                        m_time = now;
-                        return;
-                    }
-                    if (m_alreadySaid.Contains(userWord))
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriAlreadySaid(m_guild.Id));
-                        m_didLost = true;
-                        return;
-                    }
-                    if (userWord[userWord.Length - 1] == 'ん')
-                    {
-                        await m_chan.SendMessageAsync(Sentences.ShiritoriEndWithN(m_guild.Id));
-                        m_didLost = true;
-                        return;
-                    }
-                    m_nbFound++;
-                    if (!m_userIds.Contains(user.Id))
-                        m_userIds.Add(user.Id);
-                    m_words.Remove(m_words.Find(x => x.Split('$')[0] == userWord));
-                    m_alreadySaid.Add(userWord);
-                    m_currWord = userWord;
-                    Post();
                 }
+                if (!isCorrect)
+                {
+                    m_time = now;
+                    return (Sentences.ShiritoriDoesntExist(m_guild.Id));
+                }
+                if (!isNoun)
+                {
+                    m_time = now;
+                    return (Sentences.ShiritoriNotNoun(m_guild.Id));
+                }
+                if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
+                {
+                    m_time = now;
+                    return (Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), LinguistModule.FromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
+                }
+                if (m_alreadySaid.Contains(userWord))
+                {
+                    m_didLost = true;
+                    return (Sentences.ShiritoriAlreadySaid(m_guild.Id));
+                }
+                if (userWord[userWord.Length - 1] == 'ん')
+                {
+                    m_didLost = true;
+                    return (Sentences.ShiritoriEndWithN(m_guild.Id));
+                }
+                m_words.Remove(m_words.Find(x => x.Split('$')[0] == userWord));
+                m_alreadySaid.Add(userWord);
+                m_currWord = userWord;
+                return (null);
             }
 
             private char HiraganaToUpper(char current)
@@ -338,81 +341,60 @@ namespace SanaraV2.Entertainment
                     image = image.Replace("\\", "");
                     int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
                     w.DownloadFile(image, "shipgirlquizz" + currentTime + ".jpg");
-                    m_time = DateTime.Now;
                     return (new string[] { "shipgirlquizz" + currentTime + ".jpg" });
                 }
             }
-            
-            public override async void CheckCorrect(string userWord, IUser user)
+
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
-                if (m_time == DateTime.MinValue)
+                sayCorrect = true;
+                m_nbAttempt++;
+                try
                 {
-                    await m_chan.SendMessageAsync(Sentences.WaitImage(m_guild.Id));
+                    bool isSpace = true;
+                    string newName = "";
+                    foreach (char c in userWord)
+                    {
+                        if (c == ' ')
+                        {
+                            isSpace = true;
+                            newName += ' ';
+                        }
+                        else
+                        {
+                            if (isSpace)
+                                newName += char.ToUpper(c);
+                            else
+                                newName += c;
+                            isSpace = false;
+                        }
+                    }
+                    using (WebClient w = new WebClient())
+                    {
+                        string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
+                        string json = w.DownloadString(url);
+                        string code = Utilities.GetElementXml("\"title\":\"", json, '"');
+                        url = "http://kancolle.wikia.com/wiki/" + code + "?action=raw";
+                        url = url.Replace(' ', '_');
+                        json = w.DownloadString(url);
+                        if (Utilities.GetElementXml("{{", json, '}') != "ShipPageHeader")
+                            return (Sentences.KancolleGuessDontExist(m_guild.Id));
+                        w.Encoding = Encoding.UTF8;
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                        url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
+                        json = w.DownloadString(url);
+                        code = Utilities.GetElementXml("\"id\":", json, ',');
+                        if (m_idImage == code)
+                            return (null);
+                        return (Sentences.BooruGuessBad(m_guild.Id, newName));
+                    }
                 }
-                else
+                catch (WebException ex)
                 {
-                    m_nbAttempt++;
-                    try
-                    {
-                        bool isSpace = true;
-                        string newName = "";
-                        foreach (char c in userWord)
-                        {
-                            if (c == ' ')
-                            {
-                                isSpace = true;
-                                newName += ' ';
-                            }
-                            else
-                            {
-                                if (isSpace)
-                                    newName += char.ToUpper(c);
-                                else
-                                    newName += c;
-                                isSpace = false;
-                            }
-                        }
-                        using (WebClient w = new WebClient())
-                        {
-                            string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
-                            string json = w.DownloadString(url);
-                            string code = Utilities.GetElementXml("\"title\":\"", json, '"');
-                            url = "http://kancolle.wikia.com/wiki/" + code + "?action=raw";
-                            url = url.Replace(' ', '_');
-                            json = w.DownloadString(url);
-                            if (Utilities.GetElementXml("{{", json, '}') != "ShipPageHeader")
-                            {
-                                await m_chan.SendMessageAsync(Sentences.KancolleGuessDontExist(m_guild.Id));
-                            }
-                            else
-                            {
-                                w.Encoding = Encoding.UTF8;
-                                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                                url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
-                                json = w.DownloadString(url);
-                                code = Utilities.GetElementXml("\"id\":", json, ',');
-                                if (m_idImage == code)
-                                {
-                                    m_time = DateTime.MinValue;
-                                    m_nbFound++;
-                                    if (!m_userIds.Contains(user.Id))
-                                        m_userIds.Add(user.Id);
-                                    await m_chan.SendMessageAsync(Sentences.GuessGood(m_guild.Id));
-                                    Post();
-                                }
-                                else
-                                {
-                                    await m_chan.SendMessageAsync(Sentences.BooruGuessBad(m_guild.Id, newName));
-                                }
-                            }
-                        }
-                    }
-                    catch (WebException ex)
-                    {
-                        HttpWebResponse code = ex.Response as HttpWebResponse;
-                        if (code.StatusCode == HttpStatusCode.NotFound)
-                            await m_chan.SendMessageAsync(Sentences.KancolleGuessDontExist(m_guild.Id));
-                    }
+                    HttpWebResponse code = ex.Response as HttpWebResponse;
+                    if (code.StatusCode == HttpStatusCode.NotFound)
+                        return (Sentences.KancolleGuessDontExist(m_guild.Id));
+                    throw ex;
                 }
             }
 
@@ -447,10 +429,8 @@ namespace SanaraV2.Entertainment
             public override string[] GetPost(out bool isMsg)
             {
                 isMsg = false;
-                m_time = DateTime.MinValue;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + m_guild.Id.ToString();
-                m_time = DateTime.Now;
+                string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + ((m_guild != null) ? (m_guild.Id) : (0)).ToString();
                 return (new string[] {
                     BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
                     BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
@@ -458,26 +438,15 @@ namespace SanaraV2.Entertainment
                 });
             }
 
-            public override async void CheckCorrect(string userWord, IUser user)
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
-                if (m_time == DateTime.MinValue)
-                    await m_chan.SendMessageAsync(Sentences.WaitImages(m_guild.Id));
-                else
-                {
-                    m_nbAttempt++;
-                    if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
-                    {
-                        m_nbFound++;
-                        if (!m_userIds.Contains(user.Id))
-                            m_userIds.Add(user.Id);
-                        await m_chan.SendMessageAsync(Sentences.GuessGood(m_guild.Id));
-                        Post();
-                    }
-                    else if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
-                        await m_chan.SendMessageAsync(Sentences.BooruGuessClose(m_guild.Id, userWord));
-                    else
-                        await m_chan.SendMessageAsync(Sentences.BooruGuessBad(m_guild.Id, userWord));
-                }
+                sayCorrect = true;
+                m_nbAttempt++;
+                if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
+                    return (null);
+                if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
+                    return (Sentences.BooruGuessClose(m_guild.Id, userWord));
+                return (Sentences.BooruGuessBad(m_guild.Id, userWord));
             }
 
 #pragma warning disable CS1998

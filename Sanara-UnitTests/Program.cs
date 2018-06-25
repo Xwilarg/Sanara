@@ -209,7 +209,7 @@ namespace Sanara_UnitTests
             string id, thumbnail;
             Assert.True(KancolleModule.GetShipInfos("Ikazuchi", out id, out thumbnail));
             Assert.Equal("2524", id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/b/b4/DD_Ikazuchi_Kai_236_Card.jpg", thumbnail);
+            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", thumbnail);
         }
 
         [Fact]
@@ -280,6 +280,52 @@ namespace Sanara_UnitTests
             Assert.Equal("\tif (i % 2 == 0)", code[2]);
             Assert.Equal("\t\ta++;", code[3]);
             Assert.Equal("}", code[4]);
+        }
+
+        private void InitShiritoriGame()
+        {
+            if (!Directory.Exists("Saves"))
+                Directory.CreateDirectory("Saves");
+            File.WriteAllText("Saves/shiritoriWords.dat", "りゅう$Dragon");
+        }
+
+        [Fact]
+        public void GetPostShiritori()
+        {
+            InitShiritoriGame();
+            new SanaraV2.Program(true);
+            GameModule.Shiritori shiritori = new GameModule.Shiritori(null, null, null, false);
+            Assert.Equal("しりとり (shiritori)", shiritori.GetPost(out _)[0]);
+            Assert.Equal("りゅう (ryuu) - Meaning: Dragon", shiritori.GetPost(out _)[0]);
+        }
+
+        [Fact]
+        public void GetPostKancolle()
+        {
+            new SanaraV2.Program(true);
+            GameModule.Kancolle kancolle = new GameModule.Kancolle(null, null, null, false);
+            Assert.True(File.Exists(kancolle.GetPost(out _)[0]));
+        }
+
+        [Fact]
+        public void GetPostBooru()
+        {
+            if (!Directory.Exists("Saves"))
+                Directory.CreateDirectory("Saves");
+            File.WriteAllText("Saves/BooruTriviaTags.dat", "swimsuit 10");
+            new SanaraV2.Program(true);
+            GameModule.BooruGame booru = new GameModule.BooruGame(null, null, null, false);
+            foreach (string s in booru.GetPost(out _))
+                Assert.True(File.Exists(s));
+        }
+
+        [Fact]
+        public void CheckCorrectShiritoriCorrect()
+        {
+            InitShiritoriGame();
+            GameModule.Shiritori shiritori = new GameModule.Shiritori(null, null, null, false);
+            shiritori.GetPost(out _);
+            Assert.Null(shiritori.GetCheckCorrect("ryuu", out _));
         }
     }
 }
