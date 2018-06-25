@@ -1,8 +1,4 @@
-﻿
-using Discord;
-using SanaraV2.Base;
-using System;
-/// This file is part of Sanara.
+﻿/// This file is part of Sanara.
 ///
 /// Sanara is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU General Public License as published by
@@ -16,6 +12,10 @@ using System;
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
+using SanaraV2.Base;
+using System;
+
 namespace SanaraV2.Tools
 {
     public static class Sentences
