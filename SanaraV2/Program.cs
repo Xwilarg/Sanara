@@ -587,7 +587,7 @@ namespace SanaraV2
             {
                 GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
                 if (game != null)
-                    game.CheckCorrect(arg.Content, arg.Author);
+                    await game.CheckCorrect(arg.Content, arg.Author);
             }
             int pos = 0;
             string prefix = prefixs[(arg.Channel as ITextChannel).GuildId];

@@ -70,22 +70,11 @@ namespace SanaraV2.Tools
                     return;
                 }
                 string currName = "negate" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + extension;
-                using (WebClient wc = new WebClient())
+                ChangeImage(currName, word[0], delegate (Bitmap bmp, int i, int y)
                 {
-                    using (MemoryStream stream = new MemoryStream(wc.DownloadData(word[0])))
-                    {
-                        Bitmap bmp = new Bitmap(stream);
-                        for (int i = 0; i < bmp.Size.Width; i++)
-                        {
-                            for (int y = 0; y < bmp.Size.Height; y++)
-                            {
-                                Color color = bmp.GetPixel(i, y);
-                                bmp.SetPixel(i, y, Color.FromArgb(color.A, 255 - color.R, 255 - color.G, 255 - color.B));
-                            }
-                        }
-                        bmp.Save(currName);
-                    }
-                }
+                    Color color = bmp.GetPixel(i, y);
+                    bmp.SetPixel(i, y, Color.FromArgb(color.A, 255 - color.R, 255 - color.G, 255 - color.B));
+                });
                 await Context.Channel.SendFileAsync(currName);
                 File.Delete(currName);
             }
@@ -151,13 +140,9 @@ namespace SanaraV2.Tools
                     return;
                 }
                 string currName = "rgb" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + ".png";
-                for (int i = 0; i < bmp.Size.Width; i++)
-                {
-                    for (int y = 0; y < bmp.Size.Height; y++)
-                    {
-                        bmp.SetPixel(i, y, color);
-                    }
-                }
+                LoopImage(bmp, delegate (Bitmap bitmap, int i, int y) {
+                    bitmap.SetPixel(i, y, color);
+                });
                 bmp.Save(currName);
                 await Context.Channel.SendFileAsync(currName);
                 File.Delete(currName);
@@ -202,24 +187,37 @@ namespace SanaraV2.Tools
                     }
                 }
                 string currName = "epure" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + "." + extension;
-                using (WebClient wc = new WebClient())
+                ChangeImage(currName, word[0], delegate (Bitmap bmp, int i, int y)
                 {
-                    using (MemoryStream stream = new MemoryStream(wc.DownloadData(word[0])))
-                    {
-                        Bitmap bmp = new Bitmap(stream);
-                        for (int i = 0; i < bmp.Size.Width; i++)
-                        {
-                            for (int y = 0; y < bmp.Size.Height; y++)
-                            {
-                                Color color = bmp.GetPixel(i, y);
-                                bmp.SetPixel(i, y, GetClosestColor(color, step));
-                            }
-                        }
-                        bmp.Save(currName);
-                    }
-                }
+                    Color color = bmp.GetPixel(i, y);
+                    bmp.SetPixel(i, y, GetClosestColor(color, step));
+                });
                 await Context.Channel.SendFileAsync(currName);
                 File.Delete(currName);
+            }
+        }
+
+        private void LoopImage(Bitmap bmp, Action<Bitmap, int, int> action)
+        {
+            for (int i = 0; i < bmp.Size.Width; i++)
+            {
+                for (int y = 0; y < bmp.Size.Height; y++)
+                {
+                    action(bmp, i, y);
+                }
+            }
+        }
+
+        private void ChangeImage(string currName, string url, Action<Bitmap, int, int> action)
+        {
+            using (WebClient wc = new WebClient())
+            {
+                using (MemoryStream stream = new MemoryStream(wc.DownloadData(url)))
+                {
+                    Bitmap bmp = new Bitmap(stream);
+                    LoopImage(bmp, action);
+                    bmp.Save(currName);
+                }
             }
         }
 
