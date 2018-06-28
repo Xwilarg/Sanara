@@ -134,6 +134,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<RadioModule>();
             await commands.AddModuleAsync<XKCDModule>();
             await commands.AddModuleAsync<ImageModule>();
+            await commands.AddModuleAsync<GirlsFrontierModule>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -479,6 +480,7 @@ namespace SanaraV2
             Debug,
             Doujinshi,
             Game,
+            GirlsFrontier,
             GoogleShortener,
             Image,
             Kancolle,

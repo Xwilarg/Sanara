@@ -200,24 +200,33 @@ namespace Sanara_UnitTests
         [Fact]
         public void WrongShipInfos()
         {
-            Assert.False(KancolleModule.GetShipInfos("awawawawawawa", out _, out _));
+            Assert.False(Wikia.GetCharacInfos("awawawawawawa", out _, out _, Wikia.WikiaType.KanColle));
         }
 
         [Fact]
         public void ShipInfos()
         {
             string id, thumbnail;
-            Assert.True(KancolleModule.GetShipInfos("Ikazuchi", out id, out thumbnail));
+            Assert.True(Wikia.GetCharacInfos("Ikazuchi", out id, out thumbnail, Wikia.WikiaType.KanColle));
             Assert.Equal("2524", id);
             Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", thumbnail);
+        }
+
+        [Fact]
+        public void TDollInfos()
+        {
+            string id, thumbnail;
+            Assert.True(Wikia.GetCharacInfos("MP5", out id, out thumbnail, Wikia.WikiaType.GirlsFrontline));
+            Assert.Equal("879", id);
+            Assert.Equal("https://vignette.wikia.nocookie.net/girlsfrontline/images/1/16/Mp5_norm.png", thumbnail);
         }
 
         [Fact]
         public void DownloadThumbnail()
         {
             string thumbnail;
-            Assert.True(KancolleModule.GetShipInfos("Hibiki", out _, out thumbnail));
-            string fileName = KancolleModule.DownloadShipThumbnail(thumbnail);
+            Assert.True(Wikia.GetCharacInfos("Hibiki", out _, out thumbnail, Wikia.WikiaType.KanColle));
+            string fileName = Wikia.DownloadCharacThumbnail(thumbnail);
             Assert.True(File.Exists(fileName));
         }
 
@@ -225,7 +234,7 @@ namespace Sanara_UnitTests
         public void FillKancolleInfos()
         {
             string id;
-            KancolleModule.GetShipInfos("Ryuujou", out id, out _);
+            Wikia.GetCharacInfos("Ryuujou", out id, out _, Wikia.WikiaType.KanColle);
             string infos = Utilities.AddArgs(KancolleModule.FillKancolleInfos(id, 0).ToArray());
             Assert.Contains("**personality**", infos);
             Assert.Contains("**appearance**", infos);

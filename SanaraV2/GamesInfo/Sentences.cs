@@ -18,7 +18,14 @@ namespace SanaraV2.GamesInfo
 {
     public static class Sentences
     {
-        /// --------------------------- KanColle---------------------------
+        /// --------------------------- Girls Frontline ---------------------------
+        public static string GirlsFrontlineHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineHelp")); }
+        public static string TDollDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "tdollDontExist")); }
+        public static string ModelAndHistoricalInformation(ulong guildId) { return (Translation.GetTranslation(guildId, "modelAndHistoricalInformation")); }
+        public static string Basic(ulong guildId) { return (Translation.GetTranslation(guildId, "basic")); }
+        public static string Technical(ulong guildId) { return (Translation.GetTranslation(guildId, "technical")); }
+
+        /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }
         public static string ShipgirlDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "shipgirlDontExist")); }
         public static string DontDropOnMaps(ulong guildId) { return (Translation.GetTranslation(guildId, "dontDropOnMaps")); }
@@ -42,5 +49,7 @@ namespace SanaraV2.GamesInfo
         public static string Trivia(ulong guildId) { return (Translation.GetTranslation(guildId, "trivia")); }
         public static string InGame(ulong guildId) { return (Translation.GetTranslation(guildId, "inGame")); }
         public static string Historical(ulong guildId) { return (Translation.GetTranslation(guildId, "historical")); }
+        public static string LibeccioCG(ulong guildId) { return (Translation.GetTranslation(guildId, "libeccioCG")); }
+        public static string LibeccioAsAShip(ulong guildId) { return (Translation.GetTranslation(guildId, "libeccioAsAShip")); }
     }
 }

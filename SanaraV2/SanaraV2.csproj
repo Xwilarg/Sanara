@@ -221,6 +221,8 @@
   <ItemGroup>
     <Compile Include="Entertainment\Sentences.cs" />
     <Compile Include="GamesInfo\Sentences.cs" />
+    <Compile Include="GamesInfo\GirlsFrontierModule.cs" />
+    <Compile Include="GamesInfo\Wikia.cs" />
     <Compile Include="NSFW\Sentences.cs" />
     <Compile Include="Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
