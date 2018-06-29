@@ -76,7 +76,7 @@ namespace SanaraV2.GamesInfo
                         return (false);
                     string url = "http://" + WikiaTypeToString(wikia) + ".wikia.com/wiki/" + title + "?action=raw";
                     json = w.DownloadString(url);
-                    if (!CheckPageHeader(wikia, Utilities.GetElementXml("{{", json.Split('\n')[0], '}')))
+                    if (!CheckPageHeader(wikia, Utilities.GetElementXml("{{", json.Split( new string[] { "\n", "|" }, StringSplitOptions.None)[0], '}')))
                         return (false);
                     return (true);
                 }
