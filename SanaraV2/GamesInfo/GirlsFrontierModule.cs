@@ -78,8 +78,9 @@ namespace SanaraV2.GamesInfo
 
         public struct TDollInfos
         {
-            public TDollInfos(List<string> jsonInfos)
+            public TDollInfos(string name, List<string> jsonInfos)
             {
+                this.name = name;
                 firearmClass = FindElement(jsonInfos, "firearmclass =");
                 rarity = FindElement(jsonInfos, "rarity =");
                 manuTime = DateTime.ParseExact(FindElement(jsonInfos, "manuftimer ="), "HH:mm:ss", CultureInfo.CurrentCulture);
@@ -100,6 +101,7 @@ namespace SanaraV2.GamesInfo
                     intro = FindElement(jsonInfos, "ensecretary1 =");
             }
 
+            public string name;
             public string firearmClass;
             public string rarity;
             public DateTime manuTime;
@@ -131,7 +133,7 @@ namespace SanaraV2.GamesInfo
                 await ReplyAsync(Sentences.TDollDontExist(Context.Guild.Id));
                 return;
             }
-            TDollInfos jsonInfos = new TDollInfos(infos.Value.infos.Split('|').ToList());
+            TDollInfos jsonInfos = new TDollInfos(infos.Value.name, infos.Value.infos.Split('|').ToList());
             Color color;
             int rarityValue = jsonInfos.rarity.Count(delegate (char c) { return (c == '★'); });
             if (rarityValue == 2) color = new Color(255, 255, 255);
@@ -141,22 +143,21 @@ namespace SanaraV2.GamesInfo
             else color = new Color(0, 0, 0);
             EmbedBuilder embed = new EmbedBuilder()
             {
-                Title = infos.Value.name,
+                Title = jsonInfos.name,
                 Color = color,
                 ImageUrl = infos.Value.thumbnail
             };
-            Console.WriteLine(infos.Value.thumbnail);
             embed.AddField(Sentences.ClassStr(Context.Guild.Id), jsonInfos.firearmClass, true);
             embed.AddField(Sentences.Rarity(Context.Guild.Id), jsonInfos.rarity, true);
             embed.AddField(Sentences.ManufTime(Context.Guild.Id), jsonInfos.manuTime.ToString("HH:mm:ss"), true);
             embed.AddField(Sentences.GrowthGrade(Context.Guild.Id), jsonInfos.growthGrade, true);
             embed.AddField(Sentences.OperationalEffectiveness(Context.Guild.Id), jsonInfos.operationalEffectiveness.min + " → " + jsonInfos.operationalEffectiveness.max, true);
-            embed.AddField(Sentences.Health(Context.Guild.Id), "**" + jsonInfos.health.grade + ":** " + jsonInfos.health.min + " → " + jsonInfos.health.max, true);
-            embed.AddField(Sentences.Evasion(Context.Guild.Id), "**" + jsonInfos.evasion.grade + ":** " + jsonInfos.evasion.min + " → " + jsonInfos.evasion.max, true);
-            embed.AddField(Sentences.Speed(Context.Guild.Id), "**" + jsonInfos.speed.grade + ":** " + jsonInfos.speed.min, true);
-            embed.AddField(Sentences.Damage(Context.Guild.Id), "**" + jsonInfos.damage.grade + ":** " + jsonInfos.damage.min + " → " + jsonInfos.damage.max, true);
-            embed.AddField(Sentences.Accuracy(Context.Guild.Id), "**" + jsonInfos.accuracy.grade + ":** " + jsonInfos.accuracy.min + " → " + jsonInfos.accuracy.max, true);
-            embed.AddField(Sentences.RateOfFire(Context.Guild.Id), "**" + jsonInfos.rateOfFire.grade + ":** " + jsonInfos.rateOfFire.min + " → " + jsonInfos.rateOfFire.max, true);
+            embed.AddField(Sentences.Health(Context.Guild.Id), jsonInfos.health.min + " → " + jsonInfos.health.max + " (" + jsonInfos.health.grade + ")", true);
+            embed.AddField(Sentences.Evasion(Context.Guild.Id), jsonInfos.evasion.min + " → " + jsonInfos.evasion.max + " (" + jsonInfos.evasion.grade + ")", true);
+            embed.AddField(Sentences.Speed(Context.Guild.Id), jsonInfos.speed.min + " (" + jsonInfos.speed.grade + ")", true);
+            embed.AddField(Sentences.Damage(Context.Guild.Id), jsonInfos.damage.min + " → " + jsonInfos.damage.max + " (" + jsonInfos.damage.grade + ")", true);
+            embed.AddField(Sentences.Accuracy(Context.Guild.Id), jsonInfos.accuracy.min + " → " + jsonInfos.accuracy.max + " (" + jsonInfos.accuracy.grade + ")", true);
+            embed.AddField(Sentences.RateOfFire(Context.Guild.Id), jsonInfos.rateOfFire.min + " → " + jsonInfos.rateOfFire.max + " (" + jsonInfos.rateOfFire.grade + ")", true);
             embed.AddField(Sentences.AmmoConsumption(Context.Guild.Id), jsonInfos.ammoConsumption.min + " → " + jsonInfos.ammoConsumption.max, true);
             embed.AddField(Sentences.RationConsumption(Context.Guild.Id), jsonInfos.rationConsumption.min + " → " + jsonInfos.rationConsumption.max, true);
             embed.Footer = new EmbedFooterBuilder()
@@ -172,27 +173,70 @@ namespace SanaraV2.GamesInfo
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
             if (nameArr.Length <= 1)
             {
-                await ReplyAsync(Sentences.GirlsFrontlineHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.GirlsFrontlineCompareHelp(Context.Guild.Id));
                 return;
             }
-            Wikia.CharacInfo? c1 = Wikia.GetCharacInfos(nameArr[0], Wikia.WikiaType.GirlsFrontline);
-            Wikia.CharacInfo? c2 = Wikia.GetCharacInfos(Utilities.AddArgs(nameArr.Skip(1).ToArray()), Wikia.WikiaType.GirlsFrontline);
-            if (c1 == null || c2 == null)
+            if (nameArr.Length > 5)
             {
-                await ReplyAsync(Sentences.TDollDontExist(Context.Guild.Id));
+                await ReplyAsync(Sentences.TooManyTDolls(Context.Guild.Id));
                 return;
             }
-            TDollInfos infosC1 = new TDollInfos(c1.Value.infos.Split('|').ToList());
-            TDollInfos infosC2 = new TDollInfos(c2.Value.infos.Split('|').ToList());
-            await ReplyAsync("```" + Environment.NewLine +
-                AddPadding("", 21) + "┌" + AddPadding("", 20, '─') + "┬" + AddPadding("", 20, '─') + "┐" + Environment.NewLine +
-                AddPadding("", 21) + "│" + AddPadding(c1.Value.name, 20) + "│" + AddPadding(c2.Value.name, 20) + "│" + Environment.NewLine +
-                "┌" + AddPadding("", 20, '─') + "┼" + AddPadding("", 20, '─') + "┼" + AddPadding("", 20, '─') + "┤" + Environment.NewLine +
-                "│" + AddPadding(Sentences.ClassStr(Context.Guild.Id), 20) + "│" + AddPadding(infosC1.firearmClass, 20) + "│" + AddPadding(infosC2.firearmClass, 20) + "│" + Environment.NewLine +
-                "├" + AddPadding("", 20, '─') + "┼" + AddPadding("", 20, '─') + "┼" + AddPadding("", 20, '─') + "┤" + Environment.NewLine +
-                "│" + AddPadding(Sentences.Rarity(Context.Guild.Id), 20) + "│" + AddPadding(infosC1.rarity.Count(delegate (char c) { return (c == '★'); }) + " stars", 20) + "│" + AddPadding(infosC2.rarity.Count(delegate (char c) { return (c == '★'); }) + " stars", 20) + "│" + Environment.NewLine +
-                "└" + AddPadding("", 20, '─') + "┴" + AddPadding("", 20, '─') + "┴" + AddPadding("", 20, '─') + "┘" + Environment.NewLine +
-                "```");
+            List<Wikia.CharacInfo> characs = new List<Wikia.CharacInfo>();
+            foreach (string s in nameArr)
+            {
+                Wikia.CharacInfo? c = Wikia.GetCharacInfos(s, Wikia.WikiaType.GirlsFrontline);
+                if (c == null)
+                {
+                    await ReplyAsync(Sentences.TDollDontExistSpecify(Context.Guild.Id, s));
+                    return;
+                }
+                characs.Add(c.Value);
+            }
+            List<TDollInfos> infos = new List<TDollInfos>();
+            infos.AddRange(characs.Select(delegate (Wikia.CharacInfo charac) { return (new TDollInfos(charac.name, charac.infos.Split('|').ToList())); }));
+            string[] elems = new string[] {
+                "```" + Environment.NewLine +
+                AddPadding("", 31) + "┌" + String.Join("┬", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┐" + Environment.NewLine +
+                AddPadding("", 31) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.name, 20)); })) + "│" + Environment.NewLine +
+                "┌" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤" + Environment.NewLine +
+                "│" + AddPadding(Sentences.ClassStr(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.firearmClass, 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Rarity(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.rarity.Count(delegate (char c) { return (c == '★'); }) + " stars", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.ManufTime(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.manuTime.ToString("HH:mm:ss"), 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.GrowthGrade(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.growthGrade.ToString(), 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.OperationalEffectiveness(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.operationalEffectiveness.min + " → " + info.operationalEffectiveness.max, 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Health(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.health.min + " → " + info.health.max + " (" + info.health.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Evasion(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.evasion.min + " → " + info.evasion.max + " (" + info.evasion.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Speed(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.speed.min + " (" + info.speed.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Damage(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.damage.min + " → " + info.damage.max + " (" + info.damage.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.Accuracy(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.accuracy.min + " → " + info.accuracy.max + " (" + info.accuracy.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.RateOfFire(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.rateOfFire.min + " → " + info.rateOfFire.max + " (" + info.rateOfFire.grade + ")", 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.AmmoConsumption(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.ammoConsumption.min + " → " + info.ammoConsumption.max, 20)); })) + "│" + Environment.NewLine +
+                "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
+                "│" + AddPadding(Sentences.RationConsumption(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.rationConsumption.min + " → " + info.rationConsumption.max, 20)); })) + "│" + Environment.NewLine +
+                "└" + AddPadding("", 30, '─') + "┴" + String.Join("┴", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┘"
+            };
+            string finalStr = "";
+            foreach (string s in elems)
+            {
+                finalStr += s + Environment.NewLine;
+                if (finalStr.Length > 1500)
+                {
+                    await ReplyAsync(finalStr + Environment.NewLine + "```");
+                    finalStr = "```";
+                }
+            }
+            await ReplyAsync(finalStr + Environment.NewLine + "```");
         }
 
         private string AddPadding(string str, int maxLenght, char fill = ' ')

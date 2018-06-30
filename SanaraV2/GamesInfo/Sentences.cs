@@ -36,6 +36,9 @@ namespace SanaraV2.GamesInfo
         public static string RateOfFire(ulong guildId) { return (Translation.GetTranslation(guildId, "rateOfFire")); }
         public static string AmmoConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "ammoConsumption")); }
         public static string RationConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "rationConsumption")); }
+        public static string GirlsFrontlineCompareHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineCompareHelp")); }
+        public static string TooManyTDolls(ulong guildId) { return (Translation.GetTranslation(guildId, "tooManyTdolls")); }
+        public static string TDollDontExistSpecify(ulong guildId, string tdoll) { return (Translation.GetTranslation(guildId, "tdollDontExistSpecify", tdoll)); }
 
         /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }
