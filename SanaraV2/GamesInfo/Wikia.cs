@@ -49,13 +49,28 @@ namespace SanaraV2.GamesInfo
             }
         }
 
+        public struct CharacInfo
+        {
+            public CharacInfo(string id, string thumbnail, string infos, string name)
+            {
+                this.id = id;
+                this.thumbnail = thumbnail;
+                this.infos = infos;
+                this.name = name;
+            }
+            public string id;
+            public string thumbnail;
+            public string infos;
+            public string name;
+        }
+
         /// <summary>
         /// Return informations about a character
         /// </summary>
         /// <param name="shipName">Name of the ship</param>
         /// <param name="id">Return the id of the ship on KanColle wikia</param>
         /// <param name="thumbnail">Return the thumbnail of the ship</param>
-        public static bool GetCharacInfos(string shipName, out string id, out string thumbnail, WikiaType wikia)
+        public static CharacInfo? GetCharacInfos(string name, WikiaType wikia)
         {
             try
             {
@@ -64,30 +79,28 @@ namespace SanaraV2.GamesInfo
                     w.Encoding = Encoding.UTF8;
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     List<string> finalStr = new List<string> { "" };
-                    string json = w.DownloadString("https://" + WikiaTypeToString(wikia) + ".wikia.com/api/v1/Search/List?query=" + shipName + "&limit=1");
-                    id = Utilities.GetElementXml("\"id\":", json, ',');
+                    string json = w.DownloadString("https://" + WikiaTypeToString(wikia) + ".wikia.com/api/v1/Search/List?query=" + name + "&limit=1");
+                    string id = Utilities.GetElementXml("\"id\":", json, ',');
                     string title = Utilities.GetElementXml("\"title\":\"", json, '"');
                     json = w.DownloadString("http://" + WikiaTypeToString(wikia) + ".wikia.com/api/v1/Articles/Details?ids=" + id);
-                    thumbnail = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
+                    string thumbnail = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
                     bool isJpg = thumbnail.Contains(".jpg");
                     thumbnail = thumbnail.Split(new string[] { ((isJpg) ? (".jpg") : (".png")) }, StringSplitOptions.None)[0] + ((isJpg) ? (".jpg") : (".png"));
                     thumbnail = thumbnail.Replace("\\", "");
-                    if (title.ToUpper() != shipName.ToUpper())
-                        return (false);
+                    if (Utilities.CleanWord(title.ToUpper()) != Utilities.CleanWord(name.ToUpper()))
+                        return (null);
                     string url = "http://" + WikiaTypeToString(wikia) + ".wikia.com/wiki/" + title + "?action=raw";
                     json = w.DownloadString(url);
-                    if (!CheckPageHeader(wikia, Utilities.GetElementXml("{{", json.Split( new string[] { "\n", "|" }, StringSplitOptions.None)[0], '}')))
-                        return (false);
-                    return (true);
+                    if (!CheckPageHeader(wikia, Utilities.GetElementXml("{{", json.Split('\n', '|')[0], '}')))
+                        return (null);
+                    return (new CharacInfo(id, thumbnail, json, title));
                 }
             }
             catch (WebException ex)
             {
                 HttpWebResponse code = ex.Response as HttpWebResponse;
-                id = null;
-                thumbnail = null;
                 if (code.StatusCode == HttpStatusCode.NotFound)
-                    return (false);
+                    return (null);
                 else
                     throw ex;
             }

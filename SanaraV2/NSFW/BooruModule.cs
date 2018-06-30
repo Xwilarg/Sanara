@@ -339,7 +339,13 @@ namespace SanaraV2.NSFW
             string fileName = booru.GetId().ToString() + DateTime.Now.ToString("HHmmssfff") + chan.Id + Program.p.rand.Next(int.MaxValue);
             long fileSize;
             string json;
-            DownloadFile(ref fileName, out fileSize, GetImageUrl(booru, tags, out json));
+            string url = GetImageUrl(booru, tags, out json);
+            if (json == null)
+            {
+                await chan.SendMessageAsync(url);
+                return;
+            }
+            DownloadFile(ref fileName, out fileSize, url);
             Program.p.statsMonth[(int)booru.GetId()] += fileSize;
             Program.p.statsMonth[(int)booru.GetId() + 5]++;
             if (fileSize >= 8000000)

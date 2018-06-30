@@ -38,8 +38,8 @@ namespace SanaraV2.Base
         {
             if (tags.Length == 1)
                 return ("I didn't find anything with the tag '" + tags[0] + "'.");
-            string finalStr = String.Join(", ", tags.ToList().Skip(1).Select(x => "'" + x + "'"));
-            return ("I didn't find anything with the tag '" + finalStr + " and '" + tags[tags.Length - 1] + "'.");
+            string finalStr = String.Join(", ", tags.ToList().Take(tags.Length - 1).Select(x => "'" + x + "'"));
+            return ("I didn't find anything with the tag " + finalStr + " and '" + tags[tags.Length - 1] + "'.");
         }
         public static string NoCorrespondingGuild(ulong guildId) { return (Translation.GetTranslation(guildId, "noCorrespondingGuild")); }
         public static string BetaFeature(ulong guildId) { return (Translation.GetTranslation(guildId, "betaFeature")); }

@@ -24,6 +24,18 @@ namespace SanaraV2.GamesInfo
         public static string ModelAndHistoricalInformation(ulong guildId) { return (Translation.GetTranslation(guildId, "modelAndHistoricalInformation")); }
         public static string Basic(ulong guildId) { return (Translation.GetTranslation(guildId, "basic")); }
         public static string Technical(ulong guildId) { return (Translation.GetTranslation(guildId, "technical")); }
+        public static string ClassStr(ulong guildId) { return (Translation.GetTranslation(guildId, "class")); }
+        public static string ManufTime(ulong guildId) { return (Translation.GetTranslation(guildId, "manufTime")); }
+        public static string GrowthGrade(ulong guildId) { return (Translation.GetTranslation(guildId, "growthGrade")); }
+        public static string OperationalEffectiveness(ulong guildId) { return (Translation.GetTranslation(guildId, "operationalEffectiveness")); }
+        public static string Health(ulong guildId) { return (Translation.GetTranslation(guildId, "health")); }
+        public static string Evasion(ulong guildId) { return (Translation.GetTranslation(guildId, "evasion")); }
+        public static string Speed(ulong guildId) { return (Translation.GetTranslation(guildId, "speed")); }
+        public static string Damage(ulong guildId) { return (Translation.GetTranslation(guildId, "damage")); }
+        public static string Accuracy(ulong guildId) { return (Translation.GetTranslation(guildId, "accuracy")); }
+        public static string RateOfFire(ulong guildId) { return (Translation.GetTranslation(guildId, "rateOfFire")); }
+        public static string AmmoConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "ammoConsumption")); }
+        public static string RationConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "rationConsumption")); }
 
         /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }

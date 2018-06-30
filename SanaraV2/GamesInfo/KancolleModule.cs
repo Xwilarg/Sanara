@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.GamesInfo
 {
+    [Group("Kancolle"), Alias("Kantai Collection", "KantaiCollection")]
     public class KancolleModule : ModuleBase
     {
         Program p = Program.p;
@@ -238,7 +239,7 @@ namespace SanaraV2.GamesInfo
                     {
                         string rarity = Utilities.GetElementXml(">", cathegories[1], '<');
                         error = DropMapError.NoError;
-                        return (Sentences.Rarity(guildId) + " " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
+                        return (Sentences.Rarity(guildId) + ": " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
                     }
                     error = DropMapError.DontDrop;
                     return (null);
@@ -283,7 +284,10 @@ namespace SanaraV2.GamesInfo
             }
         }
 
-        [Command("Kancolle", RunMode = RunMode.Async), Summary("Get informations about a Kancolle character")]
+        [Command("", RunMode = RunMode.Async), Priority(-1)]
+        public async Task CharacDefault(params string[] shipNameArr) => await Charac(shipNameArr);
+
+        [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Kancolle character")]
         public async Task Charac(params string[] shipNameArr)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
@@ -294,17 +298,17 @@ namespace SanaraV2.GamesInfo
             }
             string shipName = Utilities.AddArgs(shipNameArr);
             IGuildUser me = await Context.Guild.GetUserAsync(Base.Sentences.myId);
-            string id, thumbnail;
-            if (!Wikia.GetCharacInfos(shipName, out id, out thumbnail, Wikia.WikiaType.KanColle))
+            Wikia.CharacInfo? infos = Wikia.GetCharacInfos(shipName, Wikia.WikiaType.KanColle);
+            if (infos == null)
             {
                 await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
                 return;
             }
             string thumbnailPath = null;
-            List<string> finalStr = FillKancolleInfos(id, Context.Guild.Id);
+            List<string> finalStr = FillKancolleInfos(infos.Value.id, Context.Guild.Id);
             if (me.GuildPermissions.AttachFiles)
             {
-                thumbnailPath = Wikia.DownloadCharacThumbnail(thumbnail);
+                thumbnailPath = Wikia.DownloadCharacThumbnail(infos.Value.thumbnail);
                 await Context.Channel.SendFileAsync(thumbnailPath);
             }
             foreach (string s in finalStr)
