@@ -200,42 +200,42 @@ namespace Sanara_UnitTests
         [Fact]
         public void WrongShipInfos()
         {
-            Assert.False(Wikia.GetCharacInfos("awawawawawawa", out _, out _, Wikia.WikiaType.KanColle));
+            Assert.Null(Wikia.GetCharacInfos("awawawawawawa", Wikia.WikiaType.KanColle));
         }
 
         [Fact]
         public void ShipInfos()
         {
-            string id, thumbnail;
-            Assert.True(Wikia.GetCharacInfos("Ikazuchi", out id, out thumbnail, Wikia.WikiaType.KanColle));
-            Assert.Equal("2524", id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", thumbnail);
+            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("Ikazuchi", Wikia.WikiaType.KanColle);
+            Assert.NotNull(infos);
+            Assert.Equal("2524", infos.Value.id);
+            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", infos.Value.thumbnail);
         }
 
         [Fact]
         public void TDollInfos()
         {
-            string id, thumbnail;
-            Assert.True(Wikia.GetCharacInfos("MP5", out id, out thumbnail, Wikia.WikiaType.GirlsFrontline));
-            Assert.Equal("879", id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/girlsfrontline/images/1/16/Mp5_norm.png", thumbnail);
+            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("MP5", Wikia.WikiaType.GirlsFrontline);
+            Assert.NotNull(infos);
+            Assert.Equal("879", infos.Value.id);
+            Assert.Equal("https://vignette.wikia.nocookie.net/girlsfrontline/images/1/16/Mp5_norm.png", infos.Value.thumbnail);
         }
 
         [Fact]
         public void DownloadThumbnail()
         {
-            string thumbnail;
-            Assert.True(Wikia.GetCharacInfos("Hibiki", out _, out thumbnail, Wikia.WikiaType.KanColle));
-            string fileName = Wikia.DownloadCharacThumbnail(thumbnail);
+            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("Hibiki", Wikia.WikiaType.KanColle);
+            Assert.NotNull(infos);
+            string fileName = Wikia.DownloadCharacThumbnail(infos.Value.thumbnail);
             Assert.True(File.Exists(fileName));
         }
 
         [Fact]
         public void FillKancolleInfos()
         {
-            string id;
-            Wikia.GetCharacInfos("Ryuujou", out id, out _, Wikia.WikiaType.KanColle);
-            string infos = Utilities.AddArgs(KancolleModule.FillKancolleInfos(id, 0).ToArray());
+            Wikia.CharacInfo? cinfos = Wikia.GetCharacInfos("Ryuujou", Wikia.WikiaType.KanColle);
+            Assert.NotNull(cinfos);
+            string infos = Utilities.AddArgs(KancolleModule.FillKancolleInfos(cinfos.Value.id, 0).ToArray());
             Assert.Contains("**personality**", infos);
             Assert.Contains("**appearance**", infos);
             Assert.Contains("**trivia**", infos);
