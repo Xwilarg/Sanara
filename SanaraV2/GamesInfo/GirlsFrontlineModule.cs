@@ -20,12 +20,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SanaraV2.GamesInfo
 {
     [Group("Girls Frontline"), Alias("Girlsfrontline")]
-    public class GirlsFrontierModule : ModuleBase
+    public class GirlsFrontlineModule : ModuleBase
     {
         Program p = Program.p;
 
@@ -83,7 +84,7 @@ namespace SanaraV2.GamesInfo
                 this.name = name;
                 firearmClass = FindElement(jsonInfos, "firearmclass =");
                 rarity = FindElement(jsonInfos, "rarity =");
-                manuTime = DateTime.ParseExact(FindElement(jsonInfos, "manuftimer ="), "HH:mm:ss", CultureInfo.CurrentCulture);
+                manuTime = GetHour(FindElement(jsonInfos, "manuftimer ="));
                 growthGrade = FindElement(jsonInfos, "growthgrade =")[0];
                 operationalEffectiveness = new Intervalle(Convert.ToInt32(FindElement(jsonInfos, "baseopef =")), Convert.ToInt32(FindElement(jsonInfos, "maxopef =")));
                 health = new Intervalle(Convert.ToInt32(FindElement(jsonInfos, "basehp =")), Convert.ToInt32(FindElement(jsonInfos, "maxhp =")), FindElement(jsonInfos, "hpgrade =")[0]);
@@ -104,7 +105,7 @@ namespace SanaraV2.GamesInfo
             public string name;
             public string firearmClass;
             public string rarity;
-            public DateTime manuTime;
+            public DateTime? manuTime;
             public char growthGrade;
             public Intervalle operationalEffectiveness;
             public Intervalle health;
@@ -149,7 +150,7 @@ namespace SanaraV2.GamesInfo
             };
             embed.AddField(Sentences.ClassStr(Context.Guild.Id), jsonInfos.firearmClass, true);
             embed.AddField(Sentences.Rarity(Context.Guild.Id), jsonInfos.rarity, true);
-            embed.AddField(Sentences.ManufTime(Context.Guild.Id), jsonInfos.manuTime.ToString("HH:mm:ss"), true);
+            embed.AddField(Sentences.ManufTime(Context.Guild.Id), (jsonInfos.manuTime == null) ? (Sentences.NoData(Context.Guild.Id)) : (jsonInfos.manuTime.Value.ToString("HH:mm:ss")), true);
             embed.AddField(Sentences.GrowthGrade(Context.Guild.Id), jsonInfos.growthGrade, true);
             embed.AddField(Sentences.OperationalEffectiveness(Context.Guild.Id), jsonInfos.operationalEffectiveness.min + " → " + jsonInfos.operationalEffectiveness.max, true);
             embed.AddField(Sentences.Health(Context.Guild.Id), jsonInfos.health.min + " → " + jsonInfos.health.max + " (" + jsonInfos.health.grade + ")", true);
@@ -203,7 +204,7 @@ namespace SanaraV2.GamesInfo
                 "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
                 "│" + AddPadding(Sentences.Rarity(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.rarity.Count(delegate (char c) { return (c == '★'); }) + " stars", 20)); })) + "│" + Environment.NewLine +
                 "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
-                "│" + AddPadding(Sentences.ManufTime(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.manuTime.ToString("HH:mm:ss"), 20)); })) + "│" + Environment.NewLine +
+                "│" + AddPadding(Sentences.ManufTime(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding((info.manuTime == null) ? (Sentences.NoData(Context.Guild.Id)) : (info.manuTime.Value.ToString("HH:mm:ss")), 20)); })) + "│" + Environment.NewLine +
                 "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
                 "│" + AddPadding(Sentences.GrowthGrade(Context.Guild.Id), 30) + "│" + String.Join("│", infos.Select(delegate (TDollInfos info) { return (AddPadding(info.growthGrade.ToString(), 20)); })) + "│" + Environment.NewLine +
                 "├" + AddPadding("", 30, '─') + "┼" + String.Join("┼", infos.Select(delegate (TDollInfos info) { return (AddPadding("", 20, '─')); })) + "┤",
@@ -267,6 +268,96 @@ namespace SanaraV2.GamesInfo
                 { "Basic", Sentences.Basic },
                 { "Technical", Sentences.Technical }
             }, Wikia.WikiaType.GirlsFrontline));
+        }
+
+        private static DateTime? GetHour(string str)
+        {
+            DateTime dt;
+            if (DateTime.TryParseExact(str, "HH:mm:ss", CultureInfo.CurrentCulture, DateTimeStyles.None, out dt))
+                return (dt);
+            if (DateTime.TryParseExact(str, "H:mm:ss", CultureInfo.CurrentCulture, DateTimeStyles.None, out dt))
+                return (dt);
+            return (null);
+        }
+
+        [Command("Hours", RunMode = RunMode.Async), Summary("Compare two T-Dolls")]
+        public async Task Hours(params string[] nameArr)
+        {
+            DateTime? objDt = null;
+            if (nameArr.Length > 0)
+            {
+                objDt = GetHour(Utilities.AddArgs(nameArr));
+                if (objDt == null)
+                {
+                    await ReplyAsync(Sentences.InvalidHourFormat(Context.Guild.Id));
+                    return;
+                }
+            }
+            using (WebClient wc = new WebClient())
+            {
+                string[] infos = wc.DownloadString("http://girlsfrontline.wikia.com/wiki/Tactical_Doll_List?action=raw").Split('|');
+                Dictionary<string, DateTime> constructionTime = new Dictionary<string, DateTime>();
+                IUserMessage msg = await ReplyAsync(Sentences.ParsingInProgress(Context.Guild.Id) + " 0%");
+                int nbMax = infos.Count(delegate (string s) { return (s.StartsWith("[[")); });
+                int lastPourcent = 0;
+                int counter = 0;
+                foreach (string s in infos)
+                {
+                    if (s.StartsWith("[[")) // TODO: Colt Revolver redirect to SAA
+                    {
+                        string name = s.Replace("\n", "");
+                        name = name.Substring(2, name.Length - 4);
+                        Wikia.CharacInfo? charac = Wikia.GetCharacInfos(name, Wikia.WikiaType.GirlsFrontline);
+                        if (charac != null)
+                        {
+                            string duration = FindElement(charac.Value.infos.Split('|').ToList(), "manuftimer =");
+                            if (duration != null)
+                            {
+                                DateTime? hour = GetHour(duration);
+                                if (hour.HasValue)
+                                    constructionTime.Add(charac.Value.name, hour.Value);
+                            }
+                            counter++;
+                            int curr = (counter * 100 / nbMax) / 10;
+                            if (curr != lastPourcent)
+                            {
+                                lastPourcent = curr;
+                                await msg.ModifyAsync(x => x.Content = Sentences.ParsingInProgress(Context.Guild.Id) + " " + (curr * 10) + "%");
+                            }
+                        }
+                    }
+                }
+                await msg.ModifyAsync(x => x.Content = Sentences.ParsingInProgress(Context.Guild.Id) + " 100%");
+                    string finalStr = "";
+                if (objDt != null)
+                {
+                    Dictionary<string, DateTime> tmp = new Dictionary<string, DateTime>();
+                    foreach (var k in constructionTime)
+                    {
+                        if (k.Value == objDt.Value)
+                            tmp.Add(k.Key, k.Value);
+                    }
+                    if (tmp.Count == 0)
+                    {
+                        await ReplyAsync(Sentences.NoTDollHour(Context.Guild.Id));
+                        return;
+                    }
+                    else
+                        constructionTime = tmp;
+                }
+                while (constructionTime.Count > 0)
+                {
+                    KeyValuePair<string, DateTime>? best = null;
+                    foreach (var k in constructionTime)
+                    {
+                        if (best == null || k.Value.CompareTo(best.Value.Value) == -1)
+                            best = k;
+                    }
+                    finalStr += best.Value.Value.ToString("HH:mm:ss") + ": " + best.Value.Key + Environment.NewLine;
+                    constructionTime.Remove(best.Value.Key);
+                }
+                await ReplyAsync(finalStr);
+            }
         }
     }
 }

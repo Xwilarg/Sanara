@@ -134,7 +134,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<RadioModule>();
             await commands.AddModuleAsync<XKCDModule>();
             await commands.AddModuleAsync<ImageModule>();
-            await commands.AddModuleAsync<GirlsFrontierModule>();
+            await commands.AddModuleAsync<GirlsFrontlineModule>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;

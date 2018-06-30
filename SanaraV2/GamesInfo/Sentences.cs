@@ -39,6 +39,10 @@ namespace SanaraV2.GamesInfo
         public static string GirlsFrontlineCompareHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineCompareHelp")); }
         public static string TooManyTDolls(ulong guildId) { return (Translation.GetTranslation(guildId, "tooManyTdolls")); }
         public static string TDollDontExistSpecify(ulong guildId, string tdoll) { return (Translation.GetTranslation(guildId, "tdollDontExistSpecify", tdoll)); }
+        public static string NoData(ulong guildId) { return (Translation.GetTranslation(guildId, "noData")); }
+        public static string ParsingInProgress(ulong guildId) { return (Translation.GetTranslation(guildId, "parsingInProgress")); }
+        public static string InvalidHourFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidHourFormat")); }
+        public static string NoTDollHour(ulong guildId) { return (Translation.GetTranslation(guildId, "noTDollHour")); }
 
         /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }
