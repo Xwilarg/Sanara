@@ -9,7 +9,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 # Useful links
 
-[Commands](https://zirk.eu/sanara-commands.html)<br/>
+[Commands](https://zirk.eu/sanara.php#commands)<br/>
 [Official Discord server](https://discordapp.com/invite/H6wMRYV)<br/>
 [Report an issue/Make a suggestion](https://github.com/Xwilarg/Sanara/issues)<br/>
 [Invitation link](https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot)<br/>
@@ -29,7 +29,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 About users: Name, id, date of first encounter and number of messages sent<br/>
 About guilds: Name, id, date of first joined, best score in games when applicable and number of messages sent by modules<br/>
-You can check the different stats about the bot here: https://zirk.eu/sanara-stats.php
+You can check the different stats about the bot here: https://zirk.eu/sanara.php#stats
 
 # How to use Sanara by cloning the repository
 

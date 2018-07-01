@@ -477,7 +477,6 @@ namespace SanaraV2
             Booru,
             Code,
             Communication,
-            Debug,
             Doujinshi,
             Game,
             GirlsFrontier,
