@@ -352,20 +352,20 @@ namespace SanaraV2.NSFW
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
             {
+                IUserMessage msg;
                 while (true)
                 {
                     try
                     {
                         await chan.SendFileAsync(fileName);
+                        msg = await chan.SendMessageAsync(".");
                         break;
                     }
                     catch (RateLimitedException)
                     { }
                 }
                 File.Delete(fileName);
-                List<string> finalStr = GetTagsInfos(json, booru, (chan == null) ? (0) : (chan.GuildId));
-                foreach (string s in finalStr)
-                    await chan.SendMessageAsync(s);
+                await msg.ModifyAsync(x => x.Content = GetTagsInfos(json, booru, (chan == null) ? (0) : (chan.GuildId)));
                 File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
             }
         }
@@ -425,7 +425,7 @@ namespace SanaraV2.NSFW
                 return (booru.GetLink(GetTags(tags), maxVal));
         }
 
-        public static List<string> GetTagsInfos(string json, Booru booru, ulong guildId)
+        public static string GetTagsInfos(string json, Booru booru, ulong guildId)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();
@@ -480,125 +480,88 @@ namespace SanaraV2.NSFW
             return newName;
         }
 
-        private static List<string> WriteTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
+        private static string WriteTagsInfos(List<string> animeFrom, List<string> characs, List<string> artists, ulong guildId)
         {
-            List<string> finalMsg = new List<string>();
             artists = artists.Select(x => FixName(x)).ToList();
             characs = characs.Select(x => FixName(x)).ToList();
             animeFrom = animeFrom.Select(x => FixName(x)).ToList();
 
-            string finalStr = "";
-            finalStr += GetAnimes(animeFrom, guildId, ref finalMsg);
-            finalStr += GetCharacs(characs, guildId, ref finalMsg);
+            string finalStr = GetAnimes(animeFrom, guildId) + Environment.NewLine;
+            finalStr += GetCharacs(characs, guildId) + Environment.NewLine;
             finalStr += GetArtists(artists, guildId);
-            finalMsg.Add(finalStr);
-            return (finalMsg);
+            return (finalStr);
         }
 
-        private static string GetCharacs(List<string> characs, ulong guildId, ref List<string> finalMsg)
+        private static string GetCharacs(List<string> characs, ulong guildId)
         {
-            List<string> finalStrCharacs = new List<string> { "" };
-            int indexCharacFrom = 0;
+            string finalCharacs = "";
             if (characs.Count == 1)
-                finalStrCharacs[indexCharacFrom] = characs[0];
+                finalCharacs = characs[0];
             else if (characs.Count > 1)
             {
                 bool doesContainTagMe = characs.Any(x => x == "Tagme" || x == "Character Request");
                 for (int i = 0; i < characs.Count - 1; i++)
                 {
-                    if (finalStrCharacs[indexCharacFrom].Length > 1500)
+                    if (finalCharacs.Length > 850)
                     {
-                        indexCharacFrom++;
-                        finalStrCharacs.Add("");
+                        finalCharacs += Sentences.AndSomeOthers(guildId);
+                        break;
                     }
                     if (characs[i] != "Tagme" && characs[i] != "Character Request")
-                        finalStrCharacs[indexCharacFrom] += characs[i] + ", ";
+                        finalCharacs += characs[i] + ", ";
                 }
                 if (!doesContainTagMe)
                 {
-                    finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                    finalStrCharacs[indexCharacFrom] += " " + Base.Sentences.AndStr(guildId) + " " + characs[characs.Count - 1];
+                    finalCharacs = finalCharacs.Substring(0, finalCharacs.Length - 2);
+                    finalCharacs += " " + Base.Sentences.AndStr(guildId) + " " + characs[characs.Count - 1];
                 }
                 else
                 {
                     if (characs[characs.Count - 1] == "Tagme" || characs[characs.Count - 1] == "Source Request"
                         || characs[characs.Count - 1] == "Copyright Request")
                     {
-                        finalStrCharacs[indexCharacFrom] = finalStrCharacs[indexCharacFrom].Substring(0, finalStrCharacs[indexCharacFrom].Length - 2);
-                        finalStrCharacs[indexCharacFrom] += Sentences.CharacterNotTagged(guildId);
+                        finalCharacs = finalCharacs.Substring(0, finalCharacs.Length - 2);
+                        finalCharacs += Sentences.CharacterNotTagged(guildId);
                     }
                     else
-                        finalStrCharacs[indexCharacFrom] += ", " + characs[characs.Count - 1] + Sentences.MoreNotTagged(guildId);
+                        finalCharacs += ", " + characs[characs.Count - 1] + Sentences.MoreNotTagged(guildId);
                 }
             }
-            string finalStr = "";
-            if (finalStrCharacs[0] == "")
-                finalStr += Sentences.CharacterTagUnknowed(guildId) + Environment.NewLine;
-            else if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
-                finalStr += Sentences.CharacterNotTagged(guildId) + Environment.NewLine;
-            else if (characs.Count == 1)
-                finalStr += Sentences.CharacterIs(guildId) + finalStrCharacs[0] + "." + Environment.NewLine;
-            else
-            {
-                if (finalStr.Length > 1500)
-                {
-                    finalMsg.Add(finalStr);
-                    finalStr = "";
-                }
-                finalStr += Sentences.CharacterAre(guildId);
-                foreach (string s in finalStrCharacs)
-                {
-                    if ((finalStr.Length + s.Length) > 1500)
-                    {
-                        finalMsg.Add(finalStr);
-                        finalStr = "";
-                    }
-                    finalStr += s;
-                }
-                finalStr += "." + Environment.NewLine;
-            }
-            return (finalStr);
+            if (finalCharacs == "")
+                return (Sentences.CharacterTagUnknowed(guildId));
+            if (characs.Count == 1 && (characs[0] == "Tagme" || characs[0] == "Character Request"))
+                return (Sentences.CharacterNotTagged(guildId));
+            if (characs.Count == 1)
+                return (Sentences.CharacterIs(guildId) + finalCharacs + ".");
+            return (Sentences.CharacterAre(guildId) + finalCharacs + ".");
         }
 
-        private static string GetAnimes(List<string> animeFrom, ulong guildId, ref List<string> finalMsg)
+        private static string GetAnimes(List<string> animeFrom, ulong guildId)
         {
-            List<string> finalStrFrom = new List<string>();
-            int indexStrFrom = 0;
-            finalStrFrom.Add("");
+            string finalStr = "";
             if (animeFrom.Count == 1)
-                finalStrFrom[indexStrFrom] = animeFrom[0];
+                finalStr = animeFrom[0];
             else if (animeFrom.Count > 1)
             {
-                finalStrFrom[indexStrFrom] = String.Join(", ", animeFrom.Take(animeFrom.Count - 1));
-                finalStrFrom[indexStrFrom] += " " + Base.Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
-                if (finalStrFrom[indexStrFrom].Length > 1500)
+                for (int i = 0; i < animeFrom.Count - 1; i++)
                 {
-                    indexStrFrom++;
-                    finalStrFrom.Add("");
-                }
-            }
-            string finalStr;
-            if (animeFrom.Count == 1 && animeFrom[0] == "Original")
-                finalStr = Sentences.AnimeFromOriginal(guildId) + Environment.NewLine;
-            else if (animeFrom.Count == 1 && (animeFrom[0] == "Tagme" || animeFrom[0] == "Source Request" || animeFrom[0] == "Copyright Request"))
-                finalStr = Sentences.AnimeNotTagged(guildId) + Environment.NewLine;
-            else if (finalStrFrom[0] != "")
-            {
-                finalStr = Sentences.AnimeFrom(guildId);
-                foreach (string s in finalStrFrom)
-                {
-                    if (finalStr.Length + s.Length > 1500)
+                    if (finalStr.Length > 850)
                     {
-                        finalMsg.Add(finalStr);
-                        finalStr = "";
+                        finalStr += Sentences.AndSomeOthers(guildId);
+                        break;
                     }
-                    finalStr += s;
+                    finalStr += animeFrom[i] + ", ";
                 }
-                finalStr += "." + Environment.NewLine;
             }
-            else
-                finalStr = Sentences.AnimeTagUnknowed(guildId) + Environment.NewLine;
-            return (finalStr);
+            finalStr = finalStr.Substring(0, finalStr.Length - 2);
+            finalStr += " " + Base.Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
+            if (animeFrom.Count == 1 && animeFrom[0] == "Original")
+                return (Sentences.AnimeFromOriginal(guildId));
+            if (animeFrom.Count == 1 && (animeFrom[0] == "Tagme" || animeFrom[0] == "Source Request" || animeFrom[0] == "Copyright Request"))
+                return (Sentences.AnimeNotTagged(guildId));
+            if (finalStr != "")
+                return (Sentences.AnimeFrom(guildId) + finalStr);
+            return (Sentences.AnimeTagUnknowed(guildId));
         }
 
         private static string GetArtists(List<string> artists, ulong guildId)
