@@ -486,6 +486,10 @@ namespace SanaraV2.NSFW
             characs = characs.Select(x => FixName(x)).ToList();
             animeFrom = animeFrom.Select(x => FixName(x)).ToList();
 
+            artists.RemoveAll(x => artists.Count(delegate (string s) { return (Utilities.CleanWord(s) == Utilities.CleanWord(x)); }) > 1);
+            characs.RemoveAll(x => characs.Count(delegate (string s) { return (Utilities.CleanWord(s) == Utilities.CleanWord(x)); }) > 1);
+            animeFrom.RemoveAll(x => animeFrom.Count(delegate (string s) { return (Utilities.CleanWord(s) == Utilities.CleanWord(x)); }) > 1);
+
             string finalStr = GetAnimes(animeFrom, guildId) + Environment.NewLine;
             finalStr += GetCharacs(characs, guildId) + Environment.NewLine;
             finalStr += GetArtists(artists, guildId);
