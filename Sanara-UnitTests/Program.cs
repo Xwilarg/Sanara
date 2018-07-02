@@ -66,7 +66,7 @@ namespace Sanara_UnitTests
             BooruModule.Safebooru b = new BooruModule.Safebooru();
             string json;
             BooruModule.GetImageUrl(b, new string[] { "elodie" }, out json);
-            string[] result = Utilities.AddArgs(BooruModule.GetTagsInfos(json, b, 0).ToArray()).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.True(result.Length >= 2);
             Assert.Contains("Long Live The Queen", result[0]);
             Assert.Contains("Elodie", result[1]);
@@ -78,7 +78,7 @@ namespace Sanara_UnitTests
             BooruModule.Gelbooru b = new BooruModule.Gelbooru();
             string json;
             BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
-            string[] result = Utilities.AddArgs(BooruModule.GetTagsInfos(json, b, 0).ToArray()).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.True(result.Length >= 2);
             Assert.Contains("Kantai Collection", result[0]);
             Assert.Contains("Akatsuki", result[1]);
@@ -91,7 +91,7 @@ namespace Sanara_UnitTests
             BooruModule.Rule34 b = new BooruModule.Rule34();
             string json;
             BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
-            string[] result = Utilities.AddArgs(BooruModule.GetTagsInfos(json, b, 0).ToArray()).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.True(result.Length >= 2);
             Assert.Contains("Kantai Collection", result[0]);
             Assert.Contains("Akatsuki", result[1]);
@@ -104,7 +104,7 @@ namespace Sanara_UnitTests
             BooruModule.Konachan b = new BooruModule.Konachan();
             string json;
             BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
-            string[] result = Utilities.AddArgs(BooruModule.GetTagsInfos(json, b, 0).ToArray()).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.Contains("Kantai Collection", result[0]);
             Assert.Contains("Akatsuki", result[1]);
             Assert.Contains("Hibiki", result[1]);
@@ -116,7 +116,7 @@ namespace Sanara_UnitTests
             BooruModule.E621 b = new BooruModule.E621();
             string json;
             BooruModule.GetImageUrl(b, new string[] { "shimakaze_(kantai_collection)", "abyssal_(kantai_collection)" }, out json);
-            string[] result = Utilities.AddArgs(BooruModule.GetTagsInfos(json, b, 0).ToArray()).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.True(result.Length >= 2);
             Assert.Contains("Kantai Collection", result[0]);
             Assert.Contains("Shimakaze", result[1]);
