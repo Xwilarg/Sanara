@@ -81,7 +81,6 @@ namespace SanaraV2.Tools
                 + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "booruModuleDescription2")) : ("")));
             embed.AddField(Translation.GetTranslation(guildId, "codeModuleName"), Translation.GetTranslation(guildId, "codeModuleDescription"));
             embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "debugModuleName"), Translation.GetTranslation(guildId, "debugModuleDescription"));
             embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"),
                 ((isChanNsfw) ? (Translation.GetTranslation(guildId, "doujinshiModuleDescription"))
                               : (NoCommandAvailable(guildId))));
