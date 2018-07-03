@@ -87,7 +87,9 @@ namespace SanaraV2.GamesInfo
                     bool isJpg = thumbnail.Contains(".jpg");
                     thumbnail = thumbnail.Split(new string[] { ((isJpg) ? (".jpg") : (".png")) }, StringSplitOptions.None)[0] + ((isJpg) ? (".jpg") : (".png"));
                     thumbnail = thumbnail.Replace("\\", "");
-                    if (Utilities.CleanWord(title.ToUpper()) != Utilities.CleanWord(name.ToUpper()))
+                    string cleanTitle = Utilities.CleanWord(title);
+                    string cleanName = Utilities.CleanWord(name);
+                    if (!cleanTitle.Contains(cleanName) && !cleanName.Contains(cleanTitle))
                         return (null);
                     string url = "http://" + WikiaTypeToString(wikia) + ".wikia.com/wiki/" + title + "?action=raw";
                     json = w.DownloadString(url);
