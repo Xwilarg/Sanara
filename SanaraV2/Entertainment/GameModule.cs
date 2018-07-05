@@ -43,7 +43,6 @@ namespace SanaraV2.Entertainment
                 m_didLost = false;
                 m_refTime = refTime * ((isEasy) ? (2) : (1));
                 m_time = DateTime.Now;
-                m_charac = (charac != null) ? (Program.p.relations.Find(x => x._name == charac.Id)) : (null);
                 m_guild = guild;
                 m_nbAttempt = 0;
                 m_nbFound = 0;

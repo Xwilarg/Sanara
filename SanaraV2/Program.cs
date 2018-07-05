@@ -56,8 +56,6 @@ namespace SanaraV2
 
         public WebClient malClient;
 
-        public List<Character> relations;
-
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
@@ -106,7 +104,6 @@ namespace SanaraV2
             gameThread = new Thread(new ThreadStart(GameThread));
 
             rand = new Random();
-            relations = new List<Character>();
 
             UpdateLanguageFiles();
             guildLanguages = new Dictionary<ulong, string>();
@@ -138,7 +135,6 @@ namespace SanaraV2
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
-            client.UserJoined += UserJoin;
             client.JoinedGuild += GuildJoin;
             client.Disconnected += Disconnected;
 
@@ -366,7 +362,7 @@ namespace SanaraV2
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-                await chan.SendMessageAsync(Tools.Sentences.IntroductionMsg(arg.Id));
+                //await chan.SendMessageAsync(Tools.Sentences.IntroductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
                 File.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
@@ -375,43 +371,7 @@ namespace SanaraV2
                 Directory.CreateDirectory("Saves/Users");
             guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
             prefixs.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/prefix.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/prefix.dat")) : ("s."));
-            foreach (IUser u in arg.Users)
-            {
-                if (!File.Exists("Saves/Users/" + u.Id + ".dat"))
-                {
-                    relations.Add(new Character(u.Id, u.Username));
-                }
-                else
-                {
-                    try
-                    {
-                        if (!relations.Any(x => x._name == Convert.ToUInt64(File.ReadAllLines("Saves/Users/" + u.Id + ".dat")[1])))
-                        {
-                            relations.Add(new Character());
-                            relations[relations.Count - 1].SaveAndParseInfos(File.ReadAllLines("Saves/Users/" + u.Id + ".dat"));
-                        }
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        if (arg.Id.ToString() == File.ReadAllLines("Saves/sanaraDatas.dat")[2])
-                        {
-                            await chan.SendMessageAsync(Base.Sentences.IntroductionError(arg.Id, u.Id.ToString(), u.Username));
-                        }
-                    }
-                }
-            }
         }
-
-#pragma warning disable CS1998
-        private async Task UserJoin(SocketGuildUser arg)
-        {
-            string currTime = DateTime.UtcNow.ToString("ddMMyyHHmmss");
-            if (!File.Exists("Saves/Users/" + arg.Id + ".dat"))
-            {
-                relations.Add(new Character(arg.Id, arg.Nickname));
-            }
-        }
-#pragma warning restore CS1998
 
         /// <summary>
         /// Get usage of modules for the current month and amount of users by servers
@@ -523,14 +483,11 @@ namespace SanaraV2
                         + m.ToString()[0] + m.ToString().ToLower().Substring(1, m.ToString().Length - 1) + ".dat";
             File.WriteAllText(finalFilePath,
                         (Convert.ToInt32(File.ReadAllText(finalFilePath)) + 1).ToString());
-            foreach (Character c in relations)
+            bool didFound = false;
+            if (!didFound)
             {
-                if (u.Id == c._name)
-                {
-                    c.IncreaseNbMessage();
-                    c.Meet();
-                    break;
-                }
+                Character charac = new Character(u.Id, u.Username);
+                charac.IncreaseNbMessage();
             }
         }
 

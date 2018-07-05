@@ -19,65 +19,37 @@ namespace SanaraV2
 {
     public class Character
     {
-        public Character()
+        public Character(ulong id, string name)
         {
-            _nbMessage = 0;
-        }
-
-        public Character(ulong name, string nameStr)
-        {
-            _nbMessage = 0;
-            _name = name;
-            _nameStr = nameStr;
-            File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(false));
-        }
-
-        private string ReturnInformationsRaw(bool increaseMsg)
-        {
-            return (_nameStr + Environment.NewLine + _name + Environment.NewLine + _firstMeet + Environment.NewLine + (Convert.ToInt32(GetNbMessage()) + 1).ToString());
-        }
-
-        public void SaveAndParseInfos(string[] infos)
-        {
-            try
+            this.id = id;
+            if (!File.Exists("Saves/Users/" + id + ".dat"))
             {
-                _nameStr = infos[0];
-                _name = Convert.ToUInt64(infos[1]);
-                _firstMeet = infos[2];
+                File.WriteAllText("Saves/Users/" + id + ".dat",
+                    name + Environment.NewLine + id + Environment.NewLine +
+                    "No" + Environment.NewLine + "0");
             }
-            catch (IndexOutOfRangeException)
-            { }
         }
 
-        public void Meet()
+        private void Meet()
         {
-            if (_firstMeet == "No")
+            string[] content = File.ReadAllLines("Saves/Users/" + id + ".dat");
+            if (content[2] == "No")
             {
-                _firstMeet = DateTime.UtcNow.ToString("ddMMyyHHmmss");
-
-                File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(false));
+                File.WriteAllText("Saves/Users/" + id + ".dat",
+                    content[0] + Environment.NewLine + id + Environment.NewLine +
+                    DateTime.UtcNow.ToString("ddMMyyHHmmss") + Environment.NewLine + content[3]);
             }
         }
 
         public void IncreaseNbMessage()
         {
-            _nbMessage++;
-            File.WriteAllText("Saves/Users/" + _name + ".dat", ReturnInformationsRaw(true));
+            Meet();
+            string[] content = File.ReadAllLines("Saves/Users/" + id + ".dat");
+            File.WriteAllText("Saves/Users/" + id + ".dat",
+                content[0] + Environment.NewLine + id + Environment.NewLine +
+                content[2] + Environment.NewLine + (Convert.ToInt32(content[3]) + 1));
         }
 
-        public string GetFirstMeet()
-        {
-            return (File.ReadAllLines("Saves/Users/" + _name + ".dat")[2]);
-        }
-
-        public int GetNbMessage()
-        {
-            return (Convert.ToInt32(File.ReadAllLines("Saves/Users/" + _name + ".dat")[3]));
-        }
-
-        private string _nameStr;
-        public ulong _name { private set; get; }
-        private int _nbMessage;
-        private string _firstMeet;
+        private ulong id;
     }
 }
