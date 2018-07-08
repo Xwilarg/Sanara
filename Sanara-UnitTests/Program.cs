@@ -99,11 +99,11 @@ namespace Sanara_UnitTests
         }
 
         [Fact]
-        public void DownloadKonachan() // TODO: currently fail if image got is bigger than 8MB
+        public void DownloadKonachan()
         {
             BooruModule.Konachan b = new BooruModule.Konachan();
             string json;
-            BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
+            BooruModule.GetImageUrl(b, new string[] { "hibiki_(kancolle)", "akatsuki_(kancolle)" }, out json);
             string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             Assert.Contains("Kantai Collection", result[0]);
             Assert.Contains("Akatsuki", result[1]);
