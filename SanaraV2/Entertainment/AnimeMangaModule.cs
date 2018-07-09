@@ -57,9 +57,11 @@ namespace SanaraV2.Entertainment
                 {
                     if (code.StatusCode == HttpStatusCode.Forbidden)
                         await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                    else
+                        await ReplyAsync(Base.Sentences.HttpError(Context.Guild.Id, "MyAnimeList"));
                 }
                 else
-                    await ReplyAsync("An unexpected error occured: " + ex.Message);
+                    await ReplyAsync(Base.Sentences.HttpError(Context.Guild.Id, "MyAnimeList"));
             }
         }
 
@@ -94,9 +96,15 @@ namespace SanaraV2.Entertainment
             }
             catch (WebException ex)
             {
-                HttpWebResponse code = ex.Response as HttpWebResponse;
-                if (code.StatusCode == HttpStatusCode.Forbidden)
-                    await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                if (ex.Response is HttpWebResponse code)
+                {
+                    if (code.StatusCode == HttpStatusCode.Forbidden)
+                        await ReplyAsync(Base.Sentences.TooManyRequests(Context.Guild.Id, "MyAnimeList"));
+                    else
+                        await ReplyAsync(Base.Sentences.HttpError(Context.Guild.Id, "MyAnimeList"));
+                }
+                else
+                    await ReplyAsync(Base.Sentences.HttpError(Context.Guild.Id, "MyAnimeList"));
             }
         }
 
