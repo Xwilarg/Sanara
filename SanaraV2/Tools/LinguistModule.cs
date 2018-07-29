@@ -32,7 +32,7 @@ namespace SanaraV2.Tools
     public class LinguistModule : ModuleBase
     {
         Program p = Program.p;
-        [Command("Hiragana"), Summary("To hiragana")]
+        [Command("Hiragana"), Summary("To hiragana"), Alias("Hira")]
         public async Task ToHiraganaCmd(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
@@ -42,7 +42,7 @@ namespace SanaraV2.Tools
                 await ReplyAsync(ToHiragana(FromKatakana(Utilities.AddArgs(word))));
         }
 
-        [Command("Romaji"), Summary("To romaji")]
+        [Command("Romaji"), Summary("To romaji"), Alias("Roma")]
         public async Task ToRomajiCmd(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
@@ -52,7 +52,7 @@ namespace SanaraV2.Tools
                 await ReplyAsync(FromKatakana(FromHiragana(Utilities.AddArgs(word))));
         }
 
-        [Command("Katakana"), Summary("To romaji")]
+        [Command("Katakana"), Summary("To romaji"), Alias("Kata")]
         public async Task ToKatakanaCmd(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
@@ -88,7 +88,7 @@ namespace SanaraV2.Tools
                 {
                     string sourceLanguage;
                     string translation;
-                    if (newWords.Count == 1 && Utilities.GetExtensionImage(newWords[0]) != null && Utilities.IsLinkValid(newWords[0]))
+                    if (newWords.Count == 1 && Utilities.IsLinkValid(newWords[0]))
                     {
                         if (p.visionClient == null)
                         {
@@ -100,7 +100,21 @@ namespace SanaraV2.Tools
                             try
                             {
                                 Image image = await Image.FetchFromUriAsync(newWords[0]);
-                                TextAnnotation response = await p.visionClient.DetectDocumentTextAsync(image);
+                                TextAnnotation response;
+                                try
+                                {
+                                    response = await p.visionClient.DetectDocumentTextAsync(image);
+                                }
+                                catch (AnnotateImageException)
+                                {
+                                    await ReplyAsync(Sentences.NotAnImage(Context.Guild.Id));
+                                    return;
+                                }
+                                if (response == null)
+                                {
+                                    await ReplyAsync(Sentences.NoTextOnImage(Context.Guild.Id));
+                                    return;
+                                }
                                 translation = GetTranslation(response.Text, language, out sourceLanguage);
                                 break;
                             }
@@ -121,7 +135,7 @@ namespace SanaraV2.Tools
             }
         }
 
-        [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word")]
+        [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word"), Alias("Def")]
         public async Task Meaning(params string[] word)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);

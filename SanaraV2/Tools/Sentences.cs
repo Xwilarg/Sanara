@@ -59,6 +59,8 @@ namespace SanaraV2.Tools
         public static string GiveJapaneseTranslations(ulong guildId, string word) { return (Translation.GetTranslation(guildId, "giveJapaneseTranslations", word)); }
         public static string NoJapaneseTranslation(ulong guildId, string word) { return (Translation.GetTranslation(guildId, "noJapaneseTranslation", word)); }
         public static string Meaning(ulong guildId) { return (Translation.GetTranslation(guildId, "meaning")); }
+        public static string NoTextOnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "noTextOnImage")); }
+        public static string NotAnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnImage")); }
 
         /// --------------------------- Settings ---------------------------
         public static string CreateArchiveStr(ulong guildId, string currTime)

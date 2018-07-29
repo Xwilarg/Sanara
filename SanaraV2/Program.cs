@@ -357,15 +357,15 @@ namespace SanaraV2
             if (!Directory.Exists("Saves"))
                 Directory.CreateDirectory("Saves");
             if (!File.Exists("Saves/sanaraDatas.dat"))
-                File.WriteAllText("Saves/sanaraDatas.dat", currTime); // Creation date
+                Utilities.WriteAllText("Saves/sanaraDatas.dat", currTime); // Creation date
             if (!Directory.Exists("Saves/Servers/" + arg.Id))
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
-                File.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
+                Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
                 //await chan.SendMessageAsync(Tools.Sentences.IntroductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
-                File.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
+                Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
             // Attempt game, attempt ship, ship found, bestScore, ids of people who help to have the best score
             if (!Directory.Exists("Saves/Users"))
                 Directory.CreateDirectory("Saves/Users");
@@ -559,7 +559,7 @@ namespace SanaraV2
                 }
                 DateTime dt = DateTime.UtcNow;
                 var result = await commands.ExecuteAsync(context, pos);
-                if (result.IsSuccess && !context.User.IsBot)
+                if (result.IsSuccess)
                     SaveCommand(dt);
             }
         }
@@ -575,10 +575,10 @@ namespace SanaraV2
             if (!Directory.Exists("Saves/Stats/" + dt.Month.ToString()))
                 Directory.CreateDirectory("Saves/Stats/" + dt.Month.ToString());
             if (File.Exists("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat"))
-                File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
+                Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
             else
-                File.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
-            File.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
+                Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
+            Utilities.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
         }
 
         public void GameThread()

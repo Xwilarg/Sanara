@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.GamesInfo
 {
-    [Group("Girls Frontline"), Alias("Girlsfrontline")]
+    [Group("Girls Frontline"), Alias("Girlsfrontline", "Gf")]
     public class GirlsFrontlineModule : ModuleBase
     {
         Program p = Program.p;

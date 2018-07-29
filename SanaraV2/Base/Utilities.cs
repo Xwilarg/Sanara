@@ -15,7 +15,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -24,6 +24,27 @@ namespace SanaraV2.Base
 {
     public static class Utilities
     {
+        /// <summary>
+        /// Write text in file, retry if file is busy
+        /// </summary>
+        /// <param name="file">Path of the file</param>
+        /// <param name="content">Content to write in the file</param>
+        public static void WriteAllText(string file, string content)
+        {
+            if (!File.Exists(file))
+                throw new FileNotFoundException(file + " not found", file);
+            while (true)
+            {
+                try
+                {
+                    File.WriteAllText(file, content);
+                    break;
+                }
+                catch (IOException)
+                { }
+            }
+        }
+
         /// <summary>
         /// Remove first argument of array
         /// </summary>
