@@ -144,7 +144,7 @@ namespace SanaraV2.NSFW
                 return;
             }
             Program.p.statsMonth[id] += fileInfos.Item2;
-            Program.p.statsMonth[id + 7]++;
+            Program.p.statsMonth[id + 6]++;
             if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
