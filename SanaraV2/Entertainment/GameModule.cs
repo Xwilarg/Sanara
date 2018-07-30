@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
 using SanaraV2.Base;
@@ -430,10 +431,13 @@ namespace SanaraV2.Entertainment
                 isMsg = false;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
                 string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + ((m_guild != null) ? (m_guild.Id) : (0)).ToString();
+                Tuple<string, long, string[]> t1 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
+                Tuple<string, long, string[]> t2 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
+                Tuple<string, long, string[]> t3 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
                 return (new string[] {
-                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
-                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess }),
-                    BooruModule.GetImage(new BooruModule.Gelbooru(), new string[] { m_toGuess })
+                    (t1.Item2 > 8000000) ? (null) : (t1.Item1),
+                    (t2.Item2 > 8000000) ? (null) : (t2.Item1),
+                    (t3.Item2 > 8000000) ? (null) : (t3.Item1),
                 });
             }
 

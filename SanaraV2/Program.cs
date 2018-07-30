@@ -203,15 +203,15 @@ namespace SanaraV2
                 if (content[1] == lastMonthSent)
                 {
                     string[] mods = content[0].Split('|');
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 14; i++)
                         statsMonth.Add(Convert.ToInt64(mods[i]));
                 }
                 else
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 14; i++)
                         statsMonth.Add(0);
             }
             else
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 14; i++)
                     statsMonth.Add(0);
 
             if (File.Exists("Keys/visionAPI.json"))
@@ -508,7 +508,7 @@ namespace SanaraV2
             if (lastMonthSent != DateTime.Now.ToString("MM"))
             {
                 lastMonthSent = DateTime.Now.ToString("MM");
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 14; i++)
                     statsMonth[i] = 0;
             }
             string finalStr = "";

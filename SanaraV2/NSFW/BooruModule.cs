@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using Discord.Net;
 using System.Linq;
 using SanaraV2.Base;
+using BooruSharp.Booru;
 
 namespace SanaraV2.NSFW
 {
@@ -42,288 +43,58 @@ namespace SanaraV2.NSFW
             return (finalTags);
         }
 
-        public abstract class Booru
-        {
-            protected Booru(bool isSfw)
-            {
-                this.isSfw = isSfw;
-            }
-            public abstract int GetNbMax(string tags);
-            public abstract string GetLink(string tags, int maxNb);
-            public abstract string GetFileUrl(string json);
-            public abstract string[] GetTagInfo(string tag);
-            public virtual string GetAllTags(string json) { return (Utilities.GetElementXml("tags=\"", json, '"')); }
-            public virtual string GetTagName(string json) { return (Utilities.GetElementXml("name=\"", json, '"')); }
-            public virtual string GetTagType(string json) { return (Utilities.GetElementXml("type=\"", json, '"')); }
-            public abstract BooruId GetId();
-            public bool isSfw { private set; get; }
-        }
-
-        public enum BooruId
-        {
-            Safebooru,
-            Gelbooru,
-            Konachan,
-            Rule34,
-            E621
-        }
-
-        public class Safebooru : Booru
-        {
-            public Safebooru() : base(true)
-            { }
-
-            public override int GetNbMax(string tags)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("http://safebooru.org/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"')));
-                }
-            }
-
-            public override string GetLink(string tags, int maxNb)
-            {
-                return ("https://safebooru.org/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
-            }
-
-            public override string GetFileUrl(string json)
-            {
-                return ("https://" + Utilities.GetElementXml("file_url=\"//", json, '"'));
-            }
-
-            public override string[] GetTagInfo(string tag)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (wc.DownloadString("https://safebooru.org/index.php?page=dapi&s=tag&q=index&name=" + tag).Split('<'));
-                }
-            }
-
-            public override BooruId GetId()
-            {
-                return (BooruId.Safebooru);
-            }
-        }
-
-        public class Gelbooru : Booru
-        {
-            public Gelbooru() : base(false)
-            { }
-
-            public override int GetNbMax(string tags)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
-                    if (nbMax > 20000)
-                        return (20000 - 1);
-                    else
-                        return (nbMax);
-                }
-            }
-
-            public override string GetLink(string tags, int maxNb)
-            {
-                return ("https://gelbooru.com/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
-            }
-
-            public override string GetFileUrl(string json)
-            {
-                return (Utilities.GetElementXml("file_url=\"", json, '"'));
-            }
-
-            public override string[] GetTagInfo(string tag)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (wc.DownloadString("https://gelbooru.com/index.php?page=dapi&s=tag&q=index&name=" + tag).Split('<'));
-                }
-            }
-
-            public override BooruId GetId()
-            {
-                return (BooruId.Gelbooru);
-            }
-        }
-
-        public class Konachan : Booru
-        {
-            public Konachan() : base(false)
-            { }
-
-            public override int GetNbMax(string tags)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://www.konachan.com/post.xml?limit=1" + tags), '"')));
-                }
-            }
-
-            public override string GetLink(string tags, int maxNb)
-            {
-                return ("https://www.konachan.com/post.xml?page=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
-            }
-
-            public override string GetFileUrl(string json)
-            {
-                return (Utilities.GetElementXml("file_url=\"", json, '"'));
-            }
-
-            public override string[] GetTagInfo(string tag)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (wc.DownloadString("https://konachan.com/tag.xml?limit=10000&name=" + tag).Split('<'));
-                }
-            }
-
-            public override BooruId GetId()
-            {
-                return (BooruId.Konachan);
-            }
-        }
-
-        public class Rule34 : Booru
-        {
-            public Rule34() : base(false)
-            { }
-
-            public override int GetNbMax(string tags)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("posts count=\"", wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1" + tags), '"'));
-                    if (nbMax > 20000)
-                        return (20000 - 1);
-                    else
-                        return (nbMax);
-                }
-            }
-
-            public override string GetLink(string tags, int maxNb)
-            {
-                return ("https://rule34.xxx/index.php?page=dapi&s=post&q=index&pid=" + Program.p.rand.Next(maxNb) + tags + "&limit=1");
-            }
-
-            public override string GetFileUrl(string json)
-            {
-                return (Utilities.GetElementXml("file_url=\"", json, '"'));
-            }
-
-            public override string[] GetTagInfo(string tag)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    return (wc.DownloadString("https://rule34.xxx/index.php?page=dapi&s=tag&q=index&name=" + tag).Split('<'));
-                }
-            }
-
-            public override BooruId GetId()
-            {
-                return (BooruId.Rule34);
-            }
-        }
-
-        public class E621 : Booru
-        {
-            public E621() : base(false)
-            { }
-
-            public override int GetNbMax(string tags)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    wc.Headers.Add("User-Agent: Sanara");
-                    int nbMax = Convert.ToInt32(Utilities.GetElementXml("<posts count=\"", wc.DownloadString("https://e621.net/post/index.xml?limit=1" + tags), '"'));
-                    if (nbMax > 750)
-                        return (750 - 1);
-                    else
-                        return (nbMax);
-                }
-            }
-
-            public override string GetLink(string tags, int maxNb)
-            {
-                return ("https://e621.net/post/index.xml?page=" + (Program.p.rand.Next(maxNb) + 1) + tags + "&limit=1");
-            }
-
-            public override string GetFileUrl(string json)
-            {
-                return (Utilities.GetElementXml("<file_url>", json, '<'));
-            }
-
-            public override string[] GetTagInfo(string tag)
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    wc.Headers.Add("User-Agent: Sanara");
-                    return (wc.DownloadString("https://e621.net/tag/index.xml?limit=10000&name=" + tag).Split(new string[] { "<tag>" }, StringSplitOptions.None));
-                }
-            }
-
-            public override string GetAllTags(string json)
-            {
-                return (Utilities.GetElementXml("<tags>", json, '<'));
-            }
-
-            public override string GetTagName(string json)
-            {
-                return (Utilities.GetElementXml("<name>", json, '<'));
-            }
-            public override string GetTagType(string json)
-            {
-                return (Utilities.GetElementXml("<type type=\"integer\">", json, '<'));
-            }
-
-            public override BooruId GetId()
-            {
-                return (BooruId.E621);
-            }
-        }
-
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, 0);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, 1);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, 2);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, 3);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            string currName = "booru" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString();
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags, 4);
         }
 
-        private static async Task PostImage(Booru booru, ITextChannel chan, string[] tags)
+        [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
+        public async Task E926Search(params string[] tags)
         {
-            if (!booru.isSfw && !chan.IsNsfw)
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, 4);
+        }
+
+        [Command("Sakugabooru", RunMode = RunMode.Async), Summary("Get an image from Sakugabooru")]
+        public async Task SakugabooruSearch(params string[] tags)
+        {
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, 4);
+        }
+
+        private static async Task PostImage(Booru booru, ITextChannel chan, string[] tags, int id)
+        {
+            if (!booru.IsSafe() && !chan.IsNsfw)
             {
                 await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
                 return;
@@ -336,19 +107,45 @@ namespace SanaraV2.NSFW
                 return;
             }
             await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
-            string fileName = booru.GetId().ToString() + DateTime.Now.ToString("HHmmssfff") + chan.Id + Program.p.rand.Next(int.MaxValue);
-            long fileSize;
-            string json;
-            string url = GetImageUrl(booru, tags, out json);
-            if (json == null)
+            Tuple<string, long, string[]> fileInfos;
+            try
             {
-                await chan.SendMessageAsync(url);
+                fileInfos = await GetImage(booru, tags);
+            }
+            catch (BooruSharp.Search.InvalidTags)
+            {
+                /* List<string> newTags = new List<string>();
+                 foreach (string t in tags)
+                 {
+                     string[] correct = await CorrectName(t, booru);
+                     if (correct.Length == 1)
+                         newTags.Add(correct[0]);
+                     else if (correct.Length == 0)
+                     {
+                         await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
+                         return;
+                     }
+                     else
+                     {
+                         await chan.SendMessageAsync(Sentences.MoreThanOneSimilar(chan.GuildId, t) + Environment.NewLine + "```" + Environment.NewLine + String.Join(", ", correct) + Environment.NewLine + "```");
+                         return;
+                     }
+                 }
+                 try
+                 {
+                     fileInfos = await GetImage(booru, tags);
+                 }
+                 catch (BooruSharp.Search.InvalidTags)
+                 {
+                     await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
+                     return;
+                 }*/
+                await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
                 return;
             }
-            DownloadFile(ref fileName, out fileSize, url);
-            Program.p.statsMonth[(int)booru.GetId()] += fileSize;
-            Program.p.statsMonth[(int)booru.GetId() + 5]++;
-            if (fileSize >= 8000000)
+            Program.p.statsMonth[id] += fileInfos.Item2;
+            Program.p.statsMonth[id + 7]++;
+            if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
             {
@@ -357,40 +154,59 @@ namespace SanaraV2.NSFW
                 {
                     try
                     {
-                        await chan.SendFileAsync(fileName);
+                        await chan.SendFileAsync(fileInfos.Item1);
                         msg = await chan.SendMessageAsync(".");
                         break;
                     }
                     catch (RateLimitedException)
                     { }
                 }
-                File.Delete(fileName);
-                await msg.ModifyAsync(x => x.Content = GetTagsInfos(json, booru, (chan == null) ? (0) : (chan.GuildId)));
+                File.Delete(fileInfos.Item1);
+                await msg.ModifyAsync(x => x.Content = GetTagsInfos(booru, (chan == null) ? (0) : (chan.GuildId), fileInfos.Item3).GetAwaiter().GetResult());
                 File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
             }
         }
 
-        public static string GetImage(Booru booru, string[] tags)
+        private static async Task<string[]> CorrectName(string query, Booru booru)
         {
-            string fileName = booru.GetId().ToString() + DateTime.Now.ToString("HHmmssfff") + Program.p.rand.Next(int.MaxValue);
-            long fileSize;
-            DownloadFile(ref fileName, out fileSize, GetImageUrl(booru, tags, out _));
-            if (fileSize >= 8000000)
-                return (null);
-            else
-                return (fileName);
+             char[] split = new char[] {
+                '(', ')', '_', ',', '.', '[', ']', '#', '{', '}', '|'
+            };
+            BooruSharp.Search.Tag.SearchResult[] res = (await booru.GetTags(query)).ToArray();
+            if (res.Length > 0)
+                return (res.Select(delegate (BooruSharp.Search.Tag.SearchResult result) { return (result.name); }).ToArray());
+            List<string> othersRes = new List<string>();
+            string[] splitQuery = query.Split(split, int.MaxValue, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string q in splitQuery)
+                othersRes.AddRange((await booru.GetTags(q)).Select(delegate (BooruSharp.Search.Tag.SearchResult result) { return (result.name); }).ToList());
+            othersRes = othersRes.Distinct().ToList();
+            List<string> bestRes = new List<string>();
+            foreach (string s in othersRes)
+            {
+                bool isEverywhere = true;
+                foreach (string s2 in s.Split(split, int.MaxValue, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (!splitQuery.Contains(s2))
+                    {
+                        isEverywhere = false;
+                        break;
+                    }
+                }
+                if (isEverywhere)
+                    bestRes.Add(s);
+            }
+            if (bestRes.Count > 0)
+                return (bestRes.ToArray());
+            return (othersRes.ToArray());
         }
 
-        public static string GetImageUrl(Booru booru, string[] tags, out string json)
+        public static async Task<Tuple<string, long, string[]>> GetImage(Booru booru, string[] tags)
         {
-            string url = GetBooruUrl(booru, tags);
-            if (url == null)
-            {
-                json = null;
-                return (Base.Sentences.TagsNotFound(tags));
-            }
-            else
-                return (GetFileUrl(booru, url, out json));
+            string fileName = booru.ToString() + DateTime.Now.ToString("HHmmssfff") + Program.p.rand.Next(int.MaxValue);
+            long fileSize;
+            var result = await booru.GetRandomImage(tags);
+            DownloadFile(ref fileName, out fileSize, result.fileUrl.AbsoluteUri);
+            return (new Tuple<string, long, string[]>(fileName, fileSize, result.tags));
         }
 
         public static void DownloadFile(ref string fileName, out long fileSize, string url)
@@ -405,58 +221,32 @@ namespace SanaraV2.NSFW
             }
         }
 
-        private static string GetFileUrl(Booru booru, string url, out string json)
-        {
-            using (WebClient wc = new WebClient())
-            {
-                wc.Headers.Add("User-Agent: Sanara");
-                json = wc.DownloadString(url);
-                string image = booru.GetFileUrl(json);
-                return (image);
-            }
-        }
-
-        public static string GetBooruUrl(Booru booru, string[] tags)
-        {
-            int maxVal = booru.GetNbMax(GetTags(tags));
-            if (maxVal <= 0)
-                return (null);
-            else
-                return (booru.GetLink(GetTags(tags), maxVal));
-        }
-
-        public static string GetTagsInfos(string json, Booru booru, ulong guildId)
+        public static async Task<string> GetTagsInfos(Booru booru, ulong guildId, string[] tags)
         {
             List<string> animeFrom = new List<string>();
             List<string> characs = new List<string>();
             List<string> artists = new List<string>();
-            string[] allTags = booru.GetAllTags(json).Split(' ');
-            using (WebClient w = new WebClient())
+            foreach (string t in tags)
             {
-                foreach (string t in allTags)
+                try
                 {
-                    foreach (string s in booru.GetTagInfo(t))
+                    switch ((await booru.GetTag(t)).type)
                     {
-                        if (booru.GetTagName(s) == t)
-                        {
-                            switch (booru.GetTagType(s))
-                            {
-                                case "1":
-                                    artists.Add(t);
-                                    break;
-
-                                case "3":
-                                    animeFrom.Add(t);
-                                    break;
-
-                                case "4":
-                                    characs.Add(t);
-                                    break;
-                            }
+                        case BooruSharp.Search.Tag.TagType.Artist:
+                            artists.Add(t);
                             break;
-                        }
+
+                        case BooruSharp.Search.Tag.TagType.Copyright:
+                            animeFrom.Add(t);
+                            break;
+
+                        case BooruSharp.Search.Tag.TagType.Character:
+                            characs.Add(t);
+                            break;
                     }
                 }
+                catch (BooruSharp.Search.InvalidTags)
+                { }
             }
             return (WriteTagsInfos(animeFrom, characs, artists, guildId));
         }
@@ -557,6 +347,8 @@ namespace SanaraV2.NSFW
                     finalStr += animeFrom[i] + ", ";
                 }
             }
+            else
+                return (Sentences.AnimeTagUnknowed(guildId));
             finalStr = finalStr.Substring(0, finalStr.Length - 2);
             finalStr += " " + Base.Sentences.AndStr(guildId) + " " + animeFrom[animeFrom.Count - 1];
             if (animeFrom.Count == 1 && animeFrom[0] == "Original")

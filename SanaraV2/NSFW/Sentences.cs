@@ -33,5 +33,6 @@ namespace SanaraV2.NSFW
         public static string ArtistFrom(ulong guildId) { return (Translation.GetTranslation(guildId, "artistFrom")); }
         public static string ArtistNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "artistNotTagged")); }
         public static string AndSomeOthers(ulong guildId) { return (Translation.GetTranslation(guildId, "andSomeOthers")); }
+        public static string MoreThanOneSimilar(ulong guildId, string tag) { return (Translation.GetTranslation(guildId, "moreThanOneSimilar", tag)); }
     }
 }
