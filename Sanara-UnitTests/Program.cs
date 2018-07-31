@@ -1,8 +1,5 @@
 ﻿using Xunit;
-using SanaraV2;
 using System.IO;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Linq;
 using Discord;
 using System;
@@ -12,6 +9,8 @@ using SanaraV2.NSFW;
 using SanaraV2.Base;
 using SanaraV2.Entertainment;
 using SanaraV2.Tools;
+using BooruSharp.Booru;
+using System.Threading.Tasks;
 
 namespace Sanara_UnitTests
 {
@@ -60,67 +59,54 @@ namespace Sanara_UnitTests
             Assert.Single(results);
         }
 
-        [Fact]
-        public void DownloadSafebooru()
+        public async Task TestBooru(Booru b)
         {
-            BooruModule.Safebooru b = new BooruModule.Safebooru();
-            string json;
-            BooruModule.GetImageUrl(b, new string[] { "elodie" }, out json);
-            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            Assert.True(result.Length >= 2);
-            Assert.Contains("Long Live The Queen", result[0]);
-            Assert.Contains("Elodie", result[1]);
+            var t = await BooruModule.GetImage(b, new string[] { "kantai_collection" });
+            Assert.True(File.Exists(t.Item1));
+            Assert.NotInRange(t.Item2, 0, 0);
+            Assert.Contains("kantai_collection", t.Item3);
         }
 
         [Fact]
-        public void DownloadGelbooru()
+        public async Task DownloadSafebooru()
         {
-            BooruModule.Gelbooru b = new BooruModule.Gelbooru();
-            string json;
-            BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
-            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            Assert.True(result.Length >= 2);
-            Assert.Contains("Kantai Collection", result[0]);
-            Assert.Contains("Akatsuki", result[1]);
-            Assert.Contains("Hibiki", result[1]);
+            await TestBooru(new Safebooru());
         }
 
         [Fact]
-        public void DownloadRule34()
+        public async Task DownloadGelbooru()
         {
-            BooruModule.Rule34 b = new BooruModule.Rule34();
-            string json;
-            BooruModule.GetImageUrl(b, new string[] { "hibiki_(kantai_collection)", "akatsuki_(kantai_collection)" }, out json);
-            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            Assert.True(result.Length >= 2);
-            Assert.Contains("Kantai Collection", result[0]);
-            Assert.Contains("Akatsuki", result[1]);
-            Assert.Contains("Hibiki", result[1]);
+            await TestBooru(new Gelbooru());
         }
 
         [Fact]
-        public void DownloadKonachan()
+        public async Task DownloadKonachan()
         {
-            BooruModule.Konachan b = new BooruModule.Konachan();
-            string json;
-            BooruModule.GetImageUrl(b, new string[] { "hibiki_(kancolle)", "akatsuki_(kancolle)" }, out json);
-            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            Assert.Contains("Kantai Collection", result[0]);
-            Assert.Contains("Akatsuki", result[1]);
-            Assert.Contains("Hibiki", result[1]);
+            await TestBooru(new Konachan());
         }
 
         [Fact]
-        public void DownloadE621()
+        public async Task DownloadRule34()
         {
-            BooruModule.E621 b = new BooruModule.E621();
-            string json;
-            BooruModule.GetImageUrl(b, new string[] { "shimakaze_(kantai_collection)", "abyssal_(kantai_collection)" }, out json);
-            string[] result = BooruModule.GetTagsInfos(json, b, 0).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            Assert.True(result.Length >= 2);
-            Assert.Contains("Kantai Collection", result[0]);
-            Assert.Contains("Shimakaze", result[1]);
-            Assert.Contains("Abyssal", result[1]);
+            await TestBooru(new Rule34());
+        }
+
+        [Fact]
+        public async Task DownloadE621()
+        {
+            await TestBooru(new E621());
+        }
+
+        [Fact]
+        public async Task DownloadE926()
+        {
+            await TestBooru(new E926());
+        }
+
+        [Fact]
+        public async Task DownloadSakugabooru()
+        {
+            await TestBooru(new Sakugabooru());
         }
 
         [Fact]
