@@ -22,6 +22,8 @@ namespace SanaraV2
         public Character(ulong id, string name)
         {
             this.id = id;
+            if (!Directory.Exists("Saves/Users"))
+                Directory.CreateDirectory("Saves/Users");
             if (!File.Exists("Saves/Users/" + id + ".dat"))
             {
                 File.WriteAllText("Saves/Users/" + id + ".dat",

@@ -353,16 +353,16 @@ namespace SanaraV2
         private async Task GuildJoin(SocketGuild arg)
         {
             string currTime = DateTime.UtcNow.ToString("ddMMyyHHmmss");
-            ITextChannel chan = ReturnChannel(arg.Channels.ToList(), arg.Id);
             if (!Directory.Exists("Saves"))
                 Directory.CreateDirectory("Saves");
             if (!File.Exists("Saves/sanaraDatas.dat"))
                 Utilities.WriteAllText("Saves/sanaraDatas.dat", currTime); // Creation date
+            if (!Directory.Exists("Saves/Servers"))
+                Directory.CreateDirectory("Saves/Servers");
             if (!Directory.Exists("Saves/Servers/" + arg.Id))
             {
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-                //await chan.SendMessageAsync(Tools.Sentences.IntroductionMsg(arg.Id));
             }
             if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
                 Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
@@ -468,18 +468,19 @@ namespace SanaraV2
                 finalStr = finalStr.Substring(0, finalStr.Length - 1);
                 File.WriteAllText("Saves/CommandModules.dat", finalStr + Environment.NewLine + lastHourSent);
             }
-            if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM")))
+            DateTime now = DateTime.UtcNow;
+            if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))
             {
-                Directory.CreateDirectory("Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM"));
+                Directory.CreateDirectory("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM"));
             }
             for (int i = 0; i <= (int)Module.Youtube + 1; i++)
             {
-                string filePath = "Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM") + "/"
+                string filePath = "Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM") + "/"
                     + ((Module)i).ToString()[0] + ((Module)i).ToString().ToLower().Substring(1, ((Module)i).ToString().Length - 1) + ".dat";
                 if (!File.Exists(filePath))
                     File.WriteAllText(filePath, "0");
             }
-            string finalFilePath = "Saves/Servers/" + serverId + "/ModuleCount/" + DateTime.UtcNow.ToString("yyyyMM") + "/"
+            string finalFilePath = "Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM") + "/"
                         + m.ToString()[0] + m.ToString().ToLower().Substring(1, m.ToString().Length - 1) + ".dat";
             File.WriteAllText(finalFilePath,
                         (Convert.ToInt32(File.ReadAllText(finalFilePath)) + 1).ToString());
@@ -600,36 +601,6 @@ namespace SanaraV2
                 { }
                 Thread.Sleep(100);
             }
-        }
-
-        /// <summary>
-        /// Return the first text channel the bot find on the guild.
-        /// Used when she greet people
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="serverId"></param>
-        /// <returns></returns>
-        private ITextChannel ReturnChannel(List<SocketGuildChannel> s, ulong serverId)
-        {
-            foreach (IChannel c in s)
-            {
-                if (c.GetType().Name == "SocketTextChannel")
-                {
-                    if ((!Directory.Exists("Saves/Servers/" + serverId))
-                    || (Directory.Exists("Saves/Servers/" + serverId) && c.Id == Convert.ToUInt64(File.ReadAllLines("Saves/Servers/" + serverId + "/serverDatas.dat")[1])))
-                    {
-                        return (ITextChannel)(c);
-                    }
-                }
-            }
-            foreach (IChannel c in s)
-            {
-                if (c.GetType().Name == "SocketTextChannel")
-                {
-                    return (ITextChannel)(c);
-                }
-            }
-            return (null);
         }
 
         private Task Log(LogMessage msg)

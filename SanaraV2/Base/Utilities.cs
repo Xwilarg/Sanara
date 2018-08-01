@@ -31,8 +31,6 @@ namespace SanaraV2.Base
         /// <param name="content">Content to write in the file</param>
         public static void WriteAllText(string file, string content)
         {
-            if (!File.Exists(file))
-                throw new FileNotFoundException(file + " not found", file);
             while (true)
             {
                 try
