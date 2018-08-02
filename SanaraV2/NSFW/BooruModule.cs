@@ -82,14 +82,14 @@ namespace SanaraV2.NSFW
         public async Task E926Search(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags, 4);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, 5);
         }
 
         [Command("Sakugabooru", RunMode = RunMode.Async), Summary("Get an image from Sakugabooru")]
         public async Task SakugabooruSearch(params string[] tags)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, 4);
+            await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, 6);
         }
 
         private static async Task PostImage(Booru booru, ITextChannel chan, string[] tags, int id)
@@ -144,7 +144,7 @@ namespace SanaraV2.NSFW
                 return;
             }
             Program.p.statsMonth[id] += fileInfos.Item2;
-            Program.p.statsMonth[id + 6]++;
+            Program.p.statsMonth[id + 7]++;
             if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
