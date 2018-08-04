@@ -68,6 +68,9 @@ namespace SanaraV2
         private List<int> commandModules; // Nb of command received per months (split by modules)
         public List<long> statsMonth; // Total size of download for boorus per months followed by total of download for boorus per months
         private int commandReceived; // Nb of command received per hours
+        private Dictionary<ulong, int> commandServs;
+        private Dictionary<string, int> errors;
+
         private string lastHourSent;
         public string lastMonthSent;
 
@@ -195,6 +198,28 @@ namespace SanaraV2
             else
                 for (int i = 0; i <= (int)Module.Youtube; i++)
                     commandModules.Add(0);
+
+            commandServs = new Dictionary<ulong, int>();
+            if (File.Exists("Saves/CommandServs.dat"))
+            {
+                string[] content = File.ReadAllLines("Saves/CommandServs.dat");
+                foreach (string line in content)
+                {
+                    string[] s = line.Split(' ');
+                    commandServs.Add(Convert.ToUInt64(s[0]), Convert.ToInt32(s[1]));
+                }
+            }
+
+            errors = new Dictionary<string, int>();
+            if (File.Exists("Saves/Errors.dat"))
+            {
+                string[] content = File.ReadAllLines("Saves/Errors.dat");
+                foreach (string line in content)
+                {
+                    string[] s = line.Split(' ');
+                    errors.Add(s[0], Convert.ToInt32(s[1]));
+                }
+            }
 
             statsMonth = new List<long>();
             if (File.Exists("Saves/MonthModules.dat"))
@@ -502,15 +527,22 @@ namespace SanaraV2
             if (lastHourSent != DateTime.Now.ToString("HH"))
             {
                 lastHourSent = DateTime.Now.ToString("HH");
+                Utilities.DeleteFile("Saves/CommandReceived.dat");
+                Utilities.DeleteFile("Saves/CommandModules.dat");
+                Utilities.DeleteFile("Saves/CommandServs.dat");
                 commandReceived = 0;
                 for (int i = 0; i <= (int)Module.Youtube; i++)
                     commandModules[i] = 0;
+                commandServs = new Dictionary<ulong, int>();
             }
             if (lastMonthSent != DateTime.Now.ToString("MM"))
             {
+                Utilities.DeleteFile("Saves/MonthModules.dat");
+                Utilities.DeleteFile("Saves/Errors.dat");
                 lastMonthSent = DateTime.Now.ToString("MM");
                 for (int i = 0; i < 14; i++)
                     statsMonth[i] = 0;
+                errors = new Dictionary<string, int>();
             }
             string finalStr = "";
             foreach (int i in commandModules)
@@ -518,11 +550,21 @@ namespace SanaraV2
             string finalStrMonth = "";
             foreach (int i in statsMonth)
                 finalStrMonth += i + "|";
+            string finalErrors = "";
+            foreach (var val in errors)
+                finalErrors += val.Key + " " + val.Value + "$";
+            if (finalErrors.EndsWith("$")) finalErrors = finalErrors.Substring(0, finalErrors.Length - 1);
+            string finalCommandServs = "";
+            foreach (var val in commandServs)
+                finalCommandServs += val.Key + " " + val.Value + "$";
+            if (finalCommandServs.EndsWith("$")) finalCommandServs = finalCommandServs.Substring(0, finalCommandServs.Length - 1);
             values.Add("nbMsgs", commandReceived.ToString());
             values.Add("serverModules", finalStr);
             values.Add("monthStats", finalStrMonth);
             values.Add("modules", await GetModulesStats());
             values.Add("serverCount", client.Guilds.Count.ToString());
+            values.Add("commandServs", finalCommandServs);
+            values.Add("errors", finalErrors);
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
 
             try
@@ -561,7 +603,11 @@ namespace SanaraV2
                 DateTime dt = DateTime.UtcNow;
                 var result = await commands.ExecuteAsync(context, pos);
                 if (result.IsSuccess)
+                {
                     SaveCommand(dt);
+                    AddError("OK");
+                    AddCommandServs(context.Guild.Id);
+                }
             }
         }
 
@@ -580,6 +626,30 @@ namespace SanaraV2
             else
                 Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
             Utilities.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
+        }
+
+        private void AddError(string name)
+        {
+            if (errors.ContainsKey(name))
+                errors[name]++;
+            else
+                errors.Add(name, 1);
+            string content = "";
+            foreach (var val in errors)
+                content += val.Key + " " + val.Value + Environment.NewLine;
+            Utilities.WriteAllText("Saves/Errors.dat", content);
+        }
+
+        private void AddCommandServs(ulong name)
+        {
+            if (commandServs.ContainsKey(name))
+                commandServs[name]++;
+            else
+                commandServs.Add(name, 1);
+            string content = "";
+            foreach (var val in commandServs)
+                content += val.Key + " " + val.Value + Environment.NewLine;
+            Utilities.WriteAllText("Saves/CommandServs.dat", content);
         }
 
         public void GameThread()
@@ -639,13 +709,18 @@ namespace SanaraV2
                 ravenClient.Capture(new SentryEvent(msg.Exception));
             CommandException ce = msg.Exception as CommandException;
             if (ce != null)
+            {
                 ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                 {
                     Color = Color.Red,
                     Title = msg.Exception.InnerException.GetType().ToString(),
                     Description = Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
                 }.Build());
-                return Task.CompletedTask;
+                AddError(msg.Exception.InnerException.GetType().ToString());
+            }
+            else
+                AddError("Unknown error");
+            return Task.CompletedTask;
         }
     }
 }

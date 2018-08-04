@@ -43,6 +43,21 @@ namespace SanaraV2.Base
             }
         }
 
+        public static void DeleteFile(string file)
+        {
+            if (!File.Exists(file))
+                return;
+            while (true)
+            {
+                try
+                {
+                    File.Delete(file);
+                    break;
+                }
+                catch (IOException)
+                { }
+            }
+        }
         /// <summary>
         /// Remove first argument of array
         /// </summary>
