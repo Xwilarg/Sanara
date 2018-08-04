@@ -45,6 +45,7 @@ namespace SanaraV2.Base
         public static string BetaFeature(ulong guildId) { return (Translation.GetTranslation(guildId, "betaFeature")); }
         public static string DontPm(ulong guildId) { return (Translation.GetTranslation(guildId, "dontPm")); }
         public static string NoApiKey(ulong guildId) { return (Translation.GetTranslation(guildId, "noApiKey")); }
+        public static string NoDictionnary(ulong guildId) { return (Translation.GetTranslation(guildId, "noDictionnary")); }
         public static string TimeSeconds(ulong guildId, string seconds) { return (Translation.GetTranslation(guildId, "timeSeconds", seconds)); }
         public static string TimeMinutes(ulong guildId, string minutes, string seconds) { return (Translation.GetTranslation(guildId, "timeMinutes", minutes, seconds)); }
         public static string TimeHours(ulong guildId, string hours, string minutes, string seconds) { return (Translation.GetTranslation(guildId, "timeHours", hours, minutes, seconds)); }

@@ -489,6 +489,11 @@ namespace SanaraV2.Entertainment
                     bool isEasy = (gameName.Length > 1 && gameName[1].ToLower() == "easy");
                     if (gameName[0].ToLower() == "shiritori")
                     {
+                        if (!File.Exists("Saves/shiritoriWords.dat"))
+                        {
+                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
+                            return;
+                        }
                         await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
                         g = new Shiritori(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
@@ -502,6 +507,11 @@ namespace SanaraV2.Entertainment
                         if (!(Context.Channel as ITextChannel).IsNsfw)
                         {
                             await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                            return;
+                        }
+                        if (!File.Exists("Saves/BooruTriviaTags.dat"))
+                        {
+                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
                             return;
                         }
                         await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
