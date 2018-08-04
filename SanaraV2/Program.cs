@@ -637,7 +637,15 @@ namespace SanaraV2
             Log(msg);
             if (ravenClient != null)
                 ravenClient.Capture(new SentryEvent(msg.Exception));
-            return Task.CompletedTask;
+            CommandException ce = msg.Exception as CommandException;
+            if (ce != null)
+                ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
+                {
+                    Color = Color.Red,
+                    Title = msg.Exception.InnerException.GetType().ToString(),
+                    Description = Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
+                }.Build());
+                return Task.CompletedTask;
         }
     }
 }

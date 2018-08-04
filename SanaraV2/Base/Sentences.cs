@@ -51,6 +51,7 @@ namespace SanaraV2.Base
         public static string TimeDays(ulong guildId, string days, string hours, string minutes, string seconds) { return (Translation.GetTranslation(guildId, "timeDays", days, hours, minutes, seconds)); }
         public static string DoneStr(ulong guildId) { return (Translation.GetTranslation(guildId, "done")); }
         public static string HttpError(ulong guildId, string apiName) { return (Translation.GetTranslation(guildId, "httpError", apiName)); }
+        public static string ExceptionThrown(ulong guildId, string details) { return (Translation.GetTranslation(guildId, "exceptionThrown", details)); }
 
         /// --------------------------- Parts ---------------------------
         public static string AndStr(ulong guildId) { return (Translation.GetTranslation(guildId, "and")); }
