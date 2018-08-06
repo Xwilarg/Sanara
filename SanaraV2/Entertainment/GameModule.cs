@@ -431,9 +431,10 @@ namespace SanaraV2.Entertainment
             {
                 isMsg = false;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                Tuple<string, long, string[]> t1 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
-                Tuple<string, long, string[]> t2 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
-                Tuple<string, long, string[]> t3 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
+                Gelbooru booru = new Gelbooru();
+                Tuple<string, long, string[]> t1 = BooruModule.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
+                Tuple<string, long, string[]> t2 = BooruModule.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
+                Tuple<string, long, string[]> t3 = BooruModule.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
                 return (new string[] {
                     (t1.Item2 > 8000000) ? (null) : (t1.Item1),
                     (t2.Item2 > 8000000) ? (null) : (t2.Item1),
@@ -475,40 +476,53 @@ namespace SanaraV2.Entertainment
                 m_time = DateTime.MinValue;
             }
 
-            public override string[] GetPost(out bool isMsg)
+            private string GetCorrectPost(Sakugabooru booru, out bool isMsg, out string tag, out List<string> allTags)
             {
                 isMsg = false;
-                m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                Tuple<string, long, string[]> t1 = BooruModule.GetImage(new Sakugabooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
+                tag = m_allTags[Program.p.rand.Next(m_allTags.Count)];
+                Tuple<string, long, string[]> t1 = BooruModule.GetImage(booru, new string[] { tag }).GetAwaiter().GetResult();
+                allTags = t1.Item3.ToList();
                 if (t1.Item2 > 8000000)
                 {
                     File.Delete(t1.Item1);
-                    return (GetPost(out isMsg));
+                    return (GetCorrectPost(booru, out isMsg, out tag, out allTags));
                 }
-                return (new string[] {
-                    t1.Item1,
-                });
+                return (t1.Item1);
+            }
+
+            public override string[] GetPost(out bool isMsg)
+            {
+                string tag;
+                List<string> allTags;
+                Sakugabooru booru = new Sakugabooru();
+                string image = GetCorrectPost(booru, out isMsg, out tag, out allTags);
+                allTags.RemoveAll(x => booru.GetTag(x).GetAwaiter().GetResult().type != BooruSharp.Search.Tag.TagType.Copyright);
+                m_toGuess = allTags.ToArray();
+                return (new string[] { image });
             }
 
             public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
                 sayCorrect = true;
                 m_nbAttempt++;
-                if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
-                    return (null);
-                if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
-                    return (Sentences.BooruGuessClose(m_guild.Id, userWord));
+                foreach (string answer in m_toGuess)
+                {
+                    if (Utilities.CleanWord(userWord) == Utilities.CleanWord(answer))
+                        return (null);
+                    if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(answer).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(answer))))
+                        return (Sentences.BooruGuessClose(m_guild.Id, userWord));
+                }
                 return (Sentences.BooruGuessBad(m_guild.Id, userWord));
             }
 
 #pragma warning disable CS1998
             public override async void Loose()
             {
-                SaveServerScores(m_toGuess);
+                SaveServerScores(m_toGuess[0]);
             }
 #pragma warning restore CS1998
 
-            private string m_toGuess;
+            private string[] m_toGuess;
             private List<string> m_allTags;
         }
 
