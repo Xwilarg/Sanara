@@ -35,6 +35,7 @@ namespace SanaraV2.Entertainment
         public static readonly int shiritoriTimer = 10;
         public static readonly int kancolleTimer = 10;
         public static readonly int booruTimer = 30;
+        public static readonly int animeTimer = 30;
 
         public abstract class Game
         {
@@ -430,7 +431,6 @@ namespace SanaraV2.Entertainment
             {
                 isMsg = false;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                string currName = "booruGame" + DateTime.Now.ToString("HHmmssfff") + ((m_guild != null) ? (m_guild.Id) : (0)).ToString();
                 Tuple<string, long, string[]> t1 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
                 Tuple<string, long, string[]> t2 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
                 Tuple<string, long, string[]> t3 = BooruModule.GetImage(new Gelbooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
@@ -463,6 +463,55 @@ namespace SanaraV2.Entertainment
             private List<string> m_allTags;
         }
 
+        public class AnimeGame : Game
+        {
+            public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, animeTimer, "anime.dat", isEasy)
+            {
+                m_toGuess = null;
+                m_allTags = new List<string>();
+                string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");
+                foreach (string line in allLines)
+                    m_allTags.Add(line.Split(' ')[0]);
+                m_time = DateTime.MinValue;
+            }
+
+            public override string[] GetPost(out bool isMsg)
+            {
+                isMsg = false;
+                m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
+                Tuple<string, long, string[]> t1 = BooruModule.GetImage(new Sakugabooru(), new string[] { m_toGuess }).GetAwaiter().GetResult();
+                if (t1.Item2 > 8000000)
+                {
+                    File.Delete(t1.Item1);
+                    return (GetPost(out isMsg));
+                }
+                return (new string[] {
+                    t1.Item1,
+                });
+            }
+
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
+            {
+                sayCorrect = true;
+                m_nbAttempt++;
+                if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
+                    return (null);
+                if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
+                    return (Sentences.BooruGuessClose(m_guild.Id, userWord));
+                return (Sentences.BooruGuessBad(m_guild.Id, userWord));
+            }
+
+#pragma warning disable CS1998
+            public override async void Loose()
+            {
+                SaveServerScores(m_toGuess);
+            }
+#pragma warning restore CS1998
+
+            private string m_toGuess;
+            private List<string> m_allTags;
+        }
+
         [Command("Play"), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
@@ -473,7 +522,7 @@ namespace SanaraV2.Entertainment
                 await ReplyAsync(Sentences.InvalidGameName(Context.Guild.Id));
             else
             {
-                if (gameName[0].ToLower() != "shiritori" && gameName[0].ToLower() != "kancolle" && gameName[0].ToLower() != "booru")
+                if (gameName[0].ToLower() != "shiritori" && gameName[0].ToLower() != "kancolle" && gameName[0].ToLower() != "booru" && gameName[0].ToLower() != "anime")
                 {
                     await ReplyAsync(Sentences.InvalidGameName(Context.Guild.Id));
                 }
@@ -516,6 +565,16 @@ namespace SanaraV2.Entertainment
                         }
                         await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
                         g = new BooruGame(Context.Channel, Context.Guild, Context.User, isEasy);
+                    }
+                    else if (gameName[0].ToLower() == "anime")
+                    {
+                        if (!File.Exists("Saves/AnimeTags.dat"))
+                        {
+                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
+                            return;
+                        }
+                        await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
+                        g = new AnimeGame(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
                     p.games.Add(g);
                     g.Post();
