@@ -143,8 +143,11 @@ namespace SanaraV2.NSFW
                 await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
                 return;
             }
-            Program.p.statsMonth[id] += fileInfos.Item2;
-            Program.p.statsMonth[id + 7]++;
+            if (Program.p.sendStats)
+            {
+                Program.p.statsMonth[id] += fileInfos.Item2;
+                Program.p.statsMonth[id + 7]++;
+            }
             if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
@@ -163,7 +166,8 @@ namespace SanaraV2.NSFW
                 }
                 File.Delete(fileInfos.Item1);
                 await msg.ModifyAsync(x => x.Content = GetTagsInfos(booru, (chan == null) ? (0) : (chan.GuildId), fileInfos.Item3).GetAwaiter().GetResult());
-                File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
+                if (Program.p.sendStats)
+                    File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
             }
         }
 

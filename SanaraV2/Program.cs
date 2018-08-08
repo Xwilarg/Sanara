@@ -84,6 +84,7 @@ namespace SanaraV2
 
         private RavenClient ravenClient;
         public ImageAnnotatorClient visionClient;
+        public bool sendStats { private set; get; }
 
         private Program()
         {
@@ -113,7 +114,13 @@ namespace SanaraV2
 
             prefixs = new Dictionary<ulong, string>();
 
-            InitStats();
+            if (File.Exists("Keys/websiteToken.dat"))
+            {
+                InitStats();
+                sendStats = true;
+            }
+            else
+                sendStats = false;
             InitServices();
 
             if (!launchBot)
@@ -145,7 +152,7 @@ namespace SanaraV2
             startTime = DateTime.Now;
             await client.StartAsync();
 
-            if (File.Exists("Keys/websiteToken.dat"))
+            if (sendStats)
             {
                 var task = Task.Run(async () =>
                 {
@@ -238,14 +245,6 @@ namespace SanaraV2
             else
                 for (int i = 0; i < 14; i++)
                     statsMonth.Add(0);
-
-            if (File.Exists("Keys/visionAPI.json"))
-            {
-                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
-                visionClient = ImageAnnotatorClient.Create();
-            }
-            else
-                visionClient = null;
         }
 
         private void InitServices()
@@ -296,6 +295,15 @@ namespace SanaraV2
             }
             else
                 ravenClient = null;
+
+
+            if (File.Exists("Keys/visionAPI.json"))
+            {
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
+                visionClient = ImageAnnotatorClient.Create();
+            }
+            else
+                visionClient = null;
         }
 
         private void DeleteDirContent(string path)
@@ -484,7 +492,7 @@ namespace SanaraV2
         /// <param name="m">The module that was called (see above)</param>
         public void DoAction(IUser u, ulong serverId, Module m)
         {
-            if (!u.IsBot)
+            if (!u.IsBot && sendStats)
             {
                 commandModules[(int)m]++;
                 string finalStr = "";
@@ -605,8 +613,11 @@ namespace SanaraV2
                 if (result.IsSuccess)
                 {
                     SaveCommand(dt);
-                    AddError("OK");
-                    AddCommandServs(context.Guild.Id);
+                    if (sendStats)
+                    {
+                        AddError("OK");
+                        AddCommandServs(context.Guild.Id);
+                    }
                 }
             }
         }
@@ -614,7 +625,8 @@ namespace SanaraV2
         // Count how many messages the bot receive
         private void SaveCommand(DateTime dt)
         {
-            commandReceived++;
+            if (sendStats)
+                commandReceived++;
             if (!Directory.Exists("Saves"))
                 Directory.CreateDirectory("Saves");
             if (!Directory.Exists("Saves/Stats"))
@@ -625,7 +637,8 @@ namespace SanaraV2
                 Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
             else
                 Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
-            Utilities.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
+            if (sendStats)
+                Utilities.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
         }
 
         private void AddError(string name)
@@ -716,9 +729,10 @@ namespace SanaraV2
                     Title = msg.Exception.InnerException.GetType().ToString(),
                     Description = Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
                 }.Build());
-                AddError(msg.Exception.InnerException.GetType().ToString());
+                if (sendStats)
+                    AddError(msg.Exception.InnerException.GetType().ToString());
             }
-            else
+            else if (sendStats)
                 AddError("Unknown error");
             return Task.CompletedTask;
         }
