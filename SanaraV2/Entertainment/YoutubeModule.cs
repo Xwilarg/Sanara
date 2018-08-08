@@ -33,7 +33,7 @@ namespace SanaraV2.Entertainment
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else
             {
-                Tuple<string, string> url = (await GetYoutubeVideo(words, Context.Channel));
+                Tuple<string, string> url = (await GetYoutubeMostPopular(words, Context.Channel));
                 if (url != null)
                     await ReplyAsync(url.Item1);
             }
@@ -56,16 +56,6 @@ namespace SanaraV2.Entertainment
                 return (null);
             }
             return (searchListResponse.Items);
-        }
-
-        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan, int maxResult = 1)
-        {
-            var results = await GetVideos(words, chan, maxResult);
-            Google.Apis.YouTube.v3.Data.SearchResult sr = results[maxResult - 1];
-            if (sr.Id.Kind != "youtube#video")
-                return (await GetYoutubeVideo(words, chan, maxResult + 1));
-            else
-                return new Tuple<string, string>("https://www.youtube.com/watch?v=" + sr.Id.VideoId, sr.Snippet.Title);
         }
 
         public static async Task<Tuple<string, string>> GetYoutubeMostPopular(string[] words, IMessageChannel chan, int maxResult = 10)
