@@ -144,6 +144,8 @@ namespace SanaraV2.Entertainment
                     return;
                 await m_msgChan.SendMessageAsync("Now playing " + m_musics[0].title);
                 await m_msgChan.SendFileAsync(m_musics[0].imageName);
+                if (!File.Exists("ffmpeg.exe"))
+                    throw new FileNotFoundException("ffmped.exe was not found. Please put it near the bot executable.");
                 m_process = Process.Start(new ProcessStartInfo
                 {
                     FileName = "ffmpeg.exe",
@@ -204,7 +206,7 @@ namespace SanaraV2.Entertainment
                     if (!await StartRadio(Context.Channel))
                         return;
                 }
-                Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeVideo(words, Context.Channel);
+                Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeMostPopular(words, Context.Channel);
                 if (youtubeResult != null)
                 {
                     RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
@@ -229,7 +231,7 @@ namespace SanaraV2.Entertainment
             }
         }
 
-        [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio launch")]
+        [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio launch", "Radio start", "Start radio")]
         public async Task LaunchRadio(params string[] words)
         {
             p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);

@@ -16,6 +16,8 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Base;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Entertainment
@@ -37,7 +39,7 @@ namespace SanaraV2.Entertainment
             }
         }
 
-        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan, int maxResult = 1)
+        private static async Task<IList<Google.Apis.YouTube.v3.Data.SearchResult> > GetVideos(string[] words, IMessageChannel chan, int maxResult)
         {
             if (words.Length == 0)
             {
@@ -53,11 +55,51 @@ namespace SanaraV2.Entertainment
                 await chan.SendMessageAsync(Sentences.YoutubeNotFound((chan as ITextChannel).GuildId));
                 return (null);
             }
-            Google.Apis.YouTube.v3.Data.SearchResult sr = searchListResponse.Items[maxResult - 1];
+            return (searchListResponse.Items);
+        }
+
+        public static async Task<Tuple<string, string> > GetYoutubeVideo(string[] words, IMessageChannel chan, int maxResult = 1)
+        {
+            var results = await GetVideos(words, chan, maxResult);
+            Google.Apis.YouTube.v3.Data.SearchResult sr = results[maxResult - 1];
             if (sr.Id.Kind != "youtube#video")
                 return (await GetYoutubeVideo(words, chan, maxResult + 1));
             else
                 return new Tuple<string, string>("https://www.youtube.com/watch?v=" + sr.Id.VideoId, sr.Snippet.Title);
+        }
+
+        public static async Task<Tuple<string, string>> GetYoutubeMostPopular(string[] words, IMessageChannel chan, int maxResult = 10)
+        {
+            var results = await GetVideos(words, chan, maxResult);
+            Google.Apis.YouTube.v3.Data.SearchResult biggest = null;
+            DateTime publishTime = DateTime.MaxValue;
+            foreach (var res in results)
+            {
+                string cleanTitle = Utilities.CleanWord(res.Snippet.Title);
+                if (res.Id.Kind == "youtube#video" && words.ToList().All(x => cleanTitle.Contains(Utilities.CleanWord(x))))
+                {
+                    if (res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime)
+                    {
+                        publishTime = res.Snippet.PublishedAt.Value;
+                        biggest = res;
+                    }
+                }
+            }
+            if (biggest == null)
+            {
+                foreach (var res in results)
+                {
+                    if (res.Id.Kind == "youtube#video")
+                    {
+                        if (res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime)
+                        {
+                            publishTime = res.Snippet.PublishedAt.Value;
+                            biggest = res;
+                        }
+                    }
+                }
+            }
+            return new Tuple<string, string>("https://www.youtube.com/watch?v=" + biggest.Id.VideoId, biggest.Snippet.Title);
         }
     }
 }
