@@ -5,6 +5,8 @@
 
 Sanara is a Discord bot made in C#.
 
+Her goal is to provide various functionalities, you can check them [here](https://zirk.eu/sanara.php#commands).
+
 I spent a lot of times working on her and I hope that her source code will be able to help some people as the source code of some others bots did for me.
 
 # Useful links
@@ -18,6 +20,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 # External libraries used
 
+[BooruSharp](https://github.com/Xwilarg/BooruSharp)<br/>
 [Discord.Net](https://github.com/RogueException/Discord.Net)<br/>
 [Google API DotNet](https://github.com/google/google-api-dotnet-client)<br/>
 [VNDBSharp](https://github.com/Nikey646/VndbSharp)<br/>
@@ -29,7 +32,8 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 About users: Name, id, date of first encounter and number of messages sent<br/>
 About guilds: Name, id, date of first joined, best score in games when applicable and number of messages sent by modules<br/>
-You can check the different stats about the bot here: https://zirk.eu/sanara.php#stats
+You can check the different stats about the bot here: https://zirk.eu/sanara.php#stats<br/>
+You can also do the 'GDPR' command at any time to check the informations the bot have on you (and on the guild if you are the owner).
 
 # How to use Sanara by cloning the repository
 
@@ -37,5 +41,15 @@ You can check the different stats about the bot here: https://zirk.eu/sanara.php
 - Then open SanaraV2.sln with Visual Studio
 - You'll need to create a 'Keys' folder near your executable (default location: bin/Debug/)
 - You then need to create at least a 'token.dat' file inside the Keys folder. It contains the token of your bot.
-- You can also create the following files: malPwd.dat (contain nickname and password (sepatated by a new line) for MyAnimeList), Sanara-7430da57d6af.json (contain your json file to access to the Google Translate API), URLShortenerAPIKey.dat (contain your key for the goo.gl API), youtubeAPIKey.dat (contain your key for the YouTube API), ranven.dat (contain your url to use Sentry), visionAPI.json (contain your json for the Google Vision API)
 - The last step is to go inside 'Sentences.cs' and change the ownerId value by your Discord id.
+- You can also create the following files in the 'Keys' folder:
+  - malPwd.dat (contain nickname and password (sepatated by a new line) for MyAnimeList)
+  - Sanara-7430da57d6af.json (contain your json file to access to the Google Translate API)
+  - URLShortenerAPIKey.dat (contain your key for the goo.gl API), youtubeAPIKey.dat (contain your key for the YouTube API)
+  - ranven.dat (contain your url to use Sentry)
+  - visionAPI.json (contain your json for the Google Vision API)
+- To use radio you will also need to add opus.dll, libsodium.dll and ffmpeg.exe near Sanara executable, you can download them [here](https://dsharpplus.emzi0767.com/natives/index.html).
+- To use games, you will also need to add files to the 'Saves' folder (downloadable [here](https://zirk.eu/files/?dir=Sanara)):
+  - AnimeTags.dat for the anime guess game
+  - BooruTriviaTags.dat for the booru guess game
+  - shiritoriWords.dat for the shiritori game
