@@ -397,9 +397,6 @@ namespace SanaraV2
                 Directory.CreateDirectory("Saves/Servers/" + arg.Id);
                 Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
             }
-            if (!File.Exists("Saves/Servers/" + arg.Id + "/kancolle.dat"))
-                Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/kancolle.dat", "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0" + Environment.NewLine + "0");
-            // Attempt game, attempt ship, ship found, bestScore, ids of people who help to have the best score
             if (!Directory.Exists("Saves/Users"))
                 Directory.CreateDirectory("Saves/Users");
             guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
