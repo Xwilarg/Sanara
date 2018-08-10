@@ -113,12 +113,14 @@ namespace SanaraV2.Tools
                             "**Server name:** " + c[2]
                             + ((c.Length > 3) ? (Environment.NewLine + "**Deprecated values (now unused):** " + String.Join(", ", c.Skip(3))) : ("")));
                     }
-                    else if (fi.Name == "kancolle.dat" || fi.Name == "shiritori.dat" || fi.Name == "booru.dat")
+                    else if (fi.Name == "kancolle.dat" || fi.Name == "shiritori.dat" || fi.Name == "booru.dat" || fi.Name == "anime.dat"
+                        || fi.Name == "kancolle-easy.dat" || fi.Name == "shiritori-easy.dat" || fi.Name == "booru-easy.dat" || fi.Name == "anime-easy.dat")
                     {
                         string gameName;
-                        if (fi.Name == "kancolle.dat") gameName = "KanColle guess";
-                        else if (fi.Name == "shiritori.dat") gameName = "Shiritori";
+                        if (fi.Name.StartsWith("kancolle")) gameName = "KanColle guess";
+                        else if (fi.Name.StartsWith("shiritori")) gameName = "Shiritori";
                         else gameName = "Booru guess";
+                        if (fi.Name.EndsWith("-easy.dat")) gameName += " - Easy difficulty";
                         embed2.AddField(gameName + " game",
                             "**Game played:** " + c[0] + Environment.NewLine +
                             "**Nb. attempts:** " + c[1] + Environment.NewLine +
@@ -126,15 +128,96 @@ namespace SanaraV2.Tools
                             "**Current best score:** " + c[3] + Environment.NewLine +
                             "**Ids of the players who contribued for the best score:** " + c[4]);
                     }
+                    else if (fi.Name == "language.dat")
+                    {
+                        string language = Utilities.GetFullLanguage(File.ReadAllText(fi.FullName));
+                        embed2.AddField("Bot language", language.First().ToString().ToUpper() + language.Substring(1));
+                    }
+                    else if (fi.Name == "prefix.dat")
+                        embed2.AddField("Bot prefix", File.ReadAllText(fi.FullName));
                     else
                         embed2.AddField(fi.Name, File.ReadAllText(fi.FullName));
                 }
                 DirectoryInfo di = new DirectoryInfo("Saves/Servers/" + Context.Guild.Id + "/ModuleCount");
                 List<FileInfo> f = GetFiles(di);
                 embed2.AddField("Messages sent",
-                    "**Directory size:** " + f.Select(x => x.Length).Sum());
+                    "**Directory size:** " + f.Select(x => x.Length).Sum() + " octets");
                 await ReplyAsync("", false, embed2.Build());
             }
+        }
+
+
+
+        [Command("Status"), Summary("Display which commands aren't available because of missing files")]
+        public async Task Status()
+        {
+            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            int yes = 0;
+            int no = 0;
+            EmbedBuilder embed = new EmbedBuilder()
+            {
+                Title = "Services availability"
+            };
+            embed.AddField("Radio Module",
+                "**Opus dll:** " + ((File.Exists("opus.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**Lib Sodium dll:** " + ((File.Exists("libsodium.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**Ffmpeg:** " + ((File.Exists("ffmpeg.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**YouTube API key:** " + ((p.youtubeService != null ? ("Yes") : ("No"))));
+            if (File.Exists("opus.dll") && File.Exists("libsodium.dll") && File.Exists("ffmpeg.exe") && p.youtubeService != null)
+                yes++;
+            else
+                no++;
+            embed.AddField("Game Module",
+                "**Shiritori words file:** " + ((File.Exists("Saves/shiritoriWords.dat") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**Booru guess tags file:** " + ((File.Exists("Saves/BooruTriviaTags.dat") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**Anime guess animes file:** " + ((File.Exists("Saves/AnimeTags.dat") ? ("Yes") : ("No"))));
+            if (File.Exists("Saves/shiritoriWords.dat"))
+                yes++;
+            else
+                no++;
+            if (File.Exists("Saves/BooruTriviaTags.dat"))
+                yes++;
+            else
+                no++;
+            if (File.Exists("Saves/AnimeTags.dat"))
+                yes++;
+            else
+                no++;
+            if (p.malClient != null)
+            {
+                embed.AddField("Anime/Manga module", "**MyAnimeList API key:** Yes");
+                yes++;
+            }
+            else
+            {
+                embed.AddField("Anime/Manga module", "**MyAnimeList API key:** No");
+                no++;
+            }
+            embed.AddField("Linguistic Module - Translations",
+                "**Google Translate API key:** " + ((p.translationClient != null ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**Google Vision API key:** " + ((p.visionClient != null ? ("Yes") : ("No"))));
+            if (p.translationClient != null)
+            {
+                yes++;
+                if (p.visionClient != null)
+                    yes++;
+                else
+                    no++;
+            }
+            else
+                no += 2;
+            embed.AddField("YouTube Module", "**YouTube API key:** " + ((p.youtubeService != null) ? ("Yes") : ("No")));
+            if (p.youtubeService != null)
+                yes++;
+            else
+                no++;
+            embed.AddField("Google Shortener Module", "**Google Shortener API key:** " + ((p.service != null) ? ("Yes") : ("No")));
+            if (p.service != null)
+                yes++;
+            else
+                no++;
+            embed.Color = new Color(no * 255 / 8, yes * 255 / 8, 0);
+            await ReplyAsync("", false, embed.Build());
         }
 
         private List<FileInfo> GetFiles(DirectoryInfo dir)
