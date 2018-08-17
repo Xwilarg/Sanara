@@ -49,7 +49,7 @@ You can also do the 'GDPR' command at any time to check the informations the bot
   - ranven.dat (contain your url to use Sentry)
   - visionAPI.json (contain your json for the Google Vision API)
 - To use radio you will also need to add opus.dll, libsodium.dll and ffmpeg.exe near Sanara executable, you can download them [here](https://dsharpplus.emzi0767.com/natives/index.html).
-- To use games, you will also need to add files to the 'Saves' folder (downloadable [here](https://zirk.eu/files/?dir=Sanara)):
+- To use games, you will also need to add files to the 'Saves' folder (downloadable [here](https://files.zirk.eu/?dir=Sanara)):
   - AnimeTags.dat for the anime guess game
   - BooruTriviaTags.dat for the booru guess game
   - shiritoriWords.dat for the shiritori game
