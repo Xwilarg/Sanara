@@ -394,7 +394,19 @@
     <value>pyo</value>
   </data>
   <data name="フ" xml:space="preserve">
-    <value>hu</value>
+    <value>fu</value>
+  </data>
+  <data name="ファ" xml:space="preserve">
+    <value>fa</value>
+  </data>
+  <data name="フィ" xml:space="preserve">
+    <value>fi</value>
+  </data>
+  <data name="フェ" xml:space="preserve">
+    <value>fe</value>
+  </data>
+  <data name="フォ" xml:space="preserve">
+    <value>fo</value>
   </data>
   <data name="ブ" xml:space="preserve">
     <value>bu</value>

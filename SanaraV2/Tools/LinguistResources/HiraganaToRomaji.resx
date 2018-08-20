@@ -408,6 +408,18 @@
   <data name="ふ" xml:space="preserve">
     <value>fu</value>
   </data>
+  <data name="ふぁ" xml:space="preserve">
+    <value>fa</value>
+  </data>
+  <data name="ふぃ" xml:space="preserve">
+    <value>fi</value>
+  </data>
+  <data name="ふぇ" xml:space="preserve">
+    <value>fe</value>
+  </data>
+  <data name="ふぉ" xml:space="preserve">
+    <value>fo</value>
+  </data>
   <data name="ぶ" xml:space="preserve">
     <value>bu</value>
   </data>

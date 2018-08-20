@@ -564,4 +564,16 @@
   <data name="da" xml:space="preserve">
     <value>ダ</value>
   </data>
+  <data name="fa" xml:space="preserve">
+    <value>ファ</value>
+  </data>
+  <data name="fe" xml:space="preserve">
+    <value>フェ</value>
+  </data>
+  <data name="fi" xml:space="preserve">
+    <value>フィ</value>
+  </data>
+  <data name="fo" xml:space="preserve">
+    <value>フォ</value>
+  </data>
 </root>
