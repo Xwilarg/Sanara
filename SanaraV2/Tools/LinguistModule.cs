@@ -35,7 +35,7 @@ namespace SanaraV2.Tools
         [Command("Hiragana"), Summary("To hiragana"), Alias("Hira")]
         public async Task ToHiraganaCmd(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.ToHiraganaHelp(Context.Guild.Id));
             else
@@ -45,7 +45,7 @@ namespace SanaraV2.Tools
         [Command("Romaji"), Summary("To romaji"), Alias("Roma")]
         public async Task ToRomajiCmd(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.ToRomajiHelp(Context.Guild.Id));
             else
@@ -55,7 +55,7 @@ namespace SanaraV2.Tools
         [Command("Katakana"), Summary("To romaji"), Alias("Kata")]
         public async Task ToKatakanaCmd(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.ToKatakanaHelp(Context.Guild.Id));
             else
@@ -65,7 +65,7 @@ namespace SanaraV2.Tools
         [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence")]
         public async Task Translation(params string[] words)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (p.translationClient == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else if (words.Length < 2)
@@ -138,7 +138,7 @@ namespace SanaraV2.Tools
         [Command("Definition", RunMode = RunMode.Async), Summary("Give the meaning of a word"), Alias("Def")]
         public async Task Meaning(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             if (word.Length == 0)
                 await ReplyAsync(Sentences.JapaneseHelp(Context.Guild.Id));
             else

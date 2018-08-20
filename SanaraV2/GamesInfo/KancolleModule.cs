@@ -34,7 +34,7 @@ namespace SanaraV2.GamesInfo
         [Command("Map", RunMode = RunMode.Async), Summary("Get informations about a map")]
         public async Task Map(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             if (IsMapInvalid(command))
                 await ReplyAsync(Sentences.MapHelp(Context.Guild.Id));
             else
@@ -117,7 +117,7 @@ namespace SanaraV2.GamesInfo
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task Drop(params string[] shipNameArr)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             if (shipNameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
@@ -290,7 +290,7 @@ namespace SanaraV2.GamesInfo
         [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Kancolle character")]
         public async Task Charac(params string[] shipNameArr)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             if (shipNameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));

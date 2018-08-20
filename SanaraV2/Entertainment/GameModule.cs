@@ -529,7 +529,7 @@ namespace SanaraV2.Entertainment
         [Command("Play"), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             if (p.games.Any(x => x.m_chan == Context.Channel))
                 await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
             else if (gameName.Length == 0)

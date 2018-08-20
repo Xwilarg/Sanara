@@ -32,28 +32,28 @@ namespace SanaraV2.Tools
         [Command("Help"), Summary("Give the help"), Alias("Commands")]
         public async Task Help()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw));
         }
 
         [Command("Hi"), Summary("Answer with hi"), Alias("Hey", "Hello", "Hi!", "Hey!", "Hello!")]
         public async Task SayHi()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync(Sentences.HiStr(Context.Guild.Id));
         }
 
         [Command("Who are you"), Summary("Answer with who she is"), Alias("Who are you ?", "Who are you?")]
         public async Task WhoAreYou()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync(Sentences.WhoIAmStr(Context.Guild.Id));
         }
 
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IGuildUser user;
             if (command.Length == 0)
                 user = Context.User as IGuildUser;
@@ -72,14 +72,14 @@ namespace SanaraV2.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await InfosUser(await Context.Channel.GetUserAsync(Base.Sentences.myId) as IGuildUser);
         }
 
         [Command("GDPR"), Summary("Show infos the bot have about the user and the guild")]
         public async Task GDPR(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             string[] content = File.ReadAllLines("Saves/Users/" + Context.User.Id + ".dat");
             EmbedBuilder embed = new EmbedBuilder()
             {
@@ -151,7 +151,7 @@ namespace SanaraV2.Tools
         [Command("Status"), Summary("Display which commands aren't available because of missing files")]
         public async Task Status()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             int yes = 0;
             int no = 0;
             EmbedBuilder embed = new EmbedBuilder()

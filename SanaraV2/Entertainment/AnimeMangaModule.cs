@@ -28,7 +28,7 @@ namespace SanaraV2.Entertainment
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
         public async Task Mal(params string[] animeNameArr)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
@@ -68,7 +68,7 @@ namespace SanaraV2.Entertainment
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
         public async Task MalManga(params string[] mangaNameArr) // Stuck in loop ?
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             if (p.malClient == null)
             {
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));

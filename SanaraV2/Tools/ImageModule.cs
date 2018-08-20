@@ -29,7 +29,7 @@ namespace SanaraV2.Tools
         [Command("Transparency", RunMode = RunMode.Async), Summary("Add transparency to the image given in parameter")]
         public async Task Transparency(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
@@ -58,7 +58,7 @@ namespace SanaraV2.Tools
         [Command("Negate", RunMode = RunMode.Async), Summary("Negate the image color")]
         public async Task Negate(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
@@ -83,7 +83,7 @@ namespace SanaraV2.Tools
         [Command("Convert", RunMode = RunMode.Async), Summary("Convert an image to another format")]
         public async Task ConvertImage(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length <= 1 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpConvert(Context.Guild.Id));
             else
@@ -114,6 +114,7 @@ namespace SanaraV2.Tools
         [Command("Rgb", RunMode = RunMode.Async), Summary("Display a RGB color")]
         public async Task Rgb(params string[] word)
         {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length < 3)
                 await ReplyAsync(Sentences.HelpRgb(Context.Guild.Id));
             else
@@ -152,7 +153,7 @@ namespace SanaraV2.Tools
         [Command("Epure", RunMode = RunMode.Async), Summary("Epure an image")]
         public async Task Epure(params string[] word)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else

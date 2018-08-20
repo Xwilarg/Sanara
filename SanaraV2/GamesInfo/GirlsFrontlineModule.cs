@@ -36,7 +36,7 @@ namespace SanaraV2.GamesInfo
         [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Girls Frontline character (trivia)")]
         public async Task Charac(params string[] shipNameArr) // TODO Refactor (duplicated of Kancolle command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
             if (shipNameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineHelp(Context.Guild.Id));
@@ -122,7 +122,7 @@ namespace SanaraV2.GamesInfo
         [Command("Infos", RunMode = RunMode.Async), Summary("Get informations about a Girls Frontline character (stats)")]
         public async Task Infos(params string[] nameArr)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
             if (nameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineHelp(Context.Guild.Id));
@@ -171,7 +171,7 @@ namespace SanaraV2.GamesInfo
         [Command("Compare", RunMode = RunMode.Async), Summary("Compare two T-Dolls")]
         public async Task Compare(params string[] nameArr)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
             if (nameArr.Length <= 1)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineCompareHelp(Context.Guild.Id));

@@ -28,7 +28,7 @@ namespace SanaraV2.Entertainment
         [Command("Xkcd", RunMode = RunMode.Async), Summary("Give XKCD commic")]
         public async Task RandomXkcd(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
             int? myNb = null;
             if (command.Length > 0)
             {

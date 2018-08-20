@@ -59,7 +59,7 @@ namespace Sanara_UnitTests
             Assert.Single(results);
         }
 
-        public async Task TestBooru(Booru b)
+        private async Task TestBooru(Booru b)
         {
             var t = await BooruModule.GetImage(b, new string[] { "kantai_collection" });
             Assert.True(File.Exists(t.Item1));

@@ -46,49 +46,49 @@ namespace SanaraV2.NSFW
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, 0);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, 1);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, 2);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, 3);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new E621(), Context.Channel as ITextChannel, tags, 4);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
         public async Task E926Search(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new E926(), Context.Channel as ITextChannel, tags, 5);
         }
 
         [Command("Sakugabooru", RunMode = RunMode.Async), Summary("Get an image from Sakugabooru")]
         public async Task SakugabooruSearch(params string[] tags)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, 6);
         }
 
@@ -145,8 +145,7 @@ namespace SanaraV2.NSFW
             }
             if (Program.p.sendStats)
             {
-                Program.p.statsMonth[id] += fileInfos.Item2;
-                Program.p.statsMonth[id + 7]++;
+                await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString() + "|" + fileInfos.Item2.ToString()) });
             }
             if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
@@ -166,8 +165,6 @@ namespace SanaraV2.NSFW
                 }
                 File.Delete(fileInfos.Item1);
                 await msg.ModifyAsync(x => x.Content = GetTagsInfos(booru, (chan == null) ? (0) : (chan.GuildId), fileInfos.Item3).GetAwaiter().GetResult());
-                if (Program.p.sendStats)
-                    File.WriteAllText("Saves/MonthModules.dat", String.Join("|", Program.p.statsMonth) + Environment.NewLine + Program.p.lastMonthSent);
             }
         }
 

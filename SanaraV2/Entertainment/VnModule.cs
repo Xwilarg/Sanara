@@ -34,7 +34,7 @@ namespace SanaraV2.Entertainment
         [Command("Vn", RunMode = RunMode.Async)]
         public async Task Vndb(params string[] vns)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Vn);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Vn);
             if (vns.Length == 0)
             {
                 await ReplyAsync(Sentences.VndbHelp(Context.Guild.Id));

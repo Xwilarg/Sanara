@@ -28,7 +28,7 @@ namespace SanaraV2.Entertainment
         [Command("Youtube"), Summary("Get a random video given a playlist")]
         public async Task YoutubeVideo(params string[] words)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
             if (p.youtubeService == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else

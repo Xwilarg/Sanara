@@ -65,15 +65,6 @@ namespace SanaraV2
 
         public UrlshortenerService service;
 
-        private List<int> commandModules; // Nb of command received per months (split by modules)
-        public List<long> statsMonth; // Total size of download for boorus per months followed by total of download for boorus per months
-        private int commandReceived; // Nb of command received per hours
-        private Dictionary<ulong, int> commandServs;
-        private Dictionary<string, int> errors;
-
-        private string lastHourSent;
-        public string lastMonthSent;
-
         public DateTime startTime;
 
         public Dictionary<string, List<Translation.TranslationData>> translations;
@@ -114,13 +105,7 @@ namespace SanaraV2
 
             prefixs = new Dictionary<ulong, string>();
 
-            if (File.Exists("Keys/websiteToken.dat"))
-            {
-                InitStats();
-                sendStats = true;
-            }
-            else
-                sendStats = false;
+            sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
 
             if (!launchBot)
@@ -172,81 +157,7 @@ namespace SanaraV2
             return Task.CompletedTask;
         }
 
-        /// Stats at https://zirk.eu/sanara-stats.php
-        private void InitStats()
-        {
-            lastHourSent = DateTime.Now.ToString("HH");
-            lastMonthSent = DateTime.Now.ToString("MM");
-            if (File.Exists("Saves/CommandReceived.dat"))
-            {
-                string[] content = File.ReadAllLines("Saves/CommandReceived.dat");
-                if (content[1] == lastHourSent)
-                    commandReceived = Convert.ToInt32(content[0]);
-                else
-                    commandReceived = 0;
-            }
-            else
-                commandReceived = 0;
-
-            commandModules = new List<int>();
-            if (File.Exists("Saves/CommandModules.dat"))
-            {
-                string[] content = File.ReadAllLines("Saves/CommandModules.dat");
-                if (content[1] == lastHourSent)
-                {
-                    string[] mods = content[0].Split('|');
-                    for (int i = 0; i <= (int)Module.Youtube; i++)
-                        commandModules.Add(Convert.ToInt32(mods[i]));
-                }
-                else
-                    for (int i = 0; i <= (int)Module.Youtube; i++)
-                        commandModules.Add(0);
-            }
-            else
-                for (int i = 0; i <= (int)Module.Youtube; i++)
-                    commandModules.Add(0);
-
-            commandServs = new Dictionary<ulong, int>();
-            if (File.Exists("Saves/CommandServs.dat"))
-            {
-                string[] content = File.ReadAllLines("Saves/CommandServs.dat");
-                foreach (string line in content)
-                {
-                    string[] s = line.Split(' ');
-                    commandServs.Add(Convert.ToUInt64(s[0]), Convert.ToInt32(s[1]));
-                }
-            }
-
-            errors = new Dictionary<string, int>();
-            if (File.Exists("Saves/Errors.dat"))
-            {
-                string[] content = File.ReadAllLines("Saves/Errors.dat");
-                foreach (string line in content)
-                {
-                    string[] s = line.Split(' ');
-                    errors.Add(s[0], Convert.ToInt32(s[1]));
-                }
-            }
-
-            statsMonth = new List<long>();
-            if (File.Exists("Saves/MonthModules.dat"))
-            {
-                string[] content = File.ReadAllLines("Saves/MonthModules.dat");
-                if (content[1] == lastMonthSent)
-                {
-                    string[] mods = content[0].Split('|');
-                    for (int i = 0; i < 14; i++)
-                        statsMonth.Add(Convert.ToInt64(mods[i]));
-                }
-                else
-                    for (int i = 0; i < 14; i++)
-                        statsMonth.Add(0);
-            }
-            else
-                for (int i = 0; i < 14; i++)
-                    statsMonth.Add(0);
-        }
-
+        
         private void InitServices()
         {
             if (File.Exists("Keys/malPwd.dat"))
@@ -403,64 +314,6 @@ namespace SanaraV2
             prefixs.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/prefix.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/prefix.dat")) : ("s."));
         }
 
-        /// <summary>
-        /// Get usage of modules for the current month and amount of users by servers
-        /// </summary>
-        /// <returns></returns>
-        private async Task<string> GetModulesStats()
-        {
-            string currDate = DateTime.Now.ToString("yyyyMM");
-            List<string> allModules = new List<string>();
-            int[] valuesModules = new int[(int)Module.Youtube + 1];
-            for (int i = 0; i < valuesModules.Length; i++)
-            {
-                allModules.Add(((Module)i).ToString().ToLower());
-                valuesModules[i] = 0;
-            }
-            foreach (string d in Directory.GetDirectories("Saves/Servers"))
-            {
-                string dir = d.Replace('\\', '/') + "/ModuleCount/" + currDate;
-                if (Directory.Exists(dir))
-                {
-                    foreach (string f in Directory.GetFiles(dir))
-                    {
-                        string[] elems = f.Split(new string[] { "/", "\\" }, StringSplitOptions.None);
-                        int index = allModules.ToList().FindIndex(x => elems[elems.Length - 1].ToLower().Contains(x));
-                        if (index > -1)
-                            valuesModules[index] += Convert.ToInt32(File.ReadAllText(f));
-                    }
-                }
-            }
-            string finalStr = "";
-            for (int i = 0; i < valuesModules.Length; i++)
-                finalStr += valuesModules[i] + "|";
-            List<Tuple<string, int, int>> guilds = new List<Tuple<string, int, int>>();
-            foreach (IGuild g in client.Guilds)
-            {
-                int users = 0;
-                int bots = 0;
-                foreach (IGuildUser u in await g.GetUsersAsync())
-                {
-                    if (u.IsBot) bots++;
-                    else users++;
-                }
-                guilds.Add(new Tuple<string, int, int>(g.Name, users, bots));
-            }
-            Tuple<string, int, int> biggest = null;
-            while (guilds.Count > 0)
-            {
-                foreach (var tuple in guilds)
-                {
-                    if (biggest == null || tuple.Item2 > biggest.Item2)
-                        biggest = tuple;
-                }
-                finalStr += biggest.Item1.Replace("'", "") + "|" + biggest.Item2 + "|" + biggest.Item3 + "|";
-                guilds.Remove(biggest);
-                biggest = null;
-            }
-            return (finalStr);
-        }
-
         public enum Module
         {
             AnimeManga,
@@ -487,16 +340,11 @@ namespace SanaraV2
         /// <param name="u">User that sent the message</param>
         /// <param name="serverId">The ID of the current guild</param>
         /// <param name="m">The module that was called (see above)</param>
-        public void DoAction(IUser u, ulong serverId, Module m)
+        public async Task DoAction(IUser u, ulong serverId, Module m)
         {
             if (!u.IsBot && sendStats)
             {
-                commandModules[(int)m]++;
-                string finalStr = "";
-                foreach (int i in commandModules)
-                    finalStr += i + "|";
-                finalStr = finalStr.Substring(0, finalStr.Length - 1);
-                File.WriteAllText("Saves/CommandModules.dat", finalStr + Environment.NewLine + lastHourSent);
+                await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
             }
             DateTime now = DateTime.UtcNow;
             if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))
@@ -522,64 +370,34 @@ namespace SanaraV2
             }
         }
 
-        private async void UpdateStatus()
+        public async Task UpdateElement(Tuple<string, string>[] elems)
         {
             HttpClient httpClient = new HttpClient();
             var values = new Dictionary<string, string> {
                            { "token", File.ReadAllLines("Keys/websiteToken.dat")[1] },
+                           { "action", "add" },
                            { "name", "Sanara" }
                         };
-            if (lastHourSent != DateTime.Now.ToString("HH"))
+            foreach (var elem in elems)
             {
-                lastHourSent = DateTime.Now.ToString("HH");
-                Utilities.DeleteFile("Saves/CommandReceived.dat");
-                Utilities.DeleteFile("Saves/CommandModules.dat");
-                Utilities.DeleteFile("Saves/CommandServs.dat");
-                commandReceived = 0;
-                for (int i = 0; i <= (int)Module.Youtube; i++)
-                    commandModules[i] = 0;
-                commandServs = new Dictionary<ulong, int>();
+                values.Add(elem.Item1, elem.Item2);
             }
-            if (lastMonthSent != DateTime.Now.ToString("MM"))
-            {
-                Utilities.DeleteFile("Saves/MonthModules.dat");
-                Utilities.DeleteFile("Saves/Errors.dat");
-                lastMonthSent = DateTime.Now.ToString("MM");
-                for (int i = 0; i < 14; i++)
-                    statsMonth[i] = 0;
-                errors = new Dictionary<string, int>();
-            }
-            string finalStr = "";
-            foreach (int i in commandModules)
-                finalStr += i + "|";
-            string finalStrMonth = "";
-            foreach (int i in statsMonth)
-                finalStrMonth += i + "|";
-            string finalErrors = "";
-            foreach (var val in errors)
-                finalErrors += val.Key + " " + val.Value + "$";
-            if (finalErrors.EndsWith("$")) finalErrors = finalErrors.Substring(0, finalErrors.Length - 1);
-            string finalCommandServs = "";
-            foreach (var val in commandServs)
-                finalCommandServs += val.Key + " " + val.Value + "$";
-            if (finalCommandServs.EndsWith("$")) finalCommandServs = finalCommandServs.Substring(0, finalCommandServs.Length - 1);
-            values.Add("nbMsgs", commandReceived.ToString());
-            values.Add("serverModules", finalStr);
-            values.Add("monthStats", finalStrMonth);
-            values.Add("modules", await GetModulesStats());
-            values.Add("serverCount", client.Guilds.Count.ToString());
-            values.Add("commandServs", finalCommandServs);
-            values.Add("errors", finalErrors);
-            FormUrlEncodedContent content = new FormUrlEncodedContent(values);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, File.ReadAllLines("Keys/websiteToken.dat")[0]);
+            msg.Content = new FormUrlEncodedContent(values);
 
             try
             {
-                await httpClient.PostAsync(File.ReadAllLines("Keys/websiteToken.dat")[0], content);
+                await httpClient.SendAsync(msg);
             }
             catch (HttpRequestException)
             { }
             catch (TaskCanceledException)
             { }
+        }
+
+        private async void UpdateStatus()
+        {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("serverCount", client.Guilds.Count.ToString()) });
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
@@ -607,59 +425,23 @@ namespace SanaraV2
                 }
                 DateTime dt = DateTime.UtcNow;
                 var result = await commands.ExecuteAsync(context, pos);
-                if (result.IsSuccess)
+                if (result.IsSuccess && sendStats)
                 {
-                    SaveCommand(dt);
-                    if (sendStats)
-                    {
-                        AddError("OK");
-                        AddCommandServs(context.Guild.Id);
-                    }
+                    await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+                    await AddError("OK");
+                    await AddCommandServs(context.Guild.Id);
                 }
             }
         }
 
-        // Count how many messages the bot receive
-        private void SaveCommand(DateTime dt)
+        private async Task AddError(string name)
         {
-            if (sendStats)
-                commandReceived++;
-            if (!Directory.Exists("Saves"))
-                Directory.CreateDirectory("Saves");
-            if (!Directory.Exists("Saves/Stats"))
-                Directory.CreateDirectory("Saves/Stats");
-            if (!Directory.Exists("Saves/Stats/" + dt.Month.ToString()))
-                Directory.CreateDirectory("Saves/Stats/" + dt.Month.ToString());
-            if (File.Exists("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat"))
-                Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", (Convert.ToInt32(File.ReadAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat")) + 1).ToString());
-            else
-                Utilities.WriteAllText("Saves/Stats/" + dt.Month.ToString() + '/' + dt.Day.ToString() + ".dat", "1");
-            if (sendStats)
-                Utilities.WriteAllText("Saves/CommandReceived.dat", commandReceived + Environment.NewLine + lastHourSent);
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", name) });
         }
 
-        private void AddError(string name)
+        private async Task AddCommandServs(ulong name)
         {
-            if (errors.ContainsKey(name))
-                errors[name]++;
-            else
-                errors.Add(name, 1);
-            string content = "";
-            foreach (var val in errors)
-                content += val.Key + " " + val.Value + Environment.NewLine;
-            Utilities.WriteAllText("Saves/Errors.dat", content);
-        }
-
-        private void AddCommandServs(ulong name)
-        {
-            if (commandServs.ContainsKey(name))
-                commandServs[name]++;
-            else
-                commandServs.Add(name, 1);
-            string content = "";
-            foreach (var val in commandServs)
-                content += val.Key + " " + val.Value + Environment.NewLine;
-            Utilities.WriteAllText("Saves/CommandServs.dat", content);
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commandServs", name.ToString()) });
         }
 
         public void GameThread()

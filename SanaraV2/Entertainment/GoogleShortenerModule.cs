@@ -30,7 +30,7 @@ namespace SanaraV2.Entertainment
         [Command("Random url", RunMode = RunMode.Async), Summary("Give a random url from goo.gl")]
         public async Task RandomPastebin()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GoogleShortener);
             if (p.service == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else if (!(Context.Channel as ITextChannel).IsNsfw)

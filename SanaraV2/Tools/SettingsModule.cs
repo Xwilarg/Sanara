@@ -46,7 +46,7 @@ namespace SanaraV2.Tools
         [Command("Archive", RunMode = RunMode.Async), Summary("Create an archive for all datas")]
         public async Task Archive()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != 144851584478740481)
             {
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
@@ -66,7 +66,7 @@ namespace SanaraV2.Tools
         [Command("Language"), Summary("Set the language of the bot for this server")]
         public async Task SetLanguage(params string[] language)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
@@ -91,7 +91,7 @@ namespace SanaraV2.Tools
         [Command("Prefix"), Summary("Set the prefix of the bot for this server")]
         public async Task SetPrefix(params string[] command)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
@@ -117,7 +117,7 @@ namespace SanaraV2.Tools
         [Command("Reload language"), Summary("Reload the language files")]
         public async Task ReloadLanguage()
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
             {
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
@@ -132,7 +132,7 @@ namespace SanaraV2.Tools
         [Command("Leave server"), Summary("Leave the server")]
         public async Task Leave(string serverName = null)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
             {
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
@@ -158,7 +158,7 @@ namespace SanaraV2.Tools
         [Command("Exit"), Summary("Exit the program")]
         public async Task Exit(string serverName = null)
         {
-            p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             else
