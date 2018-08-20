@@ -344,7 +344,7 @@ namespace SanaraV2
         {
             if (!u.IsBot && sendStats)
             {
-                await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
+                await UpdateElement(new Tuple<string, string>[] {   new Tuple<string, string>("modules", m.ToString()) });
             }
             DateTime now = DateTime.UtcNow;
             if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))
@@ -397,7 +397,35 @@ namespace SanaraV2
 
         private async void UpdateStatus()
         {
-            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("serverCount", client.Guilds.Count.ToString()) });
+            List<Tuple<string, int, int>> guilds = new List<Tuple<string, int, int>>();
+            foreach (IGuild g in client.Guilds)
+            {
+                int users = 0;
+                int bots = 0;
+                foreach (IGuildUser u in await g.GetUsersAsync())
+                {
+                    if (u.IsBot) bots++;
+                    else users++;
+                }
+                guilds.Add(new Tuple<string, int, int>(g.Name, users, bots));
+            }
+            Tuple<string, int, int> biggest = null;
+            string finalStr = "";
+            for (int i = 0; i < 10; i++)
+            {
+                foreach (var tuple in guilds)
+                {
+                    if (biggest == null || tuple.Item2 > biggest.Item2)
+                        biggest = tuple;
+                }
+                if (biggest == null)
+                    break;
+                finalStr += biggest.Item1.Replace("|", "").Replace("$", "") + "|" + biggest.Item2 + "|" + biggest.Item3 + "$";
+                guilds.Remove(biggest);
+                biggest = null;
+            }
+            await UpdateElement(new Tuple<string, string>[] {   new Tuple<string, string>("serverCount", client.Guilds.Count.ToString()),
+                                                                new Tuple<string, string>("serversBiggest", finalStr) });
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
