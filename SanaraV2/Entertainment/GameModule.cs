@@ -480,7 +480,7 @@ namespace SanaraV2.Entertainment
             {
                 isMsg = false;
                 tag = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                Tuple<string, long, string[]> t1 = BooruModule.GetImage(booru, new string[] { tag }).GetAwaiter().GetResult();
+                Tuple<string, long, string[]> t1 = BooruModule.GetImage(booru, new string[] { tag, "animated" }).GetAwaiter().GetResult();
                 allTags = t1.Item3.ToList();
                 if (t1.Item2 > 8000000)
                 {
