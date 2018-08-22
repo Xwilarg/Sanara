@@ -590,6 +590,8 @@ namespace SanaraV2.Entertainment
                         await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
                         g = new AnimeGame(Context.Channel, Context.Guild, Context.User, isEasy);
                     }
+                    if (Program.p.sendStats)
+                        await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
                     p.games.Add(g);
                     g.Post();
                 }

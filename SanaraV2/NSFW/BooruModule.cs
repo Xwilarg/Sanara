@@ -144,9 +144,7 @@ namespace SanaraV2.NSFW
                 return;
             }
             if (Program.p.sendStats)
-            {
                 await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString() + "|" + fileInfos.Item2.ToString()) });
-            }
             if (fileInfos.Item2 > 8000000)
                 await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
             else
