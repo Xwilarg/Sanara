@@ -78,26 +78,26 @@ namespace SanaraV2.Tools
                 Title = Translation.GetTranslation(guildId, "help"),
                 Color = Color.Purple
             };
-            embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Translation.GetTranslation(guildId, "animeMangaModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Translation.GetTranslation(guildId, "booruModuleDescription")
-                + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "booruModuleDescription2")) : ("")));
+            embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Translation.GetTranslation(guildId, "animeMangaModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleDescription2"));
+            embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Translation.GetTranslation(guildId, "booruModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription5")
+                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription6") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleDescription7")) : ("")));
             embed.AddField(Translation.GetTranslation(guildId, "codeModuleName"), Translation.GetTranslation(guildId, "codeModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleDescription"));
+            embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleDescription3"));
             embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"),
                 ((isChanNsfw) ? (Translation.GetTranslation(guildId, "doujinshiModuleDescription"))
                               : (NoCommandAvailable(guildId))));
-            embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleDescription")
-                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription2")) : (""))
-                + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription3"));
-            embed.AddField(Translation.GetTranslation(guildId, "girlsFrontlineModuleName"), Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription"));
+            embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription3")
+                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription4")) : (""))
+                + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription5"));
+            embed.AddField(Translation.GetTranslation(guildId, "girlsFrontlineModuleName"), Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription4"));
             embed.AddField(Translation.GetTranslation(guildId, "googleShortenerModuleName"),
                 ((isChanNsfw) ? (Translation.GetTranslation(guildId, "googleShortenerModuleDescription"))
                               : (NoCommandAvailable(guildId))));
-            embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"), Translation.GetTranslation(guildId, "linguisticModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleDescription"));
-            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleDescription"));
+            embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription5"));
+            embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription3"));
+            embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"), Translation.GetTranslation(guildId, "linguisticModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription5"));
+            embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription5"));
+            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDescription2"));
             embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Translation.GetTranslation(guildId, "visualNovelModuleDescription"));
             embed.AddField(Translation.GetTranslation(guildId, "xkcdModuleName"), Translation.GetTranslation(guildId, "xkcdModuleDescription"));
             embed.AddField(Translation.GetTranslation(guildId, "youtubeModuleName"), Translation.GetTranslation(guildId, "youtubeModuleDescription") + Environment.NewLine + Environment.NewLine

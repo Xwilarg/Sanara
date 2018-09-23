@@ -387,7 +387,7 @@ namespace SanaraV2.Entertainment
                         code = Utilities.GetElementXml("\"id\":", json, ',');
                         if (m_idImage == code)
                             return (null);
-                        return (Sentences.BooruGuessBad(m_guild.Id, newName));
+                        return (Sentences.GuessBad(m_guild.Id, newName));
                     }
                 }
                 catch (WebException ex)
@@ -450,7 +450,7 @@ namespace SanaraV2.Entertainment
                     return (null);
                 if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
                     return (Sentences.BooruGuessClose(m_guild.Id, userWord));
-                return (Sentences.BooruGuessBad(m_guild.Id, userWord));
+                return (Sentences.GuessBad(m_guild.Id, userWord));
             }
 
 #pragma warning disable CS1998
@@ -512,7 +512,7 @@ namespace SanaraV2.Entertainment
                     if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(answer).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(answer))))
                         return (Sentences.BooruGuessClose(m_guild.Id, userWord));
                 }
-                return (Sentences.BooruGuessBad(m_guild.Id, userWord));
+                return (Sentences.GuessBad(m_guild.Id, userWord));
             }
 
 #pragma warning disable CS1998

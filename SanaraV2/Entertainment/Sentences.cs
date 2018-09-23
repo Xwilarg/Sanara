@@ -42,10 +42,9 @@ namespace SanaraV2.Entertainment
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string KancolleGuessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGuessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
-        public static string KancolleGuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "kancolleGuessBad", attempt)); }
+        public static string GuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "guessBad", attempt)); }
         public static string WaitImages(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImages")); }
         public static string BooruGuessClose(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "booruGuessClose", attempt)); }
-        public static string BooruGuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "booruGuessBad", attempt)); }
         public static string LostStr(ulong guildId) { return (Translation.GetTranslation(guildId, "lost")); }
         public static string InvalidDifficulty(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidDifficulty")); }
 
