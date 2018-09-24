@@ -141,7 +141,7 @@ namespace Sanara_UnitTests
             Assert.True(mapName == "Bashi Island");
             Assert.True(File.Exists(mapIntro));
             Assert.True(File.Exists(mapDraw));
-            string branchs = KancolleModule.GetBranchingRules(infos);
+            string branchs = KancolleModule.GetBranchingRules(infos)[0];
             Assert.Contains("0 -> A,E/resource", branchs);
             Assert.Contains("A -> B/resource,E/resource", branchs);
             Assert.Contains("B/resource -> C/resource,D", branchs);

@@ -46,7 +46,9 @@ namespace SanaraV2.GamesInfo
                 await Context.Channel.SendFileAsync(mapDraw);
                 File.Delete(mapIntro);
                 File.Delete(mapDraw);
-                await ReplyAsync(GetBranchingRules(infos));
+                foreach (string s in GetBranchingRules(infos))
+                    if (s != "")
+                        await ReplyAsync(Regex.Replace(s, "<!---(?s:.)*--->", ""));
             }
         }
 
@@ -95,7 +97,7 @@ namespace SanaraV2.GamesInfo
         /// Return informations about the branching rule of the map
         /// </summary>
         /// <param name="infos">string containing informations to parse</param>
-        public static string GetBranchingRules(string infos)
+        public static string[] GetBranchingRules(string infos)
         {
             string branchingRules;
             if (infos.Contains("{{MapBranchingTable"))
@@ -111,7 +113,10 @@ namespace SanaraV2.GamesInfo
                 string line = currBranch.Substring(1, currBranch.Length - 1);
                 finalStr += line + Environment.NewLine;
             }
-            return (finalStr);
+            string finalInfos = "";
+            foreach (string s in infos.Split(new string[] { "\n===" }, StringSplitOptions.None).Skip(1))
+                finalInfos += "**" + s.Replace("*", "\\*").Replace("===", "**").Replace("{{Map/Footer}}", "") + Environment.NewLine;
+            return (new string[] { finalStr, finalInfos });
         }
 
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
