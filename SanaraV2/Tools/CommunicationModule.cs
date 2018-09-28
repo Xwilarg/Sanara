@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 using SanaraV2.Base;
 using System;
 using System.Collections.Generic;
@@ -216,8 +217,71 @@ namespace SanaraV2.Tools
                 yes++;
             else
                 no++;
-            embed.Color = new Color(no * 255 / 8, yes * 255 / 8, 0);
+            embed.Color = new Color(no * 255 / 9, yes * 255 / 9, 0);
             await ReplyAsync("", false, embed.Build());
+        }
+
+        [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
+        public async Task Quote(string id = null)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            IUser author = (id == null) ? (null) : (await Utilities.GetUser(id, Context.Guild));
+            if (id == null || author != null)
+            {
+                if (author == null)
+                    author = Context.User;
+                IMessage msg = (await Context.Channel.GetMessagesAsync().FlattenAsync()).Skip(1).ToList().Find(x => x.Author.Id == author.Id);
+                if (msg == null)
+                    await ReplyAsync(Sentences.QuoteNoMessage(Context.Guild.Id));
+                else
+                    await ReplyAsync("", false, new EmbedBuilder()
+                    {
+                        Description = msg.Content
+                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)) + " in " + msg.Channel.Name).Build());
+            }
+            else
+            {
+                ulong uId;
+                try
+                {
+                    uId = Convert.ToUInt64(id);
+                }
+                catch (FormatException)
+                {
+                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                    return;
+                }
+                catch (OverflowException)
+                {
+                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                    return;
+                }
+                IMessage msg = await Context.Channel.GetMessageAsync(uId);
+                if (msg == null)
+                {
+                    foreach (IGuildChannel chan in await Context.Guild.GetChannelsAsync())
+                    {
+                        try
+                        {
+                            ITextChannel textChan = chan as ITextChannel;
+                            if (textChan == null)
+                                continue;
+                            msg = await textChan.GetMessageAsync(uId);
+                            if (msg != null)
+                                break;
+                        } catch (HttpException) { }
+                    }
+                }
+                if (msg == null)
+                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                else
+                {
+                    await ReplyAsync("", false, new EmbedBuilder()
+                    {
+                        Description = msg.Content
+                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)) + " in " + msg.Channel.Name).Build());
+                }
+            }
         }
 
         private List<FileInfo> GetFiles(DirectoryInfo dir)
