@@ -184,16 +184,6 @@ namespace SanaraV2.Tools
                 yes++;
             else
                 no++;
-            if (p.malClient != null)
-            {
-                embed.AddField("Anime/Manga module", "**MyAnimeList API key:** Yes");
-                yes++;
-            }
-            else
-            {
-                embed.AddField("Anime/Manga module", "**MyAnimeList API key:** No");
-                no++;
-            }
             embed.AddField("Linguistic Module - Translations",
                 "**Google Translate API key:** " + ((p.translationClient != null ? ("Yes") : ("No"))) + Environment.NewLine +
                 "**Google Vision API key:** " + ((p.visionClient != null ? ("Yes") : ("No"))));
@@ -217,7 +207,7 @@ namespace SanaraV2.Tools
                 yes++;
             else
                 no++;
-            embed.Color = new Color(no * 255 / 9, yes * 255 / 9, 0);
+            embed.Color = new Color(no * 255 / 8, yes * 255 / 8, 0);
             await ReplyAsync("", false, embed.Build());
         }
 

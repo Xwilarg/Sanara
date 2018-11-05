@@ -43,7 +43,6 @@ You can also do the 'GDPR' command at any time to check the informations the bot
 - You then need to create at least a 'token.dat' file inside the Keys folder. It contains the token of your bot.
 - The last step is to go inside 'Sentences.cs' and change the ownerId value by your Discord id.
 - You can also create the following files in the 'Keys' folder:
-  - malPwd.dat (contain nickname and password (sepatated by a new line) for MyAnimeList)
   - Sanara-7430da57d6af.json (contain your json file to access to the Google Translate API)
   - URLShortenerAPIKey.dat (contain your key for the goo.gl API), youtubeAPIKey.dat (contain your key for the YouTube API)
   - ranven.dat (contain your url to use Sentry)

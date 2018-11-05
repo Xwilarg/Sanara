@@ -54,8 +54,6 @@ namespace SanaraV2
         public List<GameModule.Game> games;
         public Thread gameThread;
 
-        public WebClient malClient;
-
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
@@ -160,16 +158,6 @@ namespace SanaraV2
         
         private void InitServices()
         {
-            if (File.Exists("Keys/malPwd.dat"))
-            {
-                string[] malCredentials = File.ReadAllLines("Keys/malPwd.dat");
-                malClient = new WebClient {
-                    Credentials = new NetworkCredential(malCredentials[0], malCredentials[1])
-                };
-            }
-            else
-                malClient = null;
-
             if (File.Exists("Keys/Sanara-7430da57d6af.json"))
             {
                 credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
