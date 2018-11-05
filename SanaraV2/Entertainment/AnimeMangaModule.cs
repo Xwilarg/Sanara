@@ -31,7 +31,7 @@ namespace SanaraV2.Entertainment
         public async Task Mal(params string[] animeNameArr)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            await SearchAnime(false, animeNameArr, Context.Channel as ITextChannel);
+            await SearchAnime(true, animeNameArr, Context.Channel as ITextChannel);
         }
 
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
@@ -69,7 +69,12 @@ namespace SanaraV2.Entertainment
                 Title = data.canonicalTitle,
                 Color = Color.Green,
                 ImageUrl = data.posterImage.original,
-                Description = ((data.abbreviatedTitles.Count > 0) ? ("Or " + string.Join(", ", data.abbreviatedTitles) + Environment.NewLine + Environment.NewLine) : ("")) + "Average rating: " + data.averageRating + Environment.NewLine + Environment.NewLine + data.synopsis
+                Description = ((data.abbreviatedTitles.Count > 0) ? ("Or " + string.Join(", ", data.abbreviatedTitles)
+                 + Environment.NewLine + Environment.NewLine) : ("")) + ((isAnime && data.episodeCount != null) ? ("Number of episodes: " + (string)data.episodeCount + ((data.episodeLength != null) ? (" (" + (string)data.episodeLength + " minutes per episodes)") : ("")) + Environment.NewLine) : (""))
+                 + "Kitsu average rating: " + (string)data.averageRating + "/100" + Environment.NewLine
+                 + "Released date: " + ((data.startDate != null) ? ((string)data.startDate + " - " + ((data.endDate != null) ? ((string)data.endDate) : ("???"))) : ("To be announced")) + Environment.NewLine
+                 + "Audience warning: " + (string)data.ageRatingGuide
+                 + Environment.NewLine + Environment.NewLine + data.synopsis
             }.Build());
         }
     }
