@@ -22,6 +22,8 @@ using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
+using RethinkDb.Driver;
+using RethinkDb.Driver.Net;
 using SanaraV2.Base;
 using SanaraV2.Entertainment;
 using SanaraV2.GamesInfo;
@@ -33,7 +35,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,6 +76,9 @@ namespace SanaraV2
         public ImageAnnotatorClient visionClient;
         public bool sendStats { private set; get; }
 
+        private RethinkDB R = RethinkDB.R;
+        private static Connection conn;
+
         private Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -92,6 +96,10 @@ namespace SanaraV2
 
         private async Task MainAsync(bool launchBot)
         {
+            conn = await R.Connection().ConnectAsync();
+            if (!R.DbList().Contains("Sanara").Run<bool>(conn))
+                R.DbCreate("Sanara").Run(conn);
+
             p = this;
             games = new List<GameModule.Game>();
             gameThread = new Thread(new ThreadStart(GameThread));
