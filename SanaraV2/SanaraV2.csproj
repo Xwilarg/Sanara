@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BooruSharp, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -232,72 +234,76 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entertainment\Sentences.cs" />
-    <Compile Include="GamesInfo\Sentences.cs" />
-    <Compile Include="GamesInfo\GirlsFrontlineModule.cs" />
-    <Compile Include="GamesInfo\Wikia.cs" />
-    <Compile Include="NSFW\Sentences.cs" />
-    <Compile Include="Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
+    <Compile Include="Features\Entertainment\Error.cs" />
+    <Compile Include="Features\FeatureRequest.cs" />
+    <Compile Include="Features\Utilities.cs" />
+    <Compile Include="Modules\Entertainment\Sentences.cs" />
+    <Compile Include="Modules\GamesInfo\Sentences.cs" />
+    <Compile Include="Modules\GamesInfo\GirlsFrontline.cs" />
+    <Compile Include="Modules\GamesInfo\Wikia.cs" />
+    <Compile Include="Modules\NSFW\Sentences.cs" />
+    <Compile Include="Modules\Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HiraganaToRomaji.resx</DependentUpon>
     </Compile>
-    <Compile Include="NSFW\BooruModule.cs" />
+    <Compile Include="Modules\NSFW\Booru.cs" />
     <Compile Include="Character.cs" />
-    <Compile Include="Tools\CodeModule.cs" />
-    <Compile Include="Tools\CommunicationModule.cs" />
-    <Compile Include="Entertainment\GameModule.cs" />
-    <Compile Include="Entertainment\GoogleShortenerModule.cs" />
-    <Compile Include="Tools\ImageModule.cs" />
-    <Compile Include="Tools\LinguistModule.cs" />
-    <Compile Include="GamesInfo\KancolleModule.cs" />
-    <Compile Include="Entertainment\AnimeMangaModule.cs" />
-    <Compile Include="NSFW\DoujinshiModule.cs" />
+    <Compile Include="Modules\Tools\Code.cs" />
+    <Compile Include="Modules\Tools\Communication.cs" />
+    <Compile Include="Modules\Entertainment\Game.cs" />
+    <Compile Include="Modules\Entertainment\GoogleShortener.cs" />
+    <Compile Include="Modules\Tools\Image.cs" />
+    <Compile Include="Modules\Tools\Linguist.cs" />
+    <Compile Include="Modules\GamesInfo\Kancolle.cs" />
+    <Compile Include="Modules\Entertainment\AnimeManga.cs" />
+    <Compile Include="Modules\NSFW\Doujinshi.cs" />
+    <Compile Include="Features\Entertainment\AnimeManga.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Entertainment\RadioModule.cs" />
-    <Compile Include="Base\Sentences.cs" />
-    <Compile Include="Tools\LinguistResources\KatakanaToRomaji.Designer.cs">
+    <Compile Include="Modules\Entertainment\Radio.cs" />
+    <Compile Include="Modules\Base\Sentences.cs" />
+    <Compile Include="Modules\Tools\LinguistResources\KatakanaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>KatakanaToRomaji.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tools\LinguistResources\RomajiToHiragana.Designer.cs">
+    <Compile Include="Modules\Tools\LinguistResources\RomajiToHiragana.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RomajiToHiragana.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tools\LinguistResources\RomajiToKatakana.Designer.cs">
+    <Compile Include="Modules\Tools\LinguistResources\RomajiToKatakana.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RomajiToKatakana.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Sentences.cs" />
-    <Compile Include="Tools\SettingsModule.cs" />
-    <Compile Include="Base\Translation.cs" />
-    <Compile Include="Base\Utilities.cs" />
-    <Compile Include="Entertainment\VnModule.cs" />
-    <Compile Include="Entertainment\XKCDModule.cs" />
-    <Compile Include="Entertainment\YoutubeModule.cs" />
+    <Compile Include="Modules\Tools\Sentences.cs" />
+    <Compile Include="Modules\Tools\Settings.cs" />
+    <Compile Include="Modules\Base\Translation.cs" />
+    <Compile Include="Modules\Base\Utilities.cs" />
+    <Compile Include="Modules\Entertainment\Vn.cs" />
+    <Compile Include="Modules\Entertainment\XKCD.cs" />
+    <Compile Include="Modules\Entertainment\Youtube.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Tools\LinguistResources\HiraganaToRomaji.resx">
+    <EmbeddedResource Include="Modules\Tools\LinguistResources\HiraganaToRomaji.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HiraganaToRomaji.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tools\LinguistResources\KatakanaToRomaji.resx">
+    <EmbeddedResource Include="Modules\Tools\LinguistResources\KatakanaToRomaji.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>KatakanaToRomaji.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tools\LinguistResources\RomajiToHiragana.resx">
+    <EmbeddedResource Include="Modules\Tools\LinguistResources\RomajiToHiragana.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RomajiToHiragana.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tools\LinguistResources\RomajiToKatakana.resx">
+    <EmbeddedResource Include="Modules\Tools\LinguistResources\RomajiToKatakana.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RomajiToKatakana.Designer.cs</LastGenOutput>
     </EmbeddedResource>
