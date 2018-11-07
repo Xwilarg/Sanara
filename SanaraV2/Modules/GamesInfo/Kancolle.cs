@@ -14,7 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

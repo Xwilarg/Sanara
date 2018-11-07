@@ -235,6 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Features\Entertainment\Error.cs" />
+    <Compile Include="Features\Entertainment\Response.cs" />
     <Compile Include="Features\FeatureRequest.cs" />
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />

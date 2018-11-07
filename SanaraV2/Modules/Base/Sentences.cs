@@ -57,6 +57,7 @@ namespace SanaraV2.Modules.Base
         /// --------------------------- Parts ---------------------------
         public static string AndStr(ulong guildId) { return (Translation.GetTranslation(guildId, "and")); }
         public static string DateHourFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "dateHourFormat")); }
+        public static string DateHourFormatShort(ulong guildId) { return (Translation.GetTranslation(guildId, "dateHourFormatShort")); }
         public static string OrStr(ulong guildId) { return (Translation.GetTranslation(guildId, "or")); }
     }
 }

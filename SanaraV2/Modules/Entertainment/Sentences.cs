@@ -48,14 +48,17 @@ namespace SanaraV2.Modules.Entertainment
         public static string LostStr(ulong guildId) { return (Translation.GetTranslation(guildId, "lost")); }
         public static string InvalidDifficulty(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidDifficulty")); }
 
-        /// --------------------------- MyAnimeList ---------------------------
+        /// --------------------------- AnimeManga ---------------------------
         public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }
         public static string AnimeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "animeHelp")); }
         public static string MangaNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaNotFound")); }
         public static string AnimeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotFound")); }
-        public static string AnimeInfos(ulong guildId, string type, string status, string episodes) { return (Translation.GetTranslation(guildId, "animeInfos", type, status, episodes)); }
-        public static string AnimeScore(ulong guildId, string score) { return (Translation.GetTranslation(guildId, "animeScore", score)); }
-        public static string Synopsis(ulong guildId) { return (Translation.GetTranslation(guildId, "synopsis")); }
+        public static string AnimeEpisodes(ulong guildId, int episodes) { return (Translation.GetTranslation(guildId, "animeEpisodes",  episodes.ToString())); }
+        public static string AnimeLength(ulong guildId, int length) { return (Translation.GetTranslation(guildId, "animeLength", length.ToString())); }
+        public static string AnimeDate(ulong guildId, string start, string end) { return (Translation.GetTranslation(guildId, "animeDate", start, end)); }
+        public static string AnimeRating(ulong guildId, float rating) { return (Translation.GetTranslation(guildId, "animeRating", rating.ToString())); }
+        public static string AnimeAudiance(ulong guildId, string audiance) { return (Translation.GetTranslation(guildId, "animeAudiance", audiance)); }
+        public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
 
         /// --------------------------- Radio ---------------------------
         public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }

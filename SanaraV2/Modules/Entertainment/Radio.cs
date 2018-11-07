@@ -17,7 +17,7 @@ using Discord.Audio;
 using Discord.Commands;
 using MediaToolkit;
 using MediaToolkit.Model;
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -15,8 +15,7 @@
 using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
-using SanaraV2.Base;
-using SanaraV2.Modules.NSFW;
+using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Tools;
 using System;
 using System.Collections.Generic;

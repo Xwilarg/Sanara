@@ -25,7 +25,7 @@ using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Grpc.Core;
 using System.Resources;
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 
 namespace SanaraV2.Modules.Tools
 {

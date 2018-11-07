@@ -12,7 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

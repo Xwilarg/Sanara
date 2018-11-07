@@ -15,7 +15,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.Net;
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -146,8 +146,6 @@ namespace SanaraV2.Modules.Tools
                 await ReplyAsync("", false, embed2.Build());
             }
         }
-
-
 
         [Command("Status"), Summary("Display which commands aren't available because of missing files")]
         public async Task Status()

@@ -22,7 +22,6 @@ using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
-using SanaraV2.Base;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
 using SanaraV2.Modules.GamesInfo;
@@ -154,7 +153,6 @@ namespace SanaraV2
             Environment.Exit(1);
             return Task.CompletedTask;
         }
-
         
         private void InitServices()
         {
@@ -194,8 +192,7 @@ namespace SanaraV2
             }
             else
                 ravenClient = null;
-
-
+            
             if (File.Exists("Keys/visionAPI.json"))
             {
                 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");

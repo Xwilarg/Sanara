@@ -15,6 +15,7 @@
 using Discord;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -28,29 +29,30 @@ namespace SanaraV2.Features.Entertainment
         /// <param name="isAnime">Is the search an anime (true) or a manga (false)</param>
         /// <param name="args">Name</param>
         /// <returns>Embed containing anime/manga informations (if found)</returns>
-        public static async Task<FeatureRequest<Embed, Error.AnimeMangaError>> SearchAnime(bool isAnime, string[] args)
+        public static async Task<FeatureRequest<Response.AnimeManga, Error.AnimeManga>> SearchAnime(bool isAnime, string[] args)
         {
             string searchName = Utilities.AddArgs(args);
             if (searchName.Length == 0)
-                return (new FeatureRequest<Embed, Error.AnimeMangaError>(null, Error.AnimeMangaError.Help));
+                return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.Help));
             dynamic json;
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=1&filter[text]=" + searchName)).Content.ReadAsStringAsync());
             if (json.data.Count == 0)
-                return (new FeatureRequest<Embed, Error.AnimeMangaError>(null, Error.AnimeMangaError.NotFound));
+                return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound));
             dynamic data = json.data[0].attributes;
-            return (new FeatureRequest<Embed, Error.AnimeMangaError>(new EmbedBuilder
+            return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(new Response.AnimeManga()
             {
-                Title = data.canonicalTitle,
-                Color = Color.Green,
-                ImageUrl = data.posterImage.original,
-                Description = ((data.abbreviatedTitles.Count > 0) ? ("Or " + string.Join(", ", data.abbreviatedTitles)
-                 + Environment.NewLine + Environment.NewLine) : ("")) + ((isAnime && data.episodeCount != null) ? ("Number of episodes: " + (string)data.episodeCount + ((data.episodeLength != null) ? (" (" + (string)data.episodeLength + " minutes per episodes)") : ("")) + Environment.NewLine) : (""))
-                 + "Kitsu average rating: " + (string)data.averageRating + "/100" + Environment.NewLine
-                 + "Released date: " + ((data.startDate != null) ? ((string)data.startDate + " - " + ((data.endDate != null) ? ((string)data.endDate) : ("???"))) : ("To be announced")) + Environment.NewLine
-                 + "Audience warning: " + (string)data.ageRatingGuide
-                 + Environment.NewLine + Environment.NewLine + data.synopsis
-            }.Build(), Error.AnimeMangaError.None));
+                name = data.canonicalTitle,
+                imageUrl = data.posterImage.original,
+                alternativeTitles = data.abbreviatedTitles.ToObject<string[]>(),
+                episodeCount = data.episodeCount,
+                episodeLength = data.episodeLength,
+                rating = data.averageRating,
+                startDate = data.startDate ?? DateTime.ParseExact((string)data.startDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
+                endDate = data.endDate ?? DateTime.ParseExact((string)data.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
+                ageRating = data.ageRatingGuide,
+                synopsis = data.synopsis
+            }, Error.AnimeManga.None));
         }
     }
 }

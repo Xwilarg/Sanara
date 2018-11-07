@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Discord.Net;
 using System.Linq;
-using SanaraV2.Base;
+using SanaraV2.Modules.Base;
 using BooruSharp.Booru;
 
 namespace SanaraV2.Modules.NSFW

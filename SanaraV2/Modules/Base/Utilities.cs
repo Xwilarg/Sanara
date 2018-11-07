@@ -13,15 +13,15 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
-using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanaraV2.Base
+namespace SanaraV2.Modules.Base
 {
     public static class Utilities
     {
@@ -59,6 +59,12 @@ namespace SanaraV2.Base
                 { }
             }
         }
+
+        public static string CapitalizeFirstLetter(string str)
+        {
+            return (char.ToUpper(str[0]) + str.Substring(1));
+        }
+
         /// <summary>
         /// Remove first argument of array
         /// </summary>
@@ -96,7 +102,7 @@ namespace SanaraV2.Base
         {
             if (args.Length == 0)
                 return (null);
-            return (String.Join(" ", args));
+            return (string.Join(" ", args));
         }
 
         /// <summary>

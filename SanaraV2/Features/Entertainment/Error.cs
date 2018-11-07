@@ -16,7 +16,7 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Error
     {
-        public enum AnimeMangaError
+        public enum AnimeManga
         {
             None,
             Help,
