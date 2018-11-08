@@ -34,7 +34,7 @@ namespace SanaraV2.Modules.Base
         public static string ChanIsNotNsfw(ulong guildId) { return (Translation.GetTranslation(guildId, "chanIsNotNsfw")); }
         public static string NothingAfterXIterations(ulong guildId, int nbIterations) { return (Translation.GetTranslation(guildId, "nothingAfterXIterations", nbIterations.ToString())); }
         public static string TooManyRequests(ulong guildId, string apiName) { return (Translation.GetTranslation(guildId, "tooManyRequests", apiName)); }
-        public static string TagsNotFound(string[] tags)
+        public static string TagsNotFound(string[] tags) // TODO: Support language
         {
             if (tags.Length == 1)
                 return ("I didn't find anything with the tag '" + tags[0] + "'.");

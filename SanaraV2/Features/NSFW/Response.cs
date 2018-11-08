@@ -1,4 +1,5 @@
-﻿/// This file is part of Sanara.
+﻿using Discord;
+/// This file is part of Sanara.
 ///
 /// Sanara is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU General Public License as published by
@@ -17,6 +18,12 @@ namespace SanaraV2.Features.NSFW
     public static class Response
     {
         public class Booru
+        {
+            public string url;
+            public Color colorRating;
+        }
+
+        public class Doujinshi
         {
             public string url;
         }

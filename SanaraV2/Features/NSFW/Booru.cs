@@ -12,6 +12,8 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,11 +25,31 @@ namespace SanaraV2.Features.NSFW
         {
             if (!booru.IsSafe() && isChanSafe)
                 return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW));
-            string url = (await booru.GetRandomImage(tags)).fileUrl.AbsoluteUri;
+            var res = await booru.GetRandomImage(tags);
+            string url = res.fileUrl.AbsoluteUri;
             if (!Utilities.IsImage(url.Split('.').Last()))
                 return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.InvalidFile));
+            Color color;
+            switch (res.rating)
+            {
+                case BooruSharp.Search.Post.Rating.Explicit:
+                    color = Color.Red;
+                    break;
+
+                case BooruSharp.Search.Post.Rating.Questionable:
+                    color = new Color(255, 255, 0);
+                    break;
+
+                case BooruSharp.Search.Post.Rating.Safe:
+                    color = Color.Green;
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
             return (new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
-                    url = url
+                    url = url,
+                    colorRating = color
                 }, Error.Booru.None));
         }
     }

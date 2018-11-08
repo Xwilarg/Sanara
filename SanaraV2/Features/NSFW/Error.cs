@@ -22,5 +22,12 @@ namespace SanaraV2.Features.NSFW
             ChanNotNSFW,
             InvalidFile
         }
+
+        public enum Doujinshi
+        {
+            None,
+            ChanNotNSFW,
+            NotFound
+        }
     }
 }

@@ -105,7 +105,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Booru.None:
-                    await chan.SendMessageAsync("", false, new EmbedBuilder() { Color = Color.Blue, ImageUrl = result.answer.url }.Build());
+                    await chan.SendMessageAsync("", false, new EmbedBuilder() { Color = result.answer.colorRating, ImageUrl = result.answer.url }.Build());
                     break;
 
                 default:

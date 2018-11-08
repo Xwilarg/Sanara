@@ -32,104 +32,20 @@ namespace SanaraV2.Modules.NSFW
         public async Task GetNhentai(params string[] keywords)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            if (!(Context.Channel as ITextChannel).IsNsfw)
+            var result = await Features.NSFW.Doujinshi.SearchDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, keywords, Program.p.rand);
+            switch (result.error)
             {
-                await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
-                return;
-            }
-            string errorTag;
-            string finalStr = GetDoujinshi(keywords, out errorTag);
-            if (finalStr == null)
-            {
-                if (errorTag == null)
+                case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Doujinshi.NotFound:
                     await ReplyAsync(Base.Sentences.TagsNotFound(keywords));
-                else
-                    await ReplyAsync(Base.Sentences.TagsNotFound(new string[] { errorTag }));
-            }
-            else
-                await ReplyAsync(finalStr);
-        }
+                    break;
 
-        public static string GetDoujinshi(string[] keywords, out string wrongTag)
-        {
-            wrongTag = null;
-            string tags = "";
-            if (keywords.Length != 0)
-                tags = String.Join("+", keywords);
-            string xml = GetXml(keywords, tags);
-            List<string> allDoujinshi = xml.Split(new string[] { "title" }, StringSplitOptions.None).ToList();
-            allDoujinshi.RemoveAt(0);
-            if (allDoujinshi.Count == 0)
-                return (null);
-            else
-            {
-                string curr = allDoujinshi[Program.p.rand.Next(allDoujinshi.Count)];
-                string[] ids = curr.Split(new string[] { "}]" }, StringSplitOptions.None);
-                string currBlock = "";
-                for (int i = ids.Length - 1; i >= 0; i--)
-                {
-                    currBlock = Utilities.GetElementXml("\"id\":", ids[i], ',');
-                    if (currBlock != "")
-                    {
-                        if (currBlock[currBlock.Length - 1] == '"')
-                            return GetDoujinshi(keywords, out wrongTag);
-                        if (keywords.Length == 0)
-                        {
-                            return ("https://nhentai.net/g/" + currBlock);
-                        }
-                        else
-                        {
-                            string finalOk = "";
-                            foreach (string t in keywords)
-                            {
-                                bool isOk = false;
-                                foreach (string s in ids[i - 1].Split(new string[] { "},{" }, StringSplitOptions.None))
-                                {
-                                    if (Utilities.GetElementXml("\"name\":\"", s, '"').Contains(t))
-                                    {
-                                        isOk = true;
-                                        break;
-                                    }
-                                }
-                                if (!isOk)
-                                {
-                                    finalOk = t;
-                                    break;
-                                }
-                            }
-                            if (finalOk == "")
-                                return ("https://nhentai.net/g/" + currBlock);
-                            else
-                            {
-                                wrongTag = finalOk;
-                                return (null);
-                            }
-                        }
-                    }
-                }
-                return (null);
-            }
-        }
-
-        private static string GetXml(string[] keywords, string tags)
-        {
-            string xml;
-            using (WebClient w = new WebClient())
-            {
-                w.Encoding = Encoding.UTF8;
-                if (keywords.Length == 0)
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/all?page=0");
-                else
-                    xml = w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=8000");
-            }
-            int page = Program.p.rand.Next(Convert.ToInt32(Utilities.GetElementXml("\"num_pages\":", xml, ','))) + 1;
-            using (WebClient w = new WebClient())
-            {
-                w.Encoding = Encoding.UTF8;
-                if (keywords.Length == 0)
-                    return (w.DownloadString("https://nhentai.net/api/galleries/all?page=" + page));
-                else
-                    return (w.DownloadString("https://nhentai.net/api/galleries/search?query=" + tags + "&page=" + page));
+                default:
+                    await ReplyAsync(result.answer.url);
+                    break;
             }
         }
     }
