@@ -104,6 +104,10 @@ namespace SanaraV2.Modules.NSFW
                     await chan.SendMessageAsync(Sentences.InvalidExtension(chan.GuildId));
                     break;
 
+                case Features.NSFW.Error.Booru.NotFound:
+                    await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
+                    break;
+
                 case Features.NSFW.Error.Booru.None:
                     await chan.SendMessageAsync("", false, new EmbedBuilder() { Color = result.answer.colorRating, ImageUrl = result.answer.url }.Build());
                     break;
@@ -111,39 +115,6 @@ namespace SanaraV2.Modules.NSFW
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        private static async Task<string[]> CorrectName(string query, BooruSharp.Booru.Booru booru)
-        {
-             char[] split = new char[] {
-                '(', ')', '_', ',', '.', '[', ']', '#', '{', '}', '|'
-            };
-            BooruSharp.Search.Tag.SearchResult[] res = (await booru.GetTags(query)).ToArray();
-            if (res.Length > 0)
-                return (res.Select(delegate (BooruSharp.Search.Tag.SearchResult result) { return (result.name); }).ToArray());
-            List<string> othersRes = new List<string>();
-            string[] splitQuery = query.Split(split, int.MaxValue, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string q in splitQuery)
-                othersRes.AddRange((await booru.GetTags(q)).Select(delegate (BooruSharp.Search.Tag.SearchResult result) { return (result.name); }).ToList());
-            othersRes = othersRes.Distinct().ToList();
-            List<string> bestRes = new List<string>();
-            foreach (string s in othersRes)
-            {
-                bool isEverywhere = true;
-                foreach (string s2 in s.Split(split, int.MaxValue, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (!splitQuery.Contains(s2))
-                    {
-                        isEverywhere = false;
-                        break;
-                    }
-                }
-                if (isEverywhere)
-                    bestRes.Add(s);
-            }
-            if (bestRes.Count > 0)
-                return (bestRes.ToArray());
-            return (othersRes.ToArray());
         }
 
         public static async Task<Tuple<string, long, string[]>> GetImage(BooruSharp.Booru.Booru booru, string[] tags)
