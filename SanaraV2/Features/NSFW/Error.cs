@@ -12,24 +12,15 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using System;
-
-namespace SanaraV2.Features.Entertainment
+namespace SanaraV2.Features.NSFW
 {
-    public static class Response
+    public static class Error
     {
-        public class AnimeManga
+        public enum Booru
         {
-            public string name;
-            public string imageUrl;
-            public string[] alternativeTitles;
-            public int? episodeCount;
-            public int? episodeLength;
-            public float rating;
-            public DateTime? startDate;
-            public DateTime? endDate;
-            public string ageRating;
-            public string synopsis;
+            None,
+            ChanNotNSFW,
+            InvalidFile
         }
     }
 }

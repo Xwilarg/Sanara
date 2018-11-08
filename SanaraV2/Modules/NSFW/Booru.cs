@@ -31,138 +31,85 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
-        private static string GetTags(string[] tags)
+        private enum TagId
         {
-            string finalTags = "&tags=";
-            if (tags.Length > 0)
-            {
-                finalTags += tags[0];
-                if (tags.Length > 1)
-                    finalTags += "+" + String.Join("+", tags.Skip(1));
-            }
-            return (finalTags);
+            Safebooru,
+            Gelbooru,
+            Konachan,
+            Rule34,
+            E621,
+            E926,
+            Sakugabooru
         }
 
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, 0);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, TagId.Safebooru);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, 1);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, TagId.Gelbooru);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, 2);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, TagId.Konachan);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, 3);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, TagId.Rule34);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags, 4);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags, TagId.E621);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
         public async Task E926Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags, 5);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, TagId.E926);
         }
 
-        [Command("Sakugabooru", RunMode = RunMode.Async), Summary("Get an image from Sakugabooru")]
+        /*[Command("Sakugabooru", RunMode = RunMode.Async), Summary("Get an image from Sakugabooru")]
         public async Task SakugabooruSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, 6);
-        }
+            await PostImage(new Sakugabooru(), Context.Channel as ITextChannel, tags, TagId.Sakugabooru);
+        }*/
 
-        private static async Task PostImage(BooruSharp.Booru.Booru booru, ITextChannel chan, string[] tags, int id)
+        private static async Task PostImage(BooruSharp.Booru.Booru booru, ITextChannel chan, string[] tags, TagId id)
         {
-            if (!booru.IsSafe() && !chan.IsNsfw)
+            var result = await Features.NSFW.Booru.SearchBooru(!chan.IsNsfw, tags, booru);
+            switch (result.error)
             {
-                await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
-                return;
-            }
-            IGuildUser me = await chan.Guild.GetUserAsync(Base.Sentences.myId);
-            if (!me.GuildPermissions.AttachFiles)
-            {
-                if (chan != null)
-                    await chan.SendMessageAsync(Base.Sentences.NeedAttachFile(chan.GuildId));
-                return;
-            }
-            await chan.SendMessageAsync(Sentences.PrepareImage(chan.GuildId));
-            Tuple<string, long, string[]> fileInfos;
-            try
-            {
-                fileInfos = await GetImage(booru, tags);
-            }
-            catch (BooruSharp.Search.InvalidTags)
-            {
-                /* List<string> newTags = new List<string>();
-                 foreach (string t in tags)
-                 {
-                     string[] correct = await CorrectName(t, booru);
-                     if (correct.Length == 1)
-                         newTags.Add(correct[0]);
-                     else if (correct.Length == 0)
-                     {
-                         await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
-                         return;
-                     }
-                     else
-                     {
-                         await chan.SendMessageAsync(Sentences.MoreThanOneSimilar(chan.GuildId, t) + Environment.NewLine + "```" + Environment.NewLine + String.Join(", ", correct) + Environment.NewLine + "```");
-                         return;
-                     }
-                 }
-                 try
-                 {
-                     fileInfos = await GetImage(booru, tags);
-                 }
-                 catch (BooruSharp.Search.InvalidTags)
-                 {
-                     await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
-                     return;
-                 }*/
-                await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
-                return;
-            }
-            if (Program.p.sendStats)
-                await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString() + "|" + fileInfos.Item2.ToString()) });
-            if (fileInfos.Item2 > 8000000)
-                await chan.SendMessageAsync(Sentences.FileTooBig(chan.GuildId));
-            else
-            {
-                IUserMessage msg;
-                while (true)
-                {
-                    try
-                    {
-                        await chan.SendFileAsync(fileInfos.Item1);
-                        msg = await chan.SendMessageAsync(".");
-                        break;
-                    }
-                    catch (RateLimitedException)
-                    { }
-                }
-                File.Delete(fileInfos.Item1);
-                await msg.ModifyAsync(x => x.Content = GetTagsInfos(booru, (chan == null) ? (0) : (chan.GuildId), fileInfos.Item3).GetAwaiter().GetResult());
+                case Features.NSFW.Error.Booru.ChanNotNSFW:
+                    await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
+                    break;
+
+                case Features.NSFW.Error.Booru.InvalidFile:
+                    await chan.SendMessageAsync(Sentences.InvalidExtension(chan.GuildId));
+                    break;
+
+                case Features.NSFW.Error.Booru.None:
+                    await chan.SendMessageAsync("", false, new EmbedBuilder() { Color = Color.Blue, ImageUrl = result.answer.url }.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 

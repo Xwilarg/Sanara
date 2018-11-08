@@ -19,8 +19,7 @@ namespace SanaraV2.Modules.NSFW
     public static class Sentences
     {
         /// --------------------------- Booru ---------------------------
-        public static string FileTooBig(ulong guildId) { return (Translation.GetTranslation(guildId, "fileTooBig")); }
-        public static string PrepareImage(ulong guildId) { return (Translation.GetTranslation(guildId, "prepareImage")); }
+        public static string InvalidExtension(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidExtension")); }
         public static string MoreNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "moreNotTagged")); }
         public static string AnimeFromOriginal(ulong guildId) { return (Translation.GetTranslation(guildId, "animeFromOriginal")); }
         public static string AnimeNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotTagged")); }

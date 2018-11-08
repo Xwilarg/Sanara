@@ -27,5 +27,11 @@ namespace SanaraV2.Features
                 return (null);
             return (string.Join(" ", args));
         }
+
+        public static bool IsImage(string extension)
+        {
+            return (extension == "gif" || extension == "png" || extension == "jpg"
+                || extension == "jpeg");
+        }
     }
 }

@@ -237,6 +237,9 @@
     <Compile Include="Features\Entertainment\Error.cs" />
     <Compile Include="Features\Entertainment\Response.cs" />
     <Compile Include="Features\FeatureRequest.cs" />
+    <Compile Include="Features\NSFW\Booru.cs" />
+    <Compile Include="Features\NSFW\Error.cs" />
+    <Compile Include="Features\NSFW\Response.cs" />
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
     <Compile Include="Modules\GamesInfo\Sentences.cs" />
@@ -309,6 +312,7 @@
       <LastGenOutput>RomajiToKatakana.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
