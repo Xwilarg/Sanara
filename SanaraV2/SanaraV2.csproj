@@ -237,7 +237,6 @@
     <Compile Include="Features\Entertainment\Error.cs" />
     <Compile Include="Features\Entertainment\Response.cs" />
     <Compile Include="Features\Entertainment\Xkcd.cs" />
-    <Compile Include="Features\Entertainment\YouTube.cs" />
     <Compile Include="Features\FeatureRequest.cs" />
     <Compile Include="Features\NSFW\Booru.cs" />
     <Compile Include="Features\NSFW\Doujinshi.cs" />
@@ -259,7 +258,6 @@
     <Compile Include="Modules\Tools\Code.cs" />
     <Compile Include="Modules\Tools\Communication.cs" />
     <Compile Include="Modules\Entertainment\Game.cs" />
-    <Compile Include="Modules\Entertainment\GoogleShortener.cs" />
     <Compile Include="Modules\Tools\Image.cs" />
     <Compile Include="Modules\Tools\Linguist.cs" />
     <Compile Include="Modules\GamesInfo\Kancolle.cs" />

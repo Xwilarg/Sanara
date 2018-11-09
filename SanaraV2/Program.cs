@@ -119,7 +119,6 @@ namespace SanaraV2
             await commands.AddModuleAsync<AnimeManga>();
             await commands.AddModuleAsync<GameModule>();
             await commands.AddModuleAsync<YoutubeModule>();
-            await commands.AddModuleAsync<GoogleShortener>();
             await commands.AddModuleAsync<RadioModule>();
             await commands.AddModuleAsync<Xkcd>();
             await commands.AddModuleAsync<Modules.Tools.Image>();
