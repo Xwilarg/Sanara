@@ -31,5 +31,13 @@ namespace SanaraV2.Features.Entertainment
             public string ageRating;
             public string synopsis;
         }
+
+        public class Xkcd
+        {
+            public string imageUrl;
+            public int maxNb;
+            public string title;
+            public string alt;
+        }
     }
 }

@@ -22,5 +22,12 @@ namespace SanaraV2.Features.Entertainment
             Help,
             NotFound
         }
+
+        public enum Xkcd
+        {
+            None,
+            InvalidNumber,
+            NotFound
+        }
     }
 }

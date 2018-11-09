@@ -12,11 +12,9 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Discord.Commands;
-using SanaraV2.Modules.Base;
 using System;
-using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
@@ -26,49 +24,34 @@ namespace SanaraV2.Modules.Entertainment
         Program p = Program.p;
 
         [Command("Xkcd", RunMode = RunMode.Async), Summary("Give XKCD commic")]
-        public async Task RandomXkcd(params string[] command)
+        public async Task Xkcd(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
-            int? myNb = null;
-            if (command.Length > 0)
+            var result = await Features.Entertainment.Xkcd.SearchXkcd(args, Program.p.rand);
+            switch (result.error)
             {
-                try
-                {
-                    myNb = Convert.ToInt32(Utilities.AddArgs(command));
-                }
-                catch (FormatException)
-                {
+                case Features.Entertainment.Error.Xkcd.InvalidNumber:
                     await ReplyAsync(Sentences.XkcdWrongArg(Context.Guild.Id));
-                    return;
-                }
-                catch (OverflowException)
-                {
-                    await ReplyAsync(Sentences.XkcdWrongArg(Context.Guild.Id));
-                    return;
-                }
-            }
-            using (WebClient wc = new WebClient())
-            {
-                string json = wc.DownloadString("https://xkcd.com/info.0.json");
-                int nbMax = Convert.ToInt32(Utilities.GetElementXml("\"num\":", json, ','));
-                int nb;
-                if (myNb == null)
-                    nb = p.rand.Next(nbMax) + 1;
-                else
-                {
-                    if (myNb < 1 || myNb > nbMax)
-                    {
-                        await ReplyAsync(Sentences.XkcdWrongId(Context.Guild.Id, nbMax));
-                        return;
-                    }
-                    nb = (int)myNb;
-                }
-                json = wc.DownloadString("https://xkcd.com/" + nb.ToString() + "/info.0.json");
-                string dlUrl = Utilities.GetElementXml("\"img\": \"", json, '"');
-                string currName = "xkcd" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.ToString() + Context.User.Id.ToString() + "." + dlUrl.Split('.')[dlUrl.Split('.').Length - 1];
-                wc.DownloadFile(dlUrl, currName);
-                await Context.Channel.SendFileAsync(currName);
-                File.Delete(currName);
+                    break;
+
+                case Features.Entertainment.Error.Xkcd.NotFound:
+                    await ReplyAsync(Sentences.XkcdWrongId(Context.Guild.Id, result.answer.maxNb));
+                    break;
+
+                case Features.Entertainment.Error.Xkcd.None:
+                    await ReplyAsync("", false, new EmbedBuilder() {
+                        Title = result.answer.title,
+                        Color = Color.Blue,
+                        ImageUrl = result.answer.imageUrl,
+                        Footer = new EmbedFooterBuilder()
+                        {
+                            Text = result.answer.alt
+                        }
+                    }.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
     }

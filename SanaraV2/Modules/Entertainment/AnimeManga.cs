@@ -25,7 +25,7 @@ namespace SanaraV2.Modules.Entertainment
         Program p = Program.p;
 
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
-        public async Task Mal(params string[] animeNameArr)
+        public async Task Anime(params string[] animeNameArr)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             var result = await Features.Entertainment.AnimeManga.SearchAnime(true, animeNameArr);
@@ -49,7 +49,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
-        public async Task MalManga(params string[] mangaNameArr)
+        public async Task Manga(params string[] mangaNameArr)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             var result = await Features.Entertainment.AnimeManga.SearchAnime(false, mangaNameArr);
