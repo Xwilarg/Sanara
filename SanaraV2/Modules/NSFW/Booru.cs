@@ -88,9 +88,9 @@ namespace SanaraV2.Modules.NSFW
                     {
                         Color = Color.Blue
                     };
-                    eb.AddField("Source" + ((result.answer.sourceTags.Length > 1) ? ("s") : ("")), string.Join(", ", result.answer.sourceTags));
-                    eb.AddField("Character" + ((result.answer.characTags.Length > 1) ? ("s") : ("")), string.Join(", ", result.answer.characTags));
-                    eb.AddField("Artist" + ((result.answer.artistTags.Length > 1) ? ("s") : ("")), string.Join(", ", result.answer.artistTags));
+                    eb.AddField("Source" + ((result.answer.sourceTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.sourceTags) + "`");
+                    eb.AddField("Character" + ((result.answer.characTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.characTags) + "`");
+                    eb.AddField("Artist" + ((result.answer.artistTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.artistTags) + "`");
                     await ReplyAsync("", false, eb.Build());
                     break;
 
