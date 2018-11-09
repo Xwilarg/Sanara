@@ -31,12 +31,15 @@ namespace SanaraV2.Modules.GamesInfo
         Program p = Program.p;
 
         [Command("", RunMode = RunMode.Async), Priority(-1)]
-        public async Task CharacDefault(params string[] shipNameArr) => await Charac(shipNameArr);
+        public async Task CharacDefault(params string[] shipNameArr) =>
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
 
         [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Girls Frontline character (trivia)")]
         public async Task Charac(params string[] shipNameArr) // TODO Refactor (duplicated of Kancolle command)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             if (shipNameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineHelp(Context.Guild.Id));
@@ -123,6 +126,8 @@ namespace SanaraV2.Modules.GamesInfo
         public async Task Infos(params string[] nameArr)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             if (nameArr.Length == 0)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineHelp(Context.Guild.Id));
@@ -172,6 +177,8 @@ namespace SanaraV2.Modules.GamesInfo
         public async Task Compare(params string[] nameArr)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.GirlsFrontier);
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             if (nameArr.Length <= 1)
             {
                 await ReplyAsync(Sentences.GirlsFrontlineCompareHelp(Context.Guild.Id));
@@ -283,6 +290,8 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Hours", RunMode = RunMode.Async), Summary("Compare two T-Dolls")]
         public async Task Hours(params string[] nameArr)
         {
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             DateTime? objDt = null;
             if (nameArr.Length > 0)
             {

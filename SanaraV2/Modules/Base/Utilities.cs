@@ -16,7 +16,6 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -25,6 +24,15 @@ namespace SanaraV2.Modules.Base
 {
     public static class Utilities
     {
+        public static async Task NotAvailable(ITextChannel chan)
+        {
+            await chan.SendMessageAsync("", false, new EmbedBuilder()
+            {
+                Description = "This service is no longer available, thanks for using it.",
+                Color = Color.Red
+            }.Build());
+        }
+
         /// <summary>
         /// Write text in file, retry if file is busy
         /// </summary>

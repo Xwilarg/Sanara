@@ -35,6 +35,8 @@ namespace SanaraV2.Modules.GamesInfo
         public async Task Map(params string[] command)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             if (IsMapInvalid(command))
                 await ReplyAsync(Sentences.MapHelp(Context.Guild.Id));
             else

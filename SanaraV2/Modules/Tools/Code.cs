@@ -12,7 +12,9 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Discord.Commands;
+using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,6 +29,8 @@ namespace SanaraV2.Modules.Tools
         public async Task Indent(params string[] arg)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            await Utilities.NotAvailable(Context.Channel as ITextChannel);
+            return;
             if (arg.Length == 0)
             {
                 await ReplyAsync(Sentences.IndenteHelp(Context.Guild.Id));

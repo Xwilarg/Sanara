@@ -30,6 +30,8 @@ namespace SanaraV2.Modules.Tools
         public async Task Transparency(params string[] word)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await Utilities.NotAvailable(Context.Channel as Discord.ITextChannel);
+            return;
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
@@ -59,6 +61,8 @@ namespace SanaraV2.Modules.Tools
         public async Task Negate(params string[] word)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await Utilities.NotAvailable(Context.Channel as Discord.ITextChannel);
+            return;
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
@@ -84,6 +88,8 @@ namespace SanaraV2.Modules.Tools
         public async Task ConvertImage(params string[] word)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await Utilities.NotAvailable(Context.Channel as Discord.ITextChannel);
+            return;
             if (word.Length <= 1 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpConvert(Context.Guild.Id));
             else
@@ -154,6 +160,8 @@ namespace SanaraV2.Modules.Tools
         public async Task Epure(params string[] word)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
+            await Utilities.NotAvailable(Context.Channel as Discord.ITextChannel);
+            return;
             if (word.Length == 0 || !Utilities.IsLinkValid(word[0]))
                 await ReplyAsync(Sentences.HelpTransparency(Context.Guild.Id));
             else
