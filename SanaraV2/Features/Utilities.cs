@@ -12,6 +12,9 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using System;
+using System.Text;
+
 namespace SanaraV2.Features
 {
     public static class Utilities
@@ -28,10 +31,25 @@ namespace SanaraV2.Features
             return (string.Join(" ", args));
         }
 
+        /// <summary>
+        /// Check if file extension is the one of an image
+        /// </summary>
         public static bool IsImage(string extension)
         {
             return (extension == "gif" || extension == "png" || extension == "jpg"
                 || extension == "jpeg");
+        }
+
+        /// <summary>
+        /// Generate a random code containing numbers
+        /// </summary>
+        /// <param name="nbDigits">The number of digits in the code</param>
+        public static string GenerateRandomCode(int nbDigits, Random r)
+        {
+            StringBuilder code = new StringBuilder();
+            for (int i = 0; i < nbDigits; i++)
+                code.Append(r.Next(10));
+            return (code.ToString());
         }
     }
 }

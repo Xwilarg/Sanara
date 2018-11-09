@@ -54,7 +54,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async void TestBooruSafe()
         {
-            var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru());
+            var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
             Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
             Assert.Equal(Discord.Color.Green, result.answer.colorRating);
             Assert.True(IsLinkValid(result.answer.url));
@@ -63,7 +63,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async void TestBooruNotSafe()
         {
-            var result = await Booru.SearchBooru(false, new string[] { "pussy" }, new BooruSharp.Booru.Gelbooru());
+            var result = await Booru.SearchBooru(false, new string[] { "pussy" }, new BooruSharp.Booru.Gelbooru(), new Random());
             Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
             Assert.Equal(Discord.Color.Red, result.answer.colorRating);
             Assert.True(IsLinkValid(result.answer.url));

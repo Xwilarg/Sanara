@@ -24,6 +24,12 @@ namespace SanaraV2.Features.NSFW
             NotFound
         }
 
+        public enum BooruTags
+        {
+            None,
+            NotFound
+        }
+
         public enum Doujinshi
         {
             None,

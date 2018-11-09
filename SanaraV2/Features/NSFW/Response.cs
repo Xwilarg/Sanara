@@ -21,6 +21,14 @@ namespace SanaraV2.Features.NSFW
         {
             public string url;
             public Color colorRating;
+            public string saveId;
+        }
+
+        public class BooruTags
+        {
+            public string[] sourceTags;
+            public string[] artistTags;
+            public string[] characTags;
         }
 
         public class Doujinshi
