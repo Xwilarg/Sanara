@@ -19,12 +19,12 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
 {
-    public class XKCD : ModuleBase
+    public class Xkcd : ModuleBase
     {
         Program p = Program.p;
 
         [Command("Xkcd", RunMode = RunMode.Async), Summary("Give XKCD commic")]
-        public async Task Xkcd(params string[] args)
+        public async Task XkcdSearch(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
             var result = await Features.Entertainment.Xkcd.SearchXkcd(args, Program.p.rand);

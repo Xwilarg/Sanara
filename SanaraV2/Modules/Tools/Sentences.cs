@@ -92,7 +92,6 @@ namespace SanaraV2.Modules.Tools
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription4")) : (""))
                 + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription5"));
             embed.AddField(Translation.GetTranslation(guildId, "girlsFrontlineModuleName"), Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "girlsFrontlineModuleDescription4"));
-            embed.AddField(Translation.GetTranslation(guildId, "googleShortenerModuleName"),
                 ((isChanNsfw) ? (Translation.GetTranslation(guildId, "googleShortenerModuleDescription"))
                               : (NoCommandAvailable(guildId))));
             embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "imageModuleDescription5"));

@@ -121,7 +121,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<YoutubeModule>();
             await commands.AddModuleAsync<GoogleShortener>();
             await commands.AddModuleAsync<RadioModule>();
-            await commands.AddModuleAsync<XKCD>();
+            await commands.AddModuleAsync<Xkcd>();
             await commands.AddModuleAsync<Modules.Tools.Image>();
             await commands.AddModuleAsync<GirlsFrontline>();
 
