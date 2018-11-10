@@ -12,13 +12,9 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Discord.Commands;
-using SanaraV2.Modules.Base;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
@@ -43,14 +39,14 @@ namespace SanaraV2.Modules.Tools
                     break;
 
                 case Features.Tools.Error.Image.None:
-                    Bitmap bmp = new Bitmap(100, 100, PixelFormat.Format24bppRgb);
-                    string currName = "rgb" + DateTime.Now.ToString("HHmmssfff") + Context.Guild.Id.ToString() + Context.User.Id.ToString() + ".png";
-                    for (int i = 0; i < bmp.Size.Width; i++)
-                        for (int y = 0; y < bmp.Size.Height; y++)
-                            bmp.SetPixel(i, y, result.answer.systemColor);
-                    bmp.Save(currName);
-                    await Context.Channel.SendFileAsync(currName);
-                    File.Delete(currName);
+                    await ReplyAsync("", false, new EmbedBuilder()
+                    {
+                        Title = result.answer.name,
+                        Color = result.answer.discordColor,
+                        ImageUrl = result.answer.colorUrl,
+                        Description = "RGB: " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
+                        "Hex: #" + result.answer.colorHex
+                    }.Build());
                     break;
 
                 default:

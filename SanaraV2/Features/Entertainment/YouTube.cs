@@ -12,18 +12,11 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using Discord;
 
-namespace SanaraV2.Features.Tools
+namespace SanaraV2.Features.Entertainment
 {
-    public static class Response
+    public static class YouTube
     {
-        public class Image
-        {
-            public Color discordColor;
-            public string colorUrl;
-            public string colorHex;
-            public string name;
-        }
+
     }
 }
