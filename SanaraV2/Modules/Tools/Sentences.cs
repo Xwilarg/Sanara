@@ -44,12 +44,8 @@ namespace SanaraV2.Modules.Tools
         public static string QuoteNoMessage(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteNoMessage")); }
 
         /// --------------------------- Image ---------------------------
-        public static string HelpTransparency(ulong guildId) { return (Translation.GetTranslation(guildId, "helpTransparency")); }
-        public static string HelpConvert(ulong guildId) { return (Translation.GetTranslation(guildId, "helpConvert")); }
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
-        public static string HelpRgb(ulong guildId) { return (Translation.GetTranslation(guildId, "helpRgb")); }
-        public static string InvalidStep(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidStep")); }
-        public static string InvalidFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidFormat")); }
+        public static string HelpColor(ulong guildId) { return (Translation.GetTranslation(guildId, "helpColor")); }
 
         /// --------------------------- Linguist ---------------------------
         public static string ToHiraganaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "toHiraganaHelp")); }

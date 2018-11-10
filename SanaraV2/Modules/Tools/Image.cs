@@ -31,7 +31,7 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Image.InvalidArg:
-                    await ReplyAsync(Sentences.HelpRgb(Context.Guild.Id));
+                    await ReplyAsync(Sentences.HelpColor(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Image.InvalidColor:

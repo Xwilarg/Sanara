@@ -208,7 +208,7 @@ namespace SanaraV2.Modules.Entertainment
                     if (!await StartRadio(Context.Channel))
                         return;
                 }
-                Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeMostPopular(words, Context.Channel);
+                /*Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeMostPopular(words, Context.Channel);
                 if (youtubeResult != null)
                 {
                     RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
@@ -229,7 +229,7 @@ namespace SanaraV2.Modules.Entertainment
                         await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, youtubeResult.Item2));
                         DownloadAudio(video, radio, youtubeResult.Item1, Utilities.CleanWord(youtubeResult.Item2));
                     }
-                }
+                }*/
             }
         }
 

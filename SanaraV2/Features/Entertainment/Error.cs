@@ -29,5 +29,13 @@ namespace SanaraV2.Features.Entertainment
             InvalidNumber,
             NotFound
         }
+
+        public enum YouTube
+        {
+            None,
+            NotFound,
+            InvalidApiKey,
+            Help
+        }
     }
 }

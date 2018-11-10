@@ -25,71 +25,32 @@ namespace SanaraV2.Modules.Entertainment
     public class YoutubeModule : ModuleBase
     {
         Program p = Program.p;
-        [Command("Youtube"), Summary("Get a random video given a playlist")]
-        public async Task YoutubeVideo(params string[] words)
+        [Command("Youtube"), Summary("Get a random video given some keywords")]
+        public async Task YoutubeVideo(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
-            if (p.youtubeService == null)
-                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
-            else
+            var result = await Features.Entertainment.YouTube.SearchYouTube(args, Program.p.youtubeService);
+            switch (result.error)
             {
-                Tuple<string, string> url = (await GetYoutubeMostPopular(words, Context.Channel));
-                if (url != null)
-                    await ReplyAsync(url.Item1);
-            }
-        }
+                case Features.Entertainment.Error.YouTube.InvalidApiKey:
+                    await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
+                    break;
 
-        private static async Task<IList<Google.Apis.YouTube.v3.Data.SearchResult> > GetVideos(string[] words, IMessageChannel chan, int maxResult)
-        {
-            if (words.Length == 0)
-            {
-                await chan.SendMessageAsync(Sentences.YoutubeHelp((chan as ITextChannel).GuildId));
-                return (null);
-            }
-            var searchListRequest = Program.p.youtubeService.Search.List("snippet");
-            searchListRequest.Q = Utilities.AddArgs(words);
-            searchListRequest.MaxResults = maxResult;
-            var searchListResponse = await searchListRequest.ExecuteAsync();
-            if (searchListResponse.Items.Count < maxResult)
-            {
-                await chan.SendMessageAsync(Sentences.YoutubeNotFound((chan as ITextChannel).GuildId));
-                return (null);
-            }
-            return (searchListResponse.Items);
-        }
+                case Features.Entertainment.Error.YouTube.Help:
+                    await ReplyAsync(Sentences.YoutubeHelp(Context.Guild.Id));
+                    break;
 
-        public static async Task<Tuple<string, string>> GetYoutubeMostPopular(string[] words, IMessageChannel chan, int maxResult = 10)
-        {
-            var results = await GetVideos(words, chan, maxResult);
-            Google.Apis.YouTube.v3.Data.SearchResult biggest = null;
-            DateTime publishTime = DateTime.MaxValue;
-            foreach (var res in results)
-            {
-                string cleanTitle = Utilities.CleanWord(res.Snippet.Title);
-                if (res.Id.Kind == "youtube#video" && words.ToList().All(x => cleanTitle.Contains(Utilities.CleanWord(x))))
-                {
-                    if (res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime)
-                    {
-                        publishTime = res.Snippet.PublishedAt.Value;
-                        biggest = res;
-                    }
-                }
+                case Features.Entertainment.Error.YouTube.NotFound:
+                    await ReplyAsync(Sentences.YoutubeNotFound(Context.Guild.Id));
+                    break;
+
+                case Features.Entertainment.Error.YouTube.None:
+                    await ReplyAsync(result.answer.url);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
-            if (biggest == null)
-            {
-                foreach (var res in results)
-                {
-                    if (res.Id.Kind == "youtube#video")
-                    {
-                        if (res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime)
-                        {
-                            publishTime = res.Snippet.PublishedAt.Value;
-                            biggest = res;
-                        }
-                    }
-                }
-            }
-            return new Tuple<string, string>("https://www.youtube.com/watch?v=" + biggest.Id.VideoId, biggest.Snippet.Title);
         }
     }
 }

@@ -51,5 +51,20 @@ namespace SanaraV2.Features
                 code.Append(r.Next(10));
             return (code.ToString());
         }
+        
+        /// <summary>
+        /// For comparaisons between 2 string it's sometimes useful that you remove everything except number and letters
+        /// </summary>
+        /// <param name="word">The string to deal with</param>
+        public static string CleanWord(string word)
+        {
+            string finalStr = "";
+            foreach (char c in word)
+            {
+                if (char.IsLetterOrDigit(c))
+                    finalStr += char.ToUpper(c);
+            }
+            return (finalStr);
+        }
     }
 }
