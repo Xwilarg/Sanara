@@ -173,13 +173,12 @@ namespace SanaraV2.Modules.Entertainment
             public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
                 sayCorrect = false;
-                DateTime now = DateTime.Now;
                 m_time = DateTime.MinValue;
                 m_nbAttempt++;
                 userWord = Linguist.ToHiragana(Linguist.FromKatakana(userWord));
                 if (userWord.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 {
-                    m_time = now;
+                    m_time = DateTime.Now;
                     return (Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
                 }
                 string json;
@@ -208,17 +207,17 @@ namespace SanaraV2.Modules.Entertainment
                 }
                 if (!isCorrect)
                 {
-                    m_time = now;
+                    m_time = DateTime.Now;
                     return (Sentences.ShiritoriDoesntExist(m_guild.Id));
                 }
                 if (!isNoun)
                 {
-                    m_time = now;
+                    m_time = DateTime.Now;
                     return (Sentences.ShiritoriNotNoun(m_guild.Id));
                 }
                 if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
                 {
-                    m_time = now;
+                    m_time = DateTime.Now;
                     return (Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), Linguist.FromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
                 }
                 if (m_alreadySaid.Contains(userWord))
