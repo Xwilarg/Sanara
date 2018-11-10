@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
@@ -84,26 +85,23 @@ namespace SanaraV2.Modules.Entertainment
                 await m_chan.SendMessageAsync(finalStr);
             }
 
-            public void Post()
+            public async Task Post()
             {
-                _ = Task.Run(async delegate() {
-                    m_time = DateTime.MinValue;
-                    bool isMsg;
-                    string[] allMsgs = GetPost(out isMsg);
-                    foreach (string msg in allMsgs)
-                    {
-                        if (isMsg)
-                            await m_chan.SendMessageAsync(msg);
-                        else
+                m_time = DateTime.MinValue;
+                foreach (string msg in GetPost())
+                {
+                    if (Features.Utilities.IsImage(msg.Split('.').Last()))
+                        await m_chan.SendMessageAsync("", false, new EmbedBuilder()
                         {
-                            await m_chan.SendFileAsync(msg);
-                            File.Delete(msg);
-                        }
-                    }
-                    m_time = DateTime.Now;
-                });
+                            Color = Color.Blue,
+                            ImageUrl = msg
+                        }.Build());
+                    else
+                        await m_chan.SendMessageAsync(msg);
+                }
+                m_time = DateTime.Now;
             }
-            public abstract string[] GetPost(out bool isMsg);
+            public abstract string[] GetPost();
             public async Task CheckCorrect(string userWord, IUser user)
             {
                 if (m_time == DateTime.MinValue)
@@ -121,7 +119,7 @@ namespace SanaraV2.Modules.Entertainment
                         m_userIds.Add(user.Id);
                     if (sayCorrect)
                         await m_chan.SendMessageAsync(Sentences.GuessGood(m_guild.Id));
-                    Post();
+                    await Post();
                 }
                 else
                     await m_chan.SendMessageAsync(msg);
@@ -151,9 +149,8 @@ namespace SanaraV2.Modules.Entertainment
                 m_alreadySaid = new List<string>();
             }
 
-            public override string[] GetPost(out bool isMsg)
+            public override string[] GetPost()
             {
-                isMsg = true;
                 if (m_currWord == null)
                 {
                     m_currWord = "しりとり";
@@ -180,7 +177,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_time = DateTime.MinValue;
                 m_nbAttempt++;
                 userWord = Linguist.ToHiragana(Linguist.FromKatakana(userWord));
-                if (userWord.Any(c => c < 0x0031 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
+                if (userWord.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 {
                     m_time = now;
                     return (Sentences.OnlyHiraganaKatakanaRomaji(m_guild.Id));
@@ -280,48 +277,22 @@ namespace SanaraV2.Modules.Entertainment
                     w.Encoding = Encoding.UTF8;
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     string json = w.DownloadString("http://kancolle.wikia.com/wiki/Ship?action=raw");
-                    string[] cathegories = json.Split(new string[] { "==" }, StringSplitOptions.None);
-                    bool didBegan = false;
-                    string shipName = "";
-                    bool beginRead = false;
-                    bool readBeginLine = true;
+                    json = json.Split(new string[] { "List of destroyers" }, StringSplitOptions.None)[1].Split(new string[] { "=={{anchor|type}}" }, StringSplitOptions.None)[0];
                     m_shipNames = new List<string>();
-                    foreach (char c in cathegories[2]) // Get all ship's name
+                    MatchCollection matches = Regex.Matches(json, @"\[\[([A-Za-z- 0-9]+)");
+                    foreach (Match match in matches)
                     {
-                        if (!didBegan && c == '<')
-                        {
-                            didBegan = true;
-                        }
-                        else if (didBegan)
-                        {
-                            if (c == '[' && readBeginLine)
-                            {
-                                beginRead = true;
-                                shipName = "";
-                            }
-                            else if ((c == '|' || c == ']') && shipName != "" && beginRead)
-                            {
-                                m_shipNames.Add(shipName);
-                                shipName = "";
-                                beginRead = false;
-                            }
-                            else if (c == '\n')
-                                readBeginLine = true;
-                            else
-                            {
-                                shipName += c;
-                                readBeginLine = false;
-                            }
-                        }
+                        string str = match.Groups[1].Value;
+                        if (!str.StartsWith("List of") && !str.StartsWith("Auxiliary"))
+                            m_shipNames.Add(str);
                     }
                 }
                 m_toGuess = null;
                 m_idImage = "-1";
             }
 
-            public override string[] GetPost(out bool isMsg) // TODO: sometimes post wrong images
+            public override string[] GetPost() // TODO: sometimes post wrong images
             {
-                isMsg = false;
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
                 using (WebClient w = new WebClient())
                 {
@@ -337,11 +308,8 @@ namespace SanaraV2.Modules.Entertainment
                     url = "http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + code;
                     json = w.DownloadString(url);
                     string image = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
-                    image = image.Split(new string[] { ".jpg" }, StringSplitOptions.None)[0] + ".jpg";
-                    image = image.Replace("\\", "");
-                    int currentTime = Convert.ToInt32(DateTime.Now.ToString("HHmmss"));
-                    w.DownloadFile(image, "shipgirlquizz" + currentTime + ".jpg");
-                    return (new string[] { "shipgirlquizz" + currentTime + ".jpg" });
+                    image = image.Split(new string[] { "/revision" }, StringSplitOptions.None)[0].Replace("\\", "");
+                    return (new string[] { image });
                 }
             }
 
@@ -424,20 +392,16 @@ namespace SanaraV2.Modules.Entertainment
                         m_allTags.Add(linePart[0]);
                 }
                 m_time = DateTime.MinValue;
+                m_booru = new Gelbooru();
             }
 
-            public override string[] GetPost(out bool isMsg)
+            public override string[] GetPost()
             {
-                isMsg = false;
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                Gelbooru booru = new Gelbooru();
-                Tuple<string, long, string[]> t1 = NSFW.Booru.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
-                Tuple<string, long, string[]> t2 = NSFW.Booru.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
-                Tuple<string, long, string[]> t3 = NSFW.Booru.GetImage(booru, new string[] { m_toGuess }).GetAwaiter().GetResult();
                 return (new string[] {
-                    (t1.Item2 > 8000000) ? (null) : (t1.Item1),
-                    (t2.Item2 > 8000000) ? (null) : (t2.Item1),
-                    (t3.Item2 > 8000000) ? (null) : (t3.Item1),
+                    Features.NSFW.Booru.SearchBooru(false, new string[] { m_toGuess }, m_booru, Program.p.rand).GetAwaiter().GetResult().answer.url,
+                    Features.NSFW.Booru.SearchBooru(false, new string[] { m_toGuess }, m_booru, Program.p.rand).GetAwaiter().GetResult().answer.url,
+                    Features.NSFW.Booru.SearchBooru(false, new string[] { m_toGuess }, m_booru, Program.p.rand).GetAwaiter().GetResult().answer.url,
                 });
             }
 
@@ -461,6 +425,7 @@ namespace SanaraV2.Modules.Entertainment
             
             private string m_toGuess;
             private List<string> m_allTags;
+            private Gelbooru m_booru;
         }
 
         public class AnimeGame : Game
@@ -473,29 +438,23 @@ namespace SanaraV2.Modules.Entertainment
                 foreach (string line in allLines)
                     m_allTags.Add(line.Split(' ')[0]);
                 m_time = DateTime.MinValue;
+                m_booru = new Sakugabooru();
             }
 
-            private string GetCorrectPost(Sakugabooru booru, out bool isMsg, out string tag, out List<string> allTags)
+            private string GetCorrectPost(out string tag, out List<string> allTags)
             {
-                isMsg = false;
                 tag = m_allTags[Program.p.rand.Next(m_allTags.Count)];
-                Tuple<string, long, string[]> t1 = NSFW.Booru.GetImage(booru, new string[] { tag, "animated" }).GetAwaiter().GetResult();
-                allTags = t1.Item3.ToList();
-                if (t1.Item2 > 8000000)
-                {
-                    File.Delete(t1.Item1);
-                    return (GetCorrectPost(booru, out isMsg, out tag, out allTags));
-                }
-                return (t1.Item1);
+                var result = Features.NSFW.Booru.SearchBooru(false, new string[] { tag, "animated" }, m_booru, Program.p.rand).GetAwaiter().GetResult();
+                allTags = result.answer.tags.ToList();
+                return (result.answer.url);
             }
 
-            public override string[] GetPost(out bool isMsg)
+            public override string[] GetPost()
             {
                 string tag;
                 List<string> allTags;
-                Sakugabooru booru = new Sakugabooru();
-                string image = GetCorrectPost(booru, out isMsg, out tag, out allTags);
-                allTags.RemoveAll(x => booru.GetTag(x).GetAwaiter().GetResult().type != BooruSharp.Search.Tag.TagType.Copyright);
+                string image = GetCorrectPost(out tag, out allTags);
+                allTags.RemoveAll(x => m_booru.GetTag(x).GetAwaiter().GetResult().type != BooruSharp.Search.Tag.TagType.Copyright);
                 m_toGuess = allTags.ToArray();
                 return (new string[] { image });
             }
@@ -523,9 +482,10 @@ namespace SanaraV2.Modules.Entertainment
 
             private string[] m_toGuess;
             private List<string> m_allTags;
+            private Sakugabooru m_booru;
         }
 
-        [Command("Play"), Summary("Launch a game")]
+        [Command("Play", RunMode = RunMode.Async), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
@@ -592,7 +552,7 @@ namespace SanaraV2.Modules.Entertainment
                     if (Program.p.sendStats)
                         await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
                     p.games.Add(g);
-                    g.Post();
+                    await g.Post();
                 }
             }
         }

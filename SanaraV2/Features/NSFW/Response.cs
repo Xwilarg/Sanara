@@ -23,6 +23,7 @@ namespace SanaraV2.Features.NSFW
             public string url;
             public Color colorRating;
             public string saveId;
+            public string[] tags;
         }
 
         public class BooruTags

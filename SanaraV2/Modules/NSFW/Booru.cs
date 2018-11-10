@@ -131,26 +131,5 @@ namespace SanaraV2.Modules.NSFW
                     throw new NotImplementedException();
             }
         }
-
-        public static async Task<Tuple<string, long, string[]>> GetImage(BooruSharp.Booru.Booru booru, string[] tags)
-        {
-            string fileName = booru.ToString() + DateTime.Now.ToString("HHmmssfff") + Program.p.rand.Next(int.MaxValue);
-            long fileSize;
-            var result = await booru.GetRandomImage(tags);
-            DownloadFile(ref fileName, out fileSize, result.fileUrl.AbsoluteUri);
-            return (new Tuple<string, long, string[]>(fileName, fileSize, result.tags));
-        }
-
-        public static void DownloadFile(ref string fileName, out long fileSize, string url)
-        {
-            using (WebClient wc = new WebClient())
-            {
-                fileName += "." + url.Split('.')[url.Split('.').Length - 1];
-                wc.Headers.Add("User-Agent: Sanara");
-                wc.DownloadFile(url, fileName);
-                FileInfo file = new FileInfo(fileName);
-                fileSize = file.Length;
-            }
-        }
     }
 }

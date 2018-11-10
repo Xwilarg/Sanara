@@ -46,9 +46,10 @@ namespace SanaraV2.Features.NSFW
             {
                 return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
             }
+            Error.Booru error = Error.Booru.None;
             string url = res.fileUrl.AbsoluteUri;
             if (!Utilities.IsImage(url.Split('.').Last()))
-                return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.InvalidFile));
+                error = Error.Booru.InvalidFile;
             Color color;
             switch (res.rating)
             {
@@ -72,8 +73,9 @@ namespace SanaraV2.Features.NSFW
             return (new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
                     url = url,
                     colorRating = color,
-                    saveId = saveId
-                }, Error.Booru.None));
+                    saveId = saveId,
+                    tags = res.tags
+                }, error));
         }
 
         public static async Task<FeatureRequest<Response.BooruTags, Error.BooruTags>> SearchTags(string id)

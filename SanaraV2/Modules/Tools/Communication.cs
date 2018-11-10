@@ -161,6 +161,7 @@ namespace SanaraV2.Modules.Tools
                 "**Opus dll:** " + ((File.Exists("opus.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
                 "**Lib Sodium dll:** " + ((File.Exists("libsodium.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
                 "**Ffmpeg:** " + ((File.Exists("ffmpeg.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
+                "**youtube-dl:** " + ((File.Exists("youtube-dl.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
                 "**YouTube API key:** " + ((p.youtubeService != null ? ("Yes") : ("No"))));
             if (File.Exists("opus.dll") && File.Exists("libsodium.dll") && File.Exists("ffmpeg.exe") && p.youtubeService != null)
                 yes++;
@@ -200,12 +201,7 @@ namespace SanaraV2.Modules.Tools
                 yes++;
             else
                 no++;
-            embed.AddField("Google Shortener Module", "**Google Shortener API key:** " + ((p.service != null) ? ("Yes") : ("No")));
-            if (p.service != null)
-                yes++;
-            else
-                no++;
-            embed.Color = new Color(no * 255 / 8, yes * 255 / 8, 0);
+            embed.Color = new Color(no * 255 / 7, yes * 255 / 7, 0);
             await ReplyAsync("", false, embed.Build());
         }
 

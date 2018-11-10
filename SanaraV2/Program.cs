@@ -42,7 +42,7 @@ namespace SanaraV2
     public class Program
     {
         public static void Main(string[] args)
-            => new Program().MainAsync(true).GetAwaiter().GetResult();
+            => new Program().MainAsync().GetAwaiter().GetResult();
 
         public readonly DiscordSocketClient client;
         private readonly IServiceCollection map = new ServiceCollection();
@@ -84,12 +84,7 @@ namespace SanaraV2
             commands.Log += LogError;
         }
 
-        public Program(bool unused) // For unit tests
-        {
-            MainAsync(false).GetAwaiter().GetResult();
-        }
-
-        private async Task MainAsync(bool launchBot)
+        private async Task MainAsync()
         {
             p = this;
             games = new List<GameModule.Game>();
@@ -105,9 +100,6 @@ namespace SanaraV2
             sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
 
-            if (!launchBot)
-                return;
-
             await commands.AddModuleAsync<Communication>();
             await commands.AddModuleAsync<Settings>();
             await commands.AddModuleAsync<Linguist>();
@@ -115,7 +107,6 @@ namespace SanaraV2
             await commands.AddModuleAsync<Booru>();
             await commands.AddModuleAsync<VnModule>();
             await commands.AddModuleAsync<Doujinshi>();
-            await commands.AddModuleAsync<Code>();
             await commands.AddModuleAsync<AnimeManga>();
             await commands.AddModuleAsync<GameModule>();
             await commands.AddModuleAsync<Youtube>();
