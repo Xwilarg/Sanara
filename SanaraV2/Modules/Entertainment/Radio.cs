@@ -15,17 +15,13 @@
 using Discord;
 using Discord.Audio;
 using Discord.Commands;
-using MediaToolkit;
-using MediaToolkit.Model;
 using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using VideoLibrary;
 
 namespace SanaraV2.Modules.Entertainment
 {
@@ -35,35 +31,20 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Song
         {
-            public Song(string mpath, string mtitle, string murl, IGuildUser me, string guildId)
+            public Song(string mpath, string mtitle, string murl, string mimageUrl, IGuildUser me, string guildId)
             {
                 path = mpath;
                 title = mtitle;
                 url = murl;
                 downloading = true;
-                if (me.GuildPermissions.AttachFiles)
-                {
-                    using (WebClient wc = new WebClient())
-                    {
-                        imageName = "Saves/Radio/" + guildId + "/thumbnail" + DateTime.Now.ToString("HHmmssfff") + me.Id.ToString() + ".jpg";
-                        wc.DownloadFile("https://img.youtube.com/vi/" + url.Split('=')[1] + "/0.jpg", imageName);
-                    }
-                }
-                else
-                    imageName = null;
-            }
-
-            public void DeleteThumbnail()
-            {
-                if (imageName != null)
-                    File.Delete(imageName);
+                imageUrl = mimageUrl;
             }
 
             public string path;
             public string title;
             public string url;
             public bool downloading;
-            public string imageName;
+            public string imageUrl;
         }
 
         public class RadioChannel
@@ -95,14 +76,9 @@ namespace SanaraV2.Modules.Entertainment
                 return (m_musics.Any(x => x.url == url));
             }
 
-            public void AddMusic(string path, string title, string url, IGuildUser me, string guildId)
+            public void AddMusic(string path, string title, string url, string imageUrl, IGuildUser me, string guildId)
             {
-                m_musics.Add(new Song(path, title, url, me, guildId));
-            }
-
-            public void RemoveSong(string url)
-            {
-                m_musics.Remove(m_musics.Find(x => x.url == url));
+                m_musics.Add(new Song(path, title, url, imageUrl, me, guildId));
             }
 
             public async Task<bool> Skip(IMessageChannel chan)
@@ -142,10 +118,18 @@ namespace SanaraV2.Modules.Entertainment
             {
                 if (m_musics.Count == 0 || (m_process != null && !m_process.HasExited) || m_musics[0].downloading)
                     return;
-                await m_msgChan.SendMessageAsync("Now playing " + m_musics[0].title);
-                await m_msgChan.SendFileAsync(m_musics[0].imageName);
+                await m_msgChan.SendMessageAsync("", false, new EmbedBuilder()
+                {
+                    Title = m_musics[0].title,
+                    ImageUrl = m_musics[0].imageUrl,
+                    Color = Color.Blue,
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = m_musics[0].url
+                    }
+                }.Build());
                 if (!File.Exists("ffmpeg.exe"))
-                    throw new FileNotFoundException("ffmped.exe was not found. Please put it near the bot executable.");
+                    throw new FileNotFoundException("ffmpeg.exe was not found. Please put it near the bot executable.");
                 m_process = Process.Start(new ProcessStartInfo
                 {
                     FileName = "ffmpeg.exe",
@@ -164,7 +148,6 @@ namespace SanaraV2.Modules.Entertainment
                         {
                             try
                             {
-                                m_musics[0].DeleteThumbnail();
                                 File.Delete(m_musics[0].path);
                                 break;
                             }
@@ -174,7 +157,6 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     await discord.FlushAsync();
                 }
-                m_musics[0].DeleteThumbnail();
                 File.Delete(m_musics[0].path);
                 m_musics.RemoveAt(0);
                 Play();
@@ -192,8 +174,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task AddRadio(params string[] words)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
             if (p.youtubeService == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
             else
@@ -208,36 +188,35 @@ namespace SanaraV2.Modules.Entertainment
                     if (!await StartRadio(Context.Channel))
                         return;
                 }
-                /*Tuple<string, string> youtubeResult = await YoutubeModule.GetYoutubeMostPopular(words, Context.Channel);
-                if (youtubeResult != null)
+                var result = await Features.Entertainment.YouTube.SearchYouTube(words, Program.p.youtubeService);
+                if (result.error == Features.Entertainment.Error.YouTube.None)
                 {
                     RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
-                    if (radio.ContainMusic(youtubeResult.Item1))
+                    if (radio.ContainMusic(result.answer.url))
                     {
                         await ReplyAsync(Sentences.RadioAlreadyInList(Context.Guild.Id));
                         return;
                     }
-                    radio.AddMusic("Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(youtubeResult.Item2) + ".mp3", youtubeResult.Item2, youtubeResult.Item1, await Context.Guild.GetUserAsync(Base.Sentences.myId), Context.Guild.Id.ToString());
-                    YouTubeVideo video = GetYoutubeVideo(youtubeResult.Item1);
-                    if (video == null)
+                    await ReplyAsync(result.answer.name + " was added to the list.");
+                    string fileName = "Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(result.answer.name) + ".mp3";
+                    radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl, await Context.Guild.GetUserAsync(Base.Sentences.myId), Context.Guild.Id.ToString());
+                    ProcessStartInfo youtubeDownload = new ProcessStartInfo()
                     {
-                        radio.RemoveSong(youtubeResult.Item1);
-                        await ReplyAsync(Sentences.CantDownload(Context.Guild.Id));
-                    }
-                    else
-                    {
-                        await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, youtubeResult.Item2));
-                        DownloadAudio(video, radio, youtubeResult.Item1, Utilities.CleanWord(youtubeResult.Item2));
-                    }
-                }*/
+                        FileName = "youtube-dl",
+                        Arguments = $"-x --audio-format mp3 -o " + fileName + " " + result.answer.url,
+                        CreateNoWindow = true
+                    };
+                    youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
+                    Process.Start(youtubeDownload).WaitForExit();
+                    radio.StopDownloading(result.answer.url);
+                    radio.Play();
+                }
             }
         }
 
         [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio launch", "Radio start", "Start radio")]
         public async Task LaunchRadio(params string[] words)
         {
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
@@ -248,8 +227,6 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist")]
         public async Task ListRadio(params string[] words)
         {
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
                 await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
@@ -260,8 +237,6 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Skip radio", RunMode = RunMode.Async), Summary("Skip the current song"), Alias("Radio skip")]
         public async Task SkipRadio(params string[] words)
         {
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
@@ -295,8 +270,6 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop")]
         public async Task StopRadio(params string[] words)
         {
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
@@ -307,35 +280,6 @@ namespace SanaraV2.Modules.Entertainment
                 p.radios.Remove(radio);
                 await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
             }
-        }
-
-        private YouTubeVideo GetYoutubeVideo(string url)
-        {
-            YouTube youTube = YouTube.Default;
-            YouTubeVideo video;
-            try
-            {
-                video = youTube.GetVideo(url);
-            }
-            catch (InvalidOperationException)
-            {
-                return (null);
-            }
-            return (video);
-        }
-
-        private void DownloadAudio(YouTubeVideo video, RadioChannel radio, string url, string title)
-        {
-            File.WriteAllBytes("Saves/Radio/" + radio.m_guildId + "/" + title + "." + video.FileExtension, video.GetBytes());
-            MediaFile inputFile = new MediaFile { Filename = "Saves/Radio/" + radio.m_guildId + "/" + title + "." + video.FileExtension };
-            MediaFile outputFile = new MediaFile { Filename = "Saves/Radio/" + radio.m_guildId + "/" + title + ".mp3"};
-            using (Engine engine = new Engine())
-            {
-                engine.Convert(inputFile, outputFile);
-            }
-            radio.StopDownloading(url);
-            File.Delete("Saves/Radio/" + radio.m_guildId + "/" + title + "." + video.FileExtension);
-            radio.Play();
         }
     }
 }

@@ -52,7 +52,9 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
             return (new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
             {
-                url = "https://www.youtube.com/watch?v=" + biggest.Id.VideoId
+                url = "https://www.youtube.com/watch?v=" + biggest.Id.VideoId,
+                name = biggest.Snippet.Title,
+                imageUrl = biggest.Snippet.Thumbnails.High.Url
             }, Error.YouTube.None));
         }
     }

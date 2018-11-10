@@ -43,6 +43,8 @@ namespace SanaraV2.Features.Entertainment
         public class YouTube
         {
             public string url;
+            public string name;
+            public string imageUrl;
         }
     }
 }

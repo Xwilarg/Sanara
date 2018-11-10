@@ -12,17 +12,13 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using Discord;
 using Discord.Commands;
-using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
 {
-    public class YoutubeModule : ModuleBase
+    public class Youtube : ModuleBase
     {
         Program p = Program.p;
         [Command("Youtube"), Summary("Get a random video given some keywords")]
