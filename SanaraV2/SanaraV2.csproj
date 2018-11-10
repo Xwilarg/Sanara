@@ -242,6 +242,9 @@
     <Compile Include="Features\NSFW\Doujinshi.cs" />
     <Compile Include="Features\NSFW\Error.cs" />
     <Compile Include="Features\NSFW\Response.cs" />
+    <Compile Include="Features\Tools\Error.cs" />
+    <Compile Include="Features\Tools\Image.cs" />
+    <Compile Include="Features\Tools\Response.cs" />
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
     <Compile Include="Modules\GamesInfo\Sentences.cs" />

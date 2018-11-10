@@ -14,12 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
-using SanaraV2.Modules.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.NSFW

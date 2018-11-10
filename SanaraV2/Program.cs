@@ -328,7 +328,7 @@ namespace SanaraV2
         {
             if (!u.IsBot && sendStats)
             {
-                await UpdateElement(new Tuple<string, string>[] {   new Tuple<string, string>("modules", m.ToString()) });
+                await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
             }
             DateTime now = DateTime.UtcNow;
             if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))

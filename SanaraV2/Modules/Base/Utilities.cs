@@ -14,7 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -52,53 +51,9 @@ namespace SanaraV2.Modules.Base
             }
         }
 
-        public static void DeleteFile(string file)
-        {
-            if (!File.Exists(file))
-                return;
-            while (true)
-            {
-                try
-                {
-                    File.Delete(file);
-                    break;
-                }
-                catch (IOException)
-                { }
-            }
-        }
-
         public static string CapitalizeFirstLetter(string str)
         {
             return (char.ToUpper(str[0]) + str.Substring(1));
-        }
-
-        /// <summary>
-        /// Remove first argument of array
-        /// </summary>
-        /// <param name="args">The string[] to deal with</param>
-        public static string[] RemoveFirstArg(string[] args)
-        {
-            List<string> newArgs = new List<string>();
-            for (int i = 1; i < args.Length; i++)
-                newArgs.Add(args[i]);
-            return (newArgs.ToArray());
-        }
-
-        /// <summary>
-        /// When receiving string from website, sometimes you have to replace some stuffs on them.
-        /// </summary>
-        /// <param name="text">The string to deal with</param>
-        public static string RemoveUnwantedSymboles(string text)
-        {
-            text = text.Replace("[i]", "*");
-            text = text.Replace("[/i]", "*");
-            text = text.Replace("&lt;br /&gt;", Environment.NewLine);
-            text = text.Replace("mdash;", "—");
-            text = text.Replace("&quot;", "\"");
-            text = text.Replace("&amp;", "&");
-            text = text.Replace("&#039;", "'");
-            return (text);
         }
 
         /// <summary>
@@ -298,16 +253,6 @@ namespace SanaraV2.Modules.Base
                 default:
                     return (null);
             }
-        }
-
-        public static string GetExtensionImage(string fileName)
-        {
-            string[] file = fileName.Split('.');
-            string extension = file[file.Length - 1];
-            if (GetImage(extension) != null)
-                return (extension);
-            else
-                return (null);
         }
     }
 }
