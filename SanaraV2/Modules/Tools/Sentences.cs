@@ -55,7 +55,7 @@ namespace SanaraV2.Modules.Tools
         public static string TranslateHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "translateHelp")); }
         public static string InvalidLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidLanguage")); }
         public static string GiveJapaneseTranslations(ulong guildId, string word) { return (Translation.GetTranslation(guildId, "giveJapaneseTranslations", word)); }
-        public static string NoJapaneseTranslation(ulong guildId, string word) { return (Translation.GetTranslation(guildId, "noJapaneseTranslation", word)); }
+        public static string NoJapaneseTranslation(ulong guildId) { return (Translation.GetTranslation(guildId, "noJapaneseTranslation")); }
         public static string Meaning(ulong guildId) { return (Translation.GetTranslation(guildId, "meaning")); }
         public static string NoTextOnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "noTextOnImage")); }
         public static string NotAnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnImage")); }
@@ -88,7 +88,7 @@ namespace SanaraV2.Modules.Tools
                 + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleDescription5"));
             embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleDescription1"));
             embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDescription3"));
-            embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"), Translation.GetTranslation(guildId, "linguisticModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription5"));
+            embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"),Translation.GetTranslation(guildId, "linguisticModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleDescription5"));
             embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription2") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription3") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription4") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleDescription5"));
             embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleDescription1") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDescription2"));
             embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Translation.GetTranslation(guildId, "visualNovelModuleDescription"));

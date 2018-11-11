@@ -239,6 +239,7 @@
     <Compile Include="Features\NSFW\Response.cs" />
     <Compile Include="Features\Tools\Error.cs" />
     <Compile Include="Features\Tools\Image.cs" />
+    <Compile Include="Features\Tools\Linguist.cs" />
     <Compile Include="Features\Tools\Response.cs" />
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
@@ -246,7 +247,7 @@
     <Compile Include="Modules\GamesInfo\GirlsFrontline.cs" />
     <Compile Include="Modules\GamesInfo\Wikia.cs" />
     <Compile Include="Modules\NSFW\Sentences.cs" />
-    <Compile Include="Modules\Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
+    <Compile Include="Features\Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HiraganaToRomaji.resx</DependentUpon>
@@ -265,17 +266,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Entertainment\Radio.cs" />
     <Compile Include="Modules\Base\Sentences.cs" />
-    <Compile Include="Modules\Tools\LinguistResources\KatakanaToRomaji.Designer.cs">
+    <Compile Include="Features\Tools\LinguistResources\KatakanaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>KatakanaToRomaji.resx</DependentUpon>
     </Compile>
-    <Compile Include="Modules\Tools\LinguistResources\RomajiToHiragana.Designer.cs">
+    <Compile Include="Features\Tools\LinguistResources\RomajiToHiragana.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RomajiToHiragana.resx</DependentUpon>
     </Compile>
-    <Compile Include="Modules\Tools\LinguistResources\RomajiToKatakana.Designer.cs">
+    <Compile Include="Features\Tools\LinguistResources\RomajiToKatakana.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RomajiToKatakana.resx</DependentUpon>
@@ -293,19 +294,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Modules\Tools\LinguistResources\HiraganaToRomaji.resx">
+    <EmbeddedResource Include="Features\Tools\LinguistResources\HiraganaToRomaji.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HiraganaToRomaji.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Tools\LinguistResources\KatakanaToRomaji.resx">
+    <EmbeddedResource Include="Features\Tools\LinguistResources\KatakanaToRomaji.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>KatakanaToRomaji.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Tools\LinguistResources\RomajiToHiragana.resx">
+    <EmbeddedResource Include="Features\Tools\LinguistResources\RomajiToHiragana.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RomajiToHiragana.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Modules\Tools\LinguistResources\RomajiToKatakana.resx">
+    <EmbeddedResource Include="Features\Tools\LinguistResources\RomajiToKatakana.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RomajiToKatakana.Designer.cs</LastGenOutput>
     </EmbeddedResource>

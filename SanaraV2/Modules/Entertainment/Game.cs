@@ -166,7 +166,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_words.Remove(word);
                 m_alreadySaid.Add(insideWord[0]);
                 m_currWord = insideWord[0];
-                return (new string[] { insideWord[0] + " (" + Linguist.FromHiragana(Linguist.FromKatakana(insideWord[0])) + ") - Meaning: " + insideWord[1] });
+                return (new string[] { insideWord[0] + " (" + Features.Tools.Linguist.ToRomaji(insideWord[0]) + ") - Meaning: " + insideWord[1] });
             }
 
             //TODO Manage kanjis using Jisho API
@@ -175,7 +175,7 @@ namespace SanaraV2.Modules.Entertainment
                 sayCorrect = false;
                 m_time = DateTime.MinValue;
                 m_nbAttempt++;
-                userWord = Linguist.ToHiragana(Linguist.FromKatakana(userWord));
+                userWord = Features.Tools.Linguist.ToHiragana(userWord);
                 if (userWord.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 {
                     m_time = DateTime.Now;
@@ -191,7 +191,7 @@ namespace SanaraV2.Modules.Entertainment
                 bool isNoun = false;
                 foreach (string s in Utilities.GetElementXml("\"japanese\":[", json, '$').Split(new string[] { "\"japanese\":[" }, StringSplitOptions.None))
                 {
-                    string hiragana = Linguist.ToHiragana(Linguist.FromKatakana(Utilities.GetElementXml("\"reading\":\"", s, '"')));
+                    string hiragana = Features.Tools.Linguist.ToHiragana(Utilities.GetElementXml("\"reading\":\"", s, '"'));
                     if (userWord == hiragana)
                     {
                         isCorrect = true;
@@ -218,7 +218,7 @@ namespace SanaraV2.Modules.Entertainment
                 if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
                 {
                     m_time = DateTime.Now;
-                    return (Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), Linguist.FromHiragana(m_currWord[m_currWord.Length - 1].ToString())));
+                    return (Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), Features.Tools.Linguist.ToRomaji(m_currWord[m_currWord.Length - 1].ToString())));
                 }
                 if (m_alreadySaid.Contains(userWord))
                 {
@@ -256,7 +256,7 @@ namespace SanaraV2.Modules.Entertainment
                 {
                     string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                     string[] insideWord = word.Split('$');
-                    finalStr += Sentences.ShiritoriSuggestion(m_guild.Id, insideWord[0], Linguist.FromHiragana(insideWord[0]), insideWord[1]) + Environment.NewLine;
+                    finalStr += Sentences.ShiritoriSuggestion(m_guild.Id, insideWord[0], Features.Tools.Linguist.ToRomaji(insideWord[0]), insideWord[1]) + Environment.NewLine;
                 }
                 await m_chan.SendMessageAsync(finalStr);
                 SaveServerScores(null);

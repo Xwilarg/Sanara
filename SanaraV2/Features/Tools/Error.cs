@@ -23,5 +23,22 @@ namespace SanaraV2.Features.Tools
             InvalidArg,
             InvalidColor
         }
+
+        public enum Translation
+        {
+            None,
+            InvalidApiKey,
+            Help,
+            InvalidLanguage,
+            NotAnImage,
+            NoTextOnImage
+        }
+
+        public enum JapaneseTranslation
+        {
+            None,
+            Help,
+            NotFound
+        }
     }
 }

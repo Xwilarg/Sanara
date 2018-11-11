@@ -43,26 +43,6 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("Archive", RunMode = RunMode.Async), Summary("Create an archive for all datas")]
-        public async Task Archive()
-        {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != 144851584478740481)
-            {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
-            }
-            else
-            {
-                await ReplyAsync(Sentences.CopyingFiles(Context.Guild.Id));
-                if (!Directory.Exists("Archives"))
-                    Directory.CreateDirectory("Archives");
-                string currTime = DateTime.UtcNow.ToString("yy-MM-dd-HH-mm-ss");
-                Directory.CreateDirectory("Archives/" + currTime);
-                CopyContent("Saves", "Archives/" + currTime);
-                await ReplyAsync(Sentences.CreateArchiveStr(Context.Guild.Id, currTime));
-            }
-        }
-
         [Command("Language"), Summary("Set the language of the bot for this server")]
         public async Task SetLanguage(params string[] language)
         {

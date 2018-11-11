@@ -25,5 +25,25 @@ namespace SanaraV2.Features.Tools
             public string colorHex;
             public string name;
         }
+
+        public class Translation
+        {
+            public string sourceLanguage;
+            public string sentence;
+        }
+
+        public class JapaneseTranslation
+        {
+            public JapaneseWord[] words;
+            public string[] definition;
+            public string[] speechPart;
+        }
+
+        public class JapaneseWord
+        {
+            public string word;
+            public string reading;
+            public string romaji;
+        }
     }
 }

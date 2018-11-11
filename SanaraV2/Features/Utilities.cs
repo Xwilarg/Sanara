@@ -13,6 +13,8 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace SanaraV2.Features
@@ -65,6 +67,62 @@ namespace SanaraV2.Features
                     finalStr += char.ToUpper(c);
             }
             return (finalStr);
+        }
+        
+        /// <summary>
+        /// Get a language in 2 letters (ex: fr for french)
+        /// </summary>
+        /// <param name="languageName">Language string</param>
+        public static string GetLanguage(string languageName, Dictionary<string, List<string>> allLanguages)
+        {
+            string lang = null;
+            languageName = languageName.ToLower();
+            if (allLanguages.ContainsKey(languageName))
+                lang = languageName;
+            foreach (var key in allLanguages)
+            {
+                if (key.Value.Contains(languageName))
+                {
+                    lang = key.Key;
+                    break;
+                }
+            }
+            return (lang);
+        }
+        
+        /// <summary>
+        /// Get a language name from 2 letters (ex: french for fr)
+        /// </summary>
+        /// <param name="languageName">Language string</param>
+        public static string GetFullLanguage(string languageName, Dictionary<string, List<string>> allLanguages)
+        {
+            languageName = languageName.ToLower();
+            if (allLanguages.ContainsKey(languageName))
+                return (allLanguages[languageName][0]);
+            return (languageName);
+        }
+
+        /// <summary>
+        /// Check if an URL is valid
+        /// </summary>
+        /// <param name="url">The URL to check</param>
+        public static bool IsLinkValid(string url)
+        {
+            if (url.StartsWith("http://") || url.StartsWith("https://"))
+            {
+                try
+                {
+                    WebRequest request = WebRequest.Create(url);
+                    request.Method = "HEAD";
+                    request.GetResponse();
+                    return (true);
+                }
+                catch (WebException)
+                {
+                    return (false);
+                }
+            }
+            return (false);
         }
     }
 }
