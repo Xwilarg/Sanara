@@ -34,7 +34,7 @@ namespace SanaraV2.Modules.Base
         {
             if (guildId == 0) // GuildId is equal to 0 for unit tests
                 return (id);
-            string language = Program.p.guildLanguages[guildId];
+            string language = Program.p.db.Languages[guildId];
             if (Program.p.translations.ContainsKey(id))
             {
                 TranslationData value = Program.p.translations[id].Find(x => x.language == language);

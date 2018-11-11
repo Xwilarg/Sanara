@@ -61,8 +61,7 @@ namespace SanaraV2.Modules.Tools
                     await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
                 else
                 {
-                    p.guildLanguages[Context.Guild.Id] = lang;
-                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/language.dat", lang);
+                    p.db.SetLanguage(Context.Guild.Id, lang);
                     await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }
@@ -71,6 +70,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Prefix"), Summary("Set the prefix of the bot for this server")]
         public async Task SetPrefix(params string[] command)
         {
+            await ReplyAsync("Inside");
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
@@ -80,15 +80,12 @@ namespace SanaraV2.Modules.Tools
             {
                 if (command.Length == 0)
                 {
-                    p.prefixs[Context.Guild.Id] = "";
-                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", "");
+                    p.db.SetPrefix(Context.Guild.Id, "");
                     await ReplyAsync(Sentences.PrefixRemoved(Context.Guild.Id));
                 }
                 else
                 {
-                    string prefix = Utilities.AddArgs(command);
-                    p.prefixs[Context.Guild.Id] = prefix;
-                    File.WriteAllText("Saves/Servers/" + Context.Guild.Id + "/prefix.dat", prefix);
+                    p.db.SetPrefix(Context.Guild.Id, Utilities.AddArgs(command));
                     await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }

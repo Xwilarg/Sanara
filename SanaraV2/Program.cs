@@ -65,16 +65,13 @@ namespace SanaraV2
         public DateTime startTime;
 
         public Dictionary<string, List<Translation.TranslationData>> translations;
-        public Dictionary<ulong, string> guildLanguages;
         public Dictionary<string, List<string>> allLanguages;
-
-        public Dictionary<ulong, string> prefixs;
 
         private RavenClient ravenClient;
         public ImageAnnotatorClient visionClient;
         public bool sendStats { private set; get; }
 
-        private Db.Db db;
+        public Db.Db db;
 
         private Program()
         {
@@ -97,9 +94,6 @@ namespace SanaraV2
             rand = new Random();
 
             UpdateLanguageFiles();
-            guildLanguages = new Dictionary<ulong, string>();
-
-            prefixs = new Dictionary<ulong, string>();
 
             sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
@@ -274,9 +268,7 @@ namespace SanaraV2
 
         private async Task GuildJoin(SocketGuild arg)
         {
-            db.InitGuild(arg.Id.ToString());
-            guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
-            prefixs.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/prefix.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/prefix.dat")) : ("s."));
+            db.InitGuild(arg.Id);
         }
 
         public enum Module
@@ -407,7 +399,7 @@ namespace SanaraV2
                     await game.CheckCorrect(arg.Content, arg.Author);
             }
             int pos = 0;
-            string prefix = prefixs[(arg.Channel as ITextChannel).GuildId];
+            string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId];
             if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
             {
                 var context = new SocketCommandContext(client, msg);
