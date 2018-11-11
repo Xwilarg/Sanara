@@ -31,7 +31,7 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.Help));
             SearchResource.ListRequest listRequest = service.Search.List("snippet");
             listRequest.Q = Utilities.AddArgs(args);
-            listRequest.MaxResults = 10;
+            listRequest.MaxResults = 5;
             IList<SearchResult> searchListResponse = (await listRequest.ExecuteAsync()).Items;
             if (searchListResponse.Count == 0)
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
@@ -41,11 +41,23 @@ namespace SanaraV2.Features.Entertainment
             foreach (SearchResult res in searchListResponse)
             {
                 string cleanTitle = Utilities.CleanWord(res.Snippet.Title);
-                if (res.Id.Kind == "youtube#video"
+                if (res.Id.Kind == "youtube#video" && args.ToList().All(x => cleanTitle.Contains(Utilities.CleanWord(x)))
                     && ((res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime) || biggest == null))
                 {
                     publishTime = res.Snippet.PublishedAt.Value;
                     biggest = res;
+                }
+            }
+            if (biggest == null)
+            {
+                foreach (SearchResult res in searchListResponse)
+                {
+                    if (res.Id.Kind == "youtube#video"
+                        && ((res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime) || biggest == null))
+                    {
+                        publishTime = res.Snippet.PublishedAt.Value;
+                        biggest = res;
+                    }
                 }
             }
             if (biggest == null)
