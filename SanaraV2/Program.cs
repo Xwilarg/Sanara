@@ -22,8 +22,6 @@ using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
-using RethinkDb.Driver;
-using RethinkDb.Driver.Net;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
 using SanaraV2.Modules.GamesInfo;
@@ -76,8 +74,7 @@ namespace SanaraV2
         public ImageAnnotatorClient visionClient;
         public bool sendStats { private set; get; }
 
-        private RethinkDB R = RethinkDB.R;
-        private static Connection conn;
+        private Db.Db db;
 
         private Program()
         {
@@ -91,10 +88,8 @@ namespace SanaraV2
 
         private async Task MainAsync()
         {
-            conn = await R.Connection().ConnectAsync();
-            if (!R.DbList().Contains("Sanara").Run<bool>(conn))
-                R.DbCreate("Sanara").Run(conn);
-
+            db = new Db.Db();
+            await db.InitAsync();
             p = this;
             games = new List<GameModule.Game>();
             gameThread = new Thread(new ThreadStart(GameThread));
@@ -126,7 +121,6 @@ namespace SanaraV2
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
-            client.JoinedGuild += GuildJoin;
             client.Disconnected += Disconnected;
 
             await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
@@ -280,20 +274,7 @@ namespace SanaraV2
 
         private async Task GuildJoin(SocketGuild arg)
         {
-            string currTime = DateTime.UtcNow.ToString("ddMMyyHHmmss");
-            if (!Directory.Exists("Saves"))
-                Directory.CreateDirectory("Saves");
-            if (!File.Exists("Saves/sanaraDatas.dat"))
-                Utilities.WriteAllText("Saves/sanaraDatas.dat", currTime); // Creation date
-            if (!Directory.Exists("Saves/Servers"))
-                Directory.CreateDirectory("Saves/Servers");
-            if (!Directory.Exists("Saves/Servers/" + arg.Id))
-            {
-                Directory.CreateDirectory("Saves/Servers/" + arg.Id);
-                Utilities.WriteAllText("Saves/Servers/" + arg.Id + "/serverDatas.dat", currTime + Environment.NewLine + 0 + Environment.NewLine + arg.Name); // Join date | unused | server name
-            }
-            if (!Directory.Exists("Saves/Users"))
-                Directory.CreateDirectory("Saves/Users");
+            db.InitGuild(arg.Id.ToString());
             guildLanguages.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/language.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/language.dat")) : ("en"));
             prefixs.Add(arg.Id, (File.Exists("Saves/Servers/" + arg.Id + "/prefix.dat")) ? (File.ReadAllText("Saves/Servers/" + arg.Id + "/prefix.dat")) : ("s."));
         }
