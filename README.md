@@ -24,9 +24,8 @@ I spent a lot of times working on her and I hope that her source code will be ab
 [Discord.Net](https://github.com/RogueException/Discord.Net)<br/>
 [Google API DotNet](https://github.com/google/google-api-dotnet-client)<br/>
 [VNDBSharp](https://github.com/Nikey646/VndbSharp)<br/>
-[libvideo](https://github.com/i3arnon/libvideo)<br/>
-[MediaToolkit](https://github.com/AydinAdn/MediaToolkit)<br/>
-[Opus, Sodium and FFmpeg](https://dsharpplus.emzi0767.com/natives/index.html)
+[Opus, Sodium and FFmpeg](https://dsharpplus.emzi0767.com/natives/index.html)<br/>
+[youtube-dl](https://rg3.github.io/youtube-dl/)
 
 # Please make note that the bot also collect and save the following datas:
 
@@ -47,7 +46,7 @@ You can also do the 'GDPR' command at any time to check the informations the bot
   - URLShortenerAPIKey.dat (contain your key for the goo.gl API), youtubeAPIKey.dat (contain your key for the YouTube API)
   - ranven.dat (contain your url to use Sentry)
   - visionAPI.json (contain your json for the Google Vision API)
-- To use radio you will also need to add opus.dll, libsodium.dll and ffmpeg.exe near Sanara executable, you can download them [here](https://dsharpplus.emzi0767.com/natives/index.html).
+- To use radio you will also need to add opus.dll, libsodium.dll, ffmpeg.exe and youtube-dl.exe near Sanara executable, you can download them [here](https://dsharpplus.emzi0767.com/natives/index.html).
 - To use games, you will also need to add files to the 'Saves' folder (downloadable [here](https://files.zirk.eu/?dir=Sanara)):
   - AnimeTags.dat for the anime guess game
   - BooruTriviaTags.dat for the booru guess game

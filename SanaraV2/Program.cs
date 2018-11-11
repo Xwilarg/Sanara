@@ -24,11 +24,11 @@ using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
-using SanaraV2.Base;
-using SanaraV2.Entertainment;
-using SanaraV2.GamesInfo;
-using SanaraV2.NSFW;
-using SanaraV2.Tools;
+using SanaraV2.Modules.Base;
+using SanaraV2.Modules.Entertainment;
+using SanaraV2.Modules.GamesInfo;
+using SanaraV2.Modules.NSFW;
+using SanaraV2.Modules.Tools;
 using SharpRaven;
 using SharpRaven.Data;
 using System;
@@ -44,7 +44,7 @@ namespace SanaraV2
     public class Program
     {
         public static void Main(string[] args)
-            => new Program().MainAsync(true).GetAwaiter().GetResult();
+            => new Program().MainAsync().GetAwaiter().GetResult();
 
         public readonly DiscordSocketClient client;
         private readonly IServiceCollection map = new ServiceCollection();
@@ -89,12 +89,7 @@ namespace SanaraV2
             commands.Log += LogError;
         }
 
-        public Program(bool unused) // For unit tests
-        {
-            MainAsync(false).GetAwaiter().GetResult();
-        }
-
-        private async Task MainAsync(bool launchBot)
+        private async Task MainAsync()
         {
             conn = await R.Connection().ConnectAsync();
             if (!R.DbList().Contains("Sanara").Run<bool>(conn))
@@ -114,25 +109,20 @@ namespace SanaraV2
             sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
 
-            if (!launchBot)
-                return;
-
-            await commands.AddModuleAsync<CommunicationModule>();
-            await commands.AddModuleAsync<SettingsModule>();
-            await commands.AddModuleAsync<LinguistModule>();
-            await commands.AddModuleAsync<KancolleModule>();
-            await commands.AddModuleAsync<BooruModule>();
+            await commands.AddModuleAsync<Communication>();
+            await commands.AddModuleAsync<Settings>();
+            await commands.AddModuleAsync<Linguist>();
+            await commands.AddModuleAsync<Kancolle>();
+            await commands.AddModuleAsync<Booru>();
             await commands.AddModuleAsync<VnModule>();
-            await commands.AddModuleAsync<DoujinshiModule>();
-            await commands.AddModuleAsync<CodeModule>();
-            await commands.AddModuleAsync<AnimeMangaModule>();
+            await commands.AddModuleAsync<Doujinshi>();
+            await commands.AddModuleAsync<AnimeManga>();
             await commands.AddModuleAsync<GameModule>();
-            await commands.AddModuleAsync<YoutubeModule>();
-            await commands.AddModuleAsync<GoogleShortenerModule>();
+            await commands.AddModuleAsync<Youtube>();
             await commands.AddModuleAsync<RadioModule>();
-            await commands.AddModuleAsync<XKCDModule>();
-            await commands.AddModuleAsync<ImageModule>();
-            await commands.AddModuleAsync<GirlsFrontlineModule>();
+            await commands.AddModuleAsync<Xkcd>();
+            await commands.AddModuleAsync<Modules.Tools.Image>();
+            await commands.AddModuleAsync<GirlsFrontline>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -162,7 +152,6 @@ namespace SanaraV2
             Environment.Exit(1);
             return Task.CompletedTask;
         }
-
         
         private void InitServices()
         {
@@ -202,8 +191,7 @@ namespace SanaraV2
             }
             else
                 ravenClient = null;
-
-
+            
             if (File.Exists("Keys/visionAPI.json"))
             {
                 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
@@ -340,7 +328,7 @@ namespace SanaraV2
         {
             if (!u.IsBot && sendStats)
             {
-                await UpdateElement(new Tuple<string, string>[] {   new Tuple<string, string>("modules", m.ToString()) });
+                await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
             }
             DateTime now = DateTime.UtcNow;
             if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))
@@ -426,12 +414,12 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.Id == Base.Sentences.myId || arg.Author.IsBot)
+            if (arg.Author.Id == Modules.Base.Sentences.myId || arg.Author.IsBot)
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
             /// When playing games
-            else if (arg.Author.Id != Base.Sentences.myId)
+            else if (arg.Author.Id != Modules.Base.Sentences.myId)
             {
                 GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
                 if (game != null)
@@ -444,7 +432,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (context.Guild == null)
                 {
-                    await context.Channel.SendMessageAsync(Base.Sentences.DontPm(0));
+                    await context.Channel.SendMessageAsync(Modules.Base.Sentences.DontPm(0));
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;
@@ -530,7 +518,7 @@ namespace SanaraV2
                 {
                     Color = Color.Red,
                     Title = msg.Exception.InnerException.GetType().ToString(),
-                    Description = Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
+                    Description = Modules.Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());

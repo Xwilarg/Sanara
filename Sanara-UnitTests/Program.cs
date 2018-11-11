@@ -1,326 +1,72 @@
 ﻿using Xunit;
-using System.IO;
-using System.Linq;
-using Discord;
 using System;
-using System.Collections.Generic;
-using SanaraV2.GamesInfo;
-using SanaraV2.NSFW;
-using SanaraV2.Base;
-using SanaraV2.Entertainment;
-using SanaraV2.Tools;
-using BooruSharp.Booru;
-using System.Threading.Tasks;
+using SanaraV2.Features.NSFW;
+using SanaraV2.Features.Entertainment;
+using System.Net;
 
 namespace Sanara_UnitTests
 {
     public class Program
     {
-        [Fact]
-        public void ToKatakana()
+        private static bool IsLinkValid(string url)
         {
-            Assert.Equal("オランジ ジュイス", LinguistModule.ToKatakana(LinguistModule.FromHiragana("oranji じゅいす")));
+            if (url.StartsWith("http://") || url.StartsWith("https://"))
+            {
+                try
+                {
+                    WebRequest request = WebRequest.Create(url);
+                    request.Method = "HEAD";
+                    request.GetResponse();
+                    return (true);
+                }
+                catch (WebException)
+                { }
+            }
+            return (false);
         }
 
         [Fact]
-        public void ToHiragana()
+        public async void TestAnime()
         {
-            Assert.Equal("おらんじ じゅいす", LinguistModule.ToHiragana(LinguistModule.FromKatakana("oranji ジュイス")));
+            var result = await AnimeManga.SearchAnime(true, ("Gochuumon wa Usagi desu ka?").Split(' '));
+            Assert.Equal(SanaraV2.Features.Entertainment.Error.AnimeManga.None, result.error);
+            Assert.NotNull(result.answer);
+            Assert.Equal("Gochuumon wa Usagi desu ka?", result.answer.name);
+            Assert.Equal("https://media.kitsu.io/anime/poster_images/8095/original.jpg?1408463456", result.answer.imageUrl);
+            Assert.Equal("GochiUsa", string.Join("", result.answer.alternativeTitles));
+            Assert.Equal(12, result.answer.episodeCount);
+            Assert.Equal(23, result.answer.episodeLength);
+            Assert.InRange(result.answer.rating, 60, 90);
+            Assert.Equal(new DateTime(2014, 4, 10), result.answer.startDate);
+            Assert.Equal(new DateTime(2014, 6, 26), result.answer.endDate);
+            Assert.Equal("Teens 13 or older", result.answer.ageRating);
+            Assert.InRange(result.answer.synopsis.Length, 800, 1200);
         }
 
         [Fact]
-        public void ToRomaji()
+        public async void TestDoujinshi()
         {
-            Assert.Equal("oranji juisu", LinguistModule.FromHiragana(LinguistModule.FromKatakana("おらんじ ジュイス")));
+            var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
+            Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
+            Assert.True(IsLinkValid(result.answer.url));
         }
 
         [Fact]
-        public async void VnDescription()
+        public async void TestBooruSafe()
         {
-            Embed e = VnModule.GetEmbed(await VnModule.GetVn("hoshizora no memoria wish upon a shooting star"), 0, true);
-            Assert.True(e.Title == "星空のメモリア-Wish upon a shooting star- (Hoshizora no Memoria -Wish upon a Shooting Star-)");
-            string[] description = e.Description.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            Assert.Equal("availableEnglish", description[0]);
-            Assert.Equal("availableWindows", description[1]);
-            Assert.Equal("Long (30 - 50 hours)", description[2]);
-            Assert.Equal("Released the 27/3/2009.", description[4]);
-            Assert.Equal("After their mother passes away, Kogasaka You and his younger sister, Chinami, pack up and move out of the city back to their hometown of Hibarigasaki to live with their aunt Shino. Before making the move to the city, You spent almost every single day after school playing with a girl up at the town observation lookout; she was You's first true friend. And when she learns of You’s upcoming relocation to the city she becomes very upset…so much so that she makes him promise to her that one-day he must return to Hibarigasaki to marry her. And with a final departure she kisses You on the forehead.", description[5]);
-            Assert.Equal("Years later, upon returning to Hibarigasaki, You comes across a now abandoned, fenced-off observatory lookout. It is at this lookout where he encounters a mysterious scythe-wielding girl named Mare who looks strangely like his childhood friend from years past. But as You's life back in his hometown progresses, he is able to makes new friends both in the astronomy club at school and while working at a local restaurant, all while still attempting to seek out his childhood friend. Intrigued, he continues to visit with this mysterious girl at the lookout, but who is she really, and will he ever be to find his childhood friend and make good on his promise?", description[6]);
-            Assert.True(e.Image.HasValue);
+            var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
+            Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
+            Assert.Equal(Discord.Color.Green, result.answer.colorRating);
+            Assert.True(IsLinkValid(result.answer.url));
         }
 
         [Fact]
-        public async void VnGetImage()
+        public async void TestBooruNotSafe()
         {
-            Directory.GetFiles(".", "vn*").ToList().ForEach(delegate (string path) { if (!path.EndsWith(".dll")) File.Delete(path); });
-            List<string> images = VnModule.GetImages(await VnModule.GetVn("Rondo Duo Yoake no Fortissimo Punyu Puri ff"), 0, 0, true);
-            List<string> results = Directory.GetFiles(".", "vn*").ToList();
-            results.RemoveAll(x => x.EndsWith(".dll"));
-            Assert.Single(results);
-        }
-
-        private async Task TestBooru(Booru b)
-        {
-            var t = await BooruModule.GetImage(b, new string[] { "kantai_collection" });
-            Assert.True(File.Exists(t.Item1));
-            Assert.NotInRange(t.Item2, 0, 0);
-            Assert.Contains("kantai_collection", t.Item3);
-        }
-
-        [Fact]
-        public async Task DownloadSafebooru()
-        {
-            await TestBooru(new Safebooru());
-        }
-
-        [Fact]
-        public async Task DownloadGelbooru()
-        {
-            await TestBooru(new Gelbooru());
-        }
-
-        [Fact]
-        public async Task DownloadKonachan()
-        {
-            await TestBooru(new Konachan());
-        }
-
-        [Fact]
-        public async Task DownloadRule34()
-        {
-            await TestBooru(new Rule34());
-        }
-
-        [Fact]
-        public async Task DownloadE621()
-        {
-            await TestBooru(new E621());
-        }
-
-        [Fact]
-        public async Task DownloadE926()
-        {
-            await TestBooru(new E926());
-        }
-
-        [Fact]
-        public async Task DownloadSakugabooru()
-        {
-            await TestBooru(new Sakugabooru());
-        }
-
-        [Fact]
-        public void MapInvalidEmpty()
-        {
-            Assert.True(KancolleModule.IsMapInvalid(new string[] { }));
-        }
-
-        [Fact]
-        public void MapInvalidBadWorld()
-        {
-            Assert.True(KancolleModule.IsMapInvalid(new string[] { "9", "2" }));
-        }
-
-        [Fact]
-        public void MapInvalidBadLevel()
-        {
-            Assert.True(KancolleModule.IsMapInvalid(new string[] { "2", "9" }));
-        }
-
-        [Fact]
-        public void MapValid()
-        {
-            Assert.False(KancolleModule.IsMapInvalid(new string[] { "2", "2" }));
-        }
-
-        [Fact]
-        public void GetBranchingRules()
-        {
-            string mapIntro, mapDraw, mapName;
-            string infos = KancolleModule.GetMapInfos('2', '2', out mapIntro, out mapDraw, out mapName);
-            Assert.True(mapName == "Bashi Island");
-            Assert.True(File.Exists(mapIntro));
-            Assert.True(File.Exists(mapDraw));
-            string branchs = KancolleModule.GetBranchingRules(infos)[0];
-            Assert.Contains("0 -> A,E/resource", branchs);
-            Assert.Contains("A -> B/resource,E/resource", branchs);
-            Assert.Contains("B/resource -> C/resource,D", branchs);
-            Assert.Contains("E/resource -> F/battle", branchs);
-            Assert.Contains("E/resource -> G/battle", branchs);
-        }
-
-        [Fact]
-        public void InvalidShipName()
-        {
-            Assert.Null(KancolleModule.GetShipName(new string[] { "awawawawawawawa" }));
-        }
-
-        [Fact]
-        public void InvalidDropConstruction()
-        {
-            Assert.Null(KancolleModule.GetDropConstruction(KancolleModule.GetShipName(new string[] { "u511" }), 0));
-        }
-
-        [Fact]
-        public void DropConstruction()
-        {
-            Assert.NotNull(KancolleModule.GetDropConstruction(KancolleModule.GetShipName(new string[] { "Akitsu", "Maru" }), 0));
-        }
-
-        [Fact]
-        public void InvalidDropMap()
-        {
-            KancolleModule.DropMapError error;
-            KancolleModule.GetDropMap(KancolleModule.GetShipName(new string[] { "Taihou" }), 0, out error);
-            Assert.Equal(KancolleModule.DropMapError.DontDrop, error);
-        }
-
-        [Fact]
-        public void DropMap()
-        {
-            KancolleModule.DropMapError error;
-            KancolleModule.GetDropMap(KancolleModule.GetShipName(new string[] { "Ikazuchi" }), 0, out error);
-            Assert.Equal(KancolleModule.DropMapError.NoError, error);
-        }
-
-        [Fact]
-        public void WrongShipInfos()
-        {
-            Assert.Null(Wikia.GetCharacInfos("awawawawawawa", Wikia.WikiaType.KanColle));
-        }
-
-        [Fact]
-        public void ShipInfos()
-        {
-            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("Ikazuchi", Wikia.WikiaType.KanColle);
-            Assert.NotNull(infos);
-            Assert.Equal("2524", infos.Value.id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/e/e6/DD_Ikazuchi_036_Card.jpg", infos.Value.thumbnail);
-        }
-
-        [Fact]
-        public void TDollInfos()
-        {
-            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("MP5", Wikia.WikiaType.GirlsFrontline);
-            Assert.NotNull(infos);
-            Assert.Equal("879", infos.Value.id);
-            Assert.Equal("https://vignette.wikia.nocookie.net/girlsfrontline/images/1/16/Mp5_norm.png", infos.Value.thumbnail);
-        }
-
-        [Fact]
-        public void DownloadThumbnail()
-        {
-            Wikia.CharacInfo? infos = Wikia.GetCharacInfos("Hibiki", Wikia.WikiaType.KanColle);
-            Assert.NotNull(infos);
-            string fileName = Wikia.DownloadCharacThumbnail(infos.Value.thumbnail);
-            Assert.True(File.Exists(fileName));
-        }
-
-        [Fact]
-        public void FillKancolleInfos()
-        {
-            Wikia.CharacInfo? cinfos = Wikia.GetCharacInfos("Ryuujou", Wikia.WikiaType.KanColle);
-            Assert.NotNull(cinfos);
-            string infos = Utilities.AddArgs(KancolleModule.FillKancolleInfos(cinfos.Value.id, 0).ToArray());
-            Assert.Contains("**personality**", infos);
-            Assert.Contains("**appearance**", infos);
-            Assert.Contains("**trivia**", infos);
-        }
-
-        [Fact]
-        public void IsLinkValid()
-        {
-            Assert.True(Utilities.IsLinkValid("http://www.google.com"));
-        }
-
-        [Fact]
-        public void Doujinshi()
-        {
-            new SanaraV2.Program(true);
-            string url = DoujinshiModule.GetDoujinshi(new string[] { }, out _);
-            Assert.NotNull(url);
-            Assert.True(Utilities.IsLinkValid(url));
-        }
-
-        [Fact]
-        public void DoujinshiInvalid()
-        {
-            new SanaraV2.Program(true);
-            string url = DoujinshiModule.GetDoujinshi(new string[] { "awawawawawawawa" }, out _);
-            Assert.Null(url);
-        }
-
-        [Fact]
-        public void Tags()
-        {
-            new SanaraV2.Program(true);
-            string url = DoujinshiModule.GetDoujinshi(new string[] { "kantai", "collection", "color" }, out _);
-            Assert.NotNull(url); /// TODO: Sometimes null
-            Assert.True(Utilities.IsLinkValid(url));
-        }
-
-        [Fact]
-        public void Definition()
-        {
-            Assert.Contains("そら", Utilities.AddArgs(LinguistModule.GetAllKanjis("sky", 0).ToArray()));
-        }
-
-        [Fact]
-        public void Code()
-        {
-            string[] code = CodeModule.IndenteCode(CodeModule.ParseCode("for (int i = 0; i < 5; i++) { if (i % 2 == 0) a++; }".Split(' '))).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            Assert.Equal(5, code.Length);
-            Assert.Equal("for (int i = 0; i < 5; i++)", code[0]);
-            Assert.Equal("{", code[1]);
-            Assert.Equal("\tif (i % 2 == 0)", code[2]);
-            Assert.Equal("\t\ta++;", code[3]);
-            Assert.Equal("}", code[4]);
-        }
-
-        private void InitShiritoriGame()
-        {
-            if (!Directory.Exists("Saves"))
-                Directory.CreateDirectory("Saves");
-            File.WriteAllText("Saves/shiritoriWords.dat", "りゅう$Dragon");
-        }
-
-        [Fact]
-        public void GetPostShiritori()
-        {
-            InitShiritoriGame();
-            new SanaraV2.Program(true);
-            GameModule.Shiritori shiritori = new GameModule.Shiritori(null, null, null, false);
-            Assert.Equal("しりとり (shiritori)", shiritori.GetPost(out _)[0]);
-            Assert.Equal("りゅう (ryuu) - Meaning: Dragon", shiritori.GetPost(out _)[0]);
-        }
-
-        [Fact]
-        public void GetPostKancolle()
-        {
-            new SanaraV2.Program(true);
-            GameModule.Kancolle kancolle = new GameModule.Kancolle(null, null, null, false);
-            Assert.True(File.Exists(kancolle.GetPost(out _)[0]));
-        }
-
-        [Fact]
-        public void GetPostBooru()
-        {
-            if (!Directory.Exists("Saves"))
-                Directory.CreateDirectory("Saves");
-            File.WriteAllText("Saves/BooruTriviaTags.dat", "swimsuit 10");
-            new SanaraV2.Program(true);
-            GameModule.BooruGame booru = new GameModule.BooruGame(null, null, null, false);
-            foreach (string s in booru.GetPost(out _))
-                Assert.True(File.Exists(s));
-        }
-
-        [Fact]
-        public void CheckCorrectShiritoriCorrect()
-        {
-            InitShiritoriGame();
-            GameModule.Shiritori shiritori = new GameModule.Shiritori(null, null, null, false);
-            shiritori.GetPost(out _);
-            Assert.Null(shiritori.GetCheckCorrect("ryuu", out _));
+            var result = await Booru.SearchBooru(false, new string[] { "sex" }, new BooruSharp.Booru.Gelbooru(), new Random());
+            Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
+            Assert.Equal(Discord.Color.Red, result.answer.colorRating);
+            Assert.True(IsLinkValid(result.answer.url));
         }
     }
 }
