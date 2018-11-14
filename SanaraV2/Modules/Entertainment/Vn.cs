@@ -83,10 +83,10 @@ namespace SanaraV2.Modules.Entertainment
 
         public static Embed GetEmbed(VisualNovel vn, ulong guildId, bool isNsfw)
         {
-            List<string> tmpDesc = vn.Description.Split('\n').ToList();
-            if (tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
+            List<string> tmpDesc = vn.Description?.Split('\n').ToList();
+            if (tmpDesc != null && tmpDesc[tmpDesc.Count - 1].Contains("[/url]"))
                 tmpDesc.RemoveAt(tmpDesc.Count - 1);
-            string desc = String.Join(Environment.NewLine, tmpDesc);
+            string desc = (tmpDesc == null) ? ("") : (String.Join(Environment.NewLine, tmpDesc));
             Dictionary<string, string> allLengths = new Dictionary<string, string>()
              {
                  { "VeryShort", "< 2 hours" },
