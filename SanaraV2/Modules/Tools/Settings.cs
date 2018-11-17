@@ -26,23 +26,6 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
-        private void CopyContent(string source, string destination)
-        {
-            source = source.Replace('\\', '/');
-            destination = destination.Replace('\\', '/');
-            foreach (string f in Directory.GetFiles(source))
-            {
-                string f2 = f.Replace('\\', '/');
-                File.Copy(f2, destination + "/" + f2.Split('/')[f2.Split('/').Length - 1]);
-            }
-            foreach (string d in Directory.GetDirectories(source))
-            {
-                string d2 = d.Replace('\\', '/');
-                Directory.CreateDirectory(destination + "/" + d2.Split('/')[d2.Split('/').Length - 1]);
-                CopyContent(d2, destination + "/" + d2.Split('/')[d2.Split('/').Length - 1]);
-            }
-        }
-
         [Command("Language"), Summary("Set the language of the bot for this server")]
         public async Task SetLanguage(params string[] language)
         {

@@ -201,58 +201,5 @@ namespace SanaraV2.Modules.Base
                 return (Program.p.allLanguages[languageName][0]);
             return (languageName);
         }
-
-        /// <summary>
-        /// Check if an URL is valid
-        /// </summary>
-        /// <param name="url">The URL to check</param>
-        public static bool IsLinkValid(string url)
-        {
-            if (url.StartsWith("http://") || url.StartsWith("https://"))
-            {
-                try
-                {
-                    WebRequest request = WebRequest.Create(url);
-                    request.Method = "HEAD";
-                    request.GetResponse();
-                    return (true);
-                }
-                catch (WebException)
-                { }
-            }
-            return (false);
-        }
-
-        public static System.Drawing.Imaging.ImageFormat GetImage(string extension)
-        {
-            switch (extension.ToLower())
-            {
-                case "jpg":
-                case "jpeg":
-                    return (System.Drawing.Imaging.ImageFormat.Jpeg);
-                case "png":
-                    return (System.Drawing.Imaging.ImageFormat.Png);
-                case "bmp":
-                    return (System.Drawing.Imaging.ImageFormat.Bmp);
-                case "emf":
-                    return (System.Drawing.Imaging.ImageFormat.Emf);
-                case "exif":
-                    return (System.Drawing.Imaging.ImageFormat.Exif);
-                case "gif":
-                    return (System.Drawing.Imaging.ImageFormat.Gif);
-                case "icon":
-                    return (System.Drawing.Imaging.ImageFormat.Icon);
-                case "memorybmp":
-                case "memory bmp":
-                case "memory_bmp":
-                    return (System.Drawing.Imaging.ImageFormat.MemoryBmp);
-                case "tiff":
-                    return (System.Drawing.Imaging.ImageFormat.Tiff);
-                case "wmf":
-                    return (System.Drawing.Imaging.ImageFormat.Wmf);
-                default:
-                    return (null);
-            }
-        }
     }
 }
