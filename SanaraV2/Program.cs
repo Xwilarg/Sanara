@@ -87,6 +87,7 @@ namespace SanaraV2
         {
             db = new Db.Db();
             await db.InitAsync();
+
             p = this;
             games = new List<GameModule.Game>();
             gameThread = new Thread(new ThreadStart(GameThread));

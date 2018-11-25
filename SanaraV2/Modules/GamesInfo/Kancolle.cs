@@ -123,32 +123,58 @@ namespace SanaraV2.Modules.GamesInfo
 
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task Drop(params string[] shipNameArr)
-        {
+        { //Max rarity: 7
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
-            if (shipNameArr.Length == 0)
+            string embedMsg = null;
+            var result = await Features.GamesInfo.Kancolle.SearchDropMap(shipNameArr);
+            switch (result.error)
             {
-                await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
-                return;
+                case Features.GamesInfo.Error.DropMap.Help:
+                    await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
+                    return;
+
+                case Features.GamesInfo.Error.DropMap.NotFound:
+                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                    return;
+
+                case Features.GamesInfo.Error.DropMap.NotReferenced:
+                    embedMsg = Sentences.ShipNotReferencedMap(Context.Guild.Id);
+                    break;
+
+                case Features.GamesInfo.Error.DropMap.DontDrop:
+                    embedMsg = Sentences.DontDropOnMaps(Context.Guild.Id);
+                    break;
+
+                case Features.GamesInfo.Error.DropMap.None:
+                    foreach (var k in result.answer.dropMap)
+                    {
+                        embedMsg += "**" + k.Key + ":** ";
+                        switch (k.Value)
+                        {
+                            case Features.GamesInfo.Response.DropMapLocation.NormalOnly:
+                                embedMsg += Sentences.OnlyNormalNodes(Context.Guild.Id);
+                                break;
+
+                            case Features.GamesInfo.Response.DropMapLocation.BossOnly:
+                                embedMsg += Sentences.OnlyBossNode(Context.Guild.Id);
+                                break;
+
+                            case Features.GamesInfo.Response.DropMapLocation.Anywhere:
+                                embedMsg += Sentences.AnyNode(Context.Guild.Id);
+                                break;
+                        }
+                        embedMsg += Environment.NewLine;
+                    }
+                    break;
             }
-            string shipName = GetShipName(shipNameArr);
-            if (shipName == null)
+            string name = string.Join("", shipNameArr);
+            EmbedBuilder embed = new EmbedBuilder()
             {
-                await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
-                return;
-            }
-            DropMapError error;
-            string dropMap = GetDropMap(shipName, Context.Guild.Id, out error);
-            if (error == DropMapError.DontDrop)
-                await ReplyAsync(Sentences.DontDropOnMaps(Context.Guild.Id));
-            else if (error == DropMapError.NotReferenced)
-                await ReplyAsync(Sentences.ShipNotReferencedMap(Context.Guild.Id));
-            else
-                await ReplyAsync(dropMap);
-            string dropConstruction = GetDropConstruction(shipName, Context.Guild.Id);
-            if (dropConstruction == null)
-                await ReplyAsync(Sentences.ShipNotReferencedConstruction(Context.Guild.Id));
-            else
-                await ReplyAsync(dropConstruction);
+                Title = char.ToUpper(name[0]) + name.Substring(1),
+                Color = Color.Blue
+            };
+            embed.AddField("Map drop" + ((result.answer != null && result.answer.rarity != null) ? ("Rarity: " + result.answer.rarity.ToString() + " / 7") : ("")), embedMsg);
+            await ReplyAsync("", false, embed.Build());
         }
 
         /// <summary>
@@ -168,89 +194,6 @@ namespace SanaraV2.Modules.GamesInfo
                 if (shipContain == null)
                     return (null);
                 return (Utilities.GetElementXml("<td>", shipContain, '<'));
-            }
-        }
-
-        public enum DropMapError
-        {
-            NoError,
-            NotReferenced,
-            DontDrop
-        }
-
-        /// <summary>
-        /// Return the drop on maps for a ship
-        /// </summary>
-        /// <param name="shipName">Name of the ship</param>
-        /// <param name="guildId">Guild ID was sent from</param>
-        /// <param name="error">If the research fail, return the error in this param</param>
-        public static string GetDropMap(string shipName, ulong guildId, out DropMapError error)
-        {
-            using (WebClient wc = new WebClient())
-            {
-                wc.Encoding = Encoding.UTF8;
-                string html = wc.DownloadString("https://wikiwiki.jp/kancolle/%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E9%80%86%E5%BC%95%E3%81%8D");
-                html = html.Split(new string[] { "<thead>" }, StringSplitOptions.None)[1];
-                html = html.Split(new string[] { "艦種別表" }, StringSplitOptions.None)[0];
-                string[] shipgirls = html.Split(new string[] { "<tr>" }, StringSplitOptions.None);
-                string shipgirl = shipgirls.ToList().Find(x => x.Contains(shipName));
-                string finalStr = "";
-                if (shipgirl == null)
-                {
-                    error = DropMapError.NotReferenced;
-                    return (null);
-                }
-                else
-                {
-                    string[] cathegories = shipgirl.Split(new string[] { "<td class=\"style_td\"" }, StringSplitOptions.RemoveEmptyEntries);
-                    int[] toKeep = new int[] { 4, 5, 6, 7, 8, 9,    // World 1
-                                           11, 12, 13, 14, 15,  // world 2
-                                           17, 18, 19, 20, 21,  // World 3
-                                           23, 24, 25, 26, 27,  // World 4
-                                           29, 30, 31, 32, 33,  // World 5
-                                           35, 36, 37, 38, 39}; // World 6
-                    int level = 1;
-                    int world = 1;
-                    foreach (int i in toKeep)
-                    {
-                        string node = Utilities.GetElementXml(">", cathegories[i], '<');
-                        if (node.Length > 0)
-                        {
-                            switch (node[0])
-                            {
-                                case '●':
-                                    finalStr += world + "-" + level + ": " + Sentences.OnlyNormalNodes(guildId) + Environment.NewLine;
-                                    break;
-
-                                case '○':
-                                    finalStr += world + "-" + level + ": " + Sentences.OnlyBossNode(guildId) + Environment.NewLine;
-                                    break;
-
-                                case '◎':
-                                    finalStr += world + "-" + level + ": " + Sentences.AnyNode(guildId) + Environment.NewLine;
-                                    break;
-
-                                default:
-                                    finalStr += world + "-" + level + ": " + Sentences.DefaultNode(guildId) + Environment.NewLine;
-                                    break;
-                            }
-                        }
-                        level++;
-                        if ((world == 1 && level > 6) || (world > 1 && level > 5))
-                        {
-                            world++;
-                            level = 1;
-                        }
-                    }
-                    if (finalStr.Length > 0)
-                    {
-                        string rarity = Utilities.GetElementXml(">", cathegories[1], '<');
-                        error = DropMapError.NoError;
-                        return (Sentences.Rarity(guildId) + ": " + ((rarity.Length > 0) ? (rarity) : ("?")) + "/7" + Environment.NewLine + finalStr);
-                    }
-                    error = DropMapError.DontDrop;
-                    return (null);
-                }
             }
         }
 
