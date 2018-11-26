@@ -17,7 +17,7 @@ namespace SanaraV2.Features.GamesInfo
 {
     public static class Error
     {
-        public enum DropMap
+        public enum Drop
         {
             None,
             Help,

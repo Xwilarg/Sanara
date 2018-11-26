@@ -123,29 +123,89 @@ namespace SanaraV2.Modules.GamesInfo
 
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task Drop(params string[] shipNameArr)
-        { //Max rarity: 7
+        {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            Task<EmbedFieldBuilder> constructionTask = Task.Run(() => GetDropConstructionField(shipNameArr, Context.Guild.Id));
+            Task<EmbedFieldBuilder> mapTask = Task.Run(() => GetDropMapField(shipNameArr, Context.Guild.Id));
+            string name = string.Join("", shipNameArr);
+            EmbedBuilder embed = new EmbedBuilder();
+            try
+            {
+                embed.AddField(await mapTask);
+                embed.AddField(await constructionTask);
+                embed.Title = char.ToUpper(name[0]) + name.Substring(1);
+                embed.Color = Color.Blue;
+                await ReplyAsync("", false, embed.Build());
+            }
+            catch (ArgumentException ae)
+            {
+                await ReplyAsync(ae.Message);
+            }
+        }
+
+        private async Task<EmbedFieldBuilder> GetDropConstructionField(string[] shipNameArr, ulong guildId)
+        {
+            string embedMsg = null;
+            var result = await Features.GamesInfo.Kancolle.SearchDropConstruction(shipNameArr);
+            switch (result.error)
+            {
+                case Features.GamesInfo.Error.Drop.Help:
+                    throw new ArgumentException(Sentences.KancolleHelp(guildId));
+
+                case Features.GamesInfo.Error.Drop.NotFound:
+                    throw new ArgumentException(Sentences.ShipgirlDontExist(guildId));
+
+                case Features.GamesInfo.Error.Drop.NotReferenced:
+                    embedMsg = Sentences.ShipNotReferencedConstruction(Context.Guild.Id);
+                    break;
+
+                case Features.GamesInfo.Error.Drop.DontDrop:
+                    embedMsg = Sentences.DontDropOnMaps(Context.Guild.Id);
+                    break;
+
+                case Features.GamesInfo.Error.Drop.None:
+                    int i = 1;
+                    foreach (var elem in result.answer.elems)
+                    {
+                        embedMsg += "**" + elem.chance + "%:** "
+                            + Sentences.Fuel(guildId) + " " + elem.fuel + ", "
+                            + Sentences.Ammos(guildId) + " " + elem.ammos + ", "
+                            + Sentences.Iron(guildId) + " " + elem.iron + ", "
+                            + Sentences.Bauxite(guildId) + " " + elem.bauxite + ", "
+                            + Sentences.DevMat(guildId) + " " + elem.devMat
+                            + Environment.NewLine;
+                        i++;
+                    }
+                    break;
+            }
+            return (new EmbedFieldBuilder()
+            {
+                Name = "Construction drop",
+                Value = embedMsg
+            });
+        }
+
+        private async Task<EmbedFieldBuilder> GetDropMapField(string[] shipNameArr, ulong guildId)
+        {
             string embedMsg = null;
             var result = await Features.GamesInfo.Kancolle.SearchDropMap(shipNameArr);
             switch (result.error)
             {
-                case Features.GamesInfo.Error.DropMap.Help:
-                    await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
-                    return;
+                case Features.GamesInfo.Error.Drop.Help:
+                    throw new ArgumentException(Sentences.KancolleHelp(guildId));
 
-                case Features.GamesInfo.Error.DropMap.NotFound:
-                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
-                    return;
+                case Features.GamesInfo.Error.Drop.NotFound:
+                    throw new ArgumentException(Sentences.ShipgirlDontExist(guildId));
 
-                case Features.GamesInfo.Error.DropMap.NotReferenced:
+                case Features.GamesInfo.Error.Drop.NotReferenced:
                     embedMsg = Sentences.ShipNotReferencedMap(Context.Guild.Id);
                     break;
 
-                case Features.GamesInfo.Error.DropMap.DontDrop:
+                case Features.GamesInfo.Error.Drop.DontDrop:
                     embedMsg = Sentences.DontDropOnMaps(Context.Guild.Id);
                     break;
 
-                case Features.GamesInfo.Error.DropMap.None:
+                case Features.GamesInfo.Error.Drop.None:
                     foreach (var k in result.answer.dropMap)
                     {
                         embedMsg += "**" + k.Key + ":** ";
@@ -167,71 +227,11 @@ namespace SanaraV2.Modules.GamesInfo
                     }
                     break;
             }
-            string name = string.Join("", shipNameArr);
-            EmbedBuilder embed = new EmbedBuilder()
+            return (new EmbedFieldBuilder()
             {
-                Title = char.ToUpper(name[0]) + name.Substring(1),
-                Color = Color.Blue
-            };
-            embed.AddField("Map drop" + ((result.answer != null && result.answer.rarity != null) ? ("Rarity: " + result.answer.rarity.ToString() + " / 7") : ("")), embedMsg);
-            await ReplyAsync("", false, embed.Build());
-        }
-
-        /// <summary>
-        /// Return ship name in kanji
-        /// </summary>
-        /// <param name="shipNameArr">Ship name in romaji</param>
-        public static string GetShipName(string[] shipNameArr)
-        {
-            string shipName = Utilities.CleanWord(Utilities.AddArgs(shipNameArr));
-            using (WebClient wc = new WebClient())
-            {
-                wc.Encoding = Encoding.UTF8;
-                string html = wc.DownloadString("http://kancolle.wikia.com/wiki/Internals/Translations");
-                List<string> allShipsName = html.Split(new string[] { "<tr" }, StringSplitOptions.None).ToList();
-                allShipsName.RemoveAt(0);
-                string shipContain = allShipsName.Find(x => Utilities.CleanWord(Utilities.GetElementXml("\">", x, '<')) == shipName);
-                if (shipContain == null)
-                    return (null);
-                return (Utilities.GetElementXml("<td>", shipContain, '<'));
-            }
-        }
-
-        /// <summary>
-        /// Return the drop on construction for a ship
-        /// </summary>
-        /// <param name="shipName">Name of the ship</param>
-        /// <param name="guildId">Guild ID the message was sent from</param>
-        public static string GetDropConstruction(string shipName, ulong guildId) // shipName in kanji
-        {
-            using (WebClient wc = new WebClient())
-            {
-                wc.Encoding = Encoding.UTF8;
-                wc.Headers.Add("User-Agent: Sanara");
-                string html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLogList");
-                html = Regex.Replace(
-                        html,
-                        @"\\[Uu]([0-9A-Fa-f]{4})",
-                        m => char.ToString(
-                            (char)ushort.Parse(m.Groups[1].Value, NumberStyles.AllowHexSpecifier))); // Replace \\u1313 by \u1313
-                string[] htmlSplit = html.Split(new string[] { shipName }, StringSplitOptions.None);
-                if (htmlSplit.Length == 1)
-                    return (null);
-                string[] allIds = htmlSplit[htmlSplit.Length - 2].Split(new string[] { "\",\"" }, StringSplitOptions.None);
-                wc.Headers.Add("User-Agent: Sanara");
-                html = wc.DownloadString("http://unlockacgweb.galstars.net/KanColleWiki/viewCreateShipLog?sid=" + (allIds[allIds.Length - 1].Split('"')[0]));
-                html = html.Split(new string[] { "order_by_probability" }, StringSplitOptions.None)[1];
-                html = html.Split(new string[] { "flagship_order" }, StringSplitOptions.None)[0];
-                string[] allElements = html.Split(new string[] { "{\"item1\":" }, StringSplitOptions.None);
-                string finalStr = Sentences.ShipConstruction(guildId) + Environment.NewLine;
-                for (int i = 1; i < ((allElements.Length > 6) ? (6) : (allElements.Length)); i++)
-                {
-                    string[] ressources = allElements[i].Split(new string[] { ",\"" }, StringSplitOptions.None);
-                    finalStr += Utilities.GetElementXml(":", ressources[7], '}') + "% -- " + Sentences.Fuel(guildId) + " " + ressources[0] + ", " + Sentences.Ammos(guildId) + " " + Utilities.GetElementXml(":", ressources[1], '?') + ", " + Sentences.Iron(guildId) + " " + Utilities.GetElementXml(":", ressources[2], '?') + ", " + Sentences.Bauxite(guildId) + " " + Utilities.GetElementXml(":", ressources[3], '?')
-                         + ", " + Sentences.DevMat(guildId) + " " + Utilities.GetElementXml(":", ressources[4], '?') + Environment.NewLine;
-                }
-                return (finalStr);
-            }
+                Name = "Map drop" + ((result.answer != null && result.answer.rarity != null) ? (Sentences.Rarity(guildId)    + ": " + result.answer.rarity.ToString() + " / 7") : ("")),
+                Value = embedMsg
+            });
         }
 
         [Command("", RunMode = RunMode.Async), Priority(-1)]

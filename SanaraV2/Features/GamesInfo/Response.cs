@@ -24,11 +24,26 @@ namespace SanaraV2.Features.GamesInfo
             public Dictionary<string, DropMapLocation> dropMap;
         }
 
+        public class DropConstruction
+        {
+            public ConstructionElem[] elems;
+        }
+
         public enum DropMapLocation
         {
             Anywhere,
             BossOnly,
             NormalOnly
+        }
+
+        public struct ConstructionElem
+        {
+            public string chance;
+            public string fuel;
+            public string ammos;
+            public string iron;
+            public string bauxite;
+            public string devMat;
         }
     }
 }
