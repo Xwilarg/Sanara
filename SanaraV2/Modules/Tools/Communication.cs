@@ -205,6 +205,12 @@ namespace SanaraV2.Modules.Tools
             await ReplyAsync("", false, embed.Build());
         }
 
+        [Command("Invite", RunMode = RunMode.Async), Summary("Get invitation link")]
+        public async Task Invite()
+        {
+            await ReplyAsync("<https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot>");
+        }
+
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
         public async Task Quote(string id = null)
         {
@@ -309,6 +315,7 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Sentences.Uptime(Context.Guild.Id), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
                 embed.AddField(Sentences.Website(Context.Guild.Id), "https://zirk.eu/sanara.html");
+                embed.AddField("Invitation link", "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");
                 embed.AddField(Sentences.OfficialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");
             }
             embed.AddField(Sentences.Roles(Context.Guild.Id), ((roles == "") ? (Sentences.NoRole(Context.Guild.Id)) : (roles)));
