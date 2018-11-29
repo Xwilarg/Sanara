@@ -17,6 +17,7 @@ using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using SanaraV2.Features.Tools.LinguistResources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -40,14 +41,29 @@ namespace SanaraV2.Features.Tools
             dynamic json = JsonConvert.DeserializeObject(html);
             if (json.list.Count == 0)
                 return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.NotFound));
-            else
-                return (new FeatureRequest<Response.Urban, Error.Urban>(new Response.Urban()
-                {
-                    definition = json.list[0].definition,
-                    example = json.list[0].example,
-                    link = json.list[0].permalink,
-                    word = json.list[0].word
-                }, Error.Urban.None));
+            string definition = json.list[0].definition;
+            bool definitionComplete = true;
+            while (definition.Length > 1015)
+            {
+                definitionComplete = false;
+                string[] tmp = definition.Split('.');
+                definition = string.Join(".", tmp.Take(tmp.Length - 1));
+            }
+            string example = ((string)json.list[0].example).Replace(Environment.NewLine, "\n");
+            bool exampleComplete = true;
+            while (example.Length > 1015)
+            {
+                exampleComplete = false;
+                string[] tmp = example.Split(new string[] { "\n\n" }, StringSplitOptions.None);
+                example = string.Join("\n\n", tmp.Take(tmp.Length - 1));
+            }
+            return (new FeatureRequest<Response.Urban, Error.Urban>(new Response.Urban()
+            {
+                definition = definition + ((definitionComplete) ? ("") : (Environment.NewLine + Environment.NewLine + "[...]")),
+                example = example + ((exampleComplete) ? ("") : (Environment.NewLine + Environment.NewLine + "[...]")),
+                link = json.list[0].permalink,
+                word = json.list[0].word
+            }, Error.Urban.None));
 
         }
 

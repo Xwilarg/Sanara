@@ -32,15 +32,15 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Urban.Help:
-                    await ReplyAsync(result.error.ToString());
+                    await ReplyAsync(Sentences.UrbanHelp(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Urban.ChanNotNSFW:
-                    await ReplyAsync(result.error.ToString());
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Urban.NotFound:
-                    await ReplyAsync(result.error.ToString());
+                    await ReplyAsync(Sentences.UrbanNotFound(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Urban.None:
