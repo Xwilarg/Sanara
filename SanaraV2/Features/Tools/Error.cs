@@ -40,5 +40,13 @@ namespace SanaraV2.Features.Tools
             Help,
             NotFound
         }
+
+        public enum Urban
+        {
+            None,
+            Help,
+            ChanNotNSFW,
+            NotFound
+        }
     }
 }

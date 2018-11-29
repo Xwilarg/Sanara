@@ -14,12 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord.Commands;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using Google.Cloud.Translation.V2;
-using SanaraV2.Modules.Base;
 using Discord;
 using System.Linq;
 
@@ -28,6 +23,52 @@ namespace SanaraV2.Modules.Tools
     public class Linguist : ModuleBase
     {
         Program p = Program.p;
+
+        [Command("Urban", RunMode = RunMode.Async), Summary("Search for a word in Urban Dictionary")]
+        public async Task Urban(params string[] words)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            var result = await Features.Tools.Linguist.UrbanSearch(!((ITextChannel)Context.Channel).IsNsfw, words);
+            switch (result.error)
+            {
+                case Features.Tools.Error.Urban.Help:
+                    await ReplyAsync(result.error.ToString());
+                    break;
+
+                case Features.Tools.Error.Urban.ChanNotNSFW:
+                    await ReplyAsync(result.error.ToString());
+                    break;
+
+                case Features.Tools.Error.Urban.NotFound:
+                    await ReplyAsync(result.error.ToString());
+                    break;
+
+                case Features.Tools.Error.Urban.None:
+                    await ReplyAsync("", false, new EmbedBuilder()
+                    {
+                        Color = Color.Blue,
+                        Title = char.ToUpper(result.answer.word[0]) + string.Concat(result.answer.word.Skip(1)),
+                        Fields = new System.Collections.Generic.List<EmbedFieldBuilder>()
+                        {
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Definition",
+                                Value = result.answer.definition
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Example",
+                                Value = result.answer.example
+                            }
+                        },
+                        Footer = new EmbedFooterBuilder()
+                        {
+                            Text = "From " + result.answer.link
+                        }
+                    }.Build());
+                    break;
+            }
+        }
 
         [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence")]
         public async Task Translation(params string[] words)

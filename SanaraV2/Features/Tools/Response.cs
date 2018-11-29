@@ -45,5 +45,13 @@ namespace SanaraV2.Features.Tools
             public string reading;
             public string romaji;
         }
+
+        public class Urban
+        {
+            public string definition;
+            public string example;
+            public string word;
+            public string link;
+        }
     }
 }

@@ -27,6 +27,30 @@ namespace SanaraV2.Features.Tools
 {
     public static class Linguist
     {
+        public static async Task<FeatureRequest<Response.Urban, Error.Urban>> UrbanSearch(bool isChanSafe, string[] args)
+        {
+            if (isChanSafe)
+                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.ChanNotNSFW));
+            if (args.Length == 0)
+                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.Help));
+            string searchUrl = "http://api.urbandictionary.com/v0/define?term=" + Utilities.AddArgs(args);
+            string html;
+            using (HttpClient hc = new HttpClient())
+                html = await hc.GetStringAsync(searchUrl);
+            dynamic json = JsonConvert.DeserializeObject(html);
+            if (json.list.Count == 0)
+                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.NotFound));
+            else
+                return (new FeatureRequest<Response.Urban, Error.Urban>(new Response.Urban()
+                {
+                    definition = json.list[0].definition,
+                    example = json.list[0].example,
+                    link = json.list[0].permalink,
+                    word = json.list[0].word
+                }, Error.Urban.None));
+
+        }
+
         public static async Task<FeatureRequest<Response.Translation, Error.Translation>> Translate(string[] args, TranslationClient translationClient,
             ImageAnnotatorClient visionClient, Dictionary<string, List<string>> allLanguages)
         {
