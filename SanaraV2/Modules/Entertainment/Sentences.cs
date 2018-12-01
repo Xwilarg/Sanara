@@ -30,7 +30,6 @@ namespace SanaraV2.Modules.Entertainment
         public static string EqualizedScore(ulong guildId, string score) { return (Translation.GetTranslation(guildId, "equalizedScore", score)); }
         public static string DidntBeatScore(ulong guildId, string lastScore, string newScore) { return (Translation.GetTranslation(guildId, "didntBeatScore", lastScore, newScore)); }
         public static string ShiritoriNoWord(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriNoWord")); }
-        public static string WaitPlay(ulong guildId) { return (Translation.GetTranslation(guildId, "waitPlay")); }
         public static string OnlyHiraganaKatakanaRomaji(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyHiraganaKatakanaRomaji")); }
         public static string ShiritoriNotNoun(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriNotNoun")); }
         public static string ShiritoriDoesntExist(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriDoesntExist")); }
@@ -43,7 +42,6 @@ namespace SanaraV2.Modules.Entertainment
         public static string KancolleGuessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGuessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
         public static string GuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "guessBad", attempt)); }
-        public static string WaitImages(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImages")); }
         public static string BooruGuessClose(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "booruGuessClose", attempt)); }
         public static string LostStr(ulong guildId) { return (Translation.GetTranslation(guildId, "lost")); }
         public static string InvalidDifficulty(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidDifficulty")); }
@@ -68,11 +66,9 @@ namespace SanaraV2.Modules.Entertainment
         public static string RadioAlreadyInList(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyInList")); }
         public static string RadioTooMany(ulong guildId) { return (Translation.GetTranslation(guildId, "radioTooMany")); }
         public static string RadioNoSong(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNoSong")); }
-        public static string CantDownload(ulong guildId) { return (Translation.GetTranslation(guildId, "cantDownload")); }
         public static string SongSkipped(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songSkipped", songName)); }
         public static string Current(ulong guildId) { return (Translation.GetTranslation(guildId, "current")); }
         public static string Downloading(ulong guildId) { return (Translation.GetTranslation(guildId, "downloading")); }
-        public static string SongAdded(ulong guildId, string song) { return (Translation.GetTranslation(guildId, "songAdded", song)); }
 
         /// --------------------------- VN ---------------------------
         public static string VndbHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbHelp")); }

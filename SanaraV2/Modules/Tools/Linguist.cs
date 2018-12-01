@@ -70,7 +70,7 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence")]
+        [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence"), Alias("Translate")]
         public async Task Translation(params string[] words)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
@@ -111,7 +111,7 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("Japanese", RunMode = RunMode.Async), Summary("Give the meaning of a word"), Alias("Def")]
+        [Command("Japanese", RunMode = RunMode.Async), Summary("Give the meaning of a word")]
         public async Task Meaning(params string[] words)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);

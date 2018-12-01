@@ -17,7 +17,6 @@ using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,28 +30,6 @@ namespace SanaraV2.Modules.GamesInfo
     public class Kancolle : ModuleBase
     {
         Program p = Program.p;
-        [Command("Map", RunMode = RunMode.Async), Summary("Get informations about a map")]
-        public async Task Map(params string[] command)
-        {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
-            await Utilities.NotAvailable(Context.Channel as ITextChannel);
-            return;
-            if (IsMapInvalid(command))
-                await ReplyAsync(Sentences.MapHelp(Context.Guild.Id));
-            else
-            {
-                string mapIntro, mapDraw, mapName;
-                string infos = GetMapInfos(command[0][0], command[1][0], out mapIntro, out mapDraw, out mapName);
-                await ReplyAsync(mapName);
-                await Context.Channel.SendFileAsync(mapIntro);
-                await Context.Channel.SendFileAsync(mapDraw);
-                File.Delete(mapIntro);
-                File.Delete(mapDraw);
-                foreach (string s in GetBranchingRules(infos))
-                    if (s != "")
-                        await ReplyAsync(Regex.Replace(s, "<!---(?s:.)*--->", ""));
-            }
-        }
 
         /// <summary>
         /// Return if a map is valid or not

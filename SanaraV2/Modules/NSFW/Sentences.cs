@@ -20,18 +20,5 @@ namespace SanaraV2.Modules.NSFW
     {
         /// --------------------------- Booru ---------------------------
         public static string InvalidExtension(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidExtension")); }
-        public static string MoreNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "moreNotTagged")); }
-        public static string AnimeFromOriginal(ulong guildId) { return (Translation.GetTranslation(guildId, "animeFromOriginal")); }
-        public static string AnimeNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotTagged")); }
-        public static string AnimeFrom(ulong guildId) { return (Translation.GetTranslation(guildId, "animeFrom")); }
-        public static string AnimeTagUnknowed(ulong guildId) { return (Translation.GetTranslation(guildId, "animeTagUnknowed")); }
-        public static string CharacterTagUnknowed(ulong guildId) { return (Translation.GetTranslation(guildId, "characterTagUnknowed")); }
-        public static string CharacterNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "characterNotTagged")); }
-        public static string CharacterIs(ulong guildId) { return (Translation.GetTranslation(guildId, "characterIs")); }
-        public static string CharacterAre(ulong guildId) { return (Translation.GetTranslation(guildId, "characterAre")); }
-        public static string ArtistFrom(ulong guildId) { return (Translation.GetTranslation(guildId, "artistFrom")); }
-        public static string ArtistNotTagged(ulong guildId) { return (Translation.GetTranslation(guildId, "artistNotTagged")); }
-        public static string AndSomeOthers(ulong guildId) { return (Translation.GetTranslation(guildId, "andSomeOthers")); }
-        public static string MoreThanOneSimilar(ulong guildId, string tag) { return (Translation.GetTranslation(guildId, "moreThanOneSimilar", tag)); }
     }
 }

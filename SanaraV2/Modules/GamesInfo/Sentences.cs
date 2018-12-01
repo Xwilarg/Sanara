@@ -50,13 +50,10 @@ namespace SanaraV2.Modules.GamesInfo
         public static string DontDropOnMaps(ulong guildId) { return (Translation.GetTranslation(guildId, "dontDropOnMaps")); }
         public static string ShipNotReferencedMap(ulong guildId) { return (Translation.GetTranslation(guildId, "shipNotReferencedMap")); }
         public static string ShipNotReferencedConstruction(ulong guildId) { return (Translation.GetTranslation(guildId, "shipNotReferencedConstruction")); }
-        public static string MapHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mapHelp")); }
         public static string OnlyNormalNodes(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyNormalNodes")); }
         public static string OnlyBossNode(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyBossNode")); }
         public static string AnyNode(ulong guildId) { return (Translation.GetTranslation(guildId, "anyNode")); }
-        public static string DefaultNode(ulong guildId) { return (Translation.GetTranslation(guildId, "defaultNode")); }
         public static string Rarity(ulong guildId) { return (Translation.GetTranslation(guildId, "rarity")); }
-        public static string ShipConstruction(ulong guildId) { return (Translation.GetTranslation(guildId, "shipConstruction")); }
         public static string Fuel(ulong guildId) { return (Translation.GetTranslation(guildId, "fuel")); }
         public static string Ammos(ulong guildId) { return (Translation.GetTranslation(guildId, "ammos")); }
         public static string Iron(ulong guildId) { return (Translation.GetTranslation(guildId, "iron")); }
