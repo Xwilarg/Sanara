@@ -53,7 +53,6 @@ namespace SanaraV2.Modules.Tools
         [Command("Prefix"), Summary("Set the prefix of the bot for this server")]
         public async Task SetPrefix(params string[] command)
         {
-            await ReplyAsync("Inside");
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Context.Guild.OwnerId)
             {
