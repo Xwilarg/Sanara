@@ -25,5 +25,12 @@ namespace SanaraV2.Features.GamesInfo
             DontDrop,
             NotReferenced
         }
+
+        public enum Charac
+        {
+            None,
+            Help,
+            NotFound
+        }
     }
 }

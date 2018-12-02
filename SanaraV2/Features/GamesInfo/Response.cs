@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using System;
 using System.Collections.Generic;
 
 namespace SanaraV2.Features.GamesInfo
@@ -27,6 +28,13 @@ namespace SanaraV2.Features.GamesInfo
         public class DropConstruction
         {
             public ConstructionElem[] elems;
+        }
+
+        public class Charac
+        {
+            public string name;
+            public string thumbnailUrl;
+            public List<Tuple<string, string>> allCategories;
         }
 
         public enum DropMapLocation

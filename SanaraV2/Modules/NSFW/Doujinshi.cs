@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using System;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.NSFW
@@ -37,9 +38,12 @@ namespace SanaraV2.Modules.NSFW
                     await ReplyAsync(Base.Sentences.TagsNotFound(keywords));
                     break;
 
-                default:
+                case Features.NSFW.Error.Doujinshi.None:
                     await ReplyAsync(result.answer.url);
                     break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
     }

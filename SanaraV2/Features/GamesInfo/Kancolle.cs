@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,6 +25,61 @@ namespace SanaraV2.Features.GamesInfo
 {
     public class Kancolle
     {
+        public static async Task<FeatureRequest<Response.Charac, Error.Charac>> SearchCharac(string[] args)
+        {
+            if (args.Length == 0)
+                return (new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.Help));
+            string thumbnailUrl, name;
+            string html;
+            using (HttpClient hc = new HttpClient())
+            {
+                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.wikia.com/api/v1/Search/List?query=" + string.Join("%20", args) + "&limit=1"));
+                string id = json.items[0].id;
+                string url = json.items[0].url + "?action=raw";
+                name = json.items[0].title;
+                html = await hc.GetStringAsync(url);
+                if (!html.StartsWith("{{ShipPageHeader") && !html.StartsWith("{{Ship/Header"))
+                    return (new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound));
+                html = html.Split(new string[] { "{{ShipPageFooter}}" }, StringSplitOptions.None)[0];
+                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + id));
+                thumbnailUrl = json.items[id].thumbnail;
+                thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
+            }
+            string[] categories = html.Split(new string[] { "\n==" }, StringSplitOptions.None);
+            List<Tuple<string, string>> allCats = new List<Tuple<string, string>>();
+            foreach (string s in categories.Skip(1))
+            {
+                string title = Regex.Match("==" + s, "=[=]+([^=]+)==").Groups[1].Value;
+                title = title.Trim(' ');
+                if (title.StartsWith("Quotes") || title.StartsWith("Hourly Notifications") || title.StartsWith("Seasonal Quotes") || title.StartsWith("Character") || title.StartsWith("Quests"))
+                    continue;
+                string tmp = Regex.Replace("==" + s, "=[=]+([^=]+)[=]+", "");
+                if (!tmp.Any(x => char.IsLetter(x)))
+                    continue;
+                foreach (Match match in Regex.Matches(tmp, "\\[\\[[^\\|\\]]+\\|([^\\]]+)]]"))
+                    tmp = tmp.Replace(match.Value, match.Groups[1].Value);
+                foreach (Match match in Regex.Matches(tmp, "\\[https?:\\/\\/[^ ]+ ([^\\]]+)\\]"))
+                    tmp = tmp.Replace(match.Value, match.Groups[1].Value);
+                tmp = Regex.Replace(tmp, "\\[https?:\\/\\/[^\\]]+\\]", "").Replace(" * ", "\\*").Replace("[", "").Replace("]", "");
+                string newTmp = "";
+                while (tmp.Length > 1024)
+                {
+                    string[] tmp2 = tmp.Split('\n');
+                    tmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
+                    newTmp += tmp2[tmp2.Length - 1] + "\n";
+                }
+                allCats.Add(new Tuple<string, string>(title.Trim('\''), tmp));
+                if (newTmp != "")
+                    allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 2)", newTmp));
+            }
+            return (new FeatureRequest<Response.Charac, Error.Charac>(new Response.Charac()
+            {
+                name = name,
+                allCategories = allCats,
+                thumbnailUrl = thumbnailUrl
+            }, Error.Charac.None));
+        }
+
         public static async Task<FeatureRequest<Response.DropConstruction, Error.Drop>> SearchDropConstruction(string[] args)
         {
             if (args.Length == 0)
