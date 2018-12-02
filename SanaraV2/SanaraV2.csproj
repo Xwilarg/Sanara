@@ -257,8 +257,6 @@
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
     <Compile Include="Modules\GamesInfo\Sentences.cs" />
-    <Compile Include="Modules\GamesInfo\GirlsFrontline.cs" />
-    <Compile Include="Modules\GamesInfo\Wikia.cs" />
     <Compile Include="Modules\NSFW\Sentences.cs" />
     <Compile Include="Features\Tools\LinguistResources\HiraganaToRomaji.Designer.cs">
       <AutoGen>True</AutoGen>
