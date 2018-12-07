@@ -32,8 +32,6 @@ namespace SanaraV2.Modules.Base
 
         public static string GetTranslation(ulong guildId, string id, params string[] args)
         {
-            if (guildId == 0) // GuildId is equal to 0 for unit tests
-                return (id);
             string language = Program.p.db.Languages[guildId];
             if (Program.p.translations.ContainsKey(id))
             {

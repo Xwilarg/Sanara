@@ -12,46 +12,46 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using Discord;
+using System;
+using System.Collections.Generic;
 
-namespace SanaraV2.Features.Tools
+namespace SanaraV2.Features.GamesInfo
 {
     public static class Response
     {
-        public class Image
+        public class DropMap
         {
-            public Color discordColor;
-            public string colorUrl;
-            public string colorHex;
+            public int? rarity;
+            public Dictionary<string, DropMapLocation> dropMap;
+        }
+
+        public class DropConstruction
+        {
+            public ConstructionElem[] elems;
+        }
+
+        public class Charac
+        {
             public string name;
+            public string thumbnailUrl;
+            public List<Tuple<string, string>> allCategories;
         }
 
-        public class Translation
+        public enum DropMapLocation
         {
-            public string sourceLanguage;
-            public string sentence;
+            Anywhere,
+            BossOnly,
+            NormalOnly
         }
 
-        public class JapaneseTranslation
+        public struct ConstructionElem
         {
-            public JapaneseWord[] words;
-            public string[] definition;
-            public string[] speechPart;
-        }
-
-        public class JapaneseWord
-        {
-            public string word;
-            public string reading;
-            public string romaji;
-        }
-
-        public class Urban
-        {
-            public string definition;
-            public string example;
-            public string word;
-            public string link;
+            public string chance;
+            public string fuel;
+            public string ammos;
+            public string iron;
+            public string bauxite;
+            public string devMat;
         }
     }
 }

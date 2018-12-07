@@ -87,6 +87,7 @@ namespace SanaraV2
         {
             db = new Db.Db();
             await db.InitAsync();
+
             p = this;
             games = new List<GameModule.Game>();
             gameThread = new Thread(new ThreadStart(GameThread));
@@ -111,7 +112,6 @@ namespace SanaraV2
             await commands.AddModuleAsync<RadioModule>();
             await commands.AddModuleAsync<Xkcd>();
             await commands.AddModuleAsync<Modules.Tools.Image>();
-            await commands.AddModuleAsync<GirlsFrontline>();
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -418,6 +418,7 @@ namespace SanaraV2
                 var result = await commands.ExecuteAsync(context, pos);
                 if (result.IsSuccess && sendStats)
                 {
+                    Console.WriteLine("Result!");
                     await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
                     await AddError("OK");
                     await AddCommandServs(context.Guild.Id);

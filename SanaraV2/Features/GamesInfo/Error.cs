@@ -1,4 +1,4 @@
-﻿// This file is part of Sanara.
+﻿/// This file is part of Sanara.
 ///
 /// Sanara is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU General Public License as published by
@@ -13,39 +13,23 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
-namespace SanaraV2.Features.Tools
+namespace SanaraV2.Features.GamesInfo
 {
     public static class Error
     {
-        public enum Image
-        {
-            None,
-            InvalidArg,
-            InvalidColor
-        }
-
-        public enum Translation
-        {
-            None,
-            InvalidApiKey,
-            Help,
-            InvalidLanguage,
-            NotAnImage,
-            NoTextOnImage
-        }
-
-        public enum JapaneseTranslation
+        public enum Drop
         {
             None,
             Help,
-            NotFound
+            NotFound,
+            DontDrop,
+            NotReferenced
         }
 
-        public enum Urban
+        public enum Charac
         {
             None,
             Help,
-            ChanNotNSFW,
             NotFound
         }
     }

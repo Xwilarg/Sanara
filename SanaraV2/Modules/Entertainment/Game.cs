@@ -16,7 +16,6 @@ using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
 using SanaraV2.Modules.Base;
-using SanaraV2.Modules.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -404,13 +403,30 @@ namespace SanaraV2.Modules.Entertainment
                 });
             }
 
+            private bool IsClose(string str1, string str2)
+            {
+                string[] tmpStr1 = str1.Split(new string[] { " ", "_", "-" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] tmpStr2 = str2.Split(new string[] { " ", "_", "-" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string s1 in tmpStr1)
+                {
+                    string newS1 = Utilities.CleanWord(s1);
+                    foreach (string s2 in tmpStr2)
+                    {
+                        string newS2 = Utilities.CleanWord(s2);
+                        if (newS1.Contains(newS2) || newS2.Contains(newS1))
+                            return (true);
+                    }
+                }
+                return (false);
+            }
+
             public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
                 sayCorrect = true;
                 m_nbAttempt++;
                 if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
                     return (null);
-                if (Utilities.CleanWord(userWord) != "" && (Utilities.CleanWord(m_toGuess).Contains(Utilities.CleanWord(userWord)) || Utilities.CleanWord(userWord).Contains(Utilities.CleanWord(m_toGuess))))
+                if (Utilities.CleanWord(userWord) != "" && IsClose(userWord, m_toGuess))
                     return (Sentences.BooruGuessClose(m_guild.Id, userWord));
                 return (Sentences.GuessBad(m_guild.Id, userWord));
             }
