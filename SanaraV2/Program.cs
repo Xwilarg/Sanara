@@ -143,50 +143,56 @@ namespace SanaraV2
         
         private void InitServices()
         {
+            translationClient = null;
             if (File.Exists("Keys/Sanara-7430da57d6af.json"))
             {
-                credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
-                translationClient = TranslationClient.Create(credential);
+                try
+                {
+                    credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
+                    translationClient = TranslationClient.Create(credential);
+                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
             }
-            else
-                translationClient = null;
 
+            youtubeService = null;
             if (File.Exists("Keys/YoutubeAPIKey.dat"))
             {
-                youtubeService = new YouTubeService(new BaseClientService.Initializer()
-                {
-                    ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
-                });
+                try {
+                    youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    {
+                        ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
+                    });
+                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
             }
-            else
-                youtubeService = null;
 
             radios = new List<RadioModule.RadioChannel>();
 
+            service = null;
             if (File.Exists("Keys/URLShortenerAPIKey.dat"))
             {
-                service = new UrlshortenerService(new BaseClientService.Initializer
-                {
-                    ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
-                });
+                try {
+                    service = new UrlshortenerService(new BaseClientService.Initializer
+                    {
+                        ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
+                    });
+                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
             }
-            else
-                service = null;
 
+            ravenClient = null;
             if (File.Exists("Keys/raven.dat"))
             {
-                ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
+                try {
+                    ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
+                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
             }
-            else
-                ravenClient = null;
-            
+
+            visionClient = null;
             if (File.Exists("Keys/visionAPI.json"))
             {
-                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
-                visionClient = ImageAnnotatorClient.Create();
+                try {
+                    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
+                    visionClient = ImageAnnotatorClient.Create();
+                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
             }
-            else
-                visionClient = null;
         }
 
         private void DeleteDirContent(string path)

@@ -28,8 +28,8 @@ namespace SanaraV2.Features
         /// <param name="args">The string[] to deal with</param>
         public static string AddArgs(string[] args)
         {
-            if (args.Length == 0)
-                return (null);
+            if (args == null || args.Length == 0)
+                return ("");
             return (string.Join(" ", args));
         }
 
