@@ -140,7 +140,7 @@ namespace SanaraV2
             Environment.Exit(1);
             return Task.CompletedTask;
         }
-        
+
         private void InitServices()
         {
             translationClient = null;
@@ -150,7 +150,9 @@ namespace SanaraV2
                 {
                     credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
                     translationClient = TranslationClient.Create(credential);
-                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
+                } catch (Exception e) {
+                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
 
             youtubeService = null;
@@ -161,7 +163,9 @@ namespace SanaraV2
                     {
                         ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
                     });
-                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
+                } catch (Exception e) {
+                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
 
             radios = new List<RadioModule.RadioChannel>();
@@ -174,7 +178,9 @@ namespace SanaraV2
                     {
                         ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
                     });
-                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
+                } catch (Exception e) {
+                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
 
             ravenClient = null;
@@ -182,7 +188,9 @@ namespace SanaraV2
             {
                 try {
                     ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
-                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
+                } catch (Exception e) {
+                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
 
             visionClient = null;
@@ -191,7 +199,9 @@ namespace SanaraV2
                 try {
                     Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
                     visionClient = ImageAnnotatorClient.Create();
-                } catch (Exception e) { LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); }
+                } catch (Exception e) {
+                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
         }
 
@@ -418,7 +428,6 @@ namespace SanaraV2
                 var result = await commands.ExecuteAsync(context, pos);
                 if (result.IsSuccess && sendStats)
                 {
-                    Console.WriteLine("Result!");
                     await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
                     await AddError("OK");
                     await AddCommandServs(context.Guild.Id);
