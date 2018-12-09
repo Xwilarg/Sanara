@@ -21,7 +21,6 @@ using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
-using Microsoft.Extensions.DependencyInjection;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
 using SanaraV2.Modules.GamesInfo;
@@ -41,11 +40,10 @@ namespace SanaraV2
 {
     public class Program
     {
-        public static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+        public static async Task Main(string[] args)
+        => await new Program().MainAsync();
 
         public readonly DiscordSocketClient client;
-        private readonly IServiceCollection map = new ServiceCollection();
         private readonly CommandService commands = new CommandService();
         public static Program p;
         public Random rand;
@@ -115,6 +113,7 @@ namespace SanaraV2
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
+            client.JoinedGuild += GuildJoin;
             client.Disconnected += Disconnected;
 
             await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
