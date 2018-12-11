@@ -239,6 +239,7 @@
   <ItemGroup>
     <Compile Include="Db\Db.cs" />
     <Compile Include="Features\Entertainment\Error.cs" />
+    <Compile Include="Features\Entertainment\Game.cs" />
     <Compile Include="Features\Entertainment\Response.cs" />
     <Compile Include="Features\Entertainment\Xkcd.cs" />
     <Compile Include="Features\Entertainment\YouTube.cs" />

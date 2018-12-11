@@ -37,5 +37,15 @@ namespace SanaraV2.Features.Entertainment
             InvalidApiKey,
             Help
         }
+
+        public enum Game
+        {
+            None,
+            AlreadyRunning,
+            WrongName,
+            WrongDifficulty,
+            NotNsfw,
+            NoDictionnary
+        }
     }
 }

@@ -15,12 +15,14 @@
 using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
+using Newtonsoft.Json;
 using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -500,75 +502,132 @@ namespace SanaraV2.Modules.Entertainment
             private Sakugabooru m_booru;
         }
 
+        public class FireEmblem : Game
+        {
+            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "fireemblem.dat", isEasy)
+            {
+                using (WebClient w = new WebClient())
+                {
+                    w.Encoding = Encoding.UTF8;
+                    string json = w.DownloadString("https://feheroes.gamepedia.com/Hero_list");
+                    json = json.Split(new string[] { "<table" }, StringSplitOptions.None)[1].Split(new string[] { "</table>" }, StringSplitOptions.None)[0];
+                    FillCharacters(json).GetAwaiter().GetResult();
+                }
+                m_toGuess = null;
+                m_idImage = "-1";
+            }
+
+            private async Task FillCharacters(string json)
+            {
+                m_characters = new List<Tuple<string, string, string>>();
+                MatchCollection matches = Regex.Matches(json, "title=\"[^\"]+\">([^<]+)<\\/a><\\/td><td>([^<]+)<\\/td><td data-sort-value=\"[0-9]+\">([^<]+)");
+                foreach (Match match in matches)
+                {
+                    string name = match.Groups[1].Value;
+                    if (!m_characters.Any(x => x.Item1 == name))
+                    {
+                        using (HttpClient hc = new HttpClient())
+                        {
+                            dynamic dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://fireemblem.fandom.com/api/v1/Search/List?query=" + name + "&limit=1"));
+                            string id = dyn.items[0].id;
+                            dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://fireemblem.wikia.com/api/v1/Articles/Details?ids=" + id));
+                            string thumbnailUrl = dyn.items[id].thumbnail;
+                            if (thumbnailUrl == null)
+                                continue;
+                            thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
+                            m_characters.Add(new Tuple<string, string, string>(match.Groups[1].Value, thumbnailUrl, match.Groups[3].Value));
+                        }
+                    }
+                }
+                Console.WriteLine(m_characters.Count);
+            }
+
+            public override string[] GetPost()
+            {
+                return (new string[] { m_characters[Program.p.rand.Next(m_characters.Count)].Item2 });
+            }
+
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
+            {
+                sayCorrect = false;
+                return ("Not implemented");
+            }
+
+#pragma warning disable CS1998
+            public override async void Loose()
+            {
+                SaveServerScores(m_toGuess);
+            }
+#pragma warning restore CS1998
+
+            private string m_toGuess;
+            private string m_idImage;
+            private List<Tuple<string, string, string>> m_characters; // Name, Url, Source
+        }
+
         [Command("Play", RunMode = RunMode.Async), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            if (p.games.Any(x => x.m_chan == Context.Channel))
-                await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
-            else if (gameName.Length == 0)
-                await ReplyAsync(Sentences.InvalidGameName(Context.Guild.Id));
-            else
+            var result = await Features.Entertainment.Game.Play(gameName, ((ITextChannel)Context.Channel).IsNsfw, Context.Channel.Id, p.games);
+            switch (result.error)
             {
-                if (gameName[0].ToLower() != "shiritori" && gameName[0].ToLower() != "kancolle" && gameName[0].ToLower() != "booru" && gameName[0].ToLower() != "anime")
-                {
-                    await ReplyAsync(Sentences.InvalidGameName(Context.Guild.Id));
-                }
-                else if (gameName.Length > 1 && gameName[1].ToLower() != "normal" && gameName[1].ToLower() != "easy")
-                {
+                case Features.Entertainment.Error.Game.AlreadyRunning:
+                    await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
+                    break;
+
+                case Features.Entertainment.Error.Game.NoDictionnary:
+                    await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
+                    break;
+
+                case Features.Entertainment.Error.Game.NotNsfw:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    break;
+
+                case Features.Entertainment.Error.Game.WrongDifficulty:
                     await ReplyAsync(Sentences.InvalidDifficulty(Context.Guild.Id));
-                }
-                else
-                {
+                    break;
+
+                case Features.Entertainment.Error.Game.WrongName:
+                    await ReplyAsync(Sentences.InvalidGameName(Context.Guild.Id));
+                    break;
+
+                case Features.Entertainment.Error.Game.None:
                     if (!p.gameThread.IsAlive)
                         p.gameThread.Start();
                     Game g = null;
-                    bool isEasy = (gameName.Length > 1 && gameName[1].ToLower() == "easy");
-                    if (gameName[0].ToLower() == "shiritori")
+                    if (result.answer.gameName == Features.Entertainment.Response.GameName.Anime)
                     {
-                        if (!File.Exists("Saves/shiritoriWords.dat"))
-                        {
-                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
-                            return;
-                        }
-                        await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
-                        g = new Shiritori(Context.Channel, Context.Guild, Context.User, isEasy);
+                        await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
+                        g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                     }
-                    else if (gameName[0].ToLower() == "kancolle")
+                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Booru)
+                    {
+                        await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
+                        g = new BooruGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                    }
+                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
+                    {
+                        g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                    }
+                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Kancolle)
                     {
                         await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id));
-                        g = new Kancolle(Context.Channel, Context.Guild, Context.User, isEasy);
+                        g = new Kancolle(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                     }
-                    else if (gameName[0].ToLower() == "booru")
+                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Shiritori)
                     {
-                        if (!(Context.Channel as ITextChannel).IsNsfw)
-                        {
-                            await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
-                            return;
-                        }
-                        if (!File.Exists("Saves/BooruTriviaTags.dat"))
-                        {
-                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
-                            return;
-                        }
-                        await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
-                        g = new BooruGame(Context.Channel, Context.Guild, Context.User, isEasy);
-                    }
-                    else if (gameName[0].ToLower() == "anime")
-                    {
-                        if (!File.Exists("Saves/AnimeTags.dat"))
-                        {
-                            await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
-                            return;
-                        }
-                        await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
-                        g = new AnimeGame(Context.Channel, Context.Guild, Context.User, isEasy);
+                        await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
+                        g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                     }
                     if (Program.p.sendStats)
                         await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
                     p.games.Add(g);
                     await g.Post();
-                }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
     }

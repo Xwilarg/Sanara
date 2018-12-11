@@ -46,5 +46,20 @@ namespace SanaraV2.Features.Entertainment
             public string name;
             public string imageUrl;
         }
+
+        public class Game
+        {
+            public bool isNormal;
+            public GameName gameName;
+        }
+
+        public enum GameName
+        {
+            Booru,
+            Kancolle,
+            Anime,
+            Shiritori,
+            FireEmblem
+        }
     }
 }
