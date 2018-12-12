@@ -15,16 +15,13 @@
 using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
-using Newtonsoft.Json;
 using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
@@ -146,7 +143,7 @@ namespace SanaraV2.Modules.Entertainment
             public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori.dat", isEasy)
             {
                 m_currWord = null;
-                m_words = File.ReadAllLines("Saves/shiritoriWords.dat").ToList();
+                m_words = Program.p.shiritoriDict;
                 m_alreadySaid = new List<string>();
             }
 
@@ -272,21 +269,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle.dat", isEasy)
             {
-                using (WebClient w = new WebClient())
-                {
-                    w.Encoding = Encoding.UTF8;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    string json = w.DownloadString("http://kancolle.wikia.com/wiki/Ship?action=raw");
-                    json = json.Split(new string[] { "List of destroyers" }, StringSplitOptions.None)[1].Split(new string[] { "=={{anchor|type}}" }, StringSplitOptions.None)[0];
-                    m_shipNames = new List<string>();
-                    MatchCollection matches = Regex.Matches(json, @"\[\[([A-Za-z- 0-9]+)");
-                    foreach (Match match in matches)
-                    {
-                        string str = match.Groups[1].Value;
-                        if (!str.StartsWith("List of") && !str.StartsWith("Auxiliary"))
-                            m_shipNames.Add(str);
-                    }
-                }
+                m_shipNames = Program.p.kancolleDict;
                 m_toGuess = null;
                 m_idImage = "-1";
             }
@@ -383,14 +366,7 @@ namespace SanaraV2.Modules.Entertainment
             public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru.dat", isEasy)
             {
                 m_toGuess = null;
-                m_allTags = new List<string>();
-                string[] allLines = File.ReadAllLines("Saves/BooruTriviaTags.dat");
-                foreach (string line in allLines)
-                {
-                    string[] linePart = line.Split(' ');
-                    if (Convert.ToInt32(linePart[1]) > 3)
-                        m_allTags.Add(linePart[0]);
-                }
+                m_allTags = Program.p.booruDict;
                 m_time = DateTime.MinValue;
                 m_booru = new Gelbooru();
             }
@@ -450,10 +426,7 @@ namespace SanaraV2.Modules.Entertainment
             public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, animeTimer, "anime.dat", isEasy)
             {
                 m_toGuess = null;
-                m_allTags = new List<string>();
-                string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");
-                foreach (string line in allLines)
-                    m_allTags.Add(line.Split(' ')[0]);
+                m_allTags = Program.p.animeDict;
                 m_time = DateTime.MinValue;
                 m_booru = new Sakugabooru();
             }
@@ -506,40 +479,9 @@ namespace SanaraV2.Modules.Entertainment
         {
             public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "fireemblem.dat", isEasy)
             {
-                using (WebClient w = new WebClient())
-                {
-                    w.Encoding = Encoding.UTF8;
-                    string json = w.DownloadString("https://feheroes.gamepedia.com/Hero_list");
-                    json = json.Split(new string[] { "<table" }, StringSplitOptions.None)[1].Split(new string[] { "</table>" }, StringSplitOptions.None)[0];
-                    FillCharacters(json).GetAwaiter().GetResult();
-                }
+                m_characters = Program.p.fireEmblemDict;
                 m_toGuess = null;
                 m_idImage = "-1";
-            }
-
-            private async Task FillCharacters(string json)
-            {
-                m_characters = new List<Tuple<string, string, string>>();
-                MatchCollection matches = Regex.Matches(json, "title=\"[^\"]+\">([^<]+)<\\/a><\\/td><td>([^<]+)<\\/td><td data-sort-value=\"[0-9]+\">([^<]+)");
-                foreach (Match match in matches)
-                {
-                    string name = match.Groups[1].Value;
-                    if (!m_characters.Any(x => x.Item1 == name))
-                    {
-                        using (HttpClient hc = new HttpClient())
-                        {
-                            dynamic dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://fireemblem.fandom.com/api/v1/Search/List?query=" + name + "&limit=1"));
-                            string id = dyn.items[0].id;
-                            dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://fireemblem.wikia.com/api/v1/Articles/Details?ids=" + id));
-                            string thumbnailUrl = dyn.items[id].thumbnail;
-                            if (thumbnailUrl == null)
-                                continue;
-                            thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
-                            m_characters.Add(new Tuple<string, string, string>(match.Groups[1].Value, thumbnailUrl, match.Groups[3].Value));
-                        }
-                    }
-                }
-                Console.WriteLine(m_characters.Count);
             }
 
             public override string[] GetPost()
@@ -574,10 +516,6 @@ namespace SanaraV2.Modules.Entertainment
             {
                 case Features.Entertainment.Error.Game.AlreadyRunning:
                     await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
-                    break;
-
-                case Features.Entertainment.Error.Game.NoDictionnary:
-                    await ReplyAsync(Base.Sentences.NoDictionnary(Context.Guild.Id));
                     break;
 
                 case Features.Entertainment.Error.Game.NotNsfw:

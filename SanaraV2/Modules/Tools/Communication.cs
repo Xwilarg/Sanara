@@ -168,18 +168,28 @@ namespace SanaraV2.Modules.Tools
             else
                 no++;
             embed.AddField("Game Module",
-                "**Shiritori words file:** " + ((File.Exists("Saves/shiritoriWords.dat") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Booru guess tags file:** " + ((File.Exists("Saves/BooruTriviaTags.dat") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Anime guess animes file:** " + ((File.Exists("Saves/AnimeTags.dat") ? ("Yes") : ("No"))));
-            if (File.Exists("Saves/shiritoriWords.dat"))
+                "**Shiritori:** " + ((Program.p.shiritoriDict == null) ? ("Not loaded") : (Program.p.shiritoriDict.Count + " words")) + Environment.NewLine +
+                "**Booru quizz:** " + ((Program.p.booruDict == null) ? ("Not loaded") : (Program.p.booruDict.Count + " tags")) + Environment.NewLine +
+                "**Anime quizz:** " + ((Program.p.animeDict == null) ? ("Not loaded") : (Program.p.animeDict.Count + " anime names")) + Environment.NewLine +
+                "**KanColle quizz :** " + ((Program.p.kancolleDict == null) ? ("Not loaded") : (Program.p.kancolleDict.Count + " shipgirl names")) + Environment.NewLine +
+                "**Fire Emblem quizz:** " + ((Program.p.fireEmblemDict == null) ? ("Not loaded") : (Program.p.fireEmblemDict.Count + " character names")));
+            if (Program.p.shiritoriDict != null)
                 yes++;
             else
                 no++;
-            if (File.Exists("Saves/BooruTriviaTags.dat"))
+            if (Program.p.booruDict != null)
                 yes++;
             else
                 no++;
-            if (File.Exists("Saves/AnimeTags.dat"))
+            if (Program.p.animeDict != null)
+                yes++;
+            else
+                no++;
+            if (Program.p.kancolleDict != null)
+                yes++;
+            else
+                no++;
+            if (Program.p.fireEmblemDict != null)
                 yes++;
             else
                 no++;
