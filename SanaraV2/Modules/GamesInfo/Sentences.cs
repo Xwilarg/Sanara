@@ -18,32 +18,6 @@ namespace SanaraV2.Modules.GamesInfo
 {
     public static class Sentences
     {
-        /// --------------------------- Girls Frontline ---------------------------
-        public static string GirlsFrontlineHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineHelp")); }
-        public static string TDollDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "tdollDontExist")); }
-        public static string ModelAndHistoricalInformation(ulong guildId) { return (Translation.GetTranslation(guildId, "modelAndHistoricalInformation")); }
-        public static string Basic(ulong guildId) { return (Translation.GetTranslation(guildId, "basic")); }
-        public static string Technical(ulong guildId) { return (Translation.GetTranslation(guildId, "technical")); }
-        public static string ClassStr(ulong guildId) { return (Translation.GetTranslation(guildId, "class")); }
-        public static string ManufTime(ulong guildId) { return (Translation.GetTranslation(guildId, "manufTime")); }
-        public static string GrowthGrade(ulong guildId) { return (Translation.GetTranslation(guildId, "growthGrade")); }
-        public static string OperationalEffectiveness(ulong guildId) { return (Translation.GetTranslation(guildId, "operationalEffectiveness")); }
-        public static string Health(ulong guildId) { return (Translation.GetTranslation(guildId, "health")); }
-        public static string Evasion(ulong guildId) { return (Translation.GetTranslation(guildId, "evasion")); }
-        public static string Speed(ulong guildId) { return (Translation.GetTranslation(guildId, "speed")); }
-        public static string Damage(ulong guildId) { return (Translation.GetTranslation(guildId, "damage")); }
-        public static string Accuracy(ulong guildId) { return (Translation.GetTranslation(guildId, "accuracy")); }
-        public static string RateOfFire(ulong guildId) { return (Translation.GetTranslation(guildId, "rateOfFire")); }
-        public static string AmmoConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "ammoConsumption")); }
-        public static string RationConsumption(ulong guildId) { return (Translation.GetTranslation(guildId, "rationConsumption")); }
-        public static string GirlsFrontlineCompareHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineCompareHelp")); }
-        public static string TooManyTDolls(ulong guildId) { return (Translation.GetTranslation(guildId, "tooManyTdolls")); }
-        public static string TDollDontExistSpecify(ulong guildId, string tdoll) { return (Translation.GetTranslation(guildId, "tdollDontExistSpecify", tdoll)); }
-        public static string NoData(ulong guildId) { return (Translation.GetTranslation(guildId, "noData")); }
-        public static string ParsingInProgress(ulong guildId) { return (Translation.GetTranslation(guildId, "parsingInProgress")); }
-        public static string InvalidHourFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidHourFormat")); }
-        public static string NoTDollHour(ulong guildId) { return (Translation.GetTranslation(guildId, "noTDollHour")); }
-
         /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }
         public static string ShipgirlDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "shipgirlDontExist")); }
@@ -59,13 +33,7 @@ namespace SanaraV2.Modules.GamesInfo
         public static string Iron(ulong guildId) { return (Translation.GetTranslation(guildId, "iron")); }
         public static string Bauxite(ulong guildId) { return (Translation.GetTranslation(guildId, "bauxite")); }
         public static string DevMat(ulong guildId) { return (Translation.GetTranslation(guildId, "devMat")); }
-        public static string Personality(ulong guildId) { return (Translation.GetTranslation(guildId, "personality")); }
-        public static string Appearance(ulong guildId) { return (Translation.GetTranslation(guildId, "appearance")); }
-        public static string SecondRemodel(ulong guildId) { return (Translation.GetTranslation(guildId, "secondRemodel")); }
-        public static string Trivia(ulong guildId) { return (Translation.GetTranslation(guildId, "trivia")); }
-        public static string InGame(ulong guildId) { return (Translation.GetTranslation(guildId, "inGame")); }
-        public static string Historical(ulong guildId) { return (Translation.GetTranslation(guildId, "historical")); }
-        public static string LibeccioCG(ulong guildId) { return (Translation.GetTranslation(guildId, "libeccioCG")); }
-        public static string LibeccioAsAShip(ulong guildId) { return (Translation.GetTranslation(guildId, "libeccioAsAShip")); }
+        public static string ConstructionDrop(ulong guildId) { return (Translation.GetTranslation(guildId, "constructionDrop")); }
+        public static string MapDrop(ulong guildId) { return (Translation.GetTranslation(guildId, "mapDrop")); }
     }
 }

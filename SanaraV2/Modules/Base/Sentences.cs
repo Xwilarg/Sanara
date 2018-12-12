@@ -37,7 +37,6 @@ namespace SanaraV2.Modules.Base
         public static string NoCorrespondingGuild(ulong guildId) { return (Translation.GetTranslation(guildId, "noCorrespondingGuild")); }
         public static string DontPm(ulong guildId) { return (Translation.GetTranslation(guildId, "dontPm")); }
         public static string NoApiKey(ulong guildId) { return (Translation.GetTranslation(guildId, "noApiKey")); }
-        public static string NoDictionnary(ulong guildId) { return (Translation.GetTranslation(guildId, "noDictionnary")); }
         public static string TimeSeconds(ulong guildId, string seconds) { return (Translation.GetTranslation(guildId, "timeSeconds", seconds)); }
         public static string TimeMinutes(ulong guildId, string minutes, string seconds) { return (Translation.GetTranslation(guildId, "timeMinutes", minutes, seconds)); }
         public static string TimeHours(ulong guildId, string hours, string minutes, string seconds) { return (Translation.GetTranslation(guildId, "timeHours", hours, minutes, seconds)); }
@@ -49,5 +48,6 @@ namespace SanaraV2.Modules.Base
         public static string DateHourFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "dateHourFormat")); }
         public static string DateHourFormatShort(ulong guildId) { return (Translation.GetTranslation(guildId, "dateHourFormatShort")); }
         public static string OrStr(ulong guildId) { return (Translation.GetTranslation(guildId, "or")); }
+        public static string FromStr(ulong guildId, string source) { return (Translation.GetTranslation(guildId, "from", source)); }
     }
 }

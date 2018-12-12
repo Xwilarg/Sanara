@@ -32,6 +32,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public static readonly int shiritoriTimer = 10;
         public static readonly int kancolleTimer = 10;
+        public static readonly int fireEmblemTimer = 10;
         public static readonly int booruTimer = 30;
         public static readonly int animeTimer = 30;
 
@@ -477,22 +478,28 @@ namespace SanaraV2.Modules.Entertainment
 
         public class FireEmblem : Game
         {
-            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "fireemblem.dat", isEasy)
+            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, fireEmblemTimer, "fireemblem.dat", isEasy)
             {
                 m_characters = Program.p.fireEmblemDict;
                 m_toGuess = null;
-                m_idImage = "-1";
             }
 
             public override string[] GetPost()
             {
-                return (new string[] { m_characters[Program.p.rand.Next(m_characters.Count)].Item2 });
+                var res = m_characters[Program.p.rand.Next(m_characters.Count)];
+                m_toGuess = res.Item1;
+                return (new string[] { res.Item2 });
             }
 
             public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {
-                sayCorrect = false;
-                return ("Not implemented");
+                sayCorrect = true;
+                m_nbAttempt++;
+                if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
+                    return (null);
+                if (m_characters.Any(x => Utilities.CleanWord(x.Item1) == Utilities.CleanWord(userWord)))
+                    return (Sentences.GuessBad(m_guild.Id, userWord));
+                return (Sentences.FireEmblemGuessDontExist(m_guild.Id));
             }
 
 #pragma warning disable CS1998
@@ -503,7 +510,6 @@ namespace SanaraV2.Modules.Entertainment
 #pragma warning restore CS1998
 
             private string m_toGuess;
-            private string m_idImage;
             private List<Tuple<string, string, string>> m_characters; // Name, Url, Source
         }
 
@@ -546,6 +552,7 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
                     {
+                        await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id));
                         g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                     }
                     else if (result.answer.gameName == Features.Entertainment.Response.GameName.Kancolle)

@@ -28,42 +28,42 @@ namespace SanaraV2.Modules.NSFW
         public async Task SafebooruSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
         public async Task E926Search(params string[] tags)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
 
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
@@ -73,7 +73,7 @@ namespace SanaraV2.Modules.NSFW
             switch (result.error)
             {
                 case Features.NSFW.Error.BooruTags.NotFound:
-                    await ReplyAsync("This id does not exist");
+                    await ReplyAsync(Sentences.InvalidId(Context.Guild.Id));
                     break;
 
                 case Features.NSFW.Error.BooruTags.None:
@@ -81,9 +81,9 @@ namespace SanaraV2.Modules.NSFW
                     {
                         Color = Color.Blue
                     };
-                    eb.AddField("Source" + ((result.answer.sourceTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.sourceTags) + "`");
-                    eb.AddField("Character" + ((result.answer.characTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.characTags) + "`");
-                    eb.AddField("Artist" + ((result.answer.artistTags.Length > 1) ? ("s") : ("")), "`" + string.Join(", ", result.answer.artistTags) + "`");
+                    eb.AddField(((result.answer.sourceTags.Length > 1) ? (Sentences.Sources(Context.Guild.Id)) : (Sentences.Source(Context.Guild.Id))), "`" + string.Join(", ", result.answer.sourceTags) + "`");
+                    eb.AddField(((result.answer.characTags.Length > 1) ? (Sentences.Characters(Context.Guild.Id)) : (Sentences.Character(Context.Guild.Id))), "`" + string.Join(", ", result.answer.characTags) + "`");
+                    eb.AddField(((result.answer.artistTags.Length > 1) ? (Sentences.Artists(Context.Guild.Id)) : (Sentences.Artist(Context.Guild.Id))), "`" + string.Join(", ", result.answer.artistTags) + "`");
                     await ReplyAsync("", false, eb.Build());
                     break;
 
@@ -92,7 +92,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        private static async Task PostImage(BooruSharp.Booru.Booru booru, ITextChannel chan, string[] tags)
+        private static async Task PostImage(BooruSharp.Booru.Booru booru, ITextChannel chan, string[] tags, ulong guildId)
         {
             var result = await Features.NSFW.Booru.SearchBooru(!chan.IsNsfw, tags, booru, Program.p.rand);
             switch (result.error)
@@ -115,7 +115,7 @@ namespace SanaraV2.Modules.NSFW
                         ImageUrl = result.answer.url,
                         Footer = new EmbedFooterBuilder()
                         {
-                            Text = "Do the 'Tags' command with the id '" + result.answer.saveId + "' to have more informations about the image"
+                            Text = Sentences.ImageInfo(guildId, result.answer.saveId)
                         }
                     }.Build());
                     break;

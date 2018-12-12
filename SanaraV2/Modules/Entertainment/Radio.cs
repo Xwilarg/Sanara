@@ -197,7 +197,7 @@ namespace SanaraV2.Modules.Entertainment
                         await ReplyAsync(Sentences.RadioAlreadyInList(Context.Guild.Id));
                         return;
                     }
-                    await ReplyAsync(result.answer.name + " was added to the list.");
+                    await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, result.answer.name));
                     string fileName = "Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(result.answer.name) + ".mp3";
                     radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl, await Context.Guild.GetUserAsync(Base.Sentences.myId), Context.Guild.Id.ToString());
                     ProcessStartInfo youtubeDownload = new ProcessStartInfo()

@@ -42,6 +42,8 @@ namespace SanaraV2.Modules.Tools
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
         public static string HelpColor(ulong guildId) { return (Translation.GetTranslation(guildId, "helpColor")); }
+        public static string Rgb(ulong guildId) { return (Translation.GetTranslation(guildId, "rgb")); }
+        public static string Hex(ulong guildId) { return (Translation.GetTranslation(guildId, "hex")); }
 
         /// --------------------------- Linguist ---------------------------
         public static string JapaneseHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "japaneseHelp")); }
@@ -52,6 +54,8 @@ namespace SanaraV2.Modules.Tools
         public static string NotAnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnImage")); }
         public static string UrbanHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "urbanHelp")); }
         public static string UrbanNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "urbanNotFound")); }
+        public static string Definition(ulong guildId) { return (Translation.GetTranslation(guildId, "definition")); }
+        public static string Example(ulong guildId) { return (Translation.GetTranslation(guildId, "example")); }
 
         /// --------------------------- Settings ---------------------------
         public static string NeedLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "needLanguage")); }

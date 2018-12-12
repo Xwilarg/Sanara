@@ -44,8 +44,8 @@ namespace SanaraV2.Modules.Tools
                         Title = result.answer.name,
                         Color = result.answer.discordColor,
                         ImageUrl = result.answer.colorUrl,
-                        Description = "RGB: " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
-                        "Hex: #" + result.answer.colorHex
+                        Description = Sentences.Rgb(Context.Guild.Id) + ": " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
+                        Sentences.Hex(Context.Guild.Id) + ": #" + result.answer.colorHex
                     }.Build());
                     break;
 

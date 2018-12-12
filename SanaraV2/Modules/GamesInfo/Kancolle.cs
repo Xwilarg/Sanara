@@ -90,7 +90,7 @@ namespace SanaraV2.Modules.GamesInfo
             }
             return (new EmbedFieldBuilder()
             {
-                Name = "Construction drop",
+                Name = Sentences.ConstructionDrop(guildId),
                 Value = embedMsg
             });
         }
@@ -142,7 +142,7 @@ namespace SanaraV2.Modules.GamesInfo
             }
             return (new EmbedFieldBuilder()
             {
-                Name = "Map drop" + ((result.answer != null && result.answer.rarity != null) ? (Sentences.Rarity(guildId)    + ": " + result.answer.rarity.ToString() + " / 7") : ("")),
+                Name = Sentences.MapDrop(guildId) + ((result.answer != null && result.answer.rarity != null) ? (Sentences.Rarity(guildId)    + ": " + result.answer.rarity.ToString() + " / 7") : ("")),
                 Value = embedMsg
             });
         }

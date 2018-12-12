@@ -23,6 +23,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string RulesKancolle(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesKancolle")); }
         public static string RulesBooru(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesBooru")); }
         public static string RulesAnime(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesAnime")); }
+        public static string RulesFireEmblem(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesFireEmblem")); }
         public static string InvalidGameName(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidGameName")); }
         public static string GameAlreadyRunning(ulong guildId) { return (Translation.GetTranslation(guildId, "gameAlreadyRunning")); }
         public static string TimeoutGame(ulong guildId, string answer) { return (Translation.GetTranslation(guildId, "timeoutGame", answer)); }
@@ -40,6 +41,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string ShiritoriSuggestion(ulong guildId, string suggestionHiragana, string suggestionRomaji, string suggestionTranslation) { return (Translation.GetTranslation(guildId, "shiritoriSuggestion", suggestionHiragana, suggestionRomaji, suggestionTranslation)); }
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string KancolleGuessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGuessDontExist")); }
+        public static string FireEmblemGuessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "fireEmblemGuessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
         public static string GuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "guessBad", attempt)); }
         public static string BooruGuessClose(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "booruGuessClose", attempt)); }
@@ -57,6 +59,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string AnimeRating(ulong guildId, float rating) { return (Translation.GetTranslation(guildId, "animeRating", rating.ToString())); }
         public static string AnimeAudiance(ulong guildId, string audiance) { return (Translation.GetTranslation(guildId, "animeAudiance", audiance)); }
         public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
+        public static string Unknown(ulong guildId) { return (Translation.GetTranslation(guildId, "unknown")); }
 
         /// --------------------------- Radio ---------------------------
         public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }
@@ -69,6 +72,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string SongSkipped(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songSkipped", songName)); }
         public static string Current(ulong guildId) { return (Translation.GetTranslation(guildId, "current")); }
         public static string Downloading(ulong guildId) { return (Translation.GetTranslation(guildId, "downloading")); }
+        public static string SongAdded(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songAdded", songName)); }
 
         /// --------------------------- VN ---------------------------
         public static string VndbHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbHelp")); }

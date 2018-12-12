@@ -52,18 +52,18 @@ namespace SanaraV2.Modules.Tools
                         {
                             new EmbedFieldBuilder()
                             {
-                                Name = "Definition",
+                                Name = Sentences.Definition(Context.Guild.Id),
                                 Value = result.answer.definition
                             },
                             new EmbedFieldBuilder()
                             {
-                                Name = "Example",
+                                Name = Sentences.Example(Context.Guild.Id),
                                 Value = result.answer.example
                             }
                         },
                         Footer = new EmbedFooterBuilder()
                         {
-                            Text = "From " + result.answer.link
+                            Text = Base.Sentences.FromStr(Context.Guild.Id, result.answer.link)
                         }
                     }.Build());
                     break;
@@ -101,7 +101,7 @@ namespace SanaraV2.Modules.Tools
                     await ReplyAsync("", false, new EmbedBuilder()
                     {
                         Color = Color.Blue,
-                        Title = "From " + result.answer.sourceLanguage,
+                        Title = Base.Sentences.FromStr(Context.Guild.Id, result.answer.sourceLanguage),
                         Description = result.answer.sentence
                     }.Build());
                     break;
