@@ -37,7 +37,7 @@ namespace SanaraV2.Features.NSFW
 
         public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, BooruSharp.Booru.Booru booru, Random r)
         {
-            if (isChanSafe)
+            if (isChanSafe && !booru.IsSafe())
                 return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW));
             BooruSharp.Search.Post.SearchResult res;
             try
