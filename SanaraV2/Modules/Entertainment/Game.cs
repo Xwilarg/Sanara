@@ -81,11 +81,12 @@ namespace SanaraV2.Modules.Entertainment
                             using (HttpClient hc = new HttpClient())
                             {
                                 Stream s = await hc.GetStreamAsync(msg);
+                                Stream s2 = await hc.GetStreamAsync(msg); // We create a new Stream because the first one is altered.
                                 using (MemoryStream ms = new MemoryStream())
                                 {
                                     await s.CopyToAsync(ms);
                                     if (ms.ToArray().Length < 8000000)
-                                        await m_chan.SendFileAsync(s, "Sanara-image." + msg.Split('.').Last());
+                                        await m_chan.SendFileAsync(s2, "Sanara-image." + msg.Split('.').Last());
                                     else
                                         await m_chan.SendMessageAsync(msg);
                                 }
