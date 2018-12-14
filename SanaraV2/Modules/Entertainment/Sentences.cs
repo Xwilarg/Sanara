@@ -48,6 +48,8 @@ namespace SanaraV2.Modules.Entertainment
         public static string LostStr(ulong guildId) { return (Translation.GetTranslation(guildId, "lost")); }
         public static string InvalidDifficulty(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidDifficulty")); }
         public static string NoDictionnary(ulong guildId) { return (Translation.GetTranslation(guildId, "noDictionnary")); }
+        public static string ExceptionGame(ulong guildId, string url) { return (Translation.GetTranslation(guildId, "exceptionGame", url)); }
+        public static string ExceptionGameStop(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionGameStop")); }
 
         /// --------------------------- AnimeManga ---------------------------
         public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }

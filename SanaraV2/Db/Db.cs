@@ -16,6 +16,7 @@ using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Db
@@ -79,23 +80,27 @@ namespace SanaraV2.Db
             Inferior
         }
 
-        public async Task<Tuple<Comparaison, int>> SetNewScore(string gameName, int score, ulong guildId)
+        public async Task<Tuple<Comparaison, int>> SetNewScore(string gameName, int score, ulong guildId, string ids)
         {
-            int? currScore = (await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn))[gameName];
+            string scoreStr = ((string)(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn))[gameName])?.Split('|').First();
+            int? currScore = null;
+            if (scoreStr != null)
+                currScore = int.Parse(scoreStr);
             Comparaison cmp;
-            if (currScore == null || currScore > score)
-                cmp = Comparaison.Inferior;
-            else if (currScore == score)
+            if ((currScore == null && score == 0) || (currScore != null && currScore == score))
                 cmp = Comparaison.Equal;
-            else
+            else if (currScore == null || currScore < score)
                 cmp = Comparaison.Best;
-            if (cmp == Comparaison.Inferior)
+            else
+                cmp = Comparaison.Inferior;
+            if (cmp == Comparaison.Best)
             {
                 await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
-                .With(gameName, score)
+                .With(gameName, score + "|" + ids)
                 ).RunAsync(conn);
-                Console.WriteLine("Db updated with score " + score);
             }
+            if (currScore == null)
+                currScore = 0;
             return (new Tuple<Comparaison, int>(cmp, currScore.Value));
         }
 

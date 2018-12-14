@@ -59,7 +59,7 @@ namespace SanaraV2.Modules.Entertainment
 
             protected async void SaveServerScores(string answer)
             {
-                var newScore = await Program.p.db.SetNewScore(m_fileName, m_nbFound, m_guild.Id);
+                var newScore = await Program.p.db.SetNewScore(m_fileName, m_nbFound, m_guild.Id, string.Join("|", m_userIds));
                 string finalStr = (answer == null) ? ("") : (Sentences.TimeoutGame(m_guild.Id, answer) + Environment.NewLine);
                 if (newScore.Item1 == Db.Db.Comparaison.Best)
                     finalStr += Sentences.NewBestScore(m_guild.Id, newScore.Item2.ToString(), m_nbFound.ToString());
@@ -70,17 +70,48 @@ namespace SanaraV2.Modules.Entertainment
                 await m_chan.SendMessageAsync(finalStr);
             }
 
-            public async Task Post()
+            public async Task Post(int counter = 1)
             {
                 m_time = DateTime.MinValue;
-                foreach (string msg in GetPost())
                 {
-                    using (HttpClient hc = new HttpClient())
-                        await m_chan.SendFileAsync(await hc.GetStreamAsync(msg), "Sanara-image." + msg.Split('.').Last());
+                    foreach (string msg in GetPost())
+                    {
+                        try
+                        {
+                            using (HttpClient hc = new HttpClient())
+                            {
+                                Stream s = await hc.GetStreamAsync(msg);
+                                using (MemoryStream ms = new MemoryStream())
+                                {
+                                    await s.CopyToAsync(ms);
+                                    if (ms.ToArray().Length < 8000000)
+                                        await m_chan.SendFileAsync(s, "Sanara-image." + msg.Split('.').Last());
+                                    else
+                                        await m_chan.SendMessageAsync(msg);
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            string exceptionMsg = (counter < 2) ? Sentences.ExceptionGame(m_guild.Id, msg) : Sentences.ExceptionGameStop(m_guild.Id);
+                            await m_chan.SendMessageAsync("", false, new EmbedBuilder()
+                            {
+                                Color = Color.Red,
+                                Title = e.GetType().ToString(),
+                                Description = exceptionMsg
+                            }.Build());
+                            if (counter < 2)
+                            {
+                                await Post(counter + 1);
+                                return;
+                            }
+                        }
+                    }
+                    m_time = DateTime.Now;
                 }
-                m_time = DateTime.Now;
             }
             public abstract string[] GetPost();
+
             public async Task CheckCorrect(string userWord, IUser user)
             {
                 if (m_time == DateTime.MinValue)
@@ -302,7 +333,7 @@ namespace SanaraV2.Modules.Entertainment
                             isSpace = false;
                         }
                     }
-                    using (WebClient w = new WebClient())
+                    using (WebClient w = new WebClient()) // TODO: Check if clean names match
                     {
                         string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
                         string json = w.DownloadString(url);
@@ -319,7 +350,7 @@ namespace SanaraV2.Modules.Entertainment
                         code = Utilities.GetElementXml("\"id\":", json, ',');
                         if (m_idImage == code)
                             return (null);
-                        return (Sentences.GuessBad(m_guild.Id, newName));
+                        return (Sentences.GuessBad(m_guild.Id, Utilities.GetElementXml("\"title\":", json, ',')));
                     }
                 }
                 catch (WebException ex)
