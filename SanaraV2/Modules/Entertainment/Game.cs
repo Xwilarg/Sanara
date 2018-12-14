@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -74,15 +75,8 @@ namespace SanaraV2.Modules.Entertainment
                 m_time = DateTime.MinValue;
                 foreach (string msg in GetPost())
                 {
-                    Console.WriteLine(msg);
-                    if (Features.Utilities.IsImage(msg.Split('.').Last()))
-                        await m_chan.SendMessageAsync("", false, new EmbedBuilder()
-                        {
-                            Color = Color.Blue,
-                            ImageUrl = msg
-                        }.Build());
-                    else
-                        await m_chan.SendMessageAsync(msg);
+                    using (HttpClient hc = new HttpClient())
+                        await m_chan.SendFileAsync(await hc.GetStreamAsync(msg), "Sanara-image." + msg.Split('.').Last());
                 }
                 m_time = DateTime.Now;
             }
