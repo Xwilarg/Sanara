@@ -341,7 +341,7 @@ namespace SanaraV2
 
         private async Task GuildJoin(SocketGuild arg)
         {
-            db.InitGuild(arg.Id);
+            await db.InitGuild(arg.Id);
         }
 
         public enum Module
@@ -373,31 +373,7 @@ namespace SanaraV2
         public async Task DoAction(IUser u, ulong serverId, Module m)
         {
             if (!u.IsBot && sendStats)
-            {
                 await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
-            }
-            DateTime now = DateTime.UtcNow;
-            if (!Directory.Exists("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM")))
-            {
-                Directory.CreateDirectory("Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM"));
-            }
-            for (int i = 0; i <= (int)Module.Youtube + 1; i++)
-            {
-                string filePath = "Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM") + "/"
-                    + ((Module)i).ToString()[0] + ((Module)i).ToString().ToLower().Substring(1, ((Module)i).ToString().Length - 1) + ".dat";
-                if (!File.Exists(filePath))
-                    File.WriteAllText(filePath, "0");
-            }
-            string finalFilePath = "Saves/Servers/" + serverId + "/ModuleCount/" + now.ToString("yyyyMM") + "/"
-                        + m.ToString()[0] + m.ToString().ToLower().Substring(1, m.ToString().Length - 1) + ".dat";
-            File.WriteAllText(finalFilePath,
-                        (Convert.ToInt32(File.ReadAllText(finalFilePath)) + 1).ToString());
-            bool didFound = false;
-            if (!didFound)
-            {
-                Character charac = new Character(u.Id, u.Username);
-                charac.IncreaseNbMessage();
-            }
         }
 
         public async Task UpdateElement(Tuple<string, string>[] elems)

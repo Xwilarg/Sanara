@@ -16,7 +16,6 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -62,12 +61,12 @@ namespace SanaraV2.Modules.Tools
             {
                 if (command.Length == 0)
                 {
-                    p.db.SetPrefix(Context.Guild.Id, "");
+                    await p.db.SetPrefix(Context.Guild.Id, "");
                     await ReplyAsync(Sentences.PrefixRemoved(Context.Guild.Id));
                 }
                 else
                 {
-                    p.db.SetPrefix(Context.Guild.Id, Utilities.AddArgs(command));
+                    await p.db.SetPrefix(Context.Guild.Id, Utilities.AddArgs(command));
                     await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }

@@ -58,29 +58,14 @@ namespace SanaraV2.Modules.Entertainment
 
             protected async void SaveServerScores(string answer)
             {
-                string[] datas;
-                if (File.Exists("Saves/Servers/" + m_guild.Id + "/" + m_fileName))
-                    datas = File.ReadAllLines("Saves/Servers/" + m_guild.Id + "/" + m_fileName);
-                else
-                    datas = new string[] { "0", "0", "0", "0", "0" };
-                string allUsers = "";
-                if (m_nbFound > Convert.ToInt32(datas[3]))
-                    allUsers = String.Join("|", m_userIds.Select(x => x.ToString()));
-                else
-                    allUsers = datas[4];
-                File.WriteAllText("Saves/Servers/" + m_guild.Id + "/" + m_fileName,
-                    (Convert.ToInt32(datas[0]) + 1).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[1]) + m_nbAttempt).ToString() + Environment.NewLine +
-                    (Convert.ToInt32(datas[2]) + m_nbFound).ToString() + Environment.NewLine +
-                    ((m_nbFound > Convert.ToInt32(datas[3])) ? (m_nbFound.ToString()) : (Convert.ToInt32(datas[3]).ToString())) + Environment.NewLine +
-                    allUsers);
+                var newScore = await Program.p.db.SetNewScore(m_fileName, m_nbFound, m_guild.Id);
                 string finalStr = (answer == null) ? ("") : (Sentences.TimeoutGame(m_guild.Id, answer) + Environment.NewLine);
-                if (m_nbFound > Convert.ToInt32(datas[3]))
-                    finalStr += Sentences.NewBestScore(m_guild.Id, Convert.ToInt32(datas[3]).ToString(), m_nbFound.ToString());
-                else if (m_nbFound == Convert.ToInt32(datas[3]))
+                if (newScore.Item1 == Db.Db.Comparaison.Best)
+                    finalStr += Sentences.NewBestScore(m_guild.Id, newScore.Item2.ToString(), m_nbFound.ToString());
+                else if (newScore.Item1 == Db.Db.Comparaison.Equal)
                     finalStr += Sentences.EqualizedScore(m_guild.Id, m_nbFound.ToString());
                 else
-                    finalStr += Sentences.DidntBeatScore(m_guild.Id, Convert.ToInt32(datas[3]).ToString(), m_nbFound.ToString());
+                    finalStr += Sentences.DidntBeatScore(m_guild.Id, newScore.Item2.ToString(), m_nbFound.ToString());
                 await m_chan.SendMessageAsync(finalStr);
             }
 
@@ -89,6 +74,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_time = DateTime.MinValue;
                 foreach (string msg in GetPost())
                 {
+                    Console.WriteLine(msg);
                     if (Features.Utilities.IsImage(msg.Split('.').Last()))
                         await m_chan.SendMessageAsync("", false, new EmbedBuilder()
                         {
@@ -131,7 +117,6 @@ namespace SanaraV2.Modules.Entertainment
             public bool m_didLost { protected set; get; }
             private readonly int m_refTime;
             protected DateTime m_time { set; get; }
-            protected Character m_charac { private set; get; }
 
             protected int m_nbAttempt;
             protected int m_nbFound;
@@ -145,6 +130,8 @@ namespace SanaraV2.Modules.Entertainment
             {
                 m_currWord = null;
                 m_words = Program.p.shiritoriDict;
+                if (m_words == null)
+                    throw new NullReferenceException("Dictionary not available.");
                 m_alreadySaid = new List<string>();
             }
 
@@ -368,6 +355,8 @@ namespace SanaraV2.Modules.Entertainment
             {
                 m_toGuess = null;
                 m_allTags = Program.p.booruDict;
+                if (m_allTags == null)
+                    throw new NullReferenceException("Dictionary not available.");
                 m_time = DateTime.MinValue;
                 m_booru = new Gelbooru();
             }
@@ -428,6 +417,8 @@ namespace SanaraV2.Modules.Entertainment
             {
                 m_toGuess = null;
                 m_allTags = Program.p.animeDict;
+                if (m_allTags == null)
+                    throw new NullReferenceException("Dictionary not available.");
                 m_time = DateTime.MinValue;
                 m_booru = new Sakugabooru();
             }
@@ -540,35 +531,40 @@ namespace SanaraV2.Modules.Entertainment
                     if (!p.gameThread.IsAlive)
                         p.gameThread.Start();
                     Game g = null;
-                    if (result.answer.gameName == Features.Entertainment.Response.GameName.Anime)
+                    try
                     {
-                        await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
-                        g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                        if (result.answer.gameName == Features.Entertainment.Response.GameName.Anime)
+                        {
+                            g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
+                        }
+                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.Booru)
+                        {
+                            g = new BooruGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
+                        }
+                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
+                        {
+                            g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id));
+                        }
+                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.Kancolle)
+                        {
+                            g = new Kancolle(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id));
+                        }
+                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.Shiritori)
+                        {
+                            g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
+                        }
+                        if (Program.p.sendStats)
+                            await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
+                        p.games.Add(g);
+                        await g.Post();
+                    } catch (NullReferenceException) {
+                        await ReplyAsync(Sentences.NoDictionnary(Context.Guild.Id));
                     }
-                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Booru)
-                    {
-                        await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
-                        g = new BooruGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                    }
-                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
-                    {
-                        await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id));
-                        g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                    }
-                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Kancolle)
-                    {
-                        await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id));
-                        g = new Kancolle(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                    }
-                    else if (result.answer.gameName == Features.Entertainment.Response.GameName.Shiritori)
-                    {
-                        await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
-                        g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                    }
-                    if (Program.p.sendStats)
-                        await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
-                    p.games.Add(g);
-                    await g.Post();
                     break;
 
                 default:

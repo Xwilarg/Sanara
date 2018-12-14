@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,43 +33,70 @@ namespace SanaraV2.Db
         {
             this.dbName = dbName;
             conn = await R.Connection().ConnectAsync();
-            if (!R.DbList().Contains(dbName).Run<bool>(conn))
+            if (!await R.DbList().Contains(dbName).RunAsync<bool>(conn))
                 R.DbCreate(dbName).Run(conn);
-            if (!R.Db(dbName).TableList().Contains("Users").Run<bool>(conn))
+            if (!await R.Db(dbName).TableList().Contains("Users").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Users").Run(conn);
-            if (!R.Db(dbName).TableList().Contains("Guilds").Run<bool>(conn))
+            if (!await R.Db(dbName).TableList().Contains("Guilds").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
         }
 
-        public void InitGuild(ulong guildId)
+        public async Task InitGuild(ulong guildId)
         {
             string guildIdStr = guildId.ToString();
-            if (R.Db(dbName).Table("Guilds").GetAll(guildIdStr).Count().Eq(0).Run<bool>(conn))
+            if (await R.Db(dbName).Table("Guilds").GetAll(guildIdStr).Count().Eq(0).RunAsync<bool>(conn))
             {
-                R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
+                await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
                     .With("Prefix", "s.")
                     .With("Language", "en")
-                    ).Run(conn);
+                    ).RunAsync(conn);
             }
-            dynamic json = R.Db(dbName).Table("Guilds").Get(guildIdStr).Run(conn);
+            dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
             Languages.Add(guildId, (string)json.Language);
             Prefixs.Add(guildId, (string)json.Prefix);
         }
 
-        public void SetPrefix(ulong guildId, string prefix)
+        public async Task SetPrefix(ulong guildId, string prefix)
         {
-            R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
                 .With("Prefix", prefix)
-                ).Run(conn);
+                ).RunAsync(conn);
             Prefixs[guildId] = prefix;
         }
 
-        public void SetLanguage(ulong guildId, string language)
+        public async Task SetLanguage(ulong guildId, string language)
         {
-            R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
                 .With("Language", language)
-                ).Run(conn);
+                ).RunAsync(conn);
             Languages[guildId] = language;
+        }
+
+        public enum Comparaison
+        {
+            Best,
+            Equal,
+            Inferior
+        }
+
+        public async Task<Tuple<Comparaison, int>> SetNewScore(string gameName, int score, ulong guildId)
+        {
+            int? currScore = (await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn))[gameName];
+            Comparaison cmp;
+            if (currScore == null || currScore > score)
+                cmp = Comparaison.Inferior;
+            else if (currScore == score)
+                cmp = Comparaison.Equal;
+            else
+                cmp = Comparaison.Best;
+            if (cmp == Comparaison.Inferior)
+            {
+                await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+                .With(gameName, score)
+                ).RunAsync(conn);
+                Console.WriteLine("Db updated with score " + score);
+            }
+            return (new Tuple<Comparaison, int>(cmp, currScore.Value));
         }
 
         private RethinkDB R;

@@ -265,7 +265,6 @@
       <DependentUpon>HiraganaToRomaji.resx</DependentUpon>
     </Compile>
     <Compile Include="Modules\NSFW\Booru.cs" />
-    <Compile Include="Character.cs" />
     <Compile Include="Modules\Tools\Communication.cs" />
     <Compile Include="Modules\Entertainment\Game.cs" />
     <Compile Include="Modules\Tools\Image.cs" />
