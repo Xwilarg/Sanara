@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Newtonsoft.Json;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using System;
@@ -71,6 +72,11 @@ namespace SanaraV2.Db
                 .With("Language", language)
                 ).RunAsync(conn);
             Languages[guildId] = language;
+        }
+
+        public async Task<string> GetGuild(ulong guildId)
+        {
+            return (JsonConvert.SerializeObject(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn)));
         }
 
         public enum Comparaison

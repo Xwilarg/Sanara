@@ -152,7 +152,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Shiritori : Game
         {
-            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori.dat", isEasy)
+            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori", isEasy)
             {
                 m_currWord = null;
                 m_words = Program.p.shiritoriDict;
@@ -281,7 +281,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Kancolle : Game
         {
-            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle.dat", isEasy)
+            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle", isEasy)
             {
                 m_shipNames = Program.p.kancolleDict;
                 m_toGuess = null;
@@ -377,7 +377,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class BooruGame : Game
         {
-            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru.dat", isEasy)
+            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru", isEasy)
             {
                 m_toGuess = null;
                 m_allTags = Program.p.booruDict;
@@ -439,7 +439,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class AnimeGame : Game
         {
-            public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, animeTimer, "anime.dat", isEasy)
+            public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, animeTimer, "anime", isEasy)
             {
                 m_toGuess = null;
                 m_allTags = Program.p.animeDict;
@@ -495,7 +495,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class FireEmblem : Game
         {
-            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, fireEmblemTimer, "fireemblem.dat", isEasy)
+            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, fireEmblemTimer, "fireemblem", isEasy)
             {
                 m_characters = Program.p.fireEmblemDict;
                 m_toGuess = null;
