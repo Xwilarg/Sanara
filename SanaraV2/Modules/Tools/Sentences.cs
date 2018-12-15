@@ -21,8 +21,6 @@ namespace SanaraV2.Modules.Tools
     public static class Sentences
     {
         /// --------------------------- Communication ---------------------------
-        public static string HiStr(ulong guildId) { return (Translation.GetTranslation(guildId, "hi")); }
-        public static string WhoIAmStr(ulong guildId) { return (Translation.GetTranslation(guildId, "whoIAm")); }
         public static string UserNotExist(ulong guildId) { return (Translation.GetTranslation(guildId, "userNotExist")); }
         public static string Username(ulong guildId) { return (Translation.GetTranslation(guildId, "username")); }
         public static string Nickname(ulong guildId) { return (Translation.GetTranslation(guildId, "nickname")); }
@@ -63,7 +61,7 @@ namespace SanaraV2.Modules.Tools
         
         /// --------------------------- Help ---------------------------
         private static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
-        public static Embed Help(ulong guildId, bool isChanNsfw)
+        public static Embed Help(ulong guildId, bool isChanNsfw, bool isOwner)
         {
             EmbedBuilder embed = new EmbedBuilder
             {
@@ -77,7 +75,7 @@ namespace SanaraV2.Modules.Tools
             embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"),
                 ((isChanNsfw) ? (Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi"))
                               : (NoCommandAvailable(guildId))));
-            embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")
+            embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFireEmblem")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
                 + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote"));
             embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleColor"));
@@ -85,7 +83,8 @@ namespace SanaraV2.Modules.Tools
             embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"),Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
                  + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("")));
             embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop"));
-            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix"));
+            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix")
+                + ((isOwner) ? (Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit")) : ("")));
             embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Translation.GetTranslation(guildId, "visualNovelModuleVn"));
             embed.AddField(Translation.GetTranslation(guildId, "xkcdModuleName"), Translation.GetTranslation(guildId, "xkcdModuleXkcd"));
             embed.AddField(Translation.GetTranslation(guildId, "youtubeModuleName"), Translation.GetTranslation(guildId, "youtubeModuleYoutube") + Environment.NewLine + Environment.NewLine

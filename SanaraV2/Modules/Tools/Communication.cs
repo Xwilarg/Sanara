@@ -17,8 +17,6 @@ using Discord.Commands;
 using Discord.Net;
 using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,21 +32,7 @@ namespace SanaraV2.Modules.Tools
         public async Task Help()
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw));
-        }
-
-        [Command("Hi"), Summary("Answer with hi"), Alias("Hey", "Hello", "Hi!", "Hey!", "Hello!")]
-        public async Task SayHi()
-        {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync(Sentences.HiStr(Context.Guild.Id));
-        }
-
-        [Command("Who are you"), Summary("Answer with who she is"), Alias("Who are you ?", "Who are you?")]
-        public async Task WhoAreYou()
-        {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync(Sentences.WhoIAmStr(Context.Guild.Id));
+            await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw, Context.User.Id == Base.Sentences.ownerId));
         }
 
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
@@ -225,17 +209,6 @@ namespace SanaraV2.Modules.Tools
                     }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)) + " in " + msg.Channel.Name).Build());
                 }
             }
-        }
-
-        private List<FileInfo> GetFiles(DirectoryInfo dir)
-        {
-            List<FileInfo> files = dir.GetFiles().ToList();
-            foreach (DirectoryInfo di in dir.GetDirectories())
-            {
-                files.AddRange(GetFiles(di));
-                files.AddRange(di.GetFiles());
-            }
-            return (files);
         }
 
         public async Task InfosUser(IGuildUser user)

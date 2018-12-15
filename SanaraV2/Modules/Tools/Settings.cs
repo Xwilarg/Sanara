@@ -43,7 +43,7 @@ namespace SanaraV2.Modules.Tools
                     await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
                 else
                 {
-                    p.db.SetLanguage(Context.Guild.Id, lang);
+                    await p.db.SetLanguage(Context.Guild.Id, lang);
                     await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
             }
@@ -87,7 +87,7 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("Leave server"), Summary("Leave the server")]
+        [Command("Leave"), Summary("Leave the server")]
         public async Task Leave(string serverName = null)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
