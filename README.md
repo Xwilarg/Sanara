@@ -30,8 +30,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 # Please make note that the bot also collect and save the following datas:
 
-About users: id of the highscore (when playing games)<br/>
-About guilds: Guild preference (box prefix and language)<br/>
+About guilds: preference (box prefix and language), datas about games (best score and users that contributed to it)<br/>
 You can check the different stats about the bot here: https://zirk.eu/sanara.html#stats<br/>
 You can also do the 'GDPR' command at any time to check the informations the bot have on you (and on the guild if you are the owner).
 
