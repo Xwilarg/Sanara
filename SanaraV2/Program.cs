@@ -35,6 +35,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using static SanaraV2.Modules.Entertainment.RadioModule;
 
 namespace SanaraV2
 {
@@ -173,6 +174,7 @@ namespace SanaraV2
             client.GuildAvailable += GuildJoin;
             client.JoinedGuild += GuildJoin;
             client.Disconnected += Disconnected;
+            client.UserVoiceStateUpdated += VoiceUpdate;
 
             await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
             startTime = DateTime.Now;
@@ -190,6 +192,16 @@ namespace SanaraV2
                 });
             }
             await Task.Delay(-1);
+        }
+
+        private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
+        {
+            RadioChannel radio = radios.Find(x => x.m_guildId == ((IGuildUser)user).GuildId);
+            if (radio != null && await radio.IsChanEmpty())
+            {
+                await radio.Stop();
+                radios.Remove(radio);
+            }
         }
 
         private Task Disconnected(Exception e)

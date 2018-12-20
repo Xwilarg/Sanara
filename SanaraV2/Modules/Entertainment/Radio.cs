@@ -66,6 +66,11 @@ namespace SanaraV2.Modules.Entertainment
                     File.Delete(file);
             }
 
+            public async Task<bool> IsChanEmpty()
+            {
+                return ((await m_chan.GetUsersAsync().FlattenAsync()).Count() == 1); // 1 because the bot is in the channel
+            }
+
             public void StopDownloading(string url)
             {
                 m_musics.Find(x => x.url == url).downloading = false;
@@ -159,7 +164,13 @@ namespace SanaraV2.Modules.Entertainment
                 }
                 File.Delete(m_musics[0].path);
                 m_musics.RemoveAt(0);
-                Play();
+                if (m_musics.Count == 0)
+                {
+                    Stop();
+                    Program.p.radios.Remove(this);
+                }
+                else
+                    Play();
             }
 
             private readonly IVoiceChannel m_chan;
@@ -211,6 +222,8 @@ namespace SanaraV2.Modules.Entertainment
                     radio.StopDownloading(result.answer.url);
                     radio.Play();
                 }
+                else
+                    await ReplyAsync("YouTube error: " + result.error);
             }
         }
 
@@ -267,7 +280,7 @@ namespace SanaraV2.Modules.Entertainment
             return (true);
         }
 
-        [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop")]
+        [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop", "Radio quit", "Quit radio")]
         public async Task StopRadio(params string[] words)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
