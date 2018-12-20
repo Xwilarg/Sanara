@@ -35,36 +35,31 @@ namespace SanaraV2.Features.Entertainment
             IList<SearchResult> searchListResponse = (await listRequest.ExecuteAsync()).Items;
             if (searchListResponse.Count == 0)
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
-            SearchResult biggest = null;
-            DateTime publishTime = DateTime.MaxValue;
-            List<string> argsList = args.ToList();
-            foreach (SearchResult res in searchListResponse)
+            IEnumerable<SearchResult> correctVideos = searchListResponse.Where(x => x.Id.Kind == "youtube#video");
+            if (correctVideos.Count() == 0)
+                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
+            VideosResource.ListRequest videoRequest = service.Videos.List("snippet,statistics");
+            videoRequest.Id = string.Join(",", correctVideos.Select(x => x.Id.VideoId));
+            IList<Video> videoResponse = (await videoRequest.ExecuteAsync()).Items;
+            Console.WriteLine(videoResponse.Count);
+            Video biggest = null;
+            ulong likes = ulong.MinValue;
+            foreach (Video res in videoResponse)
             {
-                string cleanTitle = Utilities.CleanWord(res.Snippet.Title);
-                if (res.Id.Kind == "youtube#video" && args.ToList().All(x => cleanTitle.Contains(Utilities.CleanWord(x)))
-                    && ((res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime) || biggest == null))
+                ulong likeCount = ulong.MinValue;
+                if (res.Statistics.LikeCount != null)
+                    likeCount = res.Statistics.LikeCount.Value;
+                if (res.Statistics.DislikeCount != null)
+                    likeCount -= res.Statistics.DislikeCount.Value;
+                if ((res.Snippet.PublishedAt.HasValue && likeCount > likes) || biggest == null)
                 {
-                    publishTime = res.Snippet.PublishedAt.Value;
+                    likes = likeCount;
                     biggest = res;
                 }
             }
-            if (biggest == null)
-            {
-                foreach (SearchResult res in searchListResponse)
-                {
-                    if (res.Id.Kind == "youtube#video"
-                        && ((res.Snippet.PublishedAt.HasValue && res.Snippet.PublishedAt < publishTime) || biggest == null))
-                    {
-                        publishTime = res.Snippet.PublishedAt.Value;
-                        biggest = res;
-                    }
-                }
-            }
-            if (biggest == null)
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
             return (new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
             {
-                url = "https://www.youtube.com/watch?v=" + biggest.Id.VideoId,
+                url = "https://www.youtube.com/watch?v=" + biggest.Id,
                 name = biggest.Snippet.Title,
                 imageUrl = biggest.Snippet.Thumbnails.High.Url
             }, Error.YouTube.None));

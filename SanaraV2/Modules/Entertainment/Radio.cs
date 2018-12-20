@@ -237,7 +237,7 @@ namespace SanaraV2.Modules.Entertainment
                 await StartRadio(Context.Channel);
         }
 
-        [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist")]
+        [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist", "Radio list", "List radio")]
         public async Task ListRadio(params string[] words)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
