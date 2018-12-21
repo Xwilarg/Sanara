@@ -17,6 +17,7 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Features.Entertainment
@@ -29,6 +30,27 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.InvalidApiKey));
             if (args.Length == 0)
                 return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.Help));
+            string id = null;
+            Match match = Regex.Match(args[0], "https:\\/\\/www.youtube.com\\/watch\\?v=([^&]+)");
+            if (match.Success)
+                id = match.Groups[1].Value;
+            match = Regex.Match(args[0], "https:\\/\\/youtu.be\\/([^&]+)");
+            if (match.Success)
+                id = match.Groups[1].Value;
+            if (id != null)
+            {
+                VideosResource.ListRequest r = service.Videos.List("snippet");
+                r.Id = id;
+                var resp = (await r.ExecuteAsync()).Items;
+                if (resp.Count() == 0)
+                    return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
+                return (new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
+                {
+                    url = "https://www.youtube.com/watch?v=" + resp[0].Id,
+                    name = resp[0].Snippet.Title,
+                    imageUrl = resp[0].Snippet.Thumbnails.High.Url
+                }, Error.YouTube.None));
+            }
             SearchResource.ListRequest listRequest = service.Search.List("snippet");
             listRequest.Q = Utilities.AddArgs(args);
             listRequest.MaxResults = 5;
@@ -41,7 +63,6 @@ namespace SanaraV2.Features.Entertainment
             VideosResource.ListRequest videoRequest = service.Videos.List("snippet,statistics");
             videoRequest.Id = string.Join(",", correctVideos.Select(x => x.Id.VideoId));
             IList<Video> videoResponse = (await videoRequest.ExecuteAsync()).Items;
-            Console.WriteLine(videoResponse.Count);
             Video biggest = null;
             ulong likes = ulong.MinValue;
             foreach (Video res in videoResponse)
@@ -51,7 +72,7 @@ namespace SanaraV2.Features.Entertainment
                     likeCount = res.Statistics.LikeCount.Value;
                 if (res.Statistics.DislikeCount != null)
                     likeCount -= res.Statistics.DislikeCount.Value;
-                if ((res.Snippet.PublishedAt.HasValue && likeCount > likes) || biggest == null)
+                if (likeCount > likes || biggest == null)
                 {
                     likes = likeCount;
                     biggest = res;
