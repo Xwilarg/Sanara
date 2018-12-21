@@ -31,7 +31,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Song
         {
-            public Song(string mpath, string mtitle, string murl, string mimageUrl, IGuildUser me, string guildId)
+            public Song(string mpath, string mtitle, string murl, string mimageUrl)
             {
                 path = mpath;
                 title = mtitle;
@@ -81,9 +81,9 @@ namespace SanaraV2.Modules.Entertainment
                 return (m_musics.Any(x => x.url == url));
             }
 
-            public void AddMusic(string path, string title, string url, string imageUrl, IGuildUser me, string guildId)
+            public void AddMusic(string path, string title, string url, string imageUrl)
             {
-                m_musics.Add(new Song(path, title, url, imageUrl, me, guildId));
+                m_musics.Add(new Song(path, title, url, imageUrl));
             }
 
             public async Task<bool> Skip(IMessageChannel chan)
@@ -210,7 +210,7 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, result.answer.name));
                     string fileName = "Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(result.answer.name) + ".mp3";
-                    radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl, await Context.Guild.GetUserAsync(Base.Sentences.myId), Context.Guild.Id.ToString());
+                    radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl);
                     ProcessStartInfo youtubeDownload = new ProcessStartInfo()
                     {
                         FileName = "youtube-dl",
