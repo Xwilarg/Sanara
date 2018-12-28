@@ -79,7 +79,7 @@ namespace SanaraV2.Modules.Entertainment
                 Title = res.name,
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
-                Description = ((res.alternativeTitles.Length > 0) ? (Base.Utilities.CapitalizeFirstLetter(Base.Sentences.OrStr(guildId)) + " " + string.Join(", ", res.alternativeTitles)
+                Description = ((res.alternativeTitles != null) ? (Base.Utilities.CapitalizeFirstLetter(Base.Sentences.OrStr(guildId)) + " " + string.Join(", ", res.alternativeTitles)
                  + Environment.NewLine + Environment.NewLine) : ("")) + ((isAnime && res.episodeCount != null) ? (Sentences.AnimeEpisodes(guildId, res.episodeCount.Value) + ((res.episodeLength != null) ? (" " + Sentences.AnimeLength(guildId, res.episodeLength.Value)) : ("")) + Environment.NewLine) : (""))
                  + Sentences.AnimeRating(guildId, res.rating) + Environment.NewLine
                  + ((res.startDate != null) ? Sentences.AnimeDate(guildId, res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)), ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId)))) : (Sentences.ToBeAnnounced(guildId))) + Environment.NewLine
