@@ -125,21 +125,25 @@ namespace SanaraV2.Features.Entertainment
                 string json = await hc.GetStringAsync("https://feheroes.gamepedia.com/Hero_list");
                 json = json.Split(new string[] { "<table" }, StringSplitOptions.None)[1].Split(new string[] { "</table>" }, StringSplitOptions.None)[0];
                 characters = new List<Tuple<string, string, string>>();
-                MatchCollection matches = Regex.Matches(json, "title=\"[^\"]+\">([^<]+)<\\/a><\\/td><td>([^<]+)<\\/td><td data-sort-value=\"[0-9]+\">([^<]+)");
+                MatchCollection matches = Regex.Matches(json, "title=\"[^\"]+\">([^<]+)<\\/a><\\/td><td[^>]*>([^<]+<\\/td>)");
                 foreach (Match match in matches)
                 {
-                    string name = match.Groups[1].Value;
-                    if (!characters.Any(x => x.Item1 == name))
+                    try
                     {
-                        dynamic dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://fireemblem.fandom.com/api/v1/Search/List?query=" + name + "&limit=1"));
-                        string id = dyn.items[0].id;
-                        dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://fireemblem.wikia.com/api/v1/Articles/Details?ids=" + id));
-                        string thumbnailUrl = dyn.items[id].thumbnail;
-                        if (thumbnailUrl == null)
-                            continue;
-                        thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
-                        characters.Add(new Tuple<string, string, string>(match.Groups[1].Value, thumbnailUrl, match.Groups[3].Value));
-                    }
+                        string name = match.Groups[1].Value.Split(':')[0];
+                        if (!characters.Any(x => x.Item1 == name))
+                        {
+                            dynamic dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://fireemblem.fandom.com/api/v1/Search/List?query=" + name + "&limit=1"));
+                            string id = dyn.items[0].id;
+                            dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://fireemblem.wikia.com/api/v1/Articles/Details?ids=" + id));
+                            string thumbnailUrl = dyn.items[id].thumbnail;
+                            if (thumbnailUrl == null)
+                                continue;
+                            thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
+                            characters.Add(new Tuple<string, string, string>(name, thumbnailUrl, match.Groups[2].Value));
+                        }
+                    } catch (HttpRequestException)
+                    { }
                 }
             }
             return (characters);

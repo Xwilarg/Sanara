@@ -97,8 +97,11 @@ namespace SanaraV2
             Task taskDict1 = Task.Run(async () =>
             {
                 shiritoriDict = Features.Entertainment.Game.LoadShiritori();
-                if (shiritoriDict == null)
+                if (shiritoriDict == null || shiritoriDict.Count == 0)
+                {
+                    shiritoriDict = null;
                     await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Shiritori dictionary"));
+                }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Shiritori dictionary was succesfully loaded"));
             });
@@ -106,8 +109,11 @@ namespace SanaraV2
             Task taskDict2 = Task.Run(async () =>
             {
                 booruDict = Features.Entertainment.Game.LoadBooru();
-                if (booruDict == null)
+                if (booruDict == null || booruDict.Count == 0)
+                {
+                    booruDict = null;
                     await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Booru dictionary"));
+                }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Booru dictionary was succesfully loaded"));
             });
@@ -115,8 +121,11 @@ namespace SanaraV2
             Task taskDict3 = Task.Run(async () =>
             {
                 animeDict = Features.Entertainment.Game.LoadAnime();
-                if (animeDict == null)
+                if (animeDict == null || animeDict.Count == 0)
+                {
+                    animeDict = null;
                     await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Anime dictionary"));
+                }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Anime dictionary was succesfully loaded"));
             });
@@ -124,8 +133,11 @@ namespace SanaraV2
             Task taskDict4 = Task.Run(async () =>
             {
                 kancolleDict = await Features.Entertainment.Game.LoadKancolle();
-                if (kancolleDict == null)
+                if (kancolleDict == null || kancolleDict.Count == 0)
+                {
+                    kancolleDict = null;
                     await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load KanColle dictionary"));
+                }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "KanColle dictionary was succesfully loaded"));
             });
@@ -133,8 +145,11 @@ namespace SanaraV2
             Task taskDict5 = Task.Run(async () =>
             {
                 fireEmblemDict = await Features.Entertainment.Game.LoadFireEmblem();
-                if (fireEmblemDict == null)
+                if (fireEmblemDict == null || fireEmblemDict.Count == 0)
+                {
+                    fireEmblemDict = null;
                     await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Fire Emblem dictionary"));
+                }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Fire Emblem dictionary was succesfully loaded"));
             });
