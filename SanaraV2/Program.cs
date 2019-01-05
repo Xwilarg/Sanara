@@ -171,19 +171,19 @@ namespace SanaraV2
             sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
 
-            await commands.AddModuleAsync<Communication>();
-            await commands.AddModuleAsync<Settings>();
-            await commands.AddModuleAsync<Linguist>();
-            await commands.AddModuleAsync<Kancolle>();
-            await commands.AddModuleAsync<Booru>();
-            await commands.AddModuleAsync<VnModule>();
-            await commands.AddModuleAsync<Doujinshi>();
-            await commands.AddModuleAsync<AnimeManga>();
-            await commands.AddModuleAsync<GameModule>();
-            await commands.AddModuleAsync<Youtube>();
-            await commands.AddModuleAsync<RadioModule>();
-            await commands.AddModuleAsync<Xkcd>();
-            await commands.AddModuleAsync<Modules.Tools.Image>();
+            await commands.AddModuleAsync<Communication>(null);
+            await commands.AddModuleAsync<Settings>(null);
+            await commands.AddModuleAsync<Linguist>(null);
+            await commands.AddModuleAsync<Kancolle>(null);
+            await commands.AddModuleAsync<Booru>(null);
+            await commands.AddModuleAsync<VnModule>(null);
+            await commands.AddModuleAsync<Doujinshi>(null);
+            await commands.AddModuleAsync<AnimeManga>(null);
+            await commands.AddModuleAsync<GameModule>(null);
+            await commands.AddModuleAsync<Youtube>(null);
+            await commands.AddModuleAsync<RadioModule>(null);
+            await commands.AddModuleAsync<Xkcd>(null);
+            await commands.AddModuleAsync<Modules.Tools.Image>(null);
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -485,7 +485,7 @@ namespace SanaraV2
                     return;
                 }
                 DateTime dt = DateTime.UtcNow;
-                var result = await commands.ExecuteAsync(context, pos);
+                var result = await commands.ExecuteAsync(context, pos, null);
                 if (result.IsSuccess && sendStats)
                 {
                     await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
