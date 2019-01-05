@@ -33,7 +33,7 @@ namespace SanaraV2.Features.GamesInfo
             string html;
             using (HttpClient hc = new HttpClient())
             {
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.wikia.com/api/v1/Search/List?query=" + string.Join("%20", args) + "&limit=1"));
+                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1"));
                 string id = json.items[0].id;
                 string url = json.items[0].url + "?action=raw";
                 name = json.items[0].title;
