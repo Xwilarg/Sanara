@@ -197,7 +197,7 @@ namespace SanaraV2.Modules.Entertainment
                 using (WebClient wc = new WebClient())
                 {
                     wc.Encoding = Encoding.UTF8;
-                    json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + userWord);
+                    json = wc.DownloadString("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userWord));
                 }
                 bool isCorrect = false;
                 bool isNoun = false;
@@ -336,7 +336,7 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     using (WebClient w = new WebClient()) // TODO: Check if clean names match
                     {
-                        string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
+                        string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
                         string json = w.DownloadString(url);
                         string code = Utilities.GetElementXml("\"title\":\"", json, '"');
                         url = "http://kancolle.wikia.com/wiki/" + code + "?action=raw";
@@ -346,7 +346,7 @@ namespace SanaraV2.Modules.Entertainment
                             return (Sentences.KancolleGuessDontExist(m_guild.Id));
                         w.Encoding = Encoding.UTF8;
                         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + newName + "&limit=1";
+                        url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
                         json = w.DownloadString(url);
                         code = Utilities.GetElementXml("\"id\":", json, ',');
                         if (m_idImage == code)
