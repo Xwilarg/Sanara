@@ -36,7 +36,7 @@ namespace Sanara_UnitTests
             Assert.Equal("GochiUsa", string.Join("", result.answer.alternativeTitles));
             Assert.Equal(12, result.answer.episodeCount);
             Assert.Equal(23, result.answer.episodeLength);
-            Assert.InRange(result.answer.rating, 60, 90);
+            Assert.InRange(result.answer.rating.Value, 60, 90);
             Assert.Equal(new DateTime(2014, 4, 10), result.answer.startDate);
             Assert.Equal(new DateTime(2014, 6, 26), result.answer.endDate);
             Assert.Equal("Teens 13 or older", result.answer.ageRating);
