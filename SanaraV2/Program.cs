@@ -93,7 +93,76 @@ namespace SanaraV2
         {
             db = new Db.Db();
             await db.InitAsync();
-            
+
+            await InitDictionaries();
+
+            p = this;
+            games = new List<GameModule.Game>();
+            gameThread = new Thread(new ThreadStart(GameThread));
+
+            rand = new Random();
+
+            UpdateLanguageFiles();
+
+            sendStats = File.Exists("Keys/websiteToken.dat");
+            InitServices();
+
+            await commands.AddModuleAsync<Communication>(null);
+            await commands.AddModuleAsync<Settings>(null);
+            await commands.AddModuleAsync<Linguist>(null);
+            await commands.AddModuleAsync<Kancolle>(null);
+            await commands.AddModuleAsync<Booru>(null);
+            await commands.AddModuleAsync<VnModule>(null);
+            await commands.AddModuleAsync<Doujinshi>(null);
+            await commands.AddModuleAsync<AnimeManga>(null);
+            await commands.AddModuleAsync<GameModule>(null);
+            await commands.AddModuleAsync<Youtube>(null);
+            await commands.AddModuleAsync<RadioModule>(null);
+            await commands.AddModuleAsync<Xkcd>(null);
+            await commands.AddModuleAsync<Modules.Tools.Image>(null);
+
+            client.MessageReceived += HandleCommandAsync;
+            client.GuildAvailable += GuildJoin;
+            client.JoinedGuild += GuildJoin;
+            client.Disconnected += Disconnected;
+            client.UserVoiceStateUpdated += VoiceUpdate;
+
+            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
+            startTime = DateTime.Now;
+            await client.StartAsync();
+
+            if (sendStats)
+            {
+                var task = Task.Run(async () =>
+                {
+                    for (;;)
+                    {
+                        await Task.Delay(60000);
+                        UpdateStatus();
+                    }
+                });
+            }
+            await Task.Delay(-1);
+        }
+
+        private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
+        {
+            RadioChannel radio = radios.Find(x => x.m_guildId == ((IGuildUser)user).GuildId);
+            if (radio != null && await radio.IsChanEmpty())
+            {
+                await radio.Stop();
+                radios.Remove(radio);
+            }
+        }
+
+        private Task Disconnected(Exception e)
+        {
+            Environment.Exit(1);
+            return Task.CompletedTask;
+        }
+
+        private async Task InitDictionaries()
+        {
             Task taskDict1 = Task.Run(async () =>
             {
                 shiritoriDict = Features.Entertainment.Game.LoadShiritori();
@@ -159,70 +228,6 @@ namespace SanaraV2
             await taskDict3;
             await taskDict4;
             await taskDict5;
-
-            p = this;
-            games = new List<GameModule.Game>();
-            gameThread = new Thread(new ThreadStart(GameThread));
-
-            rand = new Random();
-
-            UpdateLanguageFiles();
-
-            sendStats = File.Exists("Keys/websiteToken.dat");
-            InitServices();
-
-            await commands.AddModuleAsync<Communication>(null);
-            await commands.AddModuleAsync<Settings>(null);
-            await commands.AddModuleAsync<Linguist>(null);
-            await commands.AddModuleAsync<Kancolle>(null);
-            await commands.AddModuleAsync<Booru>(null);
-            await commands.AddModuleAsync<VnModule>(null);
-            await commands.AddModuleAsync<Doujinshi>(null);
-            await commands.AddModuleAsync<AnimeManga>(null);
-            await commands.AddModuleAsync<GameModule>(null);
-            await commands.AddModuleAsync<Youtube>(null);
-            await commands.AddModuleAsync<RadioModule>(null);
-            await commands.AddModuleAsync<Xkcd>(null);
-            await commands.AddModuleAsync<Modules.Tools.Image>(null);
-
-            client.MessageReceived += HandleCommandAsync;
-            client.GuildAvailable += GuildJoin;
-            client.JoinedGuild += GuildJoin;
-            client.Disconnected += Disconnected;
-            client.UserVoiceStateUpdated += VoiceUpdate;
-
-            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
-            startTime = DateTime.Now;
-            await client.StartAsync();
-
-            if (sendStats)
-            {
-                var task = Task.Run(async () =>
-                {
-                    for (;;)
-                    {
-                        await Task.Delay(60000);
-                        UpdateStatus();
-                    }
-                });
-            }
-            await Task.Delay(-1);
-        }
-
-        private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
-        {
-            RadioChannel radio = radios.Find(x => x.m_guildId == ((IGuildUser)user).GuildId);
-            if (radio != null && await radio.IsChanEmpty())
-            {
-                await radio.Stop();
-                radios.Remove(radio);
-            }
-        }
-
-        private Task Disconnected(Exception e)
-        {
-            Environment.Exit(1);
-            return Task.CompletedTask;
         }
 
         private void InitServices()

@@ -25,7 +25,7 @@ namespace SanaraV2.Features.Entertainment
             public string[] alternativeTitles;
             public int? episodeCount;
             public int? episodeLength;
-            public float rating;
+            public float? rating;
             public DateTime? startDate;
             public DateTime? endDate;
             public string ageRating;
