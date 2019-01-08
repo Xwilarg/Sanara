@@ -28,11 +28,28 @@ I spent a lot of times working on her and I hope that her source code will be ab
 [VNDBSharp](https://github.com/Nikey646/VndbSharp)<br/>
 [youtube-dl](https://rg3.github.io/youtube-dl/)<br/>
 
-# Please make note that the bot also collect and save the following datas:
+# Please make note that the bot also collect and save some datas:
 
-About guilds: preference (box prefix and language), datas about games (best score and users that contributed to it), datas about module usages and guild population<br/>
-You can check the different stats about the bot here: https://zirk.eu/sanara.html#stats<br/>
-You can also do the 'GDPR' command at any time to check the informations the bot have on you (and on the guild if you are the owner).
+#### Datas saved for stats:
+All the following datas are saved for stats purposes are are available here: https://zirk.eu/sanara.html#stats<br/>
+Datas collected:
+ - Server population and user type (user or bot)
+ - Module usage by server
+ - Game usage<br/><br/>
+ 
+#### Datas saved for guild preference:
+All the following datas are saved in a database, they are available by doing the 'GDPR' command:<br/>
+Datas collected:
+ - Guild id
+ - Guild preferences (prefix and language used)
+ - Datas about games (best score and id of users that contributed to that score)<br/><br/>
+
+#### Datas saved in case of error:
+All the following datas are saved when an exception occured (when the bot fail a command in an unexpected way) and are only visible by the owner, they are used for debug purpose and are automatically deleted after 30 days:<br/>
+Data collected:
+  - Command launched along with a full stacktrace (exact point in the code where the error occured)
+  - Complete username of the user that launched the command along with the server/chanel name where it was launched
+  - Date when the error occured
 
 # How to use Sanara by cloning the repository
 
