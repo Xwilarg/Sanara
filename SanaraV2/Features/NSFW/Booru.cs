@@ -84,19 +84,29 @@ namespace SanaraV2.Features.NSFW
                     switch ((await b.GetTag(s)).type)
                     {
                         case BooruSharp.Search.Tag.TagType.Artist:
-                            artists.Add(s);
+                            if (artists.Count == 10)
+                                artists.Add("...");
+                            else if (artists.Count < 10)
+                                artists.Add(s);
                             break;
 
                         case BooruSharp.Search.Tag.TagType.Character:
-                            characs.Add(s);
+                            if (characs.Count == 10)
+                                characs.Add("...");
+                            else if (characs.Count < 10)
+                                characs.Add(s);
                             break;
 
                         case BooruSharp.Search.Tag.TagType.Copyright:
-                            sources.Add(s);
+                            if (sources.Count == 10)
+                                sources.Add("...");
+                            else if (sources.Count < 10)
+                                sources.Add(s);
                             break;
                     }
                 } catch (BooruSharp.Search.InvalidTags) { }
             }
+            uint pgcd = PGCD((uint)elem.Item2.height, (uint)elem.Item2.width);
             return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(new Response.BooruTags()
             {
                 artistTags = artists.ToArray(),
@@ -104,8 +114,24 @@ namespace SanaraV2.Features.NSFW
                 sourceTags = sources.ToArray(),
                 imageUrl = elem.Item2.previewUrl,
                 rating = GetColorFromRating(elem.Item2.rating),
-                booruName = elem.Item1.ToString().Split('.').Last()
+                booruName = elem.Item1.ToString().Split('.').Last(),
+                height = elem.Item2.height,
+                width = elem.Item2.width,
+                aspectRatio = new Tuple<long, long>(elem.Item2.width / pgcd, elem.Item2.height / pgcd)
             }, Error.BooruTags.None));
+        }
+
+        private static uint PGCD(uint a, uint b)
+        {
+            while (a != 0 && b != 0)
+            {
+                if (a > b)
+                    a %= b;
+                else
+                    b %= a;
+            }
+
+            return a == 0 ? b : a;
         }
 
         private static Color GetColorFromRating(BooruSharp.Search.Post.Rating rating)

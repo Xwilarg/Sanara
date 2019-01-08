@@ -35,6 +35,9 @@ namespace SanaraV2.Features.NSFW
             public Uri imageUrl;
             public Color rating;
             public string booruName;
+            public int height;
+            public int width;
+            public Tuple<long, long> aspectRatio;
         }
 
         public class Doujinshi
