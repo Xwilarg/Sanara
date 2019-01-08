@@ -21,6 +21,7 @@ namespace SanaraV2.Modules.NSFW
         /// --------------------------- Booru ---------------------------
         public static string InvalidExtension(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidExtension")); }
         public static string InvalidId(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidId")); }
+        public static string HelpId (ulong guildId) { return (Translation.GetTranslation(guildId, "helpId")); }
         public static string Source(ulong guildId) { return (Translation.GetTranslation(guildId, "source")); }
         public static string Sources(ulong guildId) { return (Translation.GetTranslation(guildId, "sources")); }
         public static string Character(ulong guildId) { return (Translation.GetTranslation(guildId, "character")); }

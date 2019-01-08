@@ -69,17 +69,23 @@ namespace SanaraV2.Modules.NSFW
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
         public async Task TagsSearch(params string[] tags)
         {
-            var result = await Features.NSFW.Booru.SearchTags(tags[0]);
+            var result = await Features.NSFW.Booru.SearchTags(tags);
             switch (result.error)
             {
                 case Features.NSFW.Error.BooruTags.NotFound:
                     await ReplyAsync(Sentences.InvalidId(Context.Guild.Id));
                     break;
 
+                case Features.NSFW.Error.BooruTags.Help:
+                    await ReplyAsync(Sentences.HelpId(Context.Guild.Id));
+                    break;
+
                 case Features.NSFW.Error.BooruTags.None:
                     EmbedBuilder eb = new EmbedBuilder()
                     {
-                        Color = Color.Blue
+                        Color = result.answer.rating,
+                        Title = result.answer.booruName,
+                        ImageUrl = result.answer.imageUrl.AbsoluteUri
                     };
                     eb.AddField(((result.answer.sourceTags.Length > 1) ? (Sentences.Sources(Context.Guild.Id)) : (Sentences.Source(Context.Guild.Id))), "`" + string.Join(", ", result.answer.sourceTags) + "`");
                     eb.AddField(((result.answer.characTags.Length > 1) ? (Sentences.Characters(Context.Guild.Id)) : (Sentences.Character(Context.Guild.Id))), "`" + string.Join(", ", result.answer.characTags) + "`");

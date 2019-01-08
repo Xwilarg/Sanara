@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
+using System;
 
 namespace SanaraV2.Features.NSFW
 {
@@ -31,6 +32,9 @@ namespace SanaraV2.Features.NSFW
             public string[] sourceTags;
             public string[] artistTags;
             public string[] characTags;
+            public Uri imageUrl;
+            public Color rating;
+            public string booruName;
         }
 
         public class Doujinshi

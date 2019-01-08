@@ -33,7 +33,7 @@ namespace SanaraV2.Features.NSFW
             Sakugabooru
         }
 
-        private static Dictionary<string, Tuple<Type, string[]>> tagInfos = new Dictionary<string, Tuple<Type, string[]>>();
+        private static Dictionary<string, Tuple<Type, BooruSharp.Search.Post.SearchResult>> tagInfos = new Dictionary<string, Tuple<Type, BooruSharp.Search.Post.SearchResult>>();
 
         public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, BooruSharp.Booru.Booru booru, Random r)
         {
@@ -52,26 +52,9 @@ namespace SanaraV2.Features.NSFW
             string url = res.fileUrl.AbsoluteUri;
             if (!Utilities.IsImage(url.Split('.').Last()))
                 error = Error.Booru.InvalidFile;
-            Color color;
-            switch (res.rating)
-            {
-                case BooruSharp.Search.Post.Rating.Explicit:
-                    color = Color.Red;
-                    break;
-
-                case BooruSharp.Search.Post.Rating.Questionable:
-                    color = new Color(255, 255, 0);
-                    break;
-
-                case BooruSharp.Search.Post.Rating.Safe:
-                    color = Color.Green;
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
+            Color color = GetColorFromRating(res.rating);
             string saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
-            tagInfos.Add(saveId, new Tuple<Type, string[]>(booru.GetType(), res.tags));
+            tagInfos.Add(saveId, new Tuple<Type, BooruSharp.Search.Post.SearchResult>(booru.GetType(), res));
             return (new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
                     url = url,
                     colorRating = color,
@@ -80,8 +63,11 @@ namespace SanaraV2.Features.NSFW
                 }, error));
         }
 
-        public static async Task<FeatureRequest<Response.BooruTags, Error.BooruTags>> SearchTags(string id)
+        public static async Task<FeatureRequest<Response.BooruTags, Error.BooruTags>> SearchTags(string[] idArgs)
         {
+            if (idArgs.Length == 0)
+                return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.Help));
+            string id = idArgs[0];
             if (!tagInfos.ContainsKey(id))
                 return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.NotFound));
             var elem = tagInfos[id];
@@ -90,30 +76,54 @@ namespace SanaraV2.Features.NSFW
             List<string> sources = new List<string>();
             List<string> characs = new List<string>();
             int i = 0;
-            foreach (string s in elem.Item2)
+            foreach (string s in elem.Item2.tags)
             {
                 i++;
-                switch ((await b.GetTag(s)).type)
+                try
                 {
-                    case BooruSharp.Search.Tag.TagType.Artist:
-                        artists.Add(s);
-                        break;
+                    switch ((await b.GetTag(s)).type)
+                    {
+                        case BooruSharp.Search.Tag.TagType.Artist:
+                            artists.Add(s);
+                            break;
 
-                    case BooruSharp.Search.Tag.TagType.Character:
-                        characs.Add(s);
-                        break;
+                        case BooruSharp.Search.Tag.TagType.Character:
+                            characs.Add(s);
+                            break;
 
-                    case BooruSharp.Search.Tag.TagType.Copyright:
-                        sources.Add(s);
-                        break;
-                }
+                        case BooruSharp.Search.Tag.TagType.Copyright:
+                            sources.Add(s);
+                            break;
+                    }
+                } catch (BooruSharp.Search.InvalidTags) { }
             }
             return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(new Response.BooruTags()
             {
                 artistTags = artists.ToArray(),
                 characTags = characs.ToArray(),
-                sourceTags = sources.ToArray()
+                sourceTags = sources.ToArray(),
+                imageUrl = elem.Item2.previewUrl,
+                rating = GetColorFromRating(elem.Item2.rating),
+                booruName = elem.Item1.ToString().Split('.').Last()
             }, Error.BooruTags.None));
+        }
+
+        private static Color GetColorFromRating(BooruSharp.Search.Post.Rating rating)
+        {
+            switch (rating)
+            {
+                case BooruSharp.Search.Post.Rating.Explicit:
+                    return (Color.Red);
+
+                case BooruSharp.Search.Post.Rating.Questionable:
+                    return (new Color(255, 255, 0));
+
+                case BooruSharp.Search.Post.Rating.Safe:
+                    return (Color.Green);
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

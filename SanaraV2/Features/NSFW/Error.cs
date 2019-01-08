@@ -28,6 +28,7 @@ namespace SanaraV2.Features.NSFW
         public enum BooruTags
         {
             None,
+            Help,
             NotFound
         }
 
