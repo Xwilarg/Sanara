@@ -17,6 +17,7 @@ using System;
 using Discord;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
+using System.Linq;
 
 namespace SanaraV2.Modules.NSFW
 {
@@ -126,6 +127,8 @@ namespace SanaraV2.Modules.NSFW
                             Text = Sentences.ImageInfo(guildId, result.answer.saveId)
                         }
                     }.Build());
+                    if (Program.p.sendStats)
+                        await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString().Split('.').Last().ToLower()) });
                     break;
 
                 default:
