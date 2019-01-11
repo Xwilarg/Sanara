@@ -16,6 +16,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 [Report an issue/Make a suggestion](https://github.com/Xwilarg/Sanara/issues)<br/>
 [Invitation link](https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot)<br/>
 [Help for the translation](https://github.com/Xwilarg/Sanara-translations/)<br/>
+[Upcoming features](https://github.com/Xwilarg/Sanara/projects/2)
 
 # External libraries used
 
