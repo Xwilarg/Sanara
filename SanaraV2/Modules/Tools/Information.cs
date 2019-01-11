@@ -127,6 +127,8 @@ namespace SanaraV2.Modules.Tools
                 else
                     no++;
             }
+            if (yes + no == 0)
+                yes++;
             int max = yes + no;
             embed.Color = new Color(no * 255 / max, yes * 255 / max, 0);
             await ReplyAsync("", false, embed.Build());
