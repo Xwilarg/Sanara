@@ -30,6 +30,7 @@ using SharpRaven;
 using SharpRaven.Data;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -91,6 +92,7 @@ namespace SanaraV2
 
         private async Task MainAsync()
         {
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
             await db.InitAsync();
 
