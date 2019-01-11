@@ -384,7 +384,6 @@ namespace SanaraV2
             Communication,
             Doujinshi,
             Game,
-            GirlsFrontier,
             GoogleShortener,
             Image,
             Kancolle,

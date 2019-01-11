@@ -45,6 +45,15 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
         }
 
+        public async Task ResetGuild(ulong guildId)
+        {
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+                   .With("Prefix", "s.")
+                   .With("Language", "en")
+                   .With("Availability", "111111111111111")
+                   ).RunAsync(conn);
+        }
+
         public async Task InitGuild(ulong guildId)
         {
             string guildIdStr = guildId.ToString();
@@ -53,7 +62,7 @@ namespace SanaraV2.Db
                 await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
                     .With("Prefix", "s.")
                     .With("Language", "en")
-                    .With("Availability", "1111111111111")
+                    .With("Availability", "111111111111111")
                     ).RunAsync(conn);
             }
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
@@ -61,7 +70,7 @@ namespace SanaraV2.Db
             Prefixs.Add(guildId, (string)json.Prefix);
             string availability = (string)json.Availability;
             if (availability == null)
-                Availability.Add(guildId, "1111111111111");
+                Availability.Add(guildId, "111111111111111");
             else
                 Availability.Add(guildId, availability);
         }
@@ -85,7 +94,7 @@ namespace SanaraV2.Db
         public async Task SetAvailability(ulong guildId, Program.Module module, int enable)
         {
             StringBuilder availability = new StringBuilder(Availability[guildId]);
-            availability[(int)module] = (char)enable;
+            availability[(int)module] = (char)(enable + '0');
             string res = availability.ToString();
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
                 .With("Availability", res)

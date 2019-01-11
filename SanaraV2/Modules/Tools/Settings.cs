@@ -101,12 +101,41 @@ namespace SanaraV2.Modules.Tools
                     await Context.Guild.LeaveAsync();
                 else
                 {
-                    IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper());
+                    IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
                     if (g == null)
                         await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
                     else
                     {
                         await g.LeaveAsync();
+                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    }
+                }
+            }
+        }
+
+        [Command("ResetDb")]
+        public async Task ResetDb(string serverName = null)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Base.Sentences.ownerId)
+            {
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+            }
+            else
+            {
+                if (serverName == null)
+                {
+                    await Program.p.db.ResetGuild(Context.Guild.Id);
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                }
+                else
+                {
+                    IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
+                    if (g == null)
+                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
+                    else
+                    {
+                        await Program.p.db.ResetGuild(g.Id);
                         await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                     }
                 }
