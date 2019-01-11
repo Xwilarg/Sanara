@@ -107,7 +107,7 @@ namespace SanaraV2
             sendStats = File.Exists("Keys/websiteToken.dat");
             InitServices();
 
-            await commands.AddModuleAsync<Communication>(null);
+            await commands.AddModuleAsync<Information>(null);
             await commands.AddModuleAsync<Settings>(null);
             await commands.AddModuleAsync<Linguist>(null);
             await commands.AddModuleAsync<Kancolle>(null);
@@ -120,6 +120,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<RadioModule>(null);
             await commands.AddModuleAsync<Xkcd>(null);
             await commands.AddModuleAsync<Modules.Tools.Image>(null);
+            await commands.AddModuleAsync<Communication>(null);
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -384,8 +385,8 @@ namespace SanaraV2
             Communication,
             Doujinshi,
             Game,
-            GoogleShortener,
             Image,
+            Information,
             Kancolle,
             Linguistic,
             Radio,

@@ -36,6 +36,8 @@ namespace SanaraV2.Modules.Tools
         public static string NumberGuilds(ulong guildId) { return (Translation.GetTranslation(guildId, "numberGuilds")); }
         public static string QuoteInvalidId(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteInvalidId")); }
         public static string QuoteNoMessage(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteNoMessage")); }
+        public static string Enabled(ulong guildId) { return (Translation.GetTranslation(guildId, "enabled")); }
+        public static string Disabled(ulong guildId) { return (Translation.GetTranslation(guildId, "disabled")); }
 
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
@@ -62,6 +64,8 @@ namespace SanaraV2.Modules.Tools
         public static string ModuleManagementInvalid(ulong guildId) { return (Translation.GetTranslation(guildId, "moduleManagementInvalid")); }
         public static string ModuleEnabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleEnabled", moduleName)); }
         public static string ModuleDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleDisabled", moduleName)); }
+        public static string ModuleAlreadyEnabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyEnabled", moduleName)); }
+        public static string ModuleAlreadyDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyDisabled", moduleName)); }
 
         /// --------------------------- Help ---------------------------
         private static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
@@ -73,16 +77,16 @@ namespace SanaraV2.Modules.Tools
                 Color = Color.Purple
             };
             if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
-                embed.AddField(Translation.GetTranslation(guildId, "animeMangaName"), Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga"));
+                embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga"));
             else
-                embed.AddField(Translation.GetTranslation(guildId, "animeMangaName"), Base.Sentences.NotAvailable(guildId));
+                embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
                 embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : ("")));
             else
                 embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleGdpr") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleInvite"));
+                embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote"));
             else
                 embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
@@ -101,6 +105,10 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleColor"));
             else
                 embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Base.Sentences.NotAvailable(guildId));
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
+                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Translation.GetTranslation(guildId, "informationModuleGdpr") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite"));
+            else
+                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
                 embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop"));
             else
@@ -114,9 +122,9 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop"));
             else
                 embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Base.Sentences.NotAvailable(guildId));
-            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"), Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix")
-                + ((isOwner) ? (Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit")
-                 + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable")) : ("")));
+            embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"),
+                ((isOwner) ? (Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit")
+                 + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleResetDb")) : (NoCommandAvailable(guildId))));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Vn))
                 embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Translation.GetTranslation(guildId, "visualNovelModuleVn"));
             else

@@ -261,6 +261,7 @@
     </Compile>
     <Compile Include="Modules\NSFW\Booru.cs" />
     <Compile Include="Modules\Tools\Communication.cs" />
+    <Compile Include="Modules\Tools\Information.cs" />
     <Compile Include="Modules\Entertainment\Game.cs" />
     <Compile Include="Modules\Tools\Image.cs" />
     <Compile Include="Modules\Tools\Linguist.cs" />

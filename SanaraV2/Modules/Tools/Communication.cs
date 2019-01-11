@@ -28,14 +28,6 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
-        [Command("Help"), Summary("Give the help"), Alias("Commands")]
-        public async Task Help()
-        {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw, Context.User.Id == Base.Sentences.ownerId));
-        }
-
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)
         {
@@ -59,107 +51,16 @@ namespace SanaraV2.Modules.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Information);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
             await InfosUser(await Context.Channel.GetUserAsync(Base.Sentences.myId) as IGuildUser);
-        }
-
-        [Command("GDPR"), Summary("Show infos the bot have about the user and the guild")]
-        public async Task GDPR(params string[] command)
-        {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync("", false, new EmbedBuilder()
-            {
-                Color = Color.Blue,
-                Title = "Datas saved about " + Context.Guild.Name,
-                Description = await Program.p.db.GetGuild(Context.Guild.Id)
-            }.Build());
-        }
-
-        [Command("Status"), Summary("Display which commands aren't available because of missing files")]
-        public async Task Status()
-        {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            int yes = 0;
-            int no = 0;
-            EmbedBuilder embed = new EmbedBuilder()
-            {
-                Title = "Services availability"
-            };
-            embed.AddField("Radio Module",
-                "**Opus dll:** " + ((File.Exists("opus.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Lib Sodium dll:** " + ((File.Exists("libsodium.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Ffmpeg:** " + ((File.Exists("ffmpeg.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**youtube-dl:** " + ((File.Exists("youtube-dl.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**YouTube API key:** " + ((p.youtubeService != null ? ("Yes") : ("No"))));
-            if (File.Exists("opus.dll") && File.Exists("libsodium.dll") && File.Exists("ffmpeg.exe") && p.youtubeService != null)
-                yes++;
-            else
-                no++;
-            embed.AddField("Game Module",
-                "**Shiritori:** " + ((Program.p.shiritoriDict == null) ? ("Not loaded") : (Program.p.shiritoriDict.Count + " words")) + Environment.NewLine +
-                "**Booru quizz:** " + ((Program.p.booruDict == null) ? ("Not loaded") : (Program.p.booruDict.Count + " tags")) + Environment.NewLine +
-                "**Anime quizz:** " + ((Program.p.animeDict == null) ? ("Not loaded") : (Program.p.animeDict.Count + " anime names")) + Environment.NewLine +
-                "**KanColle quizz :** " + ((Program.p.kancolleDict == null) ? ("Not loaded") : (Program.p.kancolleDict.Count + " shipgirl names")) + Environment.NewLine +
-                "**Fire Emblem quizz:** " + ((Program.p.fireEmblemDict == null) ? ("Not loaded") : (Program.p.fireEmblemDict.Count + " character names")));
-            if (Program.p.shiritoriDict != null)
-                yes++;
-            else
-                no++;
-            if (Program.p.booruDict != null)
-                yes++;
-            else
-                no++;
-            if (Program.p.animeDict != null)
-                yes++;
-            else
-                no++;
-            if (Program.p.kancolleDict != null)
-                yes++;
-            else
-                no++;
-            if (Program.p.fireEmblemDict != null)
-                yes++;
-            else
-                no++;
-            embed.AddField("Linguistic Module - Translations",
-                "**Google Translate API key:** " + ((p.translationClient != null ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Google Vision API key:** " + ((p.visionClient != null ? ("Yes") : ("No"))));
-            if (p.translationClient != null)
-            {
-                yes++;
-                if (p.visionClient != null)
-                    yes++;
-                else
-                    no++;
-            }
-            else
-                no += 2;
-            embed.AddField("YouTube Module", "**YouTube API key:** " + ((p.youtubeService != null) ? ("Yes") : ("No")));
-            if (p.youtubeService != null)
-                yes++;
-            else
-                no++;
-            int max = yes + no;
-            embed.Color = new Color(no * 255 / max, yes * 255 / max, 0);
-            await ReplyAsync("", false, embed.Build());
-        }
-
-        [Command("Invite", RunMode = RunMode.Async), Summary("Get invitation link")]
-        public async Task Invite()
-        {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            await ReplyAsync("<https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot>");
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
         public async Task Quote(string id = null)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Information);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
             IUser author = (id == null) ? (null) : (await Utilities.GetUser(id, Context.Guild));
             if (id == null || author != null)
             {
@@ -204,7 +105,8 @@ namespace SanaraV2.Modules.Tools
                             msg = await textChan.GetMessageAsync(uId);
                             if (msg != null)
                                 break;
-                        } catch (HttpException) { }
+                        }
+                        catch (HttpException) { }
                     }
                 }
                 if (msg == null)

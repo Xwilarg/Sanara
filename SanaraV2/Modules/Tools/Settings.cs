@@ -174,10 +174,10 @@ namespace SanaraV2.Modules.Tools
                 return;
             }
             Program.Module? module = null;
-            string name = Utilities.AddArgs(args);
+            string name = Utilities.AddArgs(args).Replace(" ", "");
             for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
             {
-                if (i == Program.Module.Settings)
+                if (i == Program.Module.Settings || i == Program.Module.Information)
                     continue;
                 if (i.ToString().ToLower() == name.ToLower())
                 {
@@ -190,11 +190,19 @@ namespace SanaraV2.Modules.Tools
                 await chan.SendMessageAsync(Sentences.ModuleManagementInvalid(Context.Guild.Id) + " " + GetModuleList(Context.Guild.Id));
                 return;
             }
-            await Program.p.db.SetAvailability(Context.Guild.Id, module.Value, enable);
-            if (enable == 1)
-                await chan.SendMessageAsync(Sentences.ModuleEnabled(Context.Guild.Id, module.ToString()));
+            bool availability = Program.p.db.IsAvailable(Context.Guild.Id, module.Value);
+            if (availability && enable == 1)
+                await chan.SendMessageAsync(Sentences.ModuleAlreadyEnabled(Context.Guild.Id, module.ToString()));
+            else if (!availability && enable == 0)
+                await chan.SendMessageAsync(Sentences.ModuleAlreadyDisabled(Context.Guild.Id, module.ToString()));
             else
-                await chan.SendMessageAsync(Sentences.ModuleDisabled(Context.Guild.Id, module.ToString()));
+            {
+                await Program.p.db.SetAvailability(Context.Guild.Id, module.Value, enable);
+                if (enable == 1)
+                    await chan.SendMessageAsync(Sentences.ModuleEnabled(Context.Guild.Id, module.ToString()));
+                else
+                    await chan.SendMessageAsync(Sentences.ModuleDisabled(Context.Guild.Id, module.ToString()));
+            }
         }
 
         private string GetModuleList(ulong guildId)
@@ -202,7 +210,7 @@ namespace SanaraV2.Modules.Tools
             string finalStr = ((Program.Module)0).ToString();
             for (Program.Module i = (Program.Module)1; i <= (Program.Module.Youtube - 1); i++)
             {
-                if (i == Program.Module.Settings)
+                if (i == Program.Module.Settings || i == Program.Module.Information)
                     continue;
                 finalStr += ", " + i.ToString();
             }

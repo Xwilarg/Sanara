@@ -45,12 +45,14 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
         }
 
+        private static readonly string defaultAvailability = "111111111111111";
+
         public async Task ResetGuild(ulong guildId)
         {
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
                    .With("Prefix", "s.")
                    .With("Language", "en")
-                   .With("Availability", "111111111111111")
+                   .With("Availability", defaultAvailability)
                    ).RunAsync(conn);
         }
 
@@ -62,7 +64,7 @@ namespace SanaraV2.Db
                 await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
                     .With("Prefix", "s.")
                     .With("Language", "en")
-                    .With("Availability", "111111111111111")
+                    .With("Availability", defaultAvailability)
                     ).RunAsync(conn);
             }
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
@@ -70,9 +72,14 @@ namespace SanaraV2.Db
             Prefixs.Add(guildId, (string)json.Prefix);
             string availability = (string)json.Availability;
             if (availability == null)
-                Availability.Add(guildId, "111111111111111");
+                Availability.Add(guildId, defaultAvailability);
             else
-                Availability.Add(guildId, availability);
+            {
+                string newAvailability = availability;
+                while (newAvailability.Length < defaultAvailability.Length)
+                    newAvailability += "1";
+                Availability.Add(guildId, newAvailability);
+            }
         }
 
         public async Task SetPrefix(ulong guildId, string prefix)
