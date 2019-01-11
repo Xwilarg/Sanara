@@ -533,6 +533,7 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Play", RunMode = RunMode.Async), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             var result = await Features.Entertainment.Game.Play(gameName, ((ITextChannel)Context.Channel).IsNsfw, Context.Channel.Id, p.games);
             switch (result.error)

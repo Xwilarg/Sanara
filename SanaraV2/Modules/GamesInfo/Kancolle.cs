@@ -31,6 +31,7 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task Drop(params string[] shipNameArr)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Kancolle);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             Task<EmbedFieldBuilder> constructionTask = Task.Run(() => GetDropConstructionField(shipNameArr, Context.Guild.Id));
             Task<EmbedFieldBuilder> mapTask = Task.Run(() => GetDropMapField(shipNameArr, Context.Guild.Id));
@@ -153,6 +154,7 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Kancolle character")]
         public async Task Charac(params string[] shipNameArr)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Kancolle);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
             var result = await Features.GamesInfo.Kancolle.SearchCharac(shipNameArr);
             switch (result.error)

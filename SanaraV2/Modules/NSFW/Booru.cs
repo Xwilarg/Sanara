@@ -28,6 +28,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -35,6 +36,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -42,6 +44,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -49,6 +52,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -56,6 +60,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -63,6 +68,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
         public async Task E926Search(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
         }
@@ -70,6 +76,8 @@ namespace SanaraV2.Modules.NSFW
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
         public async Task TagsSearch(params string[] tags)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
             var result = await Features.NSFW.Booru.SearchTags(tags);
             switch (result.error)
             {

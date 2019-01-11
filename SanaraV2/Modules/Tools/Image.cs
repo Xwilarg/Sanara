@@ -26,6 +26,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Color", RunMode = RunMode.Async), Summary("Display a RGB color")]
         public async Task SearchColor(params string[] args)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Image);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Image);
             var result = await Features.Tools.Image.SearchColor(args);
             switch (result.error)

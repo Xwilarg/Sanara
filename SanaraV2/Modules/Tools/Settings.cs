@@ -122,5 +122,63 @@ namespace SanaraV2.Modules.Tools
             else
                 Environment.Exit(0);
         }
+
+        [Command("Enable"), Summary("Enable a module")]
+        public async Task Enable(params string[] args)
+            => await ManageModule(Context.Channel, args, 1);
+
+        [Command("Disable"), Summary("Disable a module")]
+        public async Task Disable(params string[] args)
+            => await ManageModule(Context.Channel, args, 0);
+
+        private async Task ManageModule(IMessageChannel chan, string[] args, int enable)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (Context.User.Id != Base.Sentences.ownerId)
+            {
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                return;
+            }
+            if (args.Length == 0)
+            {
+                await chan.SendMessageAsync(Sentences.ModuleManagementHelp(Context.Guild.Id) + " " + GetModuleList(Context.Guild.Id));
+                return;
+            }
+            Program.Module? module = null;
+            string name = Utilities.AddArgs(args);
+            for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
+            {
+                if (i == Program.Module.Settings)
+                    continue;
+                if (i.ToString().ToLower() == name.ToLower())
+                {
+                    module = i;
+                    break;
+                }
+            }
+            if (module == null)
+            {
+                await chan.SendMessageAsync(Sentences.ModuleManagementInvalid(Context.Guild.Id) + " " + GetModuleList(Context.Guild.Id));
+                return;
+            }
+            await Program.p.db.SetAvailability(Context.Guild.Id, module.Value, enable);
+            if (enable == 1)
+                await chan.SendMessageAsync(Sentences.ModuleEnabled(Context.Guild.Id, module.ToString()));
+            else
+                await chan.SendMessageAsync(Sentences.ModuleDisabled(Context.Guild.Id, module.ToString()));
+        }
+
+        private string GetModuleList(ulong guildId)
+        {
+            string finalStr = ((Program.Module)0).ToString();
+            for (Program.Module i = (Program.Module)1; i <= (Program.Module.Youtube - 1); i++)
+            {
+                if (i == Program.Module.Settings)
+                    continue;
+                finalStr += ", " + i.ToString();
+            }
+            finalStr += " " + Base.Sentences.OrStr(guildId) + " " + Program.Module.Youtube.ToString();
+            return (finalStr);
+        }
     }
 }

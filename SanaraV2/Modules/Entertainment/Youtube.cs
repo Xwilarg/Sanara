@@ -24,6 +24,7 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Youtube"), Summary("Get a random video given some keywords")]
         public async Task YoutubeVideo(params string[] args)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Youtube);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
             var result = await Features.Entertainment.YouTube.SearchYouTube(args, Program.p.youtubeService);
             switch (result.error)

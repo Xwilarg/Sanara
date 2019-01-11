@@ -27,6 +27,7 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
         public async Task Anime(params string[] animeNameArr)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             var result = await Features.Entertainment.AnimeManga.SearchAnime(true, animeNameArr);
             switch (result.error)
@@ -51,6 +52,7 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
         public async Task Manga(params string[] mangaNameArr)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
             var result = await Features.Entertainment.AnimeManga.SearchAnime(false, mangaNameArr);
             switch (result.error)
@@ -74,12 +76,13 @@ namespace SanaraV2.Modules.Entertainment
 
         private Embed CreateEmbed(bool isAnime, Response.AnimeManga res, ulong guildId)
         {
+            string orStr = Base.Sentences.OrStr(guildId);
             return (new EmbedBuilder
             {
                 Title = res.name,
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
-                Description = ((res.alternativeTitles != null) ? (Base.Utilities.CapitalizeFirstLetter(Base.Sentences.OrStr(guildId)) + " " + string.Join(", ", res.alternativeTitles)
+                Description = ((res.alternativeTitles != null) ? (char.ToUpper(orStr[0]) + orStr.Substring(1) + " " + string.Join(", ", res.alternativeTitles)
                  + Environment.NewLine + Environment.NewLine) : ("")) + ((isAnime && res.episodeCount != null) ? (Sentences.AnimeEpisodes(guildId, res.episodeCount.Value) + ((res.episodeLength != null) ? (" " + Sentences.AnimeLength(guildId, res.episodeLength.Value)) : ("")) + Environment.NewLine) : (""))
                  + ((res.rating != null) ? (Sentences.AnimeRating(guildId, res.rating.Value) + Environment.NewLine) : (""))
                  + ((res.startDate != null) ? Sentences.AnimeDate(guildId, res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)), ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId)))) : (Sentences.ToBeAnnounced(guildId))) + Environment.NewLine

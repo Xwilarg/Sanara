@@ -468,47 +468,40 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            try
+            if (arg.Author.Id == Modules.Base.Sentences.myId || arg.Author.IsBot)
+                return;
+            var msg = arg as SocketUserMessage;
+            if (msg == null) return;
+            /// When playing games
+            else if (arg.Author.Id != Modules.Base.Sentences.myId)
             {
-                if (arg.Author.Id == Modules.Base.Sentences.myId || arg.Author.IsBot)
-                    return;
-                var msg = arg as SocketUserMessage;
-                if (msg == null) return;
-                /// When playing games
-                else if (arg.Author.Id != Modules.Base.Sentences.myId)
-                {
-                    GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
-                    if (game != null)
-                        await game.CheckCorrect(arg.Content, arg.Author);
-                }
-                int pos = 0;
-                if (arg.Channel as ITextChannel == null)
-                {
-                    await arg.Channel.SendMessageAsync(Modules.Base.Sentences.DontPm(0));
-                    return;
-                }
-                string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId];
-                if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
-                {
-                    var context = new SocketCommandContext(client, msg);
-                    if (!((IGuildUser)await context.Channel.GetUserAsync(Modules.Base.Sentences.myId)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks)
-                    {
-                        await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
-                        return;
-                    }
-                    DateTime dt = DateTime.UtcNow;
-                    var result = await commands.ExecuteAsync(context, pos, null);
-                    if (result.IsSuccess && sendStats)
-                    {
-                        await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
-                        await AddError("OK");
-                        await AddCommandServs(context.Guild.Id);
-                    }
-                }
-            } catch (Exception e)
+                GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
+                if (game != null)
+                    await game.CheckCorrect(arg.Content, arg.Author);
+            }
+            int pos = 0;
+            if (arg.Channel as ITextChannel == null)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                await arg.Channel.SendMessageAsync(Modules.Base.Sentences.DontPm(0));
+                return;
+            }
+            string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId];
+            if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
+            {
+                var context = new SocketCommandContext(client, msg);
+                if (!((IGuildUser)await context.Channel.GetUserAsync(Modules.Base.Sentences.myId)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks)
+                {
+                    await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
+                    return;
+                }
+                DateTime dt = DateTime.UtcNow;
+                IResult result = await commands.ExecuteAsync(context, pos, null);
+                if (result.IsSuccess && sendStats)
+                {
+                    await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+                    await AddError("OK");
+                    await AddCommandServs(context.Guild.Id);
+                }
             }
         }
 
@@ -574,6 +567,12 @@ namespace SanaraV2
 
         private Task LogError(LogMessage msg)
         {
+            if (msg.Exception.InnerException.GetType() == typeof(NotAvailable))
+            {
+                CommandException ex = (CommandException)msg.Exception;
+                ex.Context.Channel.SendMessageAsync(Modules.Base.Sentences.NotAvailable(ex.Context.Guild.Id));
+                return Task.CompletedTask;
+            }
             Log(msg);
             if (ravenClient != null)
                 ravenClient.Capture(new SentryEvent(msg.Exception));

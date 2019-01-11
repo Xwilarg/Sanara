@@ -18,6 +18,7 @@ using RethinkDb.Driver.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Db
@@ -29,6 +30,7 @@ namespace SanaraV2.Db
             R = RethinkDB.R;
             Languages = new Dictionary<ulong, string>();
             Prefixs = new Dictionary<ulong, string>();
+            Availability = new Dictionary<ulong, string>();
         }
 
         public async Task InitAsync(string dbName = "Sanara")
@@ -51,11 +53,17 @@ namespace SanaraV2.Db
                 await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
                     .With("Prefix", "s.")
                     .With("Language", "en")
+                    .With("Availability", "1111111111111")
                     ).RunAsync(conn);
             }
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
             Languages.Add(guildId, (string)json.Language);
             Prefixs.Add(guildId, (string)json.Prefix);
+            string availability = (string)json.Availability;
+            if (availability == null)
+                Availability.Add(guildId, "1111111111111");
+            else
+                Availability.Add(guildId, availability);
         }
 
         public async Task SetPrefix(ulong guildId, string prefix)
@@ -72,6 +80,22 @@ namespace SanaraV2.Db
                 .With("Language", language)
                 ).RunAsync(conn);
             Languages[guildId] = language;
+        }
+
+        public async Task SetAvailability(ulong guildId, Program.Module module, int enable)
+        {
+            StringBuilder availability = new StringBuilder(Availability[guildId]);
+            availability[(int)module] = (char)enable;
+            string res = availability.ToString();
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+                .With("Availability", res)
+                ).RunAsync(conn);
+            Availability[guildId] = res;
+        }
+
+        public bool IsAvailable(ulong guildId, Program.Module module)
+        {
+            return (Availability[guildId][(int)module] == '1');
         }
 
         public async Task<string> GetGuild(ulong guildId)
@@ -116,5 +140,6 @@ namespace SanaraV2.Db
 
         public Dictionary<ulong, string> Languages { private set; get; }
         public Dictionary<ulong, string> Prefixs { private set; get; }
+        public Dictionary<ulong, string> Availability { private set; get; }
     }
 }

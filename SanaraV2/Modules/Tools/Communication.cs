@@ -31,6 +31,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Help"), Summary("Give the help"), Alias("Commands")]
         public async Task Help()
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw, Context.User.Id == Base.Sentences.ownerId));
         }
@@ -38,6 +39,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IGuildUser user;
             if (command.Length == 0)
@@ -57,6 +59,7 @@ namespace SanaraV2.Modules.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await InfosUser(await Context.Channel.GetUserAsync(Base.Sentences.myId) as IGuildUser);
         }
@@ -64,6 +67,7 @@ namespace SanaraV2.Modules.Tools
         [Command("GDPR"), Summary("Show infos the bot have about the user and the guild")]
         public async Task GDPR(params string[] command)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync("", false, new EmbedBuilder()
             {
@@ -76,7 +80,8 @@ namespace SanaraV2.Modules.Tools
         [Command("Status"), Summary("Display which commands aren't available because of missing files")]
         public async Task Status()
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             int yes = 0;
             int no = 0;
             EmbedBuilder embed = new EmbedBuilder()
@@ -145,13 +150,16 @@ namespace SanaraV2.Modules.Tools
         [Command("Invite", RunMode = RunMode.Async), Summary("Get invitation link")]
         public async Task Invite()
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await ReplyAsync("<https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot>");
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
         public async Task Quote(string id = null)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IUser author = (id == null) ? (null) : (await Utilities.GetUser(id, Context.Guild));
             if (id == null || author != null)
             {

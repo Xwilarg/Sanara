@@ -26,6 +26,7 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Xkcd", RunMode = RunMode.Async), Summary("Give XKCD commic")]
         public async Task XkcdSearch(params string[] args)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Xkcd);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
             var result = await Features.Entertainment.Xkcd.SearchXkcd(args, Program.p.rand);
             switch (result.error)

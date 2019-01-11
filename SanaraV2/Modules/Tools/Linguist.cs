@@ -27,6 +27,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Urban", RunMode = RunMode.Async), Summary("Search for a word in Urban Dictionary")]
         public async Task Urban(params string[] words)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             var result = await Features.Tools.Linguist.UrbanSearch(!((ITextChannel)Context.Channel).IsNsfw, words);
             switch (result.error)
@@ -73,6 +74,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Translation", RunMode = RunMode.Async), Summary("Translate a sentence"), Alias("Translate")]
         public async Task Translation(params string[] words)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             var result = await Features.Tools.Linguist.Translate(words, Program.p.translationClient, Program.p.visionClient, Program.p.allLanguages);
             switch (result.error)
@@ -114,6 +116,7 @@ namespace SanaraV2.Modules.Tools
         [Command("Japanese", RunMode = RunMode.Async), Summary("Give the meaning of a word")]
         public async Task Meaning(params string[] words)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
             var result = await Features.Tools.Linguist.JapaneseTranslate(words);
             switch (result.error)

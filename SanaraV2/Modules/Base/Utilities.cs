@@ -14,8 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using System;
-using System.IO;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -23,37 +21,10 @@ namespace SanaraV2.Modules.Base
 {
     public static class Utilities
     {
-        public static async Task NotAvailable(ITextChannel chan)
+        public static void CheckAvailability(ulong guildId, Program.Module module)
         {
-            await chan.SendMessageAsync("", false, new EmbedBuilder()
-            {
-                Description = "This service is no longer available, thanks for using it.",
-                Color = Color.Red
-            }.Build());
-        }
-
-        /// <summary>
-        /// Write text in file, retry if file is busy
-        /// </summary>
-        /// <param name="file">Path of the file</param>
-        /// <param name="content">Content to write in the file</param>
-        public static void WriteAllText(string file, string content)
-        {
-            while (true)
-            {
-                try
-                {
-                    File.WriteAllText(file, content);
-                    break;
-                }
-                catch (IOException)
-                { }
-            }
-        }
-
-        public static string CapitalizeFirstLetter(string str)
-        {
-            return (char.ToUpper(str[0]) + str.Substring(1));
+            if (!Program.p.db.IsAvailable(guildId, module))
+                throw new NotAvailable();
         }
 
         /// <summary>
@@ -189,17 +160,6 @@ namespace SanaraV2.Modules.Base
                 }
             }
             return (lang);
-        }
-
-        /// <summary>
-        /// Get a language name from 2 letters (ex: french for fr)
-        /// </summary>
-        /// <param name="languageName">Language string</param>
-        public static string GetFullLanguage(string languageName)
-        {
-            if (Program.p.allLanguages.ContainsKey(languageName))
-                return (Program.p.allLanguages[languageName][0]);
-            return (languageName);
         }
     }
 }
