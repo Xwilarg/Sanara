@@ -43,7 +43,8 @@ All the following datas are saved in a database, they are available by doing the
 Datas collected:
  - Guild id
  - Guild preferences (prefix and language used)
- - Datas about games (best score and id of users that contributed to that score)<br/><br/>
+ - Datas about games (best score and id of users that contributed to that score)
+ - Modules enabled/disabled<br/><br/>
 
 #### Datas saved in case of error:
 All the following datas are saved when an exception occured (when the bot fail a command in an unexpected way) and are only visible by the owner, they are used for debug purpose and are automatically deleted after 30 days:<br/>
@@ -51,6 +52,13 @@ Data collected:
   - Command launched along with a full stacktrace (exact point in the code where the error occured)
   - Complete username of the user that launched the command along with the server/chanel name where it was launched
   - Date when the error occured
+  
+### I want you to send me/delete every datas you have about me
+#### About an user
+Contact Zirk#0001 on Discord
+
+#### About a guild
+Contact Zirk#0001 on Discord with the guild you want information about, along with the proofs that you are indeed it owner
 
 # How to use Sanara by cloning the repository
 
