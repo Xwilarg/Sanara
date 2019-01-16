@@ -22,6 +22,7 @@ I spent a lot of times working on her and I hope that her source code will be ab
 
 [BooruSharp](https://github.com/Xwilarg/BooruSharp)<br/>
 [Discord.Net](https://github.com/RogueException/Discord.Net)<br/>
+[Dynamic Expresso](https://github.com/davideicardi/DynamicExpresso/)<br/>
 [Google API DotNet](https://github.com/google/google-api-dotnet-client)<br/>
 [Opus, Sodium and FFmpeg](https://dsharpplus.emzi0767.com/natives/index.html)<br/>
 [Raven-csharp](https://github.com/getsentry/raven-csharp)<br/>

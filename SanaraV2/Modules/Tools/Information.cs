@@ -15,10 +15,10 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DynamicExpresso;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Web.UI;
 
 namespace SanaraV2.Modules.Tools
 {
@@ -40,14 +40,11 @@ namespace SanaraV2.Modules.Tools
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             else
             {
-                Eval eval = new Eval()
-                {
-                    Client = Program.p.client,
-                    Context = Context
-                };
-                await ReplyAsync("```" + Environment.NewLine +
-                    DataBinder.Eval(eval, string.Join(" ", args)).ToString() + Environment.NewLine +
-                    "```");
+                Interpreter interpreter = new Interpreter()
+                    .SetVariable("Context", Context)
+                    .SetVariable("p", Program.p)
+                    .EnableReflection();
+                await ReplyAsync(interpreter.Eval(string.Join(" ", args)).ToString());
             }
         }
 
