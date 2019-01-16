@@ -30,6 +30,7 @@ using SharpRaven;
 using SharpRaven.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -96,7 +97,8 @@ namespace SanaraV2
             db = new Db.Db();
             await db.InitAsync();
 
-            await InitDictionaries();
+            if (!Debugger.IsAttached) // We skip that when debugging because some dict take lot of time to init
+                await InitDictionaries();
 
             p = this;
             games = new List<GameModule.Game>();

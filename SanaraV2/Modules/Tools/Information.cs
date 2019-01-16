@@ -14,16 +14,42 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
-using SanaraV2.Modules.Base;
+using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.UI;
 
 namespace SanaraV2.Modules.Tools
 {
     public class Information : ModuleBase
     {
         Program p = Program.p;
+
+        private struct Eval
+        {
+            public DiscordSocketClient Client { set; get; }
+            public ICommandContext Context { set; get; }
+        }
+
+        [Command("Eval")]
+        public async Task EvalFct(params string[] args)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            if (Context.User.Id != Base.Sentences.ownerId && Context.User.Id != 241225897389064192)
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+            else
+            {
+                Eval eval = new Eval()
+                {
+                    Client = Program.p.client,
+                    Context = Context
+                };
+                await ReplyAsync("```" + Environment.NewLine +
+                    DataBinder.Eval(eval, string.Join(" ", args)).ToString() + Environment.NewLine +
+                    "```");
+            }
+        }
 
         [Command("Help"), Summary("Give the help"), Alias("Commands")]
         public async Task Help()
