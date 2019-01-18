@@ -38,6 +38,8 @@ namespace SanaraV2.Modules.Tools
         public static string QuoteNoMessage(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteNoMessage")); }
         public static string Enabled(ulong guildId) { return (Translation.GetTranslation(guildId, "enabled")); }
         public static string Disabled(ulong guildId) { return (Translation.GetTranslation(guildId, "disabled")); }
+        public static string EvalHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "evalHelp")); }
+        public static string EvalError(ulong guildId, string msg) { return (Translation.GetTranslation(guildId, "evalError", msg)); }
 
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }

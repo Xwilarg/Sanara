@@ -16,6 +16,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DynamicExpresso;
+using DynamicExpresso.Exceptions;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -36,15 +37,24 @@ namespace SanaraV2.Modules.Tools
         public async Task EvalFct(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
-            if (Context.User.Id != Base.Sentences.ownerId && Context.User.Id != 241225897389064192)
+            if (Context.User.Id != Base.Sentences.ownerId)
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+            else if (args.Length == 0)
+                await ReplyAsync(Sentences.EvalHelp(Context.Guild.Id));
             else
             {
                 Interpreter interpreter = new Interpreter()
                     .SetVariable("Context", Context)
                     .SetVariable("p", Program.p)
                     .EnableReflection();
-                await ReplyAsync(interpreter.Eval(string.Join(" ", args)).ToString());
+                try
+                {
+                    await ReplyAsync(interpreter.Eval(string.Join(" ", args)).ToString());
+                }
+                catch (Exception e)
+                {
+                    await ReplyAsync(Sentences.EvalError(Context.Guild.Id, e.Message));
+                }
             }
         }
 

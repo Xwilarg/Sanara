@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using System;
 using System.Linq;
 
 namespace SanaraV2.Modules.Base
@@ -27,12 +26,16 @@ namespace SanaraV2.Modules.Base
         public static string OnlyMasterStr(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(ownerId).ToString())); }
         public static string OnlyOwnerStr(ulong guildId, ulong guildOwnerId) { return (Translation.GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(guildOwnerId).ToString())); }
         public static string ChanIsNotNsfw(ulong guildId) { return (Translation.GetTranslation(guildId, "chanIsNotNsfw")); }
-        public static string TagsNotFound(string[] tags) // TODO: Support language
+        private static string TagNotFoundInternal(ulong guildId, string tag) { return Translation.GetTranslation(guildId, "tagNotFound", tag); }
+        private static string TagsNotFoundInternal(ulong guildId, string[] tags) {
+            string finalStr = string.Join(", ", tags.ToList().Take(tags.Length - 1).Select(x => "'" + x + "'"));
+            return Translation.GetTranslation(guildId, "tagsNotFound", finalStr, tags[tags.Length - 1]);
+        }
+        public static string TagsNotFound(ulong guildId, string[] tags)
         {
             if (tags.Length == 1)
-                return ("I didn't find anything with the tag '" + tags[0] + "'.");
-            string finalStr = String.Join(", ", tags.ToList().Take(tags.Length - 1).Select(x => "'" + x + "'"));
-            return ("I didn't find anything with the tag " + finalStr + " and '" + tags[tags.Length - 1] + "'.");
+                return (TagNotFoundInternal(guildId, tags[0]));
+            return (TagsNotFoundInternal(guildId, tags));
         }
         public static string NoCorrespondingGuild(ulong guildId) { return (Translation.GetTranslation(guildId, "noCorrespondingGuild")); }
         public static string DontPm(ulong guildId) { return (Translation.GetTranslation(guildId, "dontPm")); }

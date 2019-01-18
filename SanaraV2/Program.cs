@@ -17,7 +17,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
-using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
@@ -67,8 +66,6 @@ namespace SanaraV2
         public YouTubeService youtubeService;
 
         public List<RadioModule.RadioChannel> radios;
-
-        public UrlshortenerService service;
 
         public DateTime startTime;
 
@@ -263,19 +260,6 @@ namespace SanaraV2
             }
 
             radios = new List<RadioModule.RadioChannel>();
-
-            service = null;
-            if (File.Exists("Keys/URLShortenerAPIKey.dat"))
-            {
-                try {
-                    service = new UrlshortenerService(new BaseClientService.Initializer
-                    {
-                        ApiKey = File.ReadAllText("Keys/URLShortenerAPIKey.dat"),
-                    });
-                } catch (Exception e) {
-                    LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
-                }
-            }
 
             ravenClient = null;
             if (File.Exists("Keys/raven.dat"))

@@ -123,7 +123,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Booru.NotFound:
-                    await chan.SendMessageAsync(Base.Sentences.TagsNotFound(tags));
+                    await chan.SendMessageAsync(Base.Sentences.TagsNotFound(guildId, tags));
                     break;
 
                 case Features.NSFW.Error.Booru.None:

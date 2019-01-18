@@ -39,7 +39,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.NotFound:
-                    await ReplyAsync(Base.Sentences.TagsNotFound(keywords));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild.Id, keywords));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
