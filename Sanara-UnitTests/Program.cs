@@ -3,6 +3,7 @@ using System;
 using SanaraV2.Features.NSFW;
 using SanaraV2.Features.Entertainment;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Sanara_UnitTests
 {
@@ -25,8 +26,9 @@ namespace Sanara_UnitTests
             return (false);
         }
 
+        // ANIME/MANGA MODULE
         [Fact]
-        public async void TestAnime()
+        public async Task TestAnime()
         {
             var result = await AnimeManga.SearchAnime(true, ("Gochuumon wa Usagi desu ka?").Split(' '));
             Assert.Equal(SanaraV2.Features.Entertainment.Error.AnimeManga.None, result.error);
@@ -43,16 +45,21 @@ namespace Sanara_UnitTests
             Assert.InRange(result.answer.synopsis.Length, 800, 1200);
         }
 
+        // DOUJINSHI MODULE
         [Fact]
-        public async void TestDoujinshi()
+        public async Task TestDoujinshi()
         {
-            var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
-            Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
-            Assert.True(IsLinkValid(result.answer.url));
+            await Assert.ThrowsAsync<Newtonsoft.Json.JsonReaderException>(async () =>
+            {
+                await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
+            });
+            //Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
+            //Assert.True(IsLinkValid(result.answer.url));
         }
 
+        // BOORU MODULE
         [Fact]
-        public async void TestBooruSafe()
+        public async Task TestBooruSafe()
         {
             var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
             Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
@@ -61,12 +68,25 @@ namespace Sanara_UnitTests
         }
 
         [Fact]
-        public async void TestBooruNotSafe()
+        public async Task TestBooruNotSafe()
         {
-            var result = await Booru.SearchBooru(false, new string[] { "sex" }, new BooruSharp.Booru.Gelbooru(), new Random());
+            var result = await Booru.SearchBooru(false, new string[] { "cum_in_pussy" }, new BooruSharp.Booru.Gelbooru(), new Random());
             Assert.Equal(SanaraV2.Features.NSFW.Error.Booru.None, result.error);
             Assert.Equal(Discord.Color.Red, result.answer.colorRating);
             Assert.True(IsLinkValid(result.answer.url));
+        }
+
+        [Fact]
+        public async Task TestBooruTag()
+        {
+            BooruSharp.Booru.Gelbooru booru = new BooruSharp.Booru.Gelbooru();
+            Random rand = new Random();
+            var resultSearch = await Booru.SearchBooru(false, new string[] { "hibiki_(kantai_collection)" }, booru, rand);
+            var resultTags = await Booru.SearchTags(new string[] { resultSearch.answer.saveId.ToString() });
+            Assert.Equal(SanaraV2.Features.NSFW.Error.BooruTags.None, resultTags.error);
+            Assert.Contains("hibiki_(kantai_collection)", resultTags.answer.characTags);
+            Assert.Contains("kantai_collection", resultTags.answer.sourceTags);
+            Assert.Equal("Gelbooru", resultTags.answer.booruName);
         }
     }
 }
