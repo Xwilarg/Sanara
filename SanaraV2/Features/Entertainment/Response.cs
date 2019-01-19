@@ -53,6 +53,20 @@ namespace SanaraV2.Features.Entertainment
             public GameName gameName;
         }
 
+        public class Vn
+        {
+            public string originalTitle;
+            public string title;
+            public string imageUrl;
+            public string description;
+            public bool isAvailableEnglish;
+            public bool isAvailableWindows;
+            public uint rating;
+            public uint? releaseYear;
+            public uint? releaseMonth;
+            public uint? releaseDay;
+        }
+
         public enum GameName
         {
             Booru,
@@ -60,6 +74,15 @@ namespace SanaraV2.Features.Entertainment
             Anime,
             Shiritori,
             FireEmblem
+        }
+
+        public enum GameLength
+        {
+            VeryShort,
+            Short,
+            Medium,
+            Long,
+            VeryLong
         }
     }
 }
