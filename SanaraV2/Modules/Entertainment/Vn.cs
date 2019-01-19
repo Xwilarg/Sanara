@@ -17,14 +17,7 @@ using Discord.Commands;
 using SanaraV2.Features.Entertainment;
 using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using VndbSharp;
-using VndbSharp.Models;
-using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2.Modules.Entertainment
 {
