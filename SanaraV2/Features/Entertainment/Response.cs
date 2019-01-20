@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using System;
+using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2.Features.Entertainment
 {
@@ -65,6 +66,7 @@ namespace SanaraV2.Features.Entertainment
             public uint? releaseYear;
             public uint? releaseMonth;
             public uint? releaseDay;
+            public VisualNovelLength? length;
         }
 
         public enum GameName
@@ -74,15 +76,6 @@ namespace SanaraV2.Features.Entertainment
             Anime,
             Shiritori,
             FireEmblem
-        }
-
-        public enum GameLength
-        {
-            VeryShort,
-            Short,
-            Medium,
-            Long,
-            VeryLong
         }
     }
 }

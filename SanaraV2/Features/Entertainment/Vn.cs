@@ -75,7 +75,8 @@ namespace SanaraV2.Features.Entertainment
                 rating = vn.Rating,
                 releaseYear = vn.Released.Year,
                 releaseMonth = vn.Released.Month,
-                releaseDay = vn.Released.Day
+                releaseDay = vn.Released.Day,
+                length = vn.Length
             }, Error.Vn.None));
         }
     }

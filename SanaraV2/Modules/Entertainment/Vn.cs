@@ -18,6 +18,7 @@ using SanaraV2.Features.Entertainment;
 using SanaraV2.Modules.Base;
 using System;
 using System.Threading.Tasks;
+using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2.Modules.Entertainment
 {
@@ -30,7 +31,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Vn);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Vn);
-            var result = await Features.Entertainment.Vn.SearchVn(args, !((ITextChannel)Context.Channel).IsNsfw);
+            var result = await Vn.SearchVn(args, !((ITextChannel)Context.Channel).IsNsfw);
             switch (result.error)
             {
                 case Error.Vn.Help:
@@ -42,13 +43,39 @@ namespace SanaraV2.Modules.Entertainment
                     break;
 
                 case Error.Vn.None:
-                    await ReplyAsync("", false, new EmbedBuilder()
+                    EmbedBuilder embed = new EmbedBuilder()
                     {
                         Title = result.answer.originalTitle == null ? result.answer.title : result.answer.originalTitle + " (" + result.answer.title + ")",
                         ImageUrl = result.answer.imageUrl,
                         Description = result.answer.description,
                         Color = Color.Blue
-                    }.Build());
+                    };
+                    embed.AddField(Sentences.AvailableEnglish(Context.Guild.Id), result.answer.isAvailableEnglish ? Base.Sentences.YesStr(Context.Guild.Id) : Base.Sentences.NoStr(Context.Guild.Id), true);
+                    embed.AddField(Sentences.AvailableWindows(Context.Guild.Id), result.answer.isAvailableWindows ? Base.Sentences.YesStr(Context.Guild.Id) : Base.Sentences.NoStr(Context.Guild.Id), true);
+                    string length = Sentences.Unknown(Context.Guild.Id);
+                    switch (result.answer.length)
+                    {
+                        case VisualNovelLength.VeryShort: length = Sentences.Hours(Context.Guild.Id, "< 2 "); break;
+                        case VisualNovelLength.Short: length = Sentences.Hours(Context.Guild.Id, "2 - 10 "); break;
+                        case VisualNovelLength.Medium: length = Sentences.Hours(Context.Guild.Id, "10 - 30 "); break;
+                        case VisualNovelLength.Long: length = Sentences.Hours(Context.Guild.Id, "30 - 50 "); break;
+                        case VisualNovelLength.VeryLong: length = Sentences.Hours(Context.Guild.Id, "> 50 "); break;
+                    }
+                    embed.AddField(Sentences.Length(Context.Guild.Id), length, true);
+                    embed.AddField(Sentences.VndbRating(Context.Guild.Id), result.answer.rating + " / 10", true);
+                    string releaseDate;
+                    if (result.answer.releaseYear == null)
+                        releaseDate = Sentences.Tba(Context.Guild.Id);
+                    else
+                    {
+                        releaseDate = result.answer.releaseYear.ToString();
+                        if (result.answer.releaseMonth != null)
+                            releaseDate = Utilities.AddZero(result.answer.releaseMonth.ToString()) + "/" + releaseDate;
+                        if (result.answer.releaseDay != null)
+                            releaseDate = Utilities.AddZero(result.answer.releaseDay.ToString()) + "/" + releaseDate;
+                    }
+                    embed.AddField(Sentences.ReleaseDate(Context.Guild.Id), releaseDate, true);
+                    await ReplyAsync("", false, embed.Build());
                     break;
 
                 default:

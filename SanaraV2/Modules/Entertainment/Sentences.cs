@@ -81,10 +81,12 @@ namespace SanaraV2.Modules.Entertainment
         public static string VndbHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbHelp")); }
         public static string VndbNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbNotFound")); }
         public static string AvailableEnglish(ulong guildId) { return (Translation.GetTranslation(guildId, "availableEnglish")); }
-        public static string NotAvailableEnglish(ulong guildId) { return (Translation.GetTranslation(guildId, "notAvailableEnglish")); }
         public static string AvailableWindows(ulong guildId) { return (Translation.GetTranslation(guildId, "availableWindows")); }
-        public static string NotAvailableWindows(ulong guildId) { return (Translation.GetTranslation(guildId, "notAvailableWindows")); }
-        public static string VndbRating(ulong guildId, string score) { return (Translation.GetTranslation(guildId, "vndbRating", score)); }
+        public static string VndbRating(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbRating")); }
+        public static string Hours(ulong guildId, string length) { return (Translation.GetTranslation(guildId, "hours", length)); }
+        public static string Length(ulong guildId) { return (Translation.GetTranslation(guildId, "length")); }
+        public static string Tba(ulong guildId) { return (Translation.GetTranslation(guildId, "tba")); }
+        public static string ReleaseDate(ulong guildId) { return (Translation.GetTranslation(guildId, "releaseDate")); }
 
         /// --------------------------- XKCD ---------------------------
         public static string XkcdWrongArg(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdWrongArg")); }
