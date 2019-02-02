@@ -64,7 +64,6 @@ namespace SanaraV2.Features.Tools
                 link = json.list[0].permalink,
                 word = json.list[0].word
             }, Error.Urban.None));
-
         }
 
         public static async Task<FeatureRequest<Response.Translation, Error.Translation>> Translate(string[] args, TranslationClient translationClient,

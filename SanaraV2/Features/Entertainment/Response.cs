@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using System;
+using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2.Features.Entertainment
 {
@@ -51,6 +52,21 @@ namespace SanaraV2.Features.Entertainment
         {
             public bool isNormal;
             public GameName gameName;
+        }
+
+        public class Vn
+        {
+            public string originalTitle;
+            public string title;
+            public string imageUrl;
+            public string description;
+            public bool isAvailableEnglish;
+            public bool isAvailableWindows;
+            public uint rating;
+            public uint? releaseYear;
+            public uint? releaseMonth;
+            public uint? releaseDay;
+            public VisualNovelLength? length;
         }
 
         public enum GameName

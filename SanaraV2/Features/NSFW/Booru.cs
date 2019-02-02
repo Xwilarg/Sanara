@@ -104,7 +104,9 @@ namespace SanaraV2.Features.NSFW
                                 sources.Add(s);
                             break;
                     }
-                } catch (BooruSharp.Search.InvalidTags) { }
+                }
+                catch (BooruSharp.Search.InvalidTags)
+                { }
             }
             uint pgcd = PGCD((uint)elem.Item2.height, (uint)elem.Item2.width);
             return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(new Response.BooruTags()

@@ -27,6 +27,13 @@ namespace SanaraV2.Modules.Base
                 throw new NotAvailable();
         }
 
+        public static string AddZero(string nb)
+        {
+            if (nb.Length == 1)
+                return ("0" + nb);
+            return (nb);
+        }
+
         /// <summary>
         /// Every commands take a string[] in parameter so they can be called with any number of arguments.
         /// This function transform it to a string adding spaces between each elements of the array
