@@ -60,6 +60,8 @@ namespace SanaraV2
         public List<string> shiritoriDict { private set; get; }
         public List<Tuple<string, string, string>> fireEmblemDict { private set; get; }
 
+        public List<ulong> gamesTmp; // To be sure that two players don't start a game at the same time in the same chan
+
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
@@ -93,6 +95,8 @@ namespace SanaraV2
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
             await db.InitAsync();
+
+            gamesTmp = new List<ulong>();
 
             if (!Debugger.IsAttached) // We skip that when debugging because some dict take lot of time to init
                 await InitDictionaries();

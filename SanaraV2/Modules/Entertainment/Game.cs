@@ -535,6 +535,12 @@ namespace SanaraV2.Modules.Entertainment
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            if (Program.p.gamesTmp.Contains(Context.Channel.Id))
+            {
+                await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
+                return;
+            }
+            Program.p.gamesTmp.Add(Context.Channel.Id);
             var result = await Features.Entertainment.Game.Play(gameName, ((ITextChannel)Context.Channel).IsNsfw, Context.Channel.Id, p.games);
             switch (result.error)
             {
@@ -597,6 +603,7 @@ namespace SanaraV2.Modules.Entertainment
                 default:
                     throw new NotImplementedException();
             }
+            Program.p.gamesTmp.Remove(Context.Channel.Id);
         }
     }
 }
