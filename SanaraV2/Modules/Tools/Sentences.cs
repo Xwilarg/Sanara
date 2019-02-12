@@ -119,7 +119,7 @@ namespace SanaraV2.Modules.Tools
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic))
-                embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"),Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleUrban")
+                embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"),Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
                  + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("")));
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"), Base.Sentences.NotAvailable(guildId));
