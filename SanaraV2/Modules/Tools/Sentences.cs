@@ -101,7 +101,7 @@ namespace SanaraV2.Modules.Tools
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
-                embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFireEmblem")
+                embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")// + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFireEmblem")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
                 + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote"));
             else if (isOwner)

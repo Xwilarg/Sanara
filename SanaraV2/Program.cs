@@ -217,7 +217,7 @@ namespace SanaraV2
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "KanColle dictionary was succesfully loaded"));
             });
 
-            Task taskDict5 = Task.Run(async () =>
+           /* Task taskDict5 = Task.Run(async () =>
             {
                 fireEmblemDict = await Features.Entertainment.Game.LoadFireEmblem();
                 if (fireEmblemDict == null || fireEmblemDict.Count == 0)
@@ -227,13 +227,13 @@ namespace SanaraV2
                 }
                 else
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Fire Emblem dictionary was succesfully loaded"));
-            });
+            });*/
 
             await taskDict1;
             await taskDict2;
             await taskDict3;
             await taskDict4;
-            await taskDict5;
+            //await taskDict5;
         }
 
         private void InitServices()

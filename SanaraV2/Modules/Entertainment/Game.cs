@@ -499,6 +499,8 @@ namespace SanaraV2.Modules.Entertainment
             {
                 m_characters = Program.p.fireEmblemDict;
                 m_toGuess = null;
+                if (m_characters == null)
+                    throw new NullReferenceException("Dictionary not available.");
             }
 
             public override string[] GetPost()
