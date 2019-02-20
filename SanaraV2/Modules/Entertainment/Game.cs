@@ -41,7 +41,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName, bool isEasy)
             {
-                m_chan = chan;
+                m_chan = (ITextChannel)chan;
                 m_didLost = false;
                 m_refTime = refTime * ((isEasy) ? (2) : (1));
                 m_time = DateTime.Now;
@@ -138,10 +138,11 @@ namespace SanaraV2.Modules.Entertainment
             public abstract string GetCheckCorrect(string userWord, out bool sayCorrect);
             public abstract void Loose();
 
-            public IMessageChannel m_chan { private set; get; }
+            public ITextChannel m_chan { private set; get; }
             protected IGuild m_guild { private set; get; }
             public bool m_didLost { protected set; get; }
             private readonly int m_refTime;
+            public int GetRefTime() { return (m_refTime); }
             protected DateTime m_time { set; get; }
 
             protected int m_nbAttempt;
@@ -532,6 +533,19 @@ namespace SanaraV2.Modules.Entertainment
             private List<Tuple<string, string, string>> m_characters; // Name, Url, Source
         }
 
+        [Command("Cancel")]
+        public async Task Reset(params string[] args)
+        {
+            Game game = Program.p.games.Find(x => x.m_chan.GuildId == Context.Guild.Id);
+            if (game == null)
+                await ReplyAsync(Sentences.ResetNone(Context.Guild.Id));
+            else
+            {
+                Program.p.games.Remove(game);
+                await ReplyAsync(Sentences.ResetDone(Context.Guild.Id));
+            }
+        }
+
         [Command("Play", RunMode = RunMode.Async), Summary("Launch a game")]
         public async Task PlayShiritori(params string[] gameName)
         {
@@ -571,27 +585,37 @@ namespace SanaraV2.Modules.Entertainment
                         if (result.answer.gameName == Features.Entertainment.Response.GameName.Anime)
                         {
                             g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id));
+                            await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
                         }
                         else if (result.answer.gameName == Features.Entertainment.Response.GameName.Booru)
                         {
                             g = new BooruGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id));
+                            await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
                         }
                         else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
                         {
                             g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id));
+                            await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
                         }
                         else if (result.answer.gameName == Features.Entertainment.Response.GameName.Kancolle)
                         {
                             g = new Kancolle(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id));
+                            await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
                         }
                         else if (result.answer.gameName == Features.Entertainment.Response.GameName.Shiritori)
                         {
                             g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id));
+                            await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
                         }
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", gameName[0].ToLower()) });
