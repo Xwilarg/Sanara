@@ -113,11 +113,15 @@ namespace SanaraV2.Features.Entertainment
             List<string> tags = new List<string>();
             string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");
             foreach (string line in allLines)
-                tags.Add(line.Split(' ')[0]);
+            {
+                string[] parts = line.Split(' ');
+                if (int.Parse(parts[1]) > 10)
+                    tags.Add(line.Split(' ')[0]);
+            }
             return (tags);
         }
 
-        public static async Task<List<Tuple<string, string, string>>> LoadFireEmblem()
+        public static async Task<List<Tuple<string, string, string>>> LoadFireEmblem() // Not working
         {
             List<Tuple<string, string, string>> characters = new List<Tuple<string, string, string>>();
             using (HttpClient hc = new HttpClient())

@@ -67,7 +67,7 @@ namespace SanaraV2
 
         public YouTubeService youtubeService;
 
-        public List<RadioModule.RadioChannel> radios;
+        public List<RadioChannel> radios;
 
         public DateTime startTime;
 
