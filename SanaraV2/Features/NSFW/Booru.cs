@@ -71,7 +71,7 @@ namespace SanaraV2.Features.NSFW
             if (!tagInfos.ContainsKey(id))
                 return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.NotFound));
             var elem = tagInfos[id];
-            BooruSharp.Booru.Booru b = (BooruSharp.Booru.Booru)Activator.CreateInstance(elem.Item1);
+            BooruSharp.Booru.Booru b = (BooruSharp.Booru.Booru)Activator.CreateInstance(elem.Item1, (BooruSharp.Booru.BooruAuth)null);
             List<string> artists = new List<string>();
             List<string> sources = new List<string>();
             List<string> characs = new List<string>();
