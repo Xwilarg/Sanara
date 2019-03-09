@@ -77,18 +77,21 @@ namespace SanaraV2.Modules.Entertainment
         private Embed CreateEmbed(bool isAnime, Response.AnimeManga res, ulong guildId)
         {
             string orStr = Base.Sentences.OrStr(guildId);
-            return (new EmbedBuilder
+            EmbedBuilder embed = new EmbedBuilder()
             {
-                Title = res.name,
+                Title = res.name + ((res.alternativeTitles != null) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")")),
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
-                Description = ((res.alternativeTitles != null) ? (char.ToUpper(orStr[0]) + orStr.Substring(1) + " " + string.Join(", ", res.alternativeTitles)
-                 + Environment.NewLine + Environment.NewLine) : ("")) + ((isAnime && res.episodeCount != null) ? (Sentences.AnimeEpisodes(guildId, res.episodeCount.Value) + ((res.episodeLength != null) ? (" " + Sentences.AnimeLength(guildId, res.episodeLength.Value)) : ("")) + Environment.NewLine) : (""))
-                 + ((res.rating != null) ? (Sentences.AnimeRating(guildId, res.rating.Value) + Environment.NewLine) : (""))
-                 + ((res.startDate != null) ? Sentences.AnimeDate(guildId, res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)), ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId)))) : (Sentences.ToBeAnnounced(guildId))) + Environment.NewLine
-                 + ((string.IsNullOrEmpty(res.ageRating)) ? ("") : (Sentences.AnimeAudiance(guildId, res.ageRating)))
-                 + Environment.NewLine + Environment.NewLine + res.synopsis
-            }.Build());
+                Description = res.synopsis
+            };
+            if (isAnime && res.episodeCount != null)
+                embed.AddField(Sentences.AnimeEpisodes(Context.Guild.Id), res.episodeCount.Value + ((res.episodeLength != null) ? (" " + Sentences.AnimeLength(guildId, res.episodeLength.Value)) : ("")), true);
+            if (res.rating != null)
+                embed.AddField(Sentences.AnimeRating(Context.Guild.Id), res.rating.Value, true);
+            embed.AddField(Sentences.ReleaseDate(Context.Guild.Id), ((res.startDate != null) ? res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)) + " - " + ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId))) : (Sentences.ToBeAnnounced(guildId))), true);
+            if (!string.IsNullOrEmpty(res.ageRating))
+                embed.AddField(Sentences.AnimeAudiance(Context.Guild.Id), res.ageRating, true);
+            return (embed.Build());
         }
     }
 }

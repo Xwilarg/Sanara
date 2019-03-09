@@ -60,11 +60,10 @@ namespace SanaraV2.Modules.Entertainment
         public static string AnimeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "animeHelp")); }
         public static string MangaNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaNotFound")); }
         public static string AnimeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotFound")); }
-        public static string AnimeEpisodes(ulong guildId, int episodes) { return (Translation.GetTranslation(guildId, "animeEpisodes",  episodes.ToString())); }
+        public static string AnimeEpisodes(ulong guildId) { return (Translation.GetTranslation(guildId, "animeEpisodes")); }
         public static string AnimeLength(ulong guildId, int length) { return (Translation.GetTranslation(guildId, "animeLength", length.ToString())); }
-        public static string AnimeDate(ulong guildId, string start, string end) { return (Translation.GetTranslation(guildId, "animeDate", start, end)); }
-        public static string AnimeRating(ulong guildId, float rating) { return (Translation.GetTranslation(guildId, "animeRating", rating.ToString())); }
-        public static string AnimeAudiance(ulong guildId, string audiance) { return (Translation.GetTranslation(guildId, "animeAudiance", audiance)); }
+        public static string AnimeRating(ulong guildId) { return (Translation.GetTranslation(guildId, "animeRating")); }
+        public static string AnimeAudiance(ulong guildId) { return (Translation.GetTranslation(guildId, "animeAudiance")); }
         public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
         public static string Unknown(ulong guildId) { return (Translation.GetTranslation(guildId, "unknown")); }
 
