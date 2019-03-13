@@ -46,7 +46,33 @@ namespace SanaraV2.Features.NSFW
             }
             catch (BooruSharp.Search.InvalidTags)
             {
-                return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
+                List<string> newTags = new List<string>();
+                foreach (string s in tags)
+                {
+                    string tag = s;
+                    if ((await booru.GetNbImage(s)) == 0)
+                    {
+                        var related = await booru.GetTags(s);
+                        tag = null;
+                        foreach (var rTag in related)
+                            if ((await booru.GetNbImage(rTag.name)) > 0)
+                            {
+                                tag = rTag.name;
+                                break;
+                            }
+                        if (tag == null)
+                            return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
+                    }
+                    newTags.Add(tag);
+                }
+                try
+                {
+                    res = await booru.GetRandomImage(newTags.ToArray());
+                }
+                catch (BooruSharp.Search.InvalidTags)
+                {
+                    return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
+                }
             }
             Error.Booru error = Error.Booru.None;
             string url = res.fileUrl.AbsoluteUri;
