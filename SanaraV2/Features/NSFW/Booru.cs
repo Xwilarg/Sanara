@@ -52,7 +52,7 @@ namespace SanaraV2.Features.NSFW
                     string tag = s;
                     if ((await booru.GetNbImage(s)) == 0)
                     {
-                        var related = await booru.GetTags(s);
+                        var related = await new BooruSharp.Booru.Konachan().GetTags(s);
                         tag = null;
                         foreach (var rTag in related)
                             if ((await booru.GetNbImage(rTag.name)) > 0)
