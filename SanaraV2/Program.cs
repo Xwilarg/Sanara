@@ -80,7 +80,7 @@ namespace SanaraV2
 
         public Db.Db db;
 
-        private Program()
+        public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -90,7 +90,7 @@ namespace SanaraV2
             commands.Log += LogError;
         }
 
-        private async Task MainAsync()
+        public async Task MainAsync(string botToken = null) // botToken is used for unit tests
         {
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
@@ -133,7 +133,7 @@ namespace SanaraV2
             client.Disconnected += Disconnected;
             client.UserVoiceStateUpdated += VoiceUpdate;
 
-            await client.LoginAsync(TokenType.Bot, File.ReadAllText("Keys/token.dat"));
+            await client.LoginAsync(TokenType.Bot, (botToken == null) ? File.ReadAllText("Keys/token.dat") : botToken);
             startTime = DateTime.Now;
             await client.StartAsync();
 
@@ -148,7 +148,8 @@ namespace SanaraV2
                     }
                 });
             }
-            await Task.Delay(-1);
+            if (botToken == null) // Unit test manage the bot life
+                await Task.Delay(-1);
         }
 
         private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)

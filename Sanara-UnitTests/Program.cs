@@ -26,6 +26,14 @@ namespace Sanara_UnitTests
             return (false);
         }
 
+        // GENERAL
+        [Fact]
+        public async Task TestGeneral()
+        {
+            SanaraV2.Program p = new SanaraV2.Program();
+            await p.MainAsync(Environment.GetEnvironmentVariable("BOT_TOKEN"));
+        }
+
         // ANIME/MANGA MODULE
         [Fact]
         public async Task TestAnime()
@@ -46,7 +54,7 @@ namespace Sanara_UnitTests
         }
 
         // DOUJINSHI MODULE
-        [Fact]
+        /*[Fact]
         public async Task TestDoujinshi()
         {
             await Assert.ThrowsAsync<Newtonsoft.Json.JsonReaderException>(async () =>
@@ -55,7 +63,7 @@ namespace Sanara_UnitTests
             });
             //Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
             //Assert.True(IsLinkValid(result.answer.url));
-        }
+        }*/
 
         // BOORU MODULE
         [Fact]
