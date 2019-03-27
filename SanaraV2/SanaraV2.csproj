@@ -68,8 +68,8 @@
     <Reference Include="DynamicExpresso.Core, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicExpresso.Core.2.3.1\lib\net461\DynamicExpresso.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Api.CommonProtos, Version=1.5.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Api.CommonProtos.1.5.0\lib\net45\Google.Api.CommonProtos.dll</HintPath>
+    <Reference Include="Google.Api.CommonProtos, Version=1.6.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Api.CommonProtos.1.6.0\lib\net45\Google.Api.CommonProtos.dll</HintPath>
     </Reference>
     <Reference Include="Google.Api.Gax, Version=2.6.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Api.Gax.2.6.0\lib\net45\Google.Api.Gax.dll</HintPath>
@@ -95,8 +95,8 @@
     <Reference Include="Google.Apis.PlatformServices, Version=1.38.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.38.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Apis.Storage.v1, Version=1.38.0.1505, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Storage.v1.1.38.0.1505\lib\net45\Google.Apis.Storage.v1.dll</HintPath>
+    <Reference Include="Google.Apis.Storage.v1, Version=1.38.0.1517, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Storage.v1.1.38.0.1517\lib\net45\Google.Apis.Storage.v1.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.Translate.v2, Version=1.38.0.875, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.Translate.v2.1.38.0.875\lib\net45\Google.Apis.Translate.v2.dll</HintPath>
@@ -116,8 +116,8 @@
     <Reference Include="Google.LongRunning, Version=1.1.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.LongRunning.1.1.0\lib\net45\Google.LongRunning.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf, Version=3.6.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.6.1\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.7.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.7.0\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Grpc.Auth, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
       <HintPath>..\packages\Grpc.Auth.1.19.0\lib\net45\Grpc.Auth.dll</HintPath>
@@ -235,7 +235,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Validation.2.4.18\lib\net45\Validation.dll</HintPath>
+      <HintPath>..\packages\Validation.2.4.22\lib\net45\Validation.dll</HintPath>
     </Reference>
     <Reference Include="VndbSharp">
       <HintPath>..\SanaraV2\VndbSharp.dll</HintPath>
