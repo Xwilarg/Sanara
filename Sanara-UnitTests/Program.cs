@@ -54,16 +54,13 @@ namespace Sanara_UnitTests
         }
 
         // DOUJINSHI MODULE
-        /*[Fact]
+        [Fact]
         public async Task TestDoujinshi()
         {
-            await Assert.ThrowsAsync<Newtonsoft.Json.JsonReaderException>(async () =>
-            {
-                await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
-            });
-            //Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
-            //Assert.True(IsLinkValid(result.answer.url));
-        }*/
+           var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
+            Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
+            Assert.True(IsLinkValid(result.answer.url));
+        }
 
         // BOORU MODULE
         [Fact]
