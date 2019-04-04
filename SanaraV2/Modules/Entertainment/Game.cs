@@ -74,37 +74,47 @@ namespace SanaraV2.Modules.Entertainment
             {
                 m_time = DateTime.MinValue;
                 {
+                    bool isImage = IsPostImage();
                     foreach (string msg in GetPost())
                     {
-                        try
+                        if (!isImage)
+                            await m_chan.SendMessageAsync(msg);
+                        else
                         {
-                            using (HttpClient hc = new HttpClient())
+                            try
                             {
-                                Stream s = await hc.GetStreamAsync(msg);
-                                Stream s2 = await hc.GetStreamAsync(msg); // We create a new Stream because the first one is altered.
-                                using (MemoryStream ms = new MemoryStream())
+                                using (HttpClient hc = new HttpClient())
                                 {
-                                    await s.CopyToAsync(ms);
-                                    if (ms.ToArray().Length < 8000000)
-                                        await m_chan.SendFileAsync(s2, "Sanara-image." + msg.Split('.').Last());
-                                    else
-                                        await m_chan.SendMessageAsync(msg);
+                                    Stream s = await hc.GetStreamAsync(msg);
+                                    Stream s2 = await hc.GetStreamAsync(msg); // We create a new Stream because the first one is altered.
+                                    using (MemoryStream ms = new MemoryStream())
+                                    {
+                                        await s.CopyToAsync(ms);
+                                        if (ms.ToArray().Length < 8000000)
+                                            await m_chan.SendFileAsync(s2, "Sanara-image." + msg.Split('.').Last());
+                                        else
+                                            await m_chan.SendMessageAsync(msg);
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            string exceptionMsg = (counter < 2) ? Sentences.ExceptionGame(m_guild.Id, msg) : Sentences.ExceptionGameStop(m_guild.Id);
-                            await m_chan.SendMessageAsync("", false, new EmbedBuilder()
+                            catch (Exception e)
                             {
-                                Color = Color.Red,
-                                Title = e.GetType().ToString(),
-                                Description = exceptionMsg
-                            }.Build());
-                            if (counter < 2)
-                            {
-                                await Post(counter + 1);
-                                return;
+                                string exceptionMsg = (counter < 2) ? Sentences.ExceptionGame(m_guild.Id, msg) : Sentences.ExceptionGameStop(m_guild.Id);
+                                await m_chan.SendMessageAsync("", false, new EmbedBuilder()
+                                {
+                                    Color = Color.Red,
+                                    Title = e.GetType().ToString(),
+                                    Description = exceptionMsg,
+                                    Footer = new EmbedFooterBuilder()
+                                    {
+                                        Text = e.Message
+                                    }
+                                }.Build());
+                                if (counter < 2)
+                                {
+                                    await Post(counter + 1);
+                                    return;
+                                }
                             }
                         }
                     }
@@ -112,6 +122,7 @@ namespace SanaraV2.Modules.Entertainment
                 }
             }
             public abstract string[] GetPost();
+            public abstract bool IsPostImage();
 
             public async Task CheckCorrect(string userWord, IUser user)
             {
@@ -161,6 +172,9 @@ namespace SanaraV2.Modules.Entertainment
                     throw new NullReferenceException("Dictionary not available.");
                 m_alreadySaid = new List<string>();
             }
+
+            public override bool IsPostImage()
+                => false;
 
             public override string[] GetPost()
             {
@@ -289,6 +303,9 @@ namespace SanaraV2.Modules.Entertainment
                 m_idImage = "-1";
             }
 
+            public override bool IsPostImage()
+                => true;
+
             public override string[] GetPost() // TODO: sometimes post wrong images
             {
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
@@ -388,6 +405,9 @@ namespace SanaraV2.Modules.Entertainment
                 m_booru = new Gelbooru();
             }
 
+            public override bool IsPostImage()
+                => true;
+
             public override string[] GetPost()
             {
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
@@ -458,6 +478,9 @@ namespace SanaraV2.Modules.Entertainment
                 return (result.answer.url);
             }
 
+            public override bool IsPostImage()
+                => true;
+
             public override string[] GetPost()
             {
                 string tag;
@@ -494,7 +517,7 @@ namespace SanaraV2.Modules.Entertainment
             private Sakugabooru m_booru;
         }
 
-        public class FireEmblem : Game
+        public class FireEmblem : Game // TODO: Dictionary isn't working
         {
             public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, fireEmblemTimer, "fireemblem", isEasy)
             {
@@ -510,6 +533,9 @@ namespace SanaraV2.Modules.Entertainment
                 m_toGuess = res.Item1;
                 return (new string[] { res.Item2 });
             }
+
+            public override bool IsPostImage()
+                => true;
 
             public override string GetCheckCorrect(string userWord, out bool sayCorrect)
             {

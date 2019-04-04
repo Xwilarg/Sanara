@@ -98,8 +98,8 @@ namespace SanaraV2
 
             gamesTmp = new List<ulong>();
 
-            if (!Debugger.IsAttached) // We skip that when debugging because some dict take lot of time to init
-                await InitDictionaries();
+            //if (!Debugger.IsAttached) // We skip that when debugging because some dict take lot of time to init
+            await InitDictionaries();
 
             p = this;
             games = new List<GameModule.Game>();
