@@ -319,12 +319,11 @@ namespace SanaraV2.Modules.Entertainment
                     m_idImage = code;
                     url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + m_toGuess + "/Gallery&limit=1";
                     json = w.DownloadString(url);
-                    code = Utilities.GetElementXml("\"id\":", json, ',');
-                    url = "http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + code;
-                    json = w.DownloadString(url);
-                    string image = Utilities.GetElementXml("\"thumbnail\":\"", json, '"');
-                    image = image.Split(new string[] { "/revision" }, StringSplitOptions.None)[0].Replace("\\", "");
-                    return (new string[] { image });
+                    code = Utilities.GetElementXml("\"title\":\"", json, '"').Replace("\\", "");
+                    string html;
+                    using (HttpClient hc = new HttpClient())
+                        html = hc.GetStringAsync("https://kancolle.fandom.com/wiki/" + code).GetAwaiter().GetResult();
+                    return (new string[] { html.Split(new string[] { "img src=\"" }, StringSplitOptions.None)[2].Split('"')[0].Split(new string[] { "/revision" }, StringSplitOptions.None)[0] });
                 }
             }
 
