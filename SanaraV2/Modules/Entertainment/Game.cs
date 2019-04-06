@@ -176,6 +176,16 @@ namespace SanaraV2.Modules.Entertainment
             public override bool IsPostImage()
                 => false;
 
+            private string GetLastCharacter(string word)
+            {
+                char lastChar = word.Last();
+                if (lastChar == 'ゃ' || lastChar == 'ぃ' || lastChar == 'ゅ'
+                    || lastChar == 'ぇ' || lastChar == 'ょ')
+                    return (word.Substring(word.Length - 2, 2));
+                return (lastChar.ToString());
+            }
+
+
             public override string[] GetPost()
             {
                 if (m_currWord == null)
@@ -185,7 +195,8 @@ namespace SanaraV2.Modules.Entertainment
                     m_alreadySaid.Add(m_currWord);
                     return (new string[] { "しりとり (shiritori)" });
                 }
-                string[] corrWords = m_words.Where(x => x[0] == m_currWord[m_currWord.Length - 1]).ToArray();
+                string last = GetLastCharacter(m_currWord);
+                string[] corrWords = m_words.Where(x => x.StartsWith(last)).ToArray();
                 if (corrWords.Length == 0)
                     return (new string[] { Sentences.ShiritoriNoWord(m_guild.Id) }); // TODO what happen then
                 string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
@@ -242,10 +253,10 @@ namespace SanaraV2.Modules.Entertainment
                     m_time = DateTime.Now;
                     return (Sentences.ShiritoriNotNoun(m_guild.Id));
                 }
-                if (userWord[0] != HiraganaToUpper(m_currWord[m_currWord.Length - 1]))
+                if (userWord.EndsWith(GetLastCharacter(m_currWord)))
                 {
                     m_time = DateTime.Now;
-                    return (Sentences.ShiritoriMustBegin(m_guild.Id, HiraganaToUpper(m_currWord[m_currWord.Length - 1]).ToString(), Features.Tools.Linguist.ToRomaji(m_currWord[m_currWord.Length - 1].ToString())));
+                    return (Sentences.ShiritoriMustBegin(m_guild.Id, GetLastCharacter(m_currWord), Features.Tools.Linguist.ToRomaji(m_currWord[m_currWord.Length - 1].ToString())));
                 }
                 if (m_alreadySaid.Contains(userWord))
                 {
@@ -263,20 +274,10 @@ namespace SanaraV2.Modules.Entertainment
                 return (null);
             }
 
-            private char HiraganaToUpper(char current)
-            {
-                if (current == 'ゃ') return ('や');
-                if (current == 'ぃ') return ('い');
-                if (current == 'ゅ') return ('ゆ');
-                if (current == 'ぇ') return ('え');
-                if (current == 'ょ') return ('よ');
-                return (current);
-            }
-
             public override async void Loose()
             {
                 string finalStr = Sentences.LostStr(m_guild.Id) + Environment.NewLine;
-                string[] corrWords = m_words.Where(x => x[0] == HiraganaToUpper(m_currWord[m_currWord.Length - 1])).ToArray();
+                string[] corrWords = m_words.Where(x => x.StartsWith(GetLastCharacter(m_currWord))).ToArray();
                 if (corrWords.Length == 0)
                     finalStr += Sentences.ShiritoriNoMoreWord(m_guild.Id) + Environment.NewLine;
                 else
