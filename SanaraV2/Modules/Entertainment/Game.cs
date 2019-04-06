@@ -583,7 +583,7 @@ namespace SanaraV2.Modules.Entertainment
                     string finalStr = "";
                     foreach (var elem in allScores)
                     {
-                        finalStr = "**" + elem.Value.Item2() + "**:" + Environment.NewLine
+                        finalStr += "**" + elem.Value.Item2() + "**:" + Environment.NewLine
                             + Sentences.ScoreText(Context.Guild.Id, elem.Value.Item1.myRanking, elem.Value.Item1.rankedNumber, elem.Value.Item1.myScore) + Environment.NewLine
                             + Sentences.ScoreContributors(Context.Guild.Id) + " " + string.Join(", ", elem.Value.Item1.contributors) + Environment.NewLine + Environment.NewLine;
                     }
