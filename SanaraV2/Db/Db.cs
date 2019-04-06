@@ -150,6 +150,23 @@ namespace SanaraV2.Db
             return (new Tuple<Comparaison, int>(cmp, currScore.Value));
         }
 
+        public async Task<Dictionary<string, Dictionary<string, string>>> GetAllScores()
+        {
+            Dictionary<string, Dictionary<string, string>> allScores = new Dictionary<string, Dictionary<string, string>>();
+            var json = await R.Db(dbName).Table("Guilds").RunAsync(conn);
+            foreach (var elem in json)
+            {
+                Dictionary<string, string> currDict = new Dictionary<string, string>();
+                if (elem.shiritori != null) currDict.Add("shiritori", elem.shiritori.ToString());
+                if (elem.anime != null) currDict.Add("anime", elem.anime.ToString());
+                if (elem.booru != null) currDict.Add("booru", elem.booru.ToString());
+                if (elem.kancolle != null) currDict.Add("kancolle", elem.kancolle.ToString());
+                if (currDict.Count > 0)
+                    allScores.Add(elem.id.ToString(), currDict);
+            }
+            return (allScores);
+        }
+
         private RethinkDB R;
         private Connection conn;
         private string dbName;

@@ -558,9 +558,48 @@ namespace SanaraV2.Modules.Entertainment
             private List<Tuple<string, string, string>> m_characters; // Name, Url, Source
         }
 
+        [Command("Score")]
+        public async Task Score(params string[] args)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            var result = await Features.Entertainment.Game.Score(Program.p.db, Context.Guild.Id, await Context.Guild.GetUsersAsync());
+            switch (result.error)
+            {
+                case Features.Entertainment.Error.Score.NoScore:
+                    await ReplyAsync("No score");
+                    break;
+
+                case Features.Entertainment.Error.Score.None:
+                    Dictionary<string, Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>> allScores = new Dictionary<string, Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>>();
+                    if (result.answer.anime != null)
+                        allScores.Add("anime", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.anime, () => { return (Sentences.AnimeGame(Context.Guild.Id)); }));
+                    if (result.answer.kancolle != null)
+                        allScores.Add("kancolle", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.kancolle, () => { return (Sentences.KancolleGame(Context.Guild.Id)); }));
+                    if (result.answer.shiritori != null)
+                        allScores.Add("shiritori", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.shiritori, () => { return (Sentences.ShiritoriGame(Context.Guild.Id)); }));
+                    if (result.answer.booru != null)
+                        allScores.Add("booru", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.booru, () => { return (Sentences.BooruGame(Context.Guild.Id)); }));
+                    string finalStr = "";
+                    foreach (var elem in allScores)
+                    {
+                        finalStr = "**" + elem.Value.Item2() + "**:" + Environment.NewLine
+                            + Sentences.ScoreText(Context.Guild.Id, elem.Value.Item1.myRanking, elem.Value.Item1.rankedNumber, elem.Value.Item1.myScore) + Environment.NewLine
+                            + Sentences.ScoreContributors(Context.Guild.Id) + " " + string.Join(", ", elem.Value.Item1.contributors) + Environment.NewLine + Environment.NewLine;
+                    }
+                    await ReplyAsync(finalStr);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("Cancel")]
         public async Task Reset(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             Game game = Program.p.games.Find(x => x.m_chan.GuildId == Context.Guild.Id);
             if (game == null)
                 await ReplyAsync(Sentences.ResetNone(Context.Guild.Id));

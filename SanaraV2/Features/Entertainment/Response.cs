@@ -19,6 +19,18 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Response
     {
+        public class Score
+        {
+            public class ScoreItem
+            {
+                public int myScore;
+                public int myRanking;
+                public int rankedNumber;
+                public string[] contributors;
+            }
+            public ScoreItem anime, kancolle, shiritori, booru;
+        }
+
         public class AnimeManga
         {
             public string name;

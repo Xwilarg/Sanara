@@ -103,7 +103,7 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
                 embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")// + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFireEmblem")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
-                + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote"));
+                + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote"));
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Image))

@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,40 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Game
     {
+        public static async Task<FeatureRequest<Response.Score, Error.Score>> Score(Db.Db db, ulong guildId, IReadOnlyCollection<IGuildUser> users)
+        {
+            var res = await db.GetAllScores();
+            var me = res[guildId.ToString()];
+            if (me == null)
+                return (new FeatureRequest<Response.Score, Error.Score>(null, Error.Score.NoScore));
+            string[] games = new string[] { "shiritori", "anime", "booru", "kancolle" };
+            Response.Score.ScoreItem shiritori = null, anime = null, booru = null, kancolle = null;
+            int i = -1;
+            foreach (var elem in games)
+            {
+                i++;
+                if (!me.ContainsKey(elem))
+                    continue;
+                string[] myElems = me[elem].Split('|');
+                Response.Score.ScoreItem item = new Score.ScoreItem();
+                item.myScore = int.Parse(myElems[0]);
+                item.contributors = myElems.Skip(1).Select(x => users.Where(y => y.Id.ToString() == x).ElementAt(0).ToString()).ToArray();
+                item.rankedNumber = res.Where(x => x.Value[elem] != null).Count();
+                item.myRanking = res.Where(x => x.Value[elem] != null && int.Parse(x.Value[elem].Split('|')[0]) > item.myScore).Count() + 1;
+                if (i == 0) shiritori = item;
+                else if (i == 1) anime = item;
+                else if (i == 2) booru = item;
+                else if (i == 3) kancolle = item;
+            }
+            return (new FeatureRequest<Response.Score, Error.Score>(new Response.Score()
+            {
+                anime = anime,
+                booru = booru,
+                kancolle = kancolle,
+                shiritori = shiritori
+            }, Error.Score.None));
+        }
+
         public static async Task<FeatureRequest<Response.Game, Error.Game>> Play(string[] args, bool isChanNsfw, ulong chanId, List<Modules.Entertainment.GameModule.Game> games)
         {
             if (games.Any(x => x.m_chan.Id == chanId))
