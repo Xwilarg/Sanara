@@ -60,17 +60,27 @@ namespace SanaraV2.Features.GamesInfo
                     tmp = tmp.Replace(match.Value, match.Groups[1].Value);
                 foreach (Match match in Regex.Matches(tmp, "\\[https?:\\/\\/[^ ]+ ([^\\]]+)\\]"))
                     tmp = tmp.Replace(match.Value, match.Groups[1].Value);
-                tmp = Regex.Replace(tmp, "\\[https?:\\/\\/[^\\]]+\\]", "").Replace(" * ", "\\*").Replace("[", "").Replace("]", "");
-                string newTmp = "";
+                tmp = Regex.Replace(tmp, "\\[https?:\\/\\/[^\\]]+\\]", "").Replace("*", "\\*").Replace("[", "").Replace("]", "");
+                string newTmp = "", lastTmp = "";
                 while (tmp.Length > 1024)
                 {
                     string[] tmp2 = tmp.Split('\n');
                     tmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
                     newTmp += tmp2[tmp2.Length - 1] + "\n";
                 }
+                while (newTmp.Length > 1024)
+                {
+                    string[] tmp2 = newTmp.Split('\n');
+                    newTmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
+                    lastTmp += tmp2[tmp2.Length - 1] + "\n";
+                }
                 allCats.Add(new Tuple<string, string>(title.Trim('\''), tmp));
                 if (newTmp != "")
+                {
                     allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 2)", newTmp));
+                    if (lastTmp != "")
+                        allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 3)", lastTmp));
+                }
             }
             return (new FeatureRequest<Response.Charac, Error.Charac>(new Response.Charac()
             {
