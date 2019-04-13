@@ -62,6 +62,36 @@ namespace Sanara_UnitTests
             Assert.True(IsLinkValid(result.answer.url));
         }
 
+        // GAME MODULE
+        [Fact]
+        public async Task TestBooruGame()
+        {
+            var dict =  Game.LoadBooru();
+            Assert.NotNull(dict);
+        }
+
+        [Fact]
+        public async Task TestShiritoriGame()
+        {
+            var dict = Game.LoadShiritori();
+            Assert.NotNull(dict);
+        }
+
+        [Fact]
+        public async Task TestAnimeGame()
+        {
+            var dict = Game.LoadAnime();
+            Assert.NotNull(dict);
+        }
+
+        [Fact]
+        public async Task TestKancolleGame()
+        {
+            var dict = await Game.LoadKancolle();
+            Assert.NotNull(dict);
+            Assert.True(dict.Count > 242);
+        }
+
         // BOORU MODULE
         [Fact]
         public async Task TestBooruSafe()
