@@ -89,7 +89,7 @@ namespace Sanara_UnitTests
         {
             var dict = await Game.LoadKancolle();
             Assert.NotNull(dict);
-            Assert.True(dict.Count > 242);
+            Assert.True(dict.Count > 220);
         }
 
         // BOORU MODULE

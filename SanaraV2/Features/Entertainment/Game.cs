@@ -115,11 +115,11 @@ namespace SanaraV2.Features.Entertainment
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 string json = await hc.GetStringAsync("http://kancolle.wikia.com/wiki/Ship?action=raw");
                 json = json.Split(new string[] { "List of destroyers" }, StringSplitOptions.None)[1].Split(new string[] { "=={{anchor|type}}" }, StringSplitOptions.None)[0];
-                MatchCollection matches = Regex.Matches(json, @"\[\[([A-Za-z- 0-9]+)");
+                MatchCollection matches = Regex.Matches(json, @"\[\[([^]]+)\]\]");
                 foreach (Match match in matches)
                 {
-                    string str = match.Groups[1].Value;
-                    if (!str.StartsWith("List of") && !str.StartsWith("Auxiliary"))
+                    string str = match.Groups[1].Value.Replace("'", "").Split('|')[0];
+                    if (!str.StartsWith("List of") && !str.StartsWith("Auxiliary") && !ships.Contains(str))
                         ships.Add(str);
                 }
             }
