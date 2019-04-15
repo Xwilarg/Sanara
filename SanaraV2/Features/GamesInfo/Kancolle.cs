@@ -33,7 +33,7 @@ namespace SanaraV2.Features.GamesInfo
             string html;
             using (HttpClient hc = new HttpClient())
             {
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1"));
+                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1"));
                 string id = json.items[0].id;
                 string url = json.items[0].url + "?action=raw";
                 name = json.items[0].title;
@@ -41,7 +41,7 @@ namespace SanaraV2.Features.GamesInfo
                 if (!html.StartsWith("{{ShipPageHeader") && !html.StartsWith("{{Ship/Header"))
                     return (new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound));
                 html = html.Split(new string[] { "{{ShipPageFooter}}" }, StringSplitOptions.None)[0];
-                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://kancolle.wikia.com/api/v1/Articles/Details?ids=" + id));
+                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Articles/Details?ids=" + id));
                 thumbnailUrl = json.items[id].thumbnail;
                 thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
             }

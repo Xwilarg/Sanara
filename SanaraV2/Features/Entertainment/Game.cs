@@ -113,13 +113,13 @@ namespace SanaraV2.Features.Entertainment
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                string json = await hc.GetStringAsync("http://kancolle.wikia.com/wiki/Ship?action=raw");
-                json = json.Split(new string[] { "List of destroyers" }, StringSplitOptions.None)[1].Split(new string[] { "=={{anchor|type}}" }, StringSplitOptions.None)[0];
-                MatchCollection matches = Regex.Matches(json, @"\[\[([^]]+)\]\]");
+                string json = await hc.GetStringAsync("https://kancolle.fandom.com/wiki/Ship");
+                json = json.Split(new string[] { "List_of_coastal_defense_ships_by_upgraded_maximum_stats" }, StringSplitOptions.None)[1].Split(new string[] { "Fleet_of_Fog" }, StringSplitOptions.None)[0];
+                MatchCollection matches = Regex.Matches(json, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"[^\"]+\">[^<]+<\\/a>");
                 foreach (Match match in matches)
                 {
                     string str = match.Groups[1].Value.Replace("'", "").Split('|')[0];
-                    if (!str.StartsWith("List of") && !str.StartsWith("Auxiliary") && !ships.Contains(str))
+                    if (!str.StartsWith("List_of") && !str.StartsWith("Category:") && !ships.Contains(str))
                         ships.Add(str);
                 }
             }
