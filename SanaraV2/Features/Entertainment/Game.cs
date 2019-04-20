@@ -46,8 +46,8 @@ namespace SanaraV2.Features.Entertainment
                 Response.Score.ScoreItem item = new Score.ScoreItem();
                 item.myScore = int.Parse(myElems[0]);
                 item.contributors = myElems.Skip(1).Select(x => users.Where(y => y.Id.ToString() == x).ElementAt(0).ToString()).ToArray();
-                item.rankedNumber = res.Where(x => x.Value.ContainsKey(elem)).Count();
-                item.myRanking = res.Where(x => x.Value.ContainsKey(elem) && int.Parse(x.Value[elem].Split('|')[0]) > item.myScore).Count() + 1;
+                item.rankedNumber = res.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(elem)).Count();
+                item.myRanking = res.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(elem) && int.Parse(x.Value[elem].Split('|')[0]) > item.myScore).Count() + 1;
                 if (i == 0) shiritori = item;
                 else if (i == 1) anime = item;
                 else if (i == 2) booru = item;

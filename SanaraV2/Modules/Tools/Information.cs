@@ -16,7 +16,6 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DynamicExpresso;
-using DynamicExpresso.Exceptions;
 using System;
 using System.IO;
 using System.Threading.Tasks;

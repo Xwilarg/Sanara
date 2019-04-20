@@ -111,7 +111,8 @@ namespace SanaraV2.Modules.Tools
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
-                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Translation.GetTranslation(guildId, "informationModuleGdpr") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite"));
+                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Translation.GetTranslation(guildId, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleGdpr") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite")
+                    + ((isOwner) ? (Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleEval")) : ("")));
             else if (isOwner)
                 embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Base.Sentences.NotAvailable(guildId));
             if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
