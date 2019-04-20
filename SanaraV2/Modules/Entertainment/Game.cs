@@ -314,11 +314,11 @@ namespace SanaraV2.Modules.Entertainment
                 {
                     w.Encoding = Encoding.UTF8;
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + m_toGuess + "&limit=1";
+                    string url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + m_toGuess + "&limit=1";
                     string json = w.DownloadString(url);
                     string code = Utilities.GetElementXml("\"id\":", json, ',');
                     m_idImage = code;
-                    url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + m_toGuess + "/Gallery&limit=1";
+                    url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + m_toGuess + "/Gallery&limit=1";
                     json = w.DownloadString(url);
                     code = Utilities.GetElementXml("\"title\":\"", json, '"').Replace("\\", "");
                     string html;
@@ -354,17 +354,17 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     using (WebClient w = new WebClient()) // TODO: Check if clean names match
                     {
-                        string url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
+                        string url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
                         string json = w.DownloadString(url);
                         string code = Utilities.GetElementXml("\"title\":\"", json, '"');
-                        url = "http://kancolle.wikia.com/wiki/" + code + "?action=raw";
+                        url = "https://kancolle.fandom.com/wiki/" + code + "?action=raw";
                         url = url.Replace(' ', '_');
                         json = w.DownloadString(url);
                         if (Utilities.GetElementXml("{{", json, '}') != "ShipPageHeader")
                             return (Sentences.KancolleGuessDontExist(m_guild.Id));
                         w.Encoding = Encoding.UTF8;
                         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        url = "https://kancolle.wikia.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
+                        url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
                         json = w.DownloadString(url);
                         code = Utilities.GetElementXml("\"id\":", json, ',');
                         if (m_idImage == code)
