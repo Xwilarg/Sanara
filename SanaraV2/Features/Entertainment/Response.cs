@@ -87,7 +87,7 @@ namespace SanaraV2.Features.Entertainment
             Kancolle,
             Anime,
             Shiritori,
-            FireEmblem
+            AzurLane
         }
     }
 }

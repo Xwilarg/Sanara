@@ -87,8 +87,8 @@ namespace SanaraV2.Features.Entertainment
                 gn = GameName.Booru;
             else if (gameName == "kancolle" || gameName == "kantaicollection" || gameName == "kc")
                 gn = GameName.Kancolle;
-            else if (gameName == "fireemblem" || gameName == "fe")
-                gn = GameName.FireEmblem;
+            else if (gameName == "azurlane" || gameName == "al")
+                gn = GameName.AzurLane;
             else
                 return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.WrongName));
             if (gn == GameName.Booru && !isChanNsfw)

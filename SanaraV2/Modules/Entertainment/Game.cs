@@ -517,48 +517,6 @@ namespace SanaraV2.Modules.Entertainment
             private Sakugabooru m_booru;
         }
 
-        public class FireEmblem : Game // TODO: Dictionary isn't working
-        {
-            public FireEmblem(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, fireEmblemTimer, "fireemblem", isEasy)
-            {
-                m_characters = Program.p.fireEmblemDict;
-                m_toGuess = null;
-                if (m_characters == null)
-                    throw new NullReferenceException("Dictionary not available.");
-            }
-
-            public override string[] GetPost()
-            {
-                var res = m_characters[Program.p.rand.Next(m_characters.Count)];
-                m_toGuess = res.Item1;
-                return (new string[] { res.Item2 });
-            }
-
-            public override bool IsPostImage()
-                => true;
-
-            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
-            {
-                sayCorrect = true;
-                m_nbAttempt++;
-                if (Utilities.CleanWord(userWord) == Utilities.CleanWord(m_toGuess))
-                    return (null);
-                if (m_characters.Any(x => Utilities.CleanWord(x.Item1) == Utilities.CleanWord(userWord)))
-                    return (Sentences.GuessBad(m_guild.Id, userWord));
-                return (Sentences.FireEmblemGuessDontExist(m_guild.Id));
-            }
-
-#pragma warning disable CS1998
-            public override async void Loose()
-            {
-                SaveServerScores(m_toGuess);
-            }
-#pragma warning restore CS1998
-
-            private string m_toGuess;
-            private List<Tuple<string, string, string>> m_characters; // Name, Url, Source
-        }
-
         [Command("Score")]
         public async Task Score(params string[] args)
         {
@@ -658,13 +616,6 @@ namespace SanaraV2.Modules.Entertainment
                         {
                             g = new BooruGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                             await ReplyAsync(Sentences.RulesBooru(Context.Guild.Id) + Environment.NewLine +
-                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
-                                Sentences.RulesReset(Context.Guild.Id));
-                        }
-                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.FireEmblem)
-                        {
-                            g = new FireEmblem(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
-                            await ReplyAsync(Sentences.RulesFireEmblem(Context.Guild.Id) + Environment.NewLine +
                                 Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
                                 Sentences.RulesReset(Context.Guild.Id));
                         }
