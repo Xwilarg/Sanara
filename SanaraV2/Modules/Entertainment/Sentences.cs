@@ -58,6 +58,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string BooruGame(ulong guildId) { return (Translation.GetTranslation(guildId, "animeGame")); }
         public static string KancolleGame(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGame")); }
         public static string ShiritoriGame(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriGame")); }
+        public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
         public static string ScoreText(ulong guildId, int rank, int total, int score) { return (Translation.GetTranslation(guildId, "scoreText", rank.ToString(), total.ToString(), score.ToString())); }
         public static string ScoreContributors(ulong guildId) { return (Translation.GetTranslation(guildId, "scoreContributors")); }
 

@@ -161,6 +161,7 @@ namespace SanaraV2.Features.Entertainment
             List<string> ships = new List<string>();
             using (HttpClient hc = new HttpClient())
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 string json = await hc.GetStringAsync("https://azurlane.koumakan.jp/List_of_Ships");
                 MatchCollection matches = Regex.Matches(json, "<a href=\"\\/[^\"]+\" title=\"([^\"]+)\">[0-9]+<\\/a>");
                 foreach (Match match in matches)

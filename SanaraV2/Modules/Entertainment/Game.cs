@@ -15,6 +15,7 @@
 using BooruSharp.Booru;
 using Discord;
 using Discord.Commands;
+using Newtonsoft.Json.Linq;
 using SanaraV2.Modules.Base;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
@@ -33,9 +35,9 @@ namespace SanaraV2.Modules.Entertainment
 
         public static readonly int shiritoriTimer = 10;
         public static readonly int kancolleTimer = 10;
-        public static readonly int fireEmblemTimer = 10;
         public static readonly int booruTimer = 30;
         public static readonly int animeTimer = 30;
+        public static readonly int azurlaneTimer = 10;
 
         public abstract class Game
         {
@@ -314,11 +316,11 @@ namespace SanaraV2.Modules.Entertainment
                 {
                     w.Encoding = Encoding.UTF8;
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    string url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + m_toGuess + "&limit=1";
+                    string url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(m_toGuess) + "&limit=1";
                     string json = w.DownloadString(url);
                     string code = Utilities.GetElementXml("\"id\":", json, ',');
                     m_idImage = code;
-                    url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + m_toGuess + "/Gallery&limit=1";
+                    url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(m_toGuess) + "/Gallery&limit=1";
                     json = w.DownloadString(url);
                     code = Utilities.GetElementXml("\"title\":\"", json, '"').Replace("\\", "");
                     string html;
@@ -352,6 +354,8 @@ namespace SanaraV2.Modules.Entertainment
                             isSpace = false;
                         }
                     }
+                    if (newName.ToUpper() == m_toGuess.ToUpper())
+                        return (null);
                     using (WebClient w = new WebClient()) // TODO: Check if clean names match
                     {
                         string url = "https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(newName) + "&limit=1";
@@ -517,6 +521,66 @@ namespace SanaraV2.Modules.Entertainment
             private Sakugabooru m_booru;
         }
 
+        public class AzurLane : Game
+        {
+            public AzurLane(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, azurlaneTimer, "azurlane", isEasy)
+            {
+                m_shipNames = Program.p.azurLaneDict;
+                m_toGuess = null;
+            }
+
+            public override bool IsPostImage()
+                => true;
+
+            public override string[] GetPost()
+            {
+                m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
+                JArray json;
+                using (HttpClient hc = new HttpClient())
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(m_toGuess.Replace(" ", "%20")) + "&limit=1").GetAwaiter().GetResult());
+                }
+                string[] nameArray = json[1].ToObject<string[]>();
+                using (HttpClient hc = new HttpClient())
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    return (new string[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + Uri.EscapeDataString(nameArray[0])).GetAwaiter().GetResult(),
+                        "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(m_toGuess) + ".png)").Groups[1].Value });
+                }
+            }
+
+            public override string GetCheckCorrect(string userWord, out bool sayCorrect)
+            {
+                sayCorrect = true;
+                m_nbAttempt++;
+                if (Regex.Replace(userWord, "[^a-zA-Z0-9]", "").ToLower() == m_toGuess.ToLower())
+                    return (null);
+                JArray json;
+                using (HttpClient hc = new HttpClient())
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(userWord.Replace(" ", "%20")) + "&limit=1").GetAwaiter().GetResult());
+                }
+                string[] nameArray = json[1].ToObject<string[]>();
+                if (nameArray.Length == 0)
+                    return (Sentences.GuessBad(m_guild.Id, userWord));
+                if (nameArray[0] == m_toGuess)
+                    return (null);
+                return (Sentences.GuessBad(m_guild.Id, nameArray[0]));
+            }
+
+#pragma warning disable CS1998
+            public override async void Loose()
+            {
+                SaveServerScores(m_toGuess);
+            }
+#pragma warning restore CS1998
+
+            private string m_toGuess;
+            private List<string> m_shipNames;
+        }
+
         [Command("Score")]
         public async Task Score(params string[] args)
         {
@@ -539,6 +603,8 @@ namespace SanaraV2.Modules.Entertainment
                         allScores.Add("shiritori", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.shiritori, () => { return (Sentences.ShiritoriGame(Context.Guild.Id)); }));
                     if (result.answer.booru != null)
                         allScores.Add("booru", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.booru, () => { return (Sentences.BooruGame(Context.Guild.Id)); }));
+                    if (result.answer.azurlane != null)
+                        allScores.Add("azurlane", new Tuple<Features.Entertainment.Response.Score.ScoreItem, Func<string>>(result.answer.azurlane, () => { return (Sentences.AzurLaneGame(Context.Guild.Id)); }));
                     string finalStr = "";
                     foreach (var elem in allScores)
                     {
@@ -630,6 +696,13 @@ namespace SanaraV2.Modules.Entertainment
                         {
                             g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                             await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
+                                Sentences.RulesReset(Context.Guild.Id));
+                        }
+                        else if (result.answer.gameName == Features.Entertainment.Response.GameName.AzurLane)
+                        {
+                            g = new AzurLane(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            await ReplyAsync(Sentences.RulesKancolle(Context.Guild.Id) + Environment.NewLine +
                                 Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
                                 Sentences.RulesReset(Context.Guild.Id));
                         }

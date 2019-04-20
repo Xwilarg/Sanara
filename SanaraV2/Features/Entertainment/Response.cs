@@ -28,7 +28,7 @@ namespace SanaraV2.Features.Entertainment
                 public int rankedNumber;
                 public string[] contributors;
             }
-            public ScoreItem anime, kancolle, shiritori, booru;
+            public ScoreItem anime, kancolle, shiritori, booru, azurlane;
         }
 
         public class AnimeManga
