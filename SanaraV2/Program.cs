@@ -57,7 +57,7 @@ namespace SanaraV2
         public List<string> animeDict { private set; get; }
         public List<string> booruDict { private set; get; }
         public List<string> shiritoriDict { private set; get; }
-        public List<Tuple<string, string, string>> fireEmblemDict { private set; get; }
+        public List<string> azurLaneDict { private set; get; }
 
         public List<ulong> gamesTmp; // To be sure that two players don't start a game at the same time in the same chan
 
@@ -97,7 +97,6 @@ namespace SanaraV2
 
             gamesTmp = new List<ulong>();
 
-            //if (!Debugger.IsAttached) // We skip that when debugging because some dict take lot of time to init
             await InitDictionaries();
 
             p = this;
@@ -218,23 +217,23 @@ namespace SanaraV2
                     await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "KanColle dictionary was succesfully loaded"));
             });
 
-           /* Task taskDict5 = Task.Run(async () =>
+            Task taskDict5 = Task.Run(async () =>
             {
-                fireEmblemDict = await Features.Entertainment.Game.LoadFireEmblem();
-                if (fireEmblemDict == null || fireEmblemDict.Count == 0)
+                azurLaneDict = await Features.Entertainment.Game.LoadAzurLane();
+                if (azurLaneDict == null || azurLaneDict.Count == 0)
                 {
-                    fireEmblemDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Fire Emblem dictionary"));
+                    azurLaneDict = null;
+                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Azur Lane dictionary"));
                 }
                 else
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Fire Emblem dictionary was succesfully loaded"));
-            });*/
+                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Azur Lane dictionary was succesfully loaded"));
+            });
 
             await taskDict1;
             await taskDict2;
             await taskDict3;
             await taskDict4;
-            //await taskDict5;
+            await taskDict5;
         }
 
         private void InitServices()

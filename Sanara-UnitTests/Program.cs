@@ -92,6 +92,14 @@ namespace Sanara_UnitTests
             Assert.True(dict.Count > 220);
         }
 
+        [Fact]
+        public async Task TestAzurLaneGame()
+        {
+            var dict = await Game.LoadAzurLane();
+            Assert.NotNull(dict);
+            Assert.True(dict.Count > 300);
+        }
+
         // BOORU MODULE
         [Fact]
         public async Task TestBooruSafe()

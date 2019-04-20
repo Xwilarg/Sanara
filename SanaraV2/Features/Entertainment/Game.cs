@@ -156,36 +156,21 @@ namespace SanaraV2.Features.Entertainment
             return (tags);
         }
 
-        public static async Task<List<Tuple<string, string, string>>> LoadFireEmblem() // Not working
+        public static async Task<List<string>> LoadAzurLane()
         {
-            List<Tuple<string, string, string>> characters = new List<Tuple<string, string, string>>();
+            List<string> ships = new List<string>();
             using (HttpClient hc = new HttpClient())
             {
-                string json = await hc.GetStringAsync("https://feheroes.gamepedia.com/Hero_list");
-                json = json.Split(new string[] { "<table" }, StringSplitOptions.None)[1].Split(new string[] { "</table>" }, StringSplitOptions.None)[0];
-                characters = new List<Tuple<string, string, string>>();
-                MatchCollection matches = Regex.Matches(json, "title=\"[^\"]+\">([^<]+)<\\/a><\\/td><td[^>]*>([^<]+<\\/td>)");
+                string json = await hc.GetStringAsync("https://azurlane.koumakan.jp/List_of_Ships");
+                MatchCollection matches = Regex.Matches(json, "<a href=\"\\/[^\"]+\" title=\"([^\"]+)\">[0-9]+<\\/a>");
                 foreach (Match match in matches)
                 {
-                    try
-                    {
-                        string name = match.Groups[1].Value.Split(':')[0];
-                        if (!characters.Any(x => x.Item1 == name))
-                        {
-                            dynamic dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://fireemblem.fandom.com/api/v1/Search/List?query=" + name + "&limit=1"));
-                            string id = dyn.items[0].id;
-                            dyn = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://fireemblem.wikia.com/api/v1/Articles/Details?ids=" + id));
-                            string thumbnailUrl = dyn.items[id].thumbnail;
-                            if (thumbnailUrl == null)
-                                continue;
-                            thumbnailUrl = thumbnailUrl.Split(new string[] { "/revision" }, StringSplitOptions.None)[0];
-                            characters.Add(new Tuple<string, string, string>(name, thumbnailUrl, match.Groups[2].Value));
-                        }
-                    } catch (HttpRequestException)
-                    { }
+                    string str = match.Groups[1].Value;
+                    if (!ships.Contains(str))
+                        ships.Add(str);
                 }
             }
-            return (characters);
+            return (ships);
         }
     }
 }
