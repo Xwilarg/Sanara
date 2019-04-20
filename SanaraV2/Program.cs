@@ -482,41 +482,49 @@ namespace SanaraV2
                     {
                         string[] content = elem.Value["shiritori"].Split('|');
                         IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
-                        if (guild == null || ranking.Any(x => x[0] != null && x[0].Item2 == GetName(guild.Name)))
-                            continue;
-                        int score = int.Parse(content[0]);
-                        if (biggestShiritori == null || score > biggestShiritori.Item1)
-                            biggestShiritori = new Tuple<int, string>(score, GetName(guild.Name));
+                        if (guild == null || ranking.Any(x => x[0] != null && x[0].Item2 == GetName(guild.Name))) { }
+                        else
+                        {
+                            int score = int.Parse(content[0]);
+                            if (biggestShiritori == null || score > biggestShiritori.Item1)
+                                biggestShiritori = new Tuple<int, string>(score, GetName(guild.Name));
+                        }
                     }
                     if (elem.Value.ContainsKey("anime"))
                     {
                         string[] content = elem.Value["anime"].Split('|');
                         IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
-                        if (guild == null || ranking.Any(x => x[1] != null && x[1].Item2 == GetName(guild.Name)))
-                            continue;
-                        int score = int.Parse(content[0]);
-                        if (biggestAnime == null || score > biggestAnime.Item1)
-                            biggestAnime = new Tuple<int, string>(score, GetName(guild.Name));
+                        if (guild == null || ranking.Any(x => x[1] != null && x[1].Item2 == GetName(guild.Name))) { }
+                        else
+                        {
+                            int score = int.Parse(content[0]);
+                            if (biggestAnime == null || score > biggestAnime.Item1)
+                                biggestAnime = new Tuple<int, string>(score, GetName(guild.Name));
+                        }
                     }
                     if (elem.Value.ContainsKey("booru"))
                     {
                         string[] content = elem.Value["booru"].Split('|');
                         IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
-                        if (guild == null || ranking.Any(x => x[2] != null && x[2].Item2 == GetName(guild.Name)))
-                            continue;
-                        int score = int.Parse(content[0]);
-                        if (biggestBooru == null || score > biggestBooru.Item1)
-                            biggestBooru = new Tuple<int, string>(score, GetName(guild.Name));
+                        if (guild == null || ranking.Any(x => x[2] != null && x[2].Item2 == GetName(guild.Name))) { }
+                        else
+                        {
+                            int score = int.Parse(content[0]);
+                            if (biggestBooru == null || score > biggestBooru.Item1)
+                                biggestBooru = new Tuple<int, string>(score, GetName(guild.Name));
+                        }
                     }
                     if (elem.Value.ContainsKey("kancolle"))
                     {
                         string[] content = elem.Value["kancolle"].Split('|');
                         IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
-                        if (guild == null || ranking.Any(x => x[3] != null && x[3].Item2 == GetName(guild.Name)))
-                            continue;
-                        int score = int.Parse(content[0]);
-                        if (biggestKanColle == null || score > biggestKanColle.Item1)
-                            biggestKanColle = new Tuple<int, string>(score, GetName(guild.Name));
+                        if (guild == null || ranking.Any(x => x[3] != null && x[3].Item2 == GetName(guild.Name))) { }
+                        else
+                        {
+                            int score = int.Parse(content[0]);
+                            if (biggestKanColle == null || score > biggestKanColle.Item1)
+                                biggestKanColle = new Tuple<int, string>(score, GetName(guild.Name));
+                        }
                     }
                 }
                 ranking.Add(new Tuple<int, string>[] { biggestShiritori, biggestAnime, biggestBooru, biggestKanColle });
