@@ -161,6 +161,7 @@ namespace SanaraV2.Db
                 if (elem.anime != null) currDict.Add("anime", elem.anime.ToString());
                 if (elem.booru != null) currDict.Add("booru", elem.booru.ToString());
                 if (elem.kancolle != null) currDict.Add("kancolle", elem.kancolle.ToString());
+                if (elem.azurlane != null) currDict.Add("azurlane", elem.azurlane.ToString());
                 if (currDict.Count > 0)
                     allScores.Add(elem.id.ToString(), currDict);
             }

@@ -29,6 +29,7 @@ using SharpRaven;
 using SharpRaven.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -41,8 +42,18 @@ namespace SanaraV2
 {
     public class Program
     {
-        public static async Task Main(string[] args)
-        => await new Program().MainAsync();
+        public static async Task Main()
+        {
+            try
+            {
+                await new Program().MainAsync();
+            }
+            catch (Exception) // If an exception occur, the program exit and is relaunched
+            {
+                if (!Debugger.IsAttached)
+                    await Task.Delay(-1);
+            }
+        }
 
         public readonly DiscordSocketClient client;
         private readonly CommandService commands = new CommandService();
