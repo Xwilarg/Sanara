@@ -70,82 +70,132 @@ namespace SanaraV2.Modules.Tools
         public static string ModuleAlreadyDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyDisabled", moduleName)); }
 
         /// --------------------------- Help ---------------------------
-        private static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
-        public static Embed Help(ulong guildId, bool isChanNsfw, bool isOwner)
+        public static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
+        public static string HelpHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "helpHelp")); }
+        public static string Help(ulong guildId) { return (Translation.GetTranslation(guildId, "help")); }
+        /// --------------------------- Help Module Name ---------------------------
+        public static string AnimeMangaModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "animeMangaModuleName")); }
+        public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }
+        public static string CommunicationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communicationModuleName")); }
+        public static string DoujinshiModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "doujinshiModuleName")); }
+        public static string GameModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "gameModuleName")); }
+        public static string ImageModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "imageModuleName")); }
+        public static string InformationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "informationModuleName")); }
+        public static string KantaiCollectionModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "kantaiCollectionModuleName")); }
+        public static string LinguisticModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "linguisticModuleName")); }
+        public static string RadioModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "radioModuleName")); }
+        public static string SettingsModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "settingsModuleName")); }
+        public static string VisualNovelModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "visualNovelModuleName")); }
+        public static string XkcdModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdModuleName")); }
+        public static string YoutubeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeModuleName")); }
+        /// --------------------------- Help Module Content ---------------------------
+        public static string AnimeMangaHelp(ulong guildId, bool isChanNsfw, bool isOwner)
         {
-            EmbedBuilder embed = new EmbedBuilder
-            {
-                Title = Translation.GetTranslation(guildId, "help"),
-                Color = Color.Purple
-            };
             if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
-                embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "animeMangaModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string BooruHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
-                embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
-                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : ("")));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "booruModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
+                + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
+                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string CommunicationHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "communicationModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string DoujinshiHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
-                    embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"), Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi"));
-                else if (isOwner)
-                    embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"), NoCommandAvailable(guildId));
+                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi");
+                else
+                    return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*";
             }
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "doujinshiModuleName"), Base.Sentences.NotAvailable(guildId));
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string GameHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
-                embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAzurLane") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")// + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFireEmblem")
-                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
-                + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "gameModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAzurLane")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")
+                    + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "gameModuleBooru")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"))
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string ImageHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Image))
-                embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Translation.GetTranslation(guildId, "imageModuleColor"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "imageModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "imageModuleColor");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string InformationHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
-                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Translation.GetTranslation(guildId, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleGdpr") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite")
-                    + ((isOwner) ? (Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleEval")) : ("")));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "informationModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleGdpr")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite")
+                    + ((isOwner) ? (Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleEval")) : (""));
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string KantaiCollectionHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
-                embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "kantaiCollectionModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string LinguisticHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic))
-                embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"),Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
-                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("")));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "linguisticModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
+                 + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string RadioHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Radio))
-                embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "radioModuleName"), Base.Sentences.NotAvailable(guildId));
-            if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "settingsModuleName"),
-                    Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleResetDb"));
+                return Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string SettingsHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Settings))
+            {
+                if (isOwner)
+                    return Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleResetDb");
+                return NoCommandAvailable(guildId);
+            }
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string VisualNovelHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Vn))
-                embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Translation.GetTranslation(guildId, "visualNovelModuleVn"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "visualNovelModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "visualNovelModuleVn");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string XkcdHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Xkcd))
-                embed.AddField(Translation.GetTranslation(guildId, "xkcdModuleName"), Translation.GetTranslation(guildId, "xkcdModuleXkcd"));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "xkcdModuleName"), Base.Sentences.NotAvailable(guildId));
+                return Translation.GetTranslation(guildId, "xkcdModuleXkcd");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string YouTubeHelp(ulong guildId, bool isChanNsfw, bool isOwner)
+        {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Youtube))
-                embed.AddField(Translation.GetTranslation(guildId, "youtubeModuleName"), Translation.GetTranslation(guildId, "youtubeModuleYoutube") + Environment.NewLine + Environment.NewLine
-                + ((isChanNsfw) ? ("") : (Translation.GetTranslation(guildId, "nsfwForFull"))));
-            else if (isOwner)
-                embed.AddField(Translation.GetTranslation(guildId, "youtubeModuleName"), Base.Sentences.NotAvailable(guildId));
-            return (embed.Build());
+                return Translation.GetTranslation(guildId, "youtubeModuleYoutube");
+            return Base.Sentences.NotAvailable(guildId);
         }
     }
 }

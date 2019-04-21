@@ -58,10 +58,118 @@ namespace SanaraV2.Modules.Tools
         }
 
         [Command("Help"), Summary("Give the help"), Alias("Commands")]
-        public async Task Help()
+        public async Task Help(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
-            await ReplyAsync("", false, Sentences.Help(Context.Guild.Id, (Context.Channel as ITextChannel).IsNsfw, Context.User.Id == Base.Sentences.ownerId));
+            EmbedBuilder embed = new EmbedBuilder()
+            {
+                Title = Sentences.Help(Context.Guild.Id),
+                Color = Color.Purple
+            };
+            string animeMangaModule = Sentences.AnimeMangaModuleName(Context.Guild.Id);
+            string booruModule = Sentences.BooruModuleName(Context.Guild.Id);
+            string communicationModule = Sentences.CommunicationModuleName(Context.Guild.Id);
+            string doujinshiModule = Sentences.DoujinshiModuleName(Context.Guild.Id);
+            string gameModule = Sentences.GameModuleName(Context.Guild.Id);
+            string imageModule = Sentences.ImageModuleName(Context.Guild.Id);
+            string informationModule = Sentences.InformationModuleName(Context.Guild.Id);
+            string kantaiCollectionModule = Sentences.KantaiCollectionModuleName(Context.Guild.Id);
+            string linguisticModule = Sentences.LinguisticModuleName(Context.Guild.Id);
+            string radioModule = Sentences.RadioModuleName(Context.Guild.Id);
+            string settingsModule = Sentences.SettingsModuleName(Context.Guild.Id);
+            string visualNovelModule = Sentences.VisualNovelModuleName(Context.Guild.Id);
+            string xkcdModule = Sentences.XkcdModuleName(Context.Guild.Id);
+            string youtubeModule = Sentences.YoutubeModuleName(Context.Guild.Id);
+            string page = string.Join(" ", args).ToLower();
+            if (page != "" && (page == "1" || animeMangaModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + animeMangaModule + ")";
+                embed.Description = Sentences.AnimeMangaHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "2" || booruModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + booruModule + ")";
+                embed.Description = Sentences.BooruHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "3" || communicationModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + communicationModule + ")";
+                embed.Description = Sentences.CommunicationHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "4" || doujinshiModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + doujinshiModule + ")";
+                embed.Description = Sentences.DoujinshiHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "5" || gameModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + gameModule + ")";
+                embed.Description = Sentences.GameHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "6" || imageModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + imageModule + ")";
+                embed.Description = Sentences.ImageHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "7" || informationModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + informationModule + ")";
+                embed.Description = Sentences.InformationHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "8" || kantaiCollectionModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + kantaiCollectionModule + ")";
+                embed.Description = Sentences.KantaiCollectionHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "9" || linguisticModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + linguisticModule + ")";
+                embed.Description = Sentences.LinguisticHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "10" || radioModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + radioModule + ")";
+                embed.Description = Sentences.RadioHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "11" || settingsModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + settingsModule + ")";
+                embed.Description = Sentences.SettingsHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "12" || visualNovelModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + visualNovelModule + ")";
+                embed.Description = Sentences.VisualNovelHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "13" || xkcdModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + xkcdModule + ")";
+                embed.Description = Sentences.XkcdHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else if (page != "" && (page == "14" || youtubeModule.ToLower().Contains(page)))
+            {
+                embed.Title += " (" + youtubeModule + ")";
+                embed.Description = Sentences.YouTubeHelp(Context.Guild.Id, ((ITextChannel)Context.Channel).IsNsfw, Context.User.Id == Base.Sentences.ownerId);
+            }
+            else
+            {
+                embed.Description = Sentences.HelpHelp(Context.Guild.Id) + Environment.NewLine +
+                    "**1**: " + animeMangaModule + Environment.NewLine +
+                    "**2**: " + booruModule + Environment.NewLine +
+                    "**3**: " + communicationModule + Environment.NewLine +
+                    "**4**: " + doujinshiModule + Environment.NewLine +
+                    "**5**: " + gameModule + Environment.NewLine +
+                    "**6**: " + imageModule + Environment.NewLine +
+                    "**7**: " + informationModule + Environment.NewLine +
+                    "**8**: " + kantaiCollectionModule + Environment.NewLine +
+                    "**9**: " + linguisticModule + Environment.NewLine +
+                    "**10**: " + radioModule + Environment.NewLine +
+                    "**11**: " + settingsModule + Environment.NewLine +
+                    "**12**: " + visualNovelModule + Environment.NewLine +
+                    "**13**: " + xkcdModule + Environment.NewLine +
+                    "**14**: " + youtubeModule + Environment.NewLine;
+            }
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("GDPR"), Summary("Show infos the bot have about the user and the guild")]

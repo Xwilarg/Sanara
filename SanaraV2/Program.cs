@@ -48,10 +48,13 @@ namespace SanaraV2
             {
                 await new Program().MainAsync();
             }
-            catch (Exception) // If an exception occur, the program exit and is relaunched
+            catch (Exception e) // If an exception occur, the program exit and is relaunched
             {
-                if (!Debugger.IsAttached)
+                if (Debugger.IsAttached)
+                {
+                    Console.WriteLine("Fatal error: " + e.Message);
                     await Task.Delay(-1);
+                }
             }
         }
 
