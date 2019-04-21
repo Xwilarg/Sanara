@@ -548,8 +548,16 @@ namespace SanaraV2.Modules.Entertainment
                 using (HttpClient hc = new HttpClient())
                 {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    return (new string[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + Uri.EscapeDataString(nameArray[0])).GetAwaiter().GetResult(),
-                        "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(m_toGuess) + ".png)").Groups[1].Value });
+                    try
+                    {
+                        return (new string[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + nameArray[0]).GetAwaiter().GetResult(),
+                        "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(m_toGuess).Replace("+", "_") + ".png)").Groups[1].Value });
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Error, invalid search: " + Uri.EscapeDataString(m_toGuess.Replace(" ", "+")));
+                        return (GetPost());
+                    }
                 }
             }
 
@@ -557,7 +565,7 @@ namespace SanaraV2.Modules.Entertainment
             {
                 sayCorrect = true;
                 m_nbAttempt++;
-                if (Regex.Replace(userWord, "[^a-zA-Z0-9]", "").ToLower() == m_toGuess.ToLower())
+                if (Regex.Replace(userWord, "[^a-zA-Z0-9]", "").ToLower() == Regex.Replace(m_toGuess, "[^a-zA-Z0-9]", "").ToLower().ToLower())
                     return (null);
                 JArray json;
                 using (HttpClient hc = new HttpClient())
@@ -569,7 +577,7 @@ namespace SanaraV2.Modules.Entertainment
                 if (nameArray.Length == 0)
                     return (Sentences.GuessBad(m_guild.Id, userWord));
                 if (nameArray[0] == m_toGuess)
-                    return (null);
+                    return (Sentences.BooruGuessClose(m_guild.Id, userWord));
                 return (Sentences.GuessBad(m_guild.Id, nameArray[0]));
             }
 
