@@ -565,7 +565,7 @@ namespace SanaraV2.Modules.Entertainment
             {
                 sayCorrect = true;
                 m_nbAttempt++;
-                if (Regex.Replace(userWord, "[^a-zA-Z0-9]", "").ToLower() == Regex.Replace(m_toGuess, "[^a-zA-Z0-9]", "").ToLower().ToLower())
+                if (Regex.Replace(userWord, "[^a-zA-Z0-9]", "").ToLower() == Regex.Replace(m_toGuess, "[^a-zA-Z0-9]", "").ToLower())
                     return (null);
                 JArray json;
                 using (HttpClient hc = new HttpClient())
