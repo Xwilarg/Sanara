@@ -542,7 +542,7 @@ namespace SanaraV2.Modules.Entertainment
                 using (HttpClient hc = new HttpClient())
                 {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(m_toGuess.Replace(" ", "+")) + "&limit=1").GetAwaiter().GetResult());
+                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(m_toGuess).Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
                 }
                 string[] nameArray = json[1].ToObject<string[]>();
                 using (HttpClient hc = new HttpClient())
@@ -550,8 +550,8 @@ namespace SanaraV2.Modules.Entertainment
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     try
                     {
-                        return (new string[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + nameArray[0]).GetAwaiter().GetResult(),
-                        "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(m_toGuess).Replace("+", "_") + ".png)").Groups[1].Value });
+                        return (new string[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + nameArray[0].Replace(" ", "_")).GetAwaiter().GetResult(),
+                        "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + m_toGuess.Replace(" ", "_") + ".png)").Groups[1].Value });
                     }
                     catch (Exception)
                     {
