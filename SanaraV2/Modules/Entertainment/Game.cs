@@ -534,7 +534,6 @@ namespace SanaraV2.Modules.Entertainment
 
             public override string[] GetPost()
             {
-                Console.WriteLine("Check post");
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
                 JArray json;
                 using (HttpClient hc = new HttpClient())
