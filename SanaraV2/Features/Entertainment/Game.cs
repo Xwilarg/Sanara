@@ -31,11 +31,11 @@ namespace SanaraV2.Features.Entertainment
         public static async Task<FeatureRequest<Response.Score, Error.Score>> Score(Db.Db db, ulong guildId, IReadOnlyCollection<IGuildUser> users)
         {
             var res = await db.GetAllScores();
-            var me = res[guildId.ToString()];
-            if (me == null)
+            if (!res.Any(x => x.Key == guildId.ToString()))
                 return (new FeatureRequest<Response.Score, Error.Score>(null, Error.Score.NoScore));
-            string[] games = new string[] { "shiritori", "anime", "booru", "kancolle" };
-            Response.Score.ScoreItem shiritori = null, anime = null, booru = null, kancolle = null;
+            var me = res[guildId.ToString()];
+            string[] games = new string[] { "shiritori", "anime", "booru", "kancolle", "azurlane" };
+            Response.Score.ScoreItem shiritori = null, anime = null, booru = null, kancolle = null, azurlane = null;
             int i = -1;
             foreach (var elem in games)
             {
@@ -52,13 +52,15 @@ namespace SanaraV2.Features.Entertainment
                 else if (i == 1) anime = item;
                 else if (i == 2) booru = item;
                 else if (i == 3) kancolle = item;
+                else if (i == 4) azurlane = item;
             }
             return (new FeatureRequest<Response.Score, Error.Score>(new Response.Score()
             {
                 anime = anime,
                 booru = booru,
                 kancolle = kancolle,
-                shiritori = shiritori
+                shiritori = shiritori,
+                azurlane = azurlane
             }, Error.Score.None));
         }
 

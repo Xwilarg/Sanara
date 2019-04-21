@@ -33,11 +33,11 @@ namespace SanaraV2.Modules.Entertainment
     {
         Program p = Program.p;
 
-        public static readonly int shiritoriTimer = 10;
-        public static readonly int kancolleTimer = 10;
+        public static readonly int shiritoriTimer = 15;
+        public static readonly int kancolleTimer = 15;
         public static readonly int booruTimer = 30;
         public static readonly int animeTimer = 30;
-        public static readonly int azurlaneTimer = 10;
+        public static readonly int azurlaneTimer = 15;
 
         public abstract class Game
         {
@@ -534,12 +534,13 @@ namespace SanaraV2.Modules.Entertainment
 
             public override string[] GetPost()
             {
+                Console.WriteLine("Check post");
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
                 JArray json;
                 using (HttpClient hc = new HttpClient())
                 {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(m_toGuess.Replace(" ", "%20")) + "&limit=1").GetAwaiter().GetResult());
+                    json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(m_toGuess.Replace(" ", "+")) + "&limit=1").GetAwaiter().GetResult());
                 }
                 string[] nameArray = json[1].ToObject<string[]>();
                 using (HttpClient hc = new HttpClient())
@@ -590,7 +591,7 @@ namespace SanaraV2.Modules.Entertainment
             switch (result.error)
             {
                 case Features.Entertainment.Error.Score.NoScore:
-                    await ReplyAsync("No score");
+                    await ReplyAsync(Sentences.NoScore(Context.Guild.Id));
                     break;
 
                 case Features.Entertainment.Error.Score.None:

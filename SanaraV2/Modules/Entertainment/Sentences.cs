@@ -61,6 +61,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
         public static string ScoreText(ulong guildId, int rank, int total, int score) { return (Translation.GetTranslation(guildId, "scoreText", rank.ToString(), total.ToString(), score.ToString())); }
         public static string ScoreContributors(ulong guildId) { return (Translation.GetTranslation(guildId, "scoreContributors")); }
+        public static string NoScore(ulong guildId) { return (Translation.GetTranslation(guildId, "noScore")); }
 
         /// --------------------------- AnimeManga ---------------------------
         public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }
