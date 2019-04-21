@@ -13,7 +13,6 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -137,7 +136,7 @@ namespace SanaraV2.Features.Entertainment
             foreach (string line in allLines)
             {
                 string[] linePart = line.Split(' ');
-                if (Convert.ToInt32(linePart[1]) > 3)
+                if (Convert.ToInt32(linePart[1]) >= 3)
                     tags.Add(linePart[0]);
             }
             return (tags);

@@ -35,7 +35,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public static readonly int shiritoriTimer = 15;
         public static readonly int kancolleTimer = 15;
-        public static readonly int booruTimer = 30;
+        public static readonly int booruTimer = 45;
         public static readonly int animeTimer = 30;
         public static readonly int azurlaneTimer = 15;
 
