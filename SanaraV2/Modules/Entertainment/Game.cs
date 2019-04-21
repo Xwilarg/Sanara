@@ -187,7 +187,6 @@ namespace SanaraV2.Modules.Entertainment
                 return (lastChar.ToString());
             }
 
-
             public override string[] GetPost()
             {
                 if (m_currWord == null)
@@ -302,6 +301,8 @@ namespace SanaraV2.Modules.Entertainment
             public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle", isEasy)
             {
                 m_shipNames = Program.p.kancolleDict;
+                if (m_shipNames == null)
+                    throw new NullReferenceException("Dictionary not available.");
                 m_toGuess = null;
                 m_idImage = "-1";
             }
@@ -526,6 +527,8 @@ namespace SanaraV2.Modules.Entertainment
             public AzurLane(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, azurlaneTimer, "azurlane", isEasy)
             {
                 m_shipNames = Program.p.azurLaneDict;
+                if (m_shipNames == null)
+                    throw new NullReferenceException("Dictionary not available.");
                 m_toGuess = null;
             }
 
