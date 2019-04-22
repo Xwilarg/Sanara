@@ -71,10 +71,13 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.WrongName));
             string gameName = args[0].ToLower();
             bool isNormal = true;
+            bool isFull = false;
             if (args.Length > 1)
             {
                 string difficulty = args[1].ToLower();
-                if (difficulty == "easy")
+                if (difficulty == "full")
+                    isFull = true;
+                else if (difficulty == "easy")
                     isNormal = false;
                 else if (difficulty != "normal")
                     return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.WrongDifficulty));
@@ -94,9 +97,12 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.WrongName));
             if (gn == GameName.Booru && !isChanNsfw)
                 return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.NotNsfw));
+            if (isFull && gn != GameName.Anime)
+                return (new FeatureRequest<Response.Game, Error.Game>(null, Error.Game.FullNotAvailable));
             return (new FeatureRequest<Response.Game, Error.Game>(new Response.Game()
             {
                 gameName = gn,
+                isFull = isFull,
                 isNormal = isNormal
             }, Error.Game.None));
         }
@@ -142,19 +148,21 @@ namespace SanaraV2.Features.Entertainment
             return (tags);
         }
 
-        public static List<string> LoadAnime()
+        public static Tuple<List<string>, List<string>> LoadAnime()
         {
             if (!File.Exists("Saves/AnimeTags.dat"))
                 return (null);
             List<string> tags = new List<string>();
+            List<string> tagsFull = new List<string>();
             string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");
             foreach (string line in allLines)
             {
                 string[] parts = line.Split(' ');
                 if (int.Parse(parts[1]) > 10)
                     tags.Add(line.Split(' ')[0]);
+                tagsFull.Add(line.Split(' ')[0]);
             }
-            return (tags);
+            return (new Tuple<List<string>, List<string>>(tagsFull, tags));
         }
 
         public static async Task<List<string>> LoadAzurLane()

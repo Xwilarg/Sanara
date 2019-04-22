@@ -63,6 +63,7 @@ namespace SanaraV2.Features.Entertainment
         public class Game
         {
             public bool isNormal;
+            public bool isFull;
             public GameName gameName;
         }
 

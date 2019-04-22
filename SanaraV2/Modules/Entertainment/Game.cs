@@ -41,7 +41,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public abstract class Game
         {
-            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName, bool isEasy)
+            protected Game(IMessageChannel chan, IGuild guild, IUser charac, int refTime, string fileName, bool isEasy, bool isFull)
             {
                 m_chan = (ITextChannel)chan;
                 m_didLost = false;
@@ -51,7 +51,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_nbAttempt = 0;
                 m_nbFound = 0;
                 m_userIds = new List<ulong>();
-                m_fileName = fileName + ((isEasy) ? ("-easy") : (""));
+                m_fileName = fileName + ((isEasy) ? ("-easy") : ("")) + ((isFull) ? ("-full") : (""));
             }
 
             public bool IsGameLost()
@@ -166,7 +166,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Shiritori : Game
         {
-            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori", isEasy)
+            public Shiritori(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, shiritoriTimer, "shiritori", isEasy, false)
             {
                 m_currWord = null;
                 m_words = Program.p.shiritoriDict;
@@ -298,7 +298,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Kancolle : Game
         {
-            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle", isEasy)
+            public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle", isEasy, false)
             {
                 m_shipNames = Program.p.kancolleDict;
                 if (m_shipNames == null)
@@ -400,7 +400,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class BooruGame : Game
         {
-            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru", isEasy)
+            public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru", isEasy, false)
             {
                 m_toGuess = null;
                 m_allTags = Program.p.booruDict;
@@ -465,10 +465,10 @@ namespace SanaraV2.Modules.Entertainment
 
         public class AnimeGame : Game
         {
-            public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, animeTimer, "anime", isEasy)
+            public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy, bool isFull) : base(chan, guild, charac, animeTimer, "anime", isEasy, isFull)
             {
                 m_toGuess = null;
-                m_allTags = Program.p.animeDict;
+                m_allTags = isFull ? Program.p.animeFullDict : Program.p.animeDict;
                 if (m_allTags == null)
                     throw new NullReferenceException("Dictionary not available.");
                 m_time = DateTime.MinValue;
@@ -524,7 +524,7 @@ namespace SanaraV2.Modules.Entertainment
 
         public class AzurLane : Game
         {
-            public AzurLane(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, azurlaneTimer, "azurlane", isEasy)
+            public AzurLane(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, azurlaneTimer, "azurlane", isEasy, false)
             {
                 m_shipNames = Program.p.azurLaneDict;
                 if (m_shipNames == null)
@@ -660,6 +660,10 @@ namespace SanaraV2.Modules.Entertainment
             var result = await Features.Entertainment.Game.Play(gameName, ((ITextChannel)Context.Channel).IsNsfw, Context.Channel.Id, p.games);
             switch (result.error)
             {
+                case Features.Entertainment.Error.Game.FullNotAvailable:
+                    await ReplyAsync(Sentences.FullNotAvailable(Context.Guild.Id));
+                    break;
+
                 case Features.Entertainment.Error.Game.AlreadyRunning:
                     await ReplyAsync(Sentences.GameAlreadyRunning(Context.Guild.Id));
                     break;
@@ -684,7 +688,7 @@ namespace SanaraV2.Modules.Entertainment
                     {
                         if (result.answer.gameName == Features.Entertainment.Response.GameName.Anime)
                         {
-                            g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
+                            g = new AnimeGame(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal, result.answer.isFull);
                             await ReplyAsync(Sentences.RulesAnime(Context.Guild.Id) + Environment.NewLine +
                                 Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
                                 Sentences.RulesReset(Context.Guild.Id));

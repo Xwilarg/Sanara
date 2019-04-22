@@ -217,8 +217,8 @@ namespace SanaraV2.Modules.Tools
                 "**Shiritori:** " + ((Program.p.shiritoriDict == null) ? ("Not loaded") : (Program.p.shiritoriDict.Count + " words")) + Environment.NewLine +
                 "**Booru quizz:** " + ((Program.p.booruDict == null) ? ("Not loaded") : (Program.p.booruDict.Count + " tags")) + Environment.NewLine +
                 "**Anime quizz:** " + ((Program.p.animeDict == null) ? ("Not loaded") : (Program.p.animeDict.Count + " anime names")) + Environment.NewLine +
+                "**Anime quizz (full):** " + ((Program.p.animeFullDict == null) ? ("Not loaded") : (Program.p.animeFullDict.Count + " anime names")) + Environment.NewLine +
                 "**KanColle quizz :** " + ((Program.p.kancolleDict == null) ? ("Not loaded") : (Program.p.kancolleDict.Count + " shipgirl names")));
-                //"**Fire Emblem quizz:** " + ((Program.p.fireEmblemDict == null) ? ("Not loaded") : (Program.p.fireEmblemDict.Count + " character names")));
                 if (Program.p.shiritoriDict != null)
                     yes++;
                 else
@@ -231,14 +231,14 @@ namespace SanaraV2.Modules.Tools
                     yes++;
                 else
                     no++;
+                if (Program.p.animeFullDict != null)
+                    yes++;
+                else
+                    no++;
                 if (Program.p.kancolleDict != null)
                     yes++;
                 else
                     no++;
-                /*if (Program.p.fireEmblemDict != null)
-                    yes++;
-                else
-                    no++;*/
             }
             if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Linguistic))
             {

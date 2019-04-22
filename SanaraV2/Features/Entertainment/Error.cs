@@ -58,7 +58,8 @@ namespace SanaraV2.Features.Entertainment
             AlreadyRunning,
             WrongName,
             WrongDifficulty,
-            NotNsfw
+            NotNsfw,
+            FullNotAvailable
         }
     }
 }

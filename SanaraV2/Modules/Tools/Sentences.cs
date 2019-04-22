@@ -126,9 +126,10 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
                 return Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAzurLane")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")
-                    + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "gameModuleBooru")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"))
+                    + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote");
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote2")
+                    + ((!isChanNsfw) ? (Environment.NewLine + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*") : (""));
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string ImageHelp(ulong guildId, bool isChanNsfw, bool isOwner)

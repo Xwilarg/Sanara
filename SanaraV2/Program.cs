@@ -69,6 +69,7 @@ namespace SanaraV2
         // GAME DICTIONARIES
         public List<string> kancolleDict { private set; get; }
         public List<string> animeDict { private set; get; }
+        public List<string> animeFullDict { private set; get; }
         public List<string> booruDict { private set; get; }
         public List<string> shiritoriDict { private set; get; }
         public List<string> azurLaneDict { private set; get; }
@@ -209,7 +210,9 @@ namespace SanaraV2
 
             Task taskDict3 = Task.Run(async () =>
             {
-                animeDict = Features.Entertainment.Game.LoadAnime();
+                var tmp = Features.Entertainment.Game.LoadAnime();
+                animeFullDict = tmp.Item1;
+                animeDict = tmp.Item2;
                 if (animeDict == null || animeDict.Count == 0)
                 {
                     animeDict = null;
