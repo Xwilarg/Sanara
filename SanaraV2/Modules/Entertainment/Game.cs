@@ -198,8 +198,12 @@ namespace SanaraV2.Modules.Entertainment
                 }
                 string last = GetLastCharacter(m_currWord);
                 string[] corrWords = m_words.Where(x => x.StartsWith(last)).ToArray();
-                if (corrWords.Length == 0)
-                    return (new string[] { Sentences.ShiritoriNoWord(m_guild.Id) }); // TODO what happen then
+                if (corrWords.Length == 0) // TODO what happen then
+                {
+                    m_chan.SendMessageAsync(Sentences.ShiritoriNoWord(m_guild.Id));
+                    Loose();
+                    return (new string[] { });
+                }
                 string word = corrWords[Program.p.rand.Next(0, corrWords.Length)];
                 string[] insideWord = word.Split('$');
                 m_words.Remove(word);
@@ -253,6 +257,11 @@ namespace SanaraV2.Modules.Entertainment
                 {
                     m_time = DateTime.Now;
                     return (Sentences.ShiritoriNotNoun(m_guild.Id));
+                }
+                if (userWord.Length == 1)
+                {
+                    m_time = DateTime.Now;
+                    return (Sentences.ShiritoriTooSmall(m_guild.Id));
                 }
                 if (!userWord.StartsWith(GetLastCharacter(m_currWord)))
                 {
@@ -711,6 +720,7 @@ namespace SanaraV2.Modules.Entertainment
                         {
                             g = new Shiritori(Context.Channel, Context.Guild, Context.User, !result.answer.isNormal);
                             await ReplyAsync(Sentences.RulesShiritori(Context.Guild.Id) + Environment.NewLine +
+                                Sentences.RulesShiritori2(Context.Guild.Id) + Environment.NewLine +
                                 Sentences.RulesTimer(Context.Guild.Id, g.GetRefTime()) + Environment.NewLine +
                                 Sentences.RulesReset(Context.Guild.Id));
                         }
