@@ -254,7 +254,7 @@ namespace SanaraV2.Modules.Entertainment
                     m_time = DateTime.Now;
                     return (Sentences.ShiritoriNotNoun(m_guild.Id));
                 }
-                if (userWord.EndsWith(GetLastCharacter(m_currWord)))
+                if (!userWord.StartsWith(GetLastCharacter(m_currWord)))
                 {
                     m_time = DateTime.Now;
                     return (Sentences.ShiritoriMustBegin(m_guild.Id, GetLastCharacter(m_currWord), Features.Tools.Linguist.ToRomaji(m_currWord[m_currWord.Length - 1].ToString())));
