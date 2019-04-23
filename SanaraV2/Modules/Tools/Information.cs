@@ -218,7 +218,8 @@ namespace SanaraV2.Modules.Tools
                 "**Booru quizz:** " + ((Program.p.booruDict == null) ? ("Not loaded") : (Program.p.booruDict.Count + " tags")) + Environment.NewLine +
                 "**Anime quizz:** " + ((Program.p.animeDict == null) ? ("Not loaded") : (Program.p.animeDict.Count + " anime names")) + Environment.NewLine +
                 "**Anime quizz (full):** " + ((Program.p.animeFullDict == null) ? ("Not loaded") : (Program.p.animeFullDict.Count + " anime names")) + Environment.NewLine +
-                "**KanColle quizz :** " + ((Program.p.kancolleDict == null) ? ("Not loaded") : (Program.p.kancolleDict.Count + " shipgirl names")));
+                "**KanColle quizz :** " + ((Program.p.kancolleDict == null) ? ("Not loaded") : (Program.p.kancolleDict.Count + " shipgirl names")) + Environment.NewLine +
+                "**Azur Lane quizz:** " + ((Program.p.azurLaneDict == null) ? ("Not loaded") : (Program.p.azurLaneDict.Count + " shipgirl names")));
                 if (Program.p.shiritoriDict != null)
                     yes++;
                 else
@@ -236,6 +237,10 @@ namespace SanaraV2.Modules.Tools
                 else
                     no++;
                 if (Program.p.kancolleDict != null)
+                    yes++;
+                else
+                    no++;
+                if (Program.p.azurLaneDict != null)
                     yes++;
                 else
                     no++;
