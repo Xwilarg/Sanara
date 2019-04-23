@@ -129,6 +129,7 @@ namespace SanaraV2.Modules.Tools
                     + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote2")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote3")
                     + ((!isChanNsfw) ? (Environment.NewLine + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*") : (""));
             return Base.Sentences.NotAvailable(guildId);
         }
