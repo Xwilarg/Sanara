@@ -120,6 +120,9 @@ namespace SanaraV2.Modules.Entertainment
                             }
                         }
                     }
+                    string help = Help();
+                    if (help != null)
+                        await m_chan.SendMessageAsync(help);
                     m_time = DateTime.Now;
                 }
             }
@@ -150,6 +153,7 @@ namespace SanaraV2.Modules.Entertainment
             }
             public abstract string GetCheckCorrect(string userWord, out bool sayCorrect);
             public abstract void Loose();
+            public abstract string Help();
 
             public ITextChannel m_chan { private set; get; }
             protected IGuild m_guild { private set; get; }
@@ -177,6 +181,9 @@ namespace SanaraV2.Modules.Entertainment
 
             public override bool IsPostImage()
                 => false;
+
+            public override string Help()
+                => null;
 
             private string GetLastCharacter(string word)
             {
@@ -319,6 +326,9 @@ namespace SanaraV2.Modules.Entertainment
             public override bool IsPostImage()
                 => true;
 
+            public override string Help()
+                => null;
+
             public override string[] GetPost() // TODO: sometimes post wrong images
             {
                 m_toGuess = m_shipNames[Program.p.rand.Next(m_shipNames.Count)];
@@ -422,6 +432,19 @@ namespace SanaraV2.Modules.Entertainment
             public override bool IsPostImage()
                 => true;
 
+            public override string Help()
+            {
+                string help = m_toGuess.First().ToString().ToUpper();
+                foreach (char c in m_toGuess.Skip(1))
+                {
+                    if (c == '_')
+                        help += ' ';
+                    else
+                        help += "\\*";
+                }
+                return help;
+            }
+
             public override string[] GetPost()
             {
                 m_toGuess = m_allTags[Program.p.rand.Next(m_allTags.Count)];
@@ -495,6 +518,19 @@ namespace SanaraV2.Modules.Entertainment
             public override bool IsPostImage()
                 => true;
 
+            public override string Help()
+            {
+                string help = m_toGuess[0].First().ToString().ToUpper();
+                foreach (char c in m_toGuess[0].Skip(1))
+                {
+                    if (c == '_')
+                        help += ' ';
+                    else
+                        help += "\\*";
+                }
+                return help;
+            }
+
             public override string[] GetPost()
             {
                 string tag;
@@ -543,6 +579,9 @@ namespace SanaraV2.Modules.Entertainment
 
             public override bool IsPostImage()
                 => true;
+
+            public override string Help()
+                => null;
 
             public override string[] GetPost()
             {
