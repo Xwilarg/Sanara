@@ -208,7 +208,7 @@ namespace SanaraV2.Modules.Entertainment
                 string[] insideWord = word.Split('$');
                 m_words.Remove(word);
                 m_alreadySaid.Add(insideWord[0]);
-                m_currWord = insideWord[0];
+                m_currWord = Features.Tools.Linguist.ToHiragana(insideWord[0]);
                 return (new string[] { insideWord[0] + " (" + Features.Tools.Linguist.ToRomaji(insideWord[0]) + ") - Meaning: " + insideWord[1] });
             }
 
