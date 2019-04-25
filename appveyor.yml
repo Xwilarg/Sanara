@@ -9,7 +9,7 @@ build:
   project: SanaraV2.sln
 
 test_script:
-- ./install.sh
+- sh install.sh
 - curl -LO http://www.commandline.co.uk/chp/chp-0.1.1.13.zip
 - unzip chp-0.1.1.13.zip
 - start chp/chp.exe rethinkdb-2.3.6/rethinkdb.exe
