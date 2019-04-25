@@ -4,6 +4,8 @@ using SanaraV2.Features.NSFW;
 using SanaraV2.Features.Entertainment;
 using System.Net;
 using System.Threading.Tasks;
+using Discord.WebSocket;
+using System.IO;
 
 namespace Sanara_UnitTests
 {
@@ -130,6 +132,26 @@ namespace Sanara_UnitTests
             Assert.Contains("hibiki_(kantai_collection)", resultTags.answer.characTags);
             Assert.Contains("kantai_collection", resultTags.answer.sourceTags);
             Assert.Equal("Gelbooru", resultTags.answer.booruName);
+        }
+
+        [Fact]
+        public async Task IntegrationTest()
+        {
+            string ayamiToken, inamiToken;
+            if (File.Exists("Keys/ayamiToken.txt"))
+                ayamiToken = File.ReadAllText("Keys/ayamiToken.txt");
+            else
+                ayamiToken = Environment.GetEnvironmentVariable("AYAMI_TOKEN");
+            if (File.Exists("Keys/inamiToken.txt"))
+                inamiToken = File.ReadAllText("Keys/inamiToken.txt");
+            else
+                inamiToken = Environment.GetEnvironmentVariable("INAMI_TOKEN");
+            DiscordSocketClient ayamiClient = new DiscordSocketClient();
+            DiscordSocketClient inamiClient = new DiscordSocketClient();
+            await ayamiClient.LoginAsync(Discord.TokenType.Bot, ayamiToken);
+            await inamiClient.LoginAsync(Discord.TokenType.Bot, inamiToken);
+            await ayamiClient.StartAsync();
+            await inamiClient.StartAsync();
         }
     }
 }
