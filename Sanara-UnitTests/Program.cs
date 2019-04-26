@@ -28,14 +28,6 @@ namespace Sanara_UnitTests
             return (false);
         }
 
-        // GENERAL
-        [Fact]
-        public async Task TestGeneral()
-        {
-            SanaraV2.Program p = new SanaraV2.Program();
-            await p.MainAsync(Environment.GetEnvironmentVariable("BOT_TOKEN"));
-        }
-
         // ANIME/MANGA MODULE
         [Fact]
         public async Task TestAnime()
@@ -134,7 +126,7 @@ namespace Sanara_UnitTests
             Assert.Equal("Gelbooru", resultTags.answer.booruName);
         }
 
-        [Fact]
+        [SkipIfNoToken]
         public async Task IntegrationTest()
         {
             string ayamiToken, inamiToken;
@@ -152,6 +144,16 @@ namespace Sanara_UnitTests
             await inamiClient.LoginAsync(Discord.TokenType.Bot, inamiToken);
             await ayamiClient.StartAsync();
             await inamiClient.StartAsync();
+        }
+    }
+
+    public sealed class SkipIfNoToken : FactAttribute
+    {
+        public SkipIfNoToken()
+        {
+            if (!File.Exists("Keys/ayamiToken.txt") && Environment.GetEnvironmentVariable("AYAMI_TOKEN") == null
+                && !File.Exists("Keys/inamiToken.txt") && Environment.GetEnvironmentVariable("INAMI_TOKEN") == null)
+                Skip = "No token found in files or environment variables";
         }
     }
 }
