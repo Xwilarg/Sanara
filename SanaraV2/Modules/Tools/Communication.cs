@@ -143,7 +143,7 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Sentences.Nickname(Context.Guild.Id), user.Nickname, true);
             embed.AddField(Sentences.AccountCreation(Context.Guild.Id), user.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
             embed.AddField(Sentences.GuildJoined(Context.Guild.Id), user.JoinedAt.Value.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
-            if (user == (await Context.Channel.GetUserAsync(Base.Sentences.myId)))
+            if (user == (await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id)))
             {
                 embed.AddField(Sentences.Creator(Context.Guild.Id), "Zirk#0001", true);
                 embed.AddField(Sentences.LatestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);

@@ -584,12 +584,12 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.Id == Modules.Base.Sentences.myId || (arg.Author.IsBot && inamiToken != arg.Author.Id)) // Inami is a bot used for integration testing
+            if (arg.Author.Id == client.CurrentUser.Id || (arg.Author.IsBot && inamiToken != arg.Author.Id)) // Inami is a bot used for integration testing
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
             /// When playing games
-            else if (arg.Author.Id != Modules.Base.Sentences.myId)
+            else if (arg.Author.Id != client.CurrentUser.Id)
             {
                 GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
                 if (game != null)
@@ -605,7 +605,7 @@ namespace SanaraV2
             if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
             {
                 var context = new SocketCommandContext(client, msg);
-                if (!((IGuildUser)await context.Channel.GetUserAsync(Modules.Base.Sentences.myId)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks)
+                if (!((IGuildUser)await context.Channel.GetUserAsync(client.CurrentUser.Id)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks)
                 {
                     await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
                     return;
