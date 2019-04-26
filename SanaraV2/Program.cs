@@ -91,6 +91,8 @@ namespace SanaraV2
 
         public Db.Db db;
 
+        private ulong inamiToken;
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -101,8 +103,13 @@ namespace SanaraV2
             commands.Log += LogError;
         }
 
-        public async Task MainAsync(string botToken = null) // botToken is used for unit tests
+        public async Task MainAsync()
+            => await MainAsync(null, 0);
+
+        public async Task MainAsync(string botToken, ulong inamiId) // botToken is used for unit tests
         {
+            inamiToken = inamiId;
+
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
             await db.InitAsync();
@@ -577,7 +584,7 @@ namespace SanaraV2
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.Id == Modules.Base.Sentences.myId || arg.Author.IsBot)
+            if (arg.Author.Id == Modules.Base.Sentences.myId || (arg.Author.IsBot && inamiToken != arg.Author.Id)) // Inami is a bot used for integration testing
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;

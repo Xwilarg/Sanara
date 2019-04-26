@@ -53,7 +53,7 @@ namespace SanaraV2.Modules.Tools
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Information);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
-            await InfosUser(await Context.Channel.GetUserAsync(Base.Sentences.myId) as IGuildUser);
+            await InfosUser(await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id) as IGuildUser);
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]

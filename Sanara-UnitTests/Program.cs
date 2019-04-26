@@ -129,7 +129,7 @@ namespace Sanara_UnitTests
         [SkipIfNoToken]
         public async Task IntegrationTest()
         {
-            string ayamiToken, inamiToken;
+            string ayamiToken, inamiToken, guildTesting, channelTesting;
             if (File.Exists("Keys/ayamiToken.txt"))
                 ayamiToken = File.ReadAllText("Keys/ayamiToken.txt");
             else
@@ -138,12 +138,20 @@ namespace Sanara_UnitTests
                 inamiToken = File.ReadAllText("Keys/inamiToken.txt");
             else
                 inamiToken = Environment.GetEnvironmentVariable("INAMI_TOKEN");
-            DiscordSocketClient ayamiClient = new DiscordSocketClient();
+            if (File.Exists("Keys/guildTesting.txt"))
+                guildTesting = File.ReadAllText("Keys/guildTesting.txt");
+            else
+                guildTesting = Environment.GetEnvironmentVariable("GUILD_TESTING");
+            if (File.Exists("Keys/channelTesting.txt"))
+                channelTesting = File.ReadAllText("Keys/channelTesting.txt");
+            else
+                channelTesting = Environment.GetEnvironmentVariable("CHANNEL_TESTING");
             DiscordSocketClient inamiClient = new DiscordSocketClient();
-            await ayamiClient.LoginAsync(Discord.TokenType.Bot, ayamiToken);
             await inamiClient.LoginAsync(Discord.TokenType.Bot, inamiToken);
-            await ayamiClient.StartAsync();
             await inamiClient.StartAsync();
+            await new SanaraV2.Program().MainAsync(ayamiToken, inamiClient.CurrentUser.Id);
+            Discord.ITextChannel chan = inamiClient.GetGuild(ulong.Parse(guildTesting)).GetTextChannel(ulong.Parse(channelTesting));
+
         }
     }
 
@@ -151,8 +159,10 @@ namespace Sanara_UnitTests
     {
         public SkipIfNoToken()
         {
-            if (!File.Exists("Keys/ayamiToken.txt") && Environment.GetEnvironmentVariable("AYAMI_TOKEN") == null
-                && !File.Exists("Keys/inamiToken.txt") && Environment.GetEnvironmentVariable("INAMI_TOKEN") == null)
+            if ((!File.Exists("Keys/ayamiToken.txt") && Environment.GetEnvironmentVariable("AYAMI_TOKEN") == null)
+                || (!File.Exists("Keys/inamiToken.txt") && Environment.GetEnvironmentVariable("INAMI_TOKEN") == null)
+                || (!File.Exists("Keys/guildTesting.txt") && Environment.GetEnvironmentVariable("GUILD_TESTING") == null)
+                || (!File.Exists("Keys/channelTesting.txt") && Environment.GetEnvironmentVariable("CHANNEL_TESTING") == null))
                 Skip = "No token found in files or environment variables";
         }
     }
