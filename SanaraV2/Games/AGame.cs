@@ -147,7 +147,7 @@ namespace SanaraV2.Games
                 return;
             if (_postImage || _checkingAnswer) // If we are already doing something (posting image or checking answer) we wait for it
                 return;
-            if (_startTime.AddSeconds(_timer).CompareTo(DateTime.Now) > 0)
+            if (_startTime.AddSeconds(_timer).CompareTo(DateTime.Now) < 0)
                 await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
         }
 

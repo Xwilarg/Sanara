@@ -24,6 +24,7 @@ namespace SanaraV2.Games
         {
             _dictionnary = dictionnary;
             _names = names;
+            _timer = timer;
         }
 
         public abstract bool IsNsfw();

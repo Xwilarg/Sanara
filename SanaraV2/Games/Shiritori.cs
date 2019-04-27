@@ -92,7 +92,8 @@ namespace SanaraV2.Games
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userAnswer)));
             bool isCorrect = false, isNoun = false;
-            return "DEBUG POINT REACHED SUCCESSFULLY";
+            Console.WriteLine(json.data[0].ToString());
+            return "Debug point reached";
         }
 
         protected override async Task<string> GetLoose()
