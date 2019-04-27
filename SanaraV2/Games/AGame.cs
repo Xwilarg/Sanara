@@ -28,6 +28,8 @@ namespace SanaraV2.Games
         protected AGame(ITextChannel chan, List<string> dictionnary, Config config)
         {
             _chan = chan;
+            if (dictionnary == null) // Dictionnary failed to load
+                throw new NoDictionnaryException();
             _dictionnary = dictionnary;
             _config = config;
             _contributors = new List<ulong>();
@@ -35,8 +37,14 @@ namespace SanaraV2.Games
             _score = 0;
             _postImage = false;
             _checkingAnswer = false;
+            _didLost = false;
+            _startTime = DateTime.Now;
+            _timer = config.refTime * (int)config.difficulty;
             PostAsync().GetAwaiter().GetResult();
         }
+
+        public bool IsSelf(ulong chanId) // Allow to check if a game is running in this channel
+            => _chan.Id == chanId;
 
         protected abstract Task<string[]> GetPostAsync();
         protected abstract PostType GetPostType();
@@ -45,6 +53,8 @@ namespace SanaraV2.Games
 
         public async Task PostAsync()
         {
+            if (_didLost)
+                return;
             _postImage = true;
             int counter = 0;
             while (true)
@@ -57,10 +67,12 @@ namespace SanaraV2.Games
                     else
                         foreach (string s in await GetPostAsync())
                             await PostFromUrl(s);
+                    _startTime = DateTime.Now;
                     break;
                 }
                 catch (LooseException le)
                 {
+                    _postImage = false;
                     await LooseAsync(le.Message);
                     break;
                 }
@@ -79,6 +91,7 @@ namespace SanaraV2.Games
                                 Text = e.Message
                             }
                         }.Build());
+                        _postImage = false;
                         await LooseAsync(null);
                         break;
                     }
@@ -102,6 +115,8 @@ namespace SanaraV2.Games
 
         public async Task CheckCorrectAsync(IUser user, string userAnswer)
         {
+            if (_didLost)
+                return;
             _checkingAnswer = true;
             if (_postImage)
             {
@@ -123,6 +138,22 @@ namespace SanaraV2.Games
             await PostAsync();
             _checkingAnswer = false;
         }
+
+        public async Task LooseTimerAsync()
+        {
+            if (_didLost) // No need to check if we already lost
+                return;
+            if (_postImage || _checkingAnswer) // If we are already doing something (posting image or checking answer) we wait for it
+                return;
+            if (_startTime.AddSeconds(_timer).CompareTo(DateTime.Now) > 0)
+            {
+                await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
+                _didLost = true;
+            }
+        }
+
+        public bool DidLost()
+            => _didLost;
 
         public async Task LooseAsync(string reason)
         {
@@ -189,5 +220,8 @@ namespace SanaraV2.Games
         protected List<string>  _dictionnary; // Game dictionnary
         private bool            _postImage; // True is Sanara is busy posting an image
         private bool            _checkingAnswer; // Used for timer
+        private bool            _didLost; // True if the game is lost
+        private DateTime        _startTime; // When the game started
+        private int             _timer; // Number of seconds before the player loose
     }
 }

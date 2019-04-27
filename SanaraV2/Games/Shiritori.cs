@@ -27,8 +27,17 @@ namespace SanaraV2.Games
 {
     public class ShiritoriPreload : APreload
     {
-        public ShiritoriPreload() : base(LoadDictionnary())
+        public ShiritoriPreload() : base(LoadDictionnary(), new[] { "shiritori" }, 15)
         { }
+
+        public override bool IsNsfw()
+            => false;
+
+        public override bool DoesAllowFull()
+            => false;
+
+        public override string GetRules(ulong guildId)
+            => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
 
         private static List<string> LoadDictionnary()
         {
@@ -40,7 +49,7 @@ namespace SanaraV2.Games
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, List<string> dictionnary, Difficulty difficulty) : base(chan, dictionnary, new Config(15, difficulty, "shiritori"))
+        public Shiritori(ITextChannel chan, List<string> dictionnary, Difficulty difficulty, bool isFull, int timer) : base(chan, dictionnary, new Config(timer, difficulty, "shiritori", isFull))
         {
             _alreadySaid = new List<string>();
             _currWord = null;

@@ -30,7 +30,7 @@ namespace SanaraV2.Games
         public static string ResetDone(ulong guildId) { return (Translation.GetTranslation(guildId, "resetDone")); }
         public static string InvalidGameName(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidGameName")); }
         public static string GameAlreadyRunning(ulong guildId) { return (Translation.GetTranslation(guildId, "gameAlreadyRunning")); }
-        public static string TimeoutGame(ulong guildId, string answer) { return (Translation.GetTranslation(guildId, "timeoutGame", answer)); }
+        public static string TimeoutGame(ulong guildId) { return (Translation.GetTranslation(guildId, "timeoutGame")); }
         public static string NewBestScore(ulong guildId, string lastScore, string newScore) { return (Translation.GetTranslation(guildId, "newBestScore", lastScore, newScore)); }
         public static string EqualizedScore(ulong guildId, string score) { return (Translation.GetTranslation(guildId, "equalizedScore", score)); }
         public static string DidntBeatScore(ulong guildId, string lastScore, string newScore) { return (Translation.GetTranslation(guildId, "didntBeatScore", lastScore, newScore)); }
@@ -64,5 +64,6 @@ namespace SanaraV2.Games
         public static string NoScore(ulong guildId) { return (Translation.GetTranslation(guildId, "noScore")); }
         public static string FullNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "fullNotAvailable")); }
         public static string Meaning(ulong guildId) { return (Translation.GetTranslation(guildId, "meaning")); }
+        public static string GoodAnswerWas(ulong guildId, string answer) { return (Translation.GetTranslation(guildId, "goodAnswerWas", answer)); }
     }
 }

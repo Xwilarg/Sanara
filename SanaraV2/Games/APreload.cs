@@ -14,14 +14,33 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV2.Games
 {
     public abstract class APreload
     {
-        public APreload(List<string> dictionnary)
-        { }
+        public APreload(List<string> dictionnary, string[] names, int timer)
+        {
+            _dictionnary = dictionnary;
+            _names = names;
+        }
+
+        public abstract bool IsNsfw();
+        public abstract bool DoesAllowFull(); // Allow 'full' attribute
+        public abstract string GetRules(ulong guildId);
+
+        public List<string> GetDictionnary()
+            => _dictionnary;
+
+        public bool ContainsName(string name)
+            => _names.Contains(name);
+
+        public int GetTimer()
+            => _timer;
 
         private List<string> _dictionnary;
+        private string[] _names;
+        private int _timer;
     }
 }

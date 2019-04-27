@@ -61,9 +61,6 @@ namespace SanaraV2
         public static Program p;
         public Random rand;
 
-        public List<GameModule.Game> games;
-        public Thread gameThread;
-
         public GameManager gm;
 
         // GAME DICTIONARIES
@@ -123,8 +120,6 @@ namespace SanaraV2
             gm = new GameManager();
 
             p = this;
-            games = new List<GameModule.Game>();
-            gameThread = new Thread(new ThreadStart(GameThread));
 
             rand = new Random();
 
@@ -141,7 +136,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<VnModule>(null);
             await commands.AddModuleAsync<Doujinshi>(null);
             await commands.AddModuleAsync<AnimeManga>(null);
-            await commands.AddModuleAsync<GameModule>(null);
+            await commands.AddModuleAsync<SanaraV2.Games.GameModule>(null);
             await commands.AddModuleAsync<Youtube>(null);
             await commands.AddModuleAsync<RadioModule>(null);
             await commands.AddModuleAsync<Xkcd>(null);
@@ -592,13 +587,10 @@ namespace SanaraV2
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
+
             /// When playing games
-            else if (arg.Author.Id != client.CurrentUser.Id)
-            {
-                GameModule.Game game = games.Find(x => x.m_chan == arg.Channel);
-                if (game != null)
-                    await game.CheckCorrect(arg.Content, arg.Author);
-            }
+            await gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id);
+
             int pos = 0;
             if (arg.Channel as ITextChannel == null)
             {
@@ -633,27 +625,6 @@ namespace SanaraV2
         private async Task AddCommandServs(ulong name)
         {
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commandServs", name.ToString()) });
-        }
-
-        public void GameThread()
-        {
-            while (Thread.CurrentThread.IsAlive) // TODO: Replace thread with async
-            {
-                try
-                {
-                    for (int i = p.games.Count - 1; i >= 0; i--)
-                    {
-                        if (p.games[i].IsGameLost())
-                        {
-                            p.games[i].Loose();
-                            p.games.RemoveAt(i);
-                        }
-                    }
-                }
-                catch (InvalidOperationException)
-                { }
-                Thread.Sleep(100);
-            }
         }
 
         private Task Log(LogMessage msg)
