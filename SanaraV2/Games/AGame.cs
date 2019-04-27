@@ -87,7 +87,7 @@ namespace SanaraV2.Games
                         {
                             Color = Color.Red,
                             Title = e.GetType().ToString(),
-                            Description = Sentences.ExceptionGameStop(_chan.GuildId),
+                            Description = Sentences.ExceptionGameStop(_chan.GuildId) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport),
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = e.Message
@@ -126,10 +126,30 @@ namespace SanaraV2.Games
                 _checkingAnswer = false;
                 return;
             }
-            string error = await GetCheckCorrectAsync(userAnswer);
+            string error;
+            try
+            {
+                error = await GetCheckCorrectAsync(userAnswer);
+            }
+            catch (Exception e)
+            {
+                await _chan.SendMessageAsync("", false, new EmbedBuilder()
+                {
+                    Color = Color.Red,
+                    Title = e.GetType().ToString(),
+                    Description = Sentences.ExceptionGameCheck(_chan.GuildId) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport),
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = e.Message
+                    }
+                }.Build());
+                await LooseAsync(null);
+                throw e;
+            }
             if (error != null)
             {
-                await PostText(error);
+                if (error != "")
+                    await PostText(error);
                 _checkingAnswer = false;
                 return;
             }

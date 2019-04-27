@@ -70,7 +70,7 @@ namespace SanaraV2.Games
             string[] validWords = GetValidWords();
             if (validWords.Length == 0) // Not supposed to happen
             {
-                throw new LooseException(GetStringFromSentence(Sentences.ShiritoriNoWord));
+                throw new LooseException(GetStringFromSentence(Sentences.ShiritoriNoWord) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport));
             }
             string word = validWords[Program.p.rand.Next(0, validWords.Length)];
             string[] splitWord = word.Split('$');
@@ -91,9 +91,51 @@ namespace SanaraV2.Games
             dynamic json;
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userAnswer)));
+            if (json.data.Length == 0)
+                return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             bool isCorrect = false, isNoun = false;
-            Console.WriteLine(json.data[0].ToString());
-            return "Debug point reached";
+            foreach (dynamic s in json.data[0])
+            {
+                foreach (dynamic jp in s.japanese)
+                {
+                    if (Linguist.ToHiragana(jp.reading) == userAnswer)
+                    {
+                        isCorrect = true;
+                        foreach (dynamic meaning in s.senses)
+                        {
+                            if (meaning.parts_of_speech == "Noun")
+                            {
+                                isNoun = true;
+                                goto ContinueCheck;
+                            }
+                        }
+                    }
+                }
+            }
+            ContinueCheck:
+            if (!isCorrect)
+                return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
+            if (!isNoun)
+                return GetStringFromSentence(Sentences.ShiritoriNotNoun);
+            if (userAnswer.Length == 1)
+                return GetStringFromSentence(Sentences.ShiritoriTooSmall);
+            string lastCharac = GetLastCharacter(_currWord);
+            if (!userAnswer.StartsWith(GetLastCharacter(_currWord)))
+                return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
+            if (_alreadySaid.Contains(userAnswer))
+            {
+                await LooseAsync(GetStringFromSentence(Sentences.ShiritoriAlreadySaid));
+                return "";
+            }
+            if (userAnswer.Last() == 'ん')
+            {
+                await LooseAsync(GetStringFromSentence(Sentences.ShiritoriEndWithN));
+                return "";
+            }
+            _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == userAnswer));
+            _alreadySaid.Add(userAnswer);
+            _currWord = userAnswer;
+            return null;
         }
 
         protected override async Task<string> GetLoose()
