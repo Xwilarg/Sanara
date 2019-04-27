@@ -36,7 +36,7 @@ namespace SanaraV2.Games
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            if (await Program.p.gm.Cancel(Context.Channel.Id))
+            if (Program.p.gm.Cancel(Context.Channel.Id))
                 await ReplyAsync(Sentences.ResetDone(Context.Guild.Id));
             else
                 await ReplyAsync(Sentences.ResetNone(Context.Guild.Id));

@@ -33,7 +33,7 @@ namespace SanaraV2.Games
         }
 
         // Cancel the current game
-        public async Task<bool> Cancel(ulong chanId)
+        public bool Cancel(ulong chanId)
         {
             lock(_games)
             {

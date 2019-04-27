@@ -50,6 +50,9 @@ namespace SanaraV2.Games
     public class Shiritori : AGame
     {
         public Shiritori(ITextChannel chan, List<string> dictionnary, Difficulty difficulty, bool isFull, int timer) : base(chan, dictionnary, new Config(timer, difficulty, "shiritori", isFull))
+        { }
+
+        protected override void Init()
         {
             _alreadySaid = new List<string>();
             _currWord = null;
