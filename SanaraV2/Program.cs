@@ -656,9 +656,9 @@ namespace SanaraV2
             return Task.CompletedTask;
         }
 
-        private Task LogError(LogMessage msg)
+        public Task LogError(LogMessage msg)
         {
-            if (msg.Exception.InnerException.GetType() == typeof(NotAvailable))
+            if (msg.Exception.InnerException != null && msg.Exception.InnerException.GetType() == typeof(NotAvailable))
             {
                 CommandException ex = (CommandException)msg.Exception;
                 ex.Context.Channel.SendMessageAsync(Modules.Base.Sentences.NotAvailable(ex.Context.Guild.Id));

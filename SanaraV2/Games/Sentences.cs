@@ -66,6 +66,5 @@ namespace SanaraV2.Games
         public static string Meaning(ulong guildId) { return (Translation.GetTranslation(guildId, "meaning")); }
         public static string GoodAnswerWas(ulong guildId, string answer) { return (Translation.GetTranslation(guildId, "goodAnswerWas", answer)); }
         public static string ExceptionGameCheck(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionGameCheck")); }
-        public static string ExceptionPleaseReport(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionPleaseReport")); }
     }
 }

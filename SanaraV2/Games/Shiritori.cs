@@ -36,6 +36,8 @@ namespace SanaraV2.Games
         public override bool DoesAllowFull()
             => false;
 
+
+
         public override string GetRules(ulong guildId)
             => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
 
@@ -70,7 +72,9 @@ namespace SanaraV2.Games
             string[] validWords = GetValidWords();
             if (validWords.Length == 0) // Not supposed to happen
             {
-                throw new LooseException(GetStringFromSentence(Sentences.ShiritoriNoWord) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport));
+                LooseException le = new LooseException(GetStringFromSentence(Sentences.ShiritoriNoWord));
+                await Program.p.LogError(new LogMessage(LogSeverity.Error, le.Source, le.Message, le));
+                throw le;
             }
             string word = validWords[Program.p.rand.Next(0, validWords.Length)];
             string[] splitWord = word.Split('$');
@@ -83,6 +87,9 @@ namespace SanaraV2.Games
         protected override PostType GetPostType()
             => PostType.Text;
 
+        protected override bool CongratulateOnGuess()
+            => false;
+
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
             userAnswer = Linguist.ToHiragana(userAnswer);
@@ -91,22 +98,25 @@ namespace SanaraV2.Games
             dynamic json;
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userAnswer)));
-            if (json.data.Length == 0)
+            if (json.data.Count == 0)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             bool isCorrect = false, isNoun = false;
-            foreach (dynamic s in json.data[0])
+            foreach (dynamic s in json.data)
             {
                 foreach (dynamic jp in s.japanese)
                 {
-                    if (Linguist.ToHiragana(jp.reading) == userAnswer)
+                    if (Linguist.ToHiragana((string)jp.reading) == userAnswer)
                     {
                         isCorrect = true;
                         foreach (dynamic meaning in s.senses)
                         {
-                            if (meaning.parts_of_speech == "Noun")
+                            foreach (dynamic partSpeech in meaning.parts_of_speech)
                             {
-                                isNoun = true;
-                                goto ContinueCheck;
+                                if (partSpeech == "Noun")
+                                {
+                                    isNoun = true;
+                                    goto ContinueCheck;
+                                }
                             }
                         }
                     }
@@ -115,13 +125,13 @@ namespace SanaraV2.Games
             ContinueCheck:
             if (!isCorrect)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
+            string lastCharac = GetLastCharacter(_currWord);
+            if (!userAnswer.StartsWith(GetLastCharacter(_currWord)))
+                return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (!isNoun)
                 return GetStringFromSentence(Sentences.ShiritoriNotNoun);
             if (userAnswer.Length == 1)
                 return GetStringFromSentence(Sentences.ShiritoriTooSmall);
-            string lastCharac = GetLastCharacter(_currWord);
-            if (!userAnswer.StartsWith(GetLastCharacter(_currWord)))
-                return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (_alreadySaid.Contains(userAnswer))
             {
                 await LooseAsync(GetStringFromSentence(Sentences.ShiritoriAlreadySaid));

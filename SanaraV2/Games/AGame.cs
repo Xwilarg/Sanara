@@ -52,6 +52,7 @@ namespace SanaraV2.Games
         protected abstract PostType GetPostType();
         protected abstract Task<string> GetCheckCorrectAsync(string userAnswer); // Return null if suceed, else return error message
         protected abstract Task<string> GetLoose();
+        protected abstract bool CongratulateOnGuess(); // Say "Congratulation you found the right answer" on a guess
 
         public async Task PostAsync()
         {
@@ -87,12 +88,13 @@ namespace SanaraV2.Games
                         {
                             Color = Color.Red,
                             Title = e.GetType().ToString(),
-                            Description = Sentences.ExceptionGameStop(_chan.GuildId) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport),
+                            Description = Sentences.ExceptionGameStop(_chan.GuildId),
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = e.Message
                             }
                         }.Build());
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                         _postImage = false;
                         await LooseAsync(null);
                         break;
@@ -109,6 +111,7 @@ namespace SanaraV2.Games
                                 Text = e.Message
                             }
                         }.Build());
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     }
                 }
             }
@@ -137,14 +140,15 @@ namespace SanaraV2.Games
                 {
                     Color = Color.Red,
                     Title = e.GetType().ToString(),
-                    Description = Sentences.ExceptionGameCheck(_chan.GuildId) + Environment.NewLine + GetStringFromSentence(Sentences.ExceptionPleaseReport),
+                    Description = Sentences.ExceptionGameCheck(_chan.GuildId),
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = e.Message
                     }
                 }.Build());
+                await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 await LooseAsync(null);
-                throw e;
+                return;
             }
             if (error != null)
             {
@@ -155,7 +159,8 @@ namespace SanaraV2.Games
             }
             if (!_contributors.Contains(user.Id))
                 _contributors.Add(user.Id);
-            await _chan.SendMessageAsync(Sentences.GuessGood(_chan.GuildId));
+            if (CongratulateOnGuess())
+                await PostText(Sentences.GuessGood(_chan.GuildId));
             _score++;
             await PostAsync();
             _checkingAnswer = false;
