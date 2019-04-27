@@ -20,6 +20,7 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
+using SanaraV2.Games;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
 using SanaraV2.Modules.GamesInfo;
@@ -62,6 +63,8 @@ namespace SanaraV2
 
         public List<GameModule.Game> games;
         public Thread gameThread;
+
+        public GameManager gm;
 
         // GAME DICTIONARIES
         public List<string> kancolleDict { private set; get; }
@@ -110,6 +113,7 @@ namespace SanaraV2
             gamesTmp = new List<ulong>();
 
             await InitDictionaries();
+            gm = new GameManager();
 
             p = this;
             games = new List<GameModule.Game>();

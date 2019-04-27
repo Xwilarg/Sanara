@@ -263,8 +263,12 @@
     <Compile Include="Features\Tools\Response.cs" />
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Games\AGame.cs" />
+    <Compile Include="Games\APreload.cs" />
     <Compile Include="Games\Config.cs" />
     <Compile Include="Games\GameManager.cs" />
+    <Compile Include="Games\LooseException.cs" />
+    <Compile Include="Games\Sentence.cs" />
+    <Compile Include="Games\Shiritori.cs" />
     <Compile Include="Modules\Base\NotAvailable.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
     <Compile Include="Modules\GamesInfo\Sentences.cs" />

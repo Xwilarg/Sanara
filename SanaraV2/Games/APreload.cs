@@ -13,25 +13,15 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using System.Collections.Generic;
+
 namespace SanaraV2.Games
 {
-    public struct Config
+    public abstract class APreload
     {
-        public Config(int refTime, Difficulty difficulty, string gameName)
-        {
-            this.refTime = refTime;
-            this.difficulty = difficulty;
-            this.gameName = gameName;
-        }
+        public APreload(List<string> dictionnary)
+        { }
 
-        public int refTime; // Time before the counter end and the player loose
-        public Difficulty difficulty;
-        public string gameName; // Used to store the score in the db
-    }
-
-    public enum Difficulty // Easy mode give twice more time
-    {
-        Normal = 1,
-        Easy
+        private List<string> _dictionnary;
     }
 }
