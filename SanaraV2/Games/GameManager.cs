@@ -29,6 +29,7 @@ namespace SanaraV2.Games
         {
             _games = new List<AGame>();
             _gameThread = new Thread(new ThreadStart(GameLoop));
+            _gameThread.Start();
         }
 
         // Cancel the current game

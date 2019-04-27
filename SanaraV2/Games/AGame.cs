@@ -146,10 +146,7 @@ namespace SanaraV2.Games
             if (_postImage || _checkingAnswer) // If we are already doing something (posting image or checking answer) we wait for it
                 return;
             if (_startTime.AddSeconds(_timer).CompareTo(DateTime.Now) > 0)
-            {
                 await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
-                _didLost = true;
-            }
         }
 
         public bool DidLost()
@@ -162,6 +159,7 @@ namespace SanaraV2.Games
                 await SaveScores(await GetLoose());
             else
                 await SaveScores(reason + Environment.NewLine + await GetLoose());
+            _didLost = true;
         }
 
         private async Task SaveScores(string reason)
