@@ -19,7 +19,6 @@ namespace SanaraV2.Modules.Base
     public static class Sentences
     {
         /// --------------------------- ID ---------------------------
-        public readonly static ulong myId = (Program.p.client == null) ? (0) : (Program.p.client.CurrentUser.Id);
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------
