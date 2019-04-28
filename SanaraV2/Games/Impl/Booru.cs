@@ -18,35 +18,34 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Games.Impl
 {
-    public class AnimePreload : APreload
+    public class BooruPreload : APreload
     {
-        public AnimePreload() : base(new[] { "anime" }, 30, Sentences.AnimeGame)
+        public BooruPreload() : base(new[] { "booru" }, 45, Sentences.BooruGame)
         { }
 
         public override bool IsNsfw()
-            => false;
-
-        public override bool DoesAllowFull()
             => true;
 
+        public override bool DoesAllowFull()
+            => false;
+
         public override string GetRules(ulong guildId)
-            => Sentences.RulesAnime(guildId);
+            => Sentences.RulesBooru(guildId);
     }
 
-    public class Anime : AQuizz
+    public class Booru : AQuizz
     {
-        public Anime(ITextChannel chan, Config config) : base(chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config)
+        public Booru(ITextChannel chan, Config config) : base(chan, Constants.booruDictionnary, config)
         { }
 
         protected override void Init()
         {
             base.Init();
-            _booru = new Sakugabooru();
+            _booru = new Gelbooru();
         }
 
         protected override bool IsDictionnaryFull()
@@ -57,30 +56,29 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
-            var result = Features.NSFW.Booru.SearchBooru(false, new string[] { curr, "animated" }, _booru, Program.p.rand).GetAwaiter().GetResult();
             return (new Tuple<string[], string[]>(
-                new[] { result.answer.url },
-                result.answer.tags.Where(x => _booru.GetTag(x).GetAwaiter().GetResult().type == BooruSharp.Search.Tag.TagType.Copyright).ToArray()
+                new[] { Features.NSFW.Booru.SearchBooru(false, new string[] { curr }, _booru, Program.p.rand).GetAwaiter().GetResult().answer.url,
+                 Features.NSFW.Booru.SearchBooru(false, new string[] { curr }, _booru, Program.p.rand).GetAwaiter().GetResult().answer.url,
+                 Features.NSFW.Booru.SearchBooru(false, new string[] { curr }, _booru, Program.p.rand).GetAwaiter().GetResult().answer.url},
+                new[] { curr }
             ));
         }
 
-        private Sakugabooru _booru;
+        private Gelbooru _booru;
 
-        public static Tuple<List<string>, List<string>> LoadDictionnaries()
+        public static List<string> LoadDictionnary()
         {
-            if (!File.Exists("Saves/AnimeTags.dat"))
+            if (!File.Exists("Saves/BooruTriviaTags.dat"))
                 return (null);
             List<string> tags = new List<string>();
-            List<string> tagsFull = new List<string>();
-            string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");
+            string[] allLines = File.ReadAllLines("Saves/BooruTriviaTags.dat");
             foreach (string line in allLines)
             {
-                string[] parts = line.Split(' ');
-                if (int.Parse(parts[1]) > 10)
-                    tags.Add(line.Split(' ')[0]);
-                tagsFull.Add(line.Split(' ')[0]);
+                string[] linePart = line.Split(' ');
+                if (Convert.ToInt32(linePart[1]) >= 3)
+                    tags.Add(linePart[0]);
             }
-            return (new Tuple<List<string>, List<string>>(tags, tagsFull));
+            return (tags);
         }
     }
 }

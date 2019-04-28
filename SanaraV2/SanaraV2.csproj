@@ -270,6 +270,7 @@
     <Compile Include="Games\GameManager.cs" />
     <Compile Include="Games\GameModule.cs" />
     <Compile Include="Games\Impl\Anime.cs" />
+    <Compile Include="Games\Impl\Booru.cs" />
     <Compile Include="Games\Impl\KanColle.cs" />
     <Compile Include="Games\LooseException.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />

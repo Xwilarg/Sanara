@@ -25,19 +25,22 @@ namespace SanaraV2.Games
         {
             new Tuple<Type, Type>(typeof(ShiritoriPreload), typeof(Shiritori)),
             new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
-            new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime))
+            new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime)),
+            new Tuple<Type, Type>(typeof(BooruPreload), typeof(Booru))
         };
 
         public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
         public static List<string> kanColleDictionnary = KanColle.LoadDictionnary();
         public static Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
+        public static List<string> booruDictionnary = Booru.LoadDictionnary();
 
         public static Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
         {
             new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2)
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
         };
     }
 }

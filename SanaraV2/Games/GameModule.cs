@@ -31,7 +31,9 @@ namespace SanaraV2.Games
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             ITextChannel chan = (ITextChannel)Context.Channel;
-            await Program.p.gm.Play(args, chan);
+            var error = await Program.p.gm.Play(args, chan);
+            if (error != null)
+                await ReplyAsync(error(Context.Guild.Id));
         }
 
         [Command("Cancel")]
