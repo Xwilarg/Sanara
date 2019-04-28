@@ -31,7 +31,6 @@ namespace SanaraV2.Games
             if (dictionnary == null) // Dictionnary failed to load
                 throw new NoDictionnaryException();
             _dictionnary = dictionnary;
-            _config = config;
             _contributors = new List<ulong>();
             _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "");
             _score = 0;
@@ -238,7 +237,6 @@ namespace SanaraV2.Games
         }
 
         private ITextChannel    _chan; // Channel where the game is
-        private Config          _config; // Game configuration
         private List<ulong>     _contributors; // Ids of the users that contributed to the current score
         private string          _saveName; // Name the game will have in the db
         private int             _score; // Current score

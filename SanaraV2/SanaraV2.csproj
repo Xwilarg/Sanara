@@ -264,14 +264,16 @@
     <Compile Include="Features\Utilities.cs" />
     <Compile Include="Games\AGame.cs" />
     <Compile Include="Games\APreload.cs" />
+    <Compile Include="Games\AQuizz.cs" />
     <Compile Include="Games\Config.cs" />
     <Compile Include="Games\Constants.cs" />
     <Compile Include="Games\GameManager.cs" />
     <Compile Include="Games\GameModule.cs" />
     <Compile Include="Games\LooseException.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />
+    <Compile Include="Games\ScoreManager.cs" />
     <Compile Include="Games\Sentences.cs" />
-    <Compile Include="Games\Shiritori.cs" />
+    <Compile Include="Games\Impl\Shiritori.cs" />
     <Compile Include="Modules\Base\NotAvailable.cs" />
     <Compile Include="Modules\Entertainment\Sentences.cs" />
     <Compile Include="Modules\GamesInfo\Sentences.cs" />

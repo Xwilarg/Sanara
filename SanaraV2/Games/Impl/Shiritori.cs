@@ -23,7 +23,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace SanaraV2.Games
+namespace SanaraV2.Games.Impl
 {
     public class ShiritoriPreload : APreload
     {
@@ -35,8 +35,6 @@ namespace SanaraV2.Games
 
         public override bool DoesAllowFull()
             => false;
-
-
 
         public override string GetRules(ulong guildId)
             => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
