@@ -21,9 +21,8 @@ namespace SanaraV2.Games
 {
     public abstract class APreload
     {
-        public APreload(List<string> dictionnary, string[] names, int timer, Func<ulong, string> gameSentence)
+        public APreload(string[] names, int timer, Func<ulong, string> gameSentence)
         {
-            _dictionnary = dictionnary;
             _names = names;
             _timer = timer;
             _gameSentence = gameSentence;
@@ -32,9 +31,6 @@ namespace SanaraV2.Games
         public abstract bool IsNsfw();
         public abstract bool DoesAllowFull(); // Allow 'full' attribute
         public abstract string GetRules(ulong guildId);
-
-        public List<string> GetDictionnary()
-            => _dictionnary;
 
         public bool ContainsName(string name)
             => _names.Contains(name);
@@ -48,7 +44,6 @@ namespace SanaraV2.Games
         public string GetGameSentence(ulong guildId)
             => _gameSentence(guildId);
 
-        private List<string> _dictionnary;
         private string[] _names;
         private int _timer;
         private Func<ulong, string> _gameSentence;

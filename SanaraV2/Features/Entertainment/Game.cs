@@ -21,38 +21,11 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static SanaraV2.Features.Entertainment.Response;
 
 namespace SanaraV2.Features.Entertainment
 {
     public static class Game
     {
-
-        public static List<string> LoadShiritori()
-        {
-            if (!File.Exists("Saves/shiritoriWords.dat"))
-                return (null);
-            return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
-        }
-
-        public static async Task<List<string>> LoadKancolle()
-        {
-            List<string> ships = new List<string>();
-            using (HttpClient hc = new HttpClient())
-            {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                string json = await hc.GetStringAsync("https://kancolle.fandom.com/wiki/Ship");
-                json = json.Split(new string[] { "List_of_coastal_defense_ships_by_upgraded_maximum_stats" }, StringSplitOptions.None)[1].Split(new string[] { "Fleet_of_Fog" }, StringSplitOptions.None)[0];
-                MatchCollection matches = Regex.Matches(json, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"[^\"]+\">[^<]+<\\/a>");
-                foreach (Match match in matches)
-                {
-                    string str = match.Groups[1].Value.Replace("'", "").Split('|')[0];
-                    if (!str.StartsWith("List_of") && !str.StartsWith("Category:") && !ships.Contains(str))
-                        ships.Add(str);
-                }
-            }
-            return (ships);
-        }
 
         public static List<string> LoadBooru()
         {

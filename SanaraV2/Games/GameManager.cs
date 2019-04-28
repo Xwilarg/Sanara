@@ -30,6 +30,7 @@ namespace SanaraV2.Games
             _games = new List<AGame>();
             _gameThread = new Thread(new ThreadStart(GameLoop));
             _gameThread.Start();
+            _gamesTmp = new List<ulong>();
         }
 
         // Cancel the current game
@@ -53,9 +54,9 @@ namespace SanaraV2.Games
                 if (_games.Any(x => x.IsSelf(chan.Id)))
                     return Sentences.GameAlreadyRunning;
             }
-            Program.p.gamesTmp.Add(chan.Id);
+            _gamesTmp.Add(chan.Id);
             var elem = await PlayInternal(args, chan);
-            Program.p.gamesTmp.Remove(chan.Id);
+            _gamesTmp.Remove(chan.Id);
             return (elem);
         }
 
@@ -105,7 +106,7 @@ namespace SanaraV2.Games
                             Sentences.RulesReset(chan.GuildId));
                         lock(_games)
                         {
-                            _games.Add((AGame)Activator.CreateInstance(game.Item2, chan, preload.GetDictionnary(), new Config(preload.GetTimer(),  difficulty, preload.GetGameName(), isFull)));
+                            _games.Add((AGame)Activator.CreateInstance(game.Item2, chan, game.Item3, new Config(preload.GetTimer(),  difficulty, preload.GetGameName(), isFull)));
                         }
                         return null;
                     }
@@ -146,5 +147,6 @@ namespace SanaraV2.Games
 
         private List<AGame> _games;
         private Thread _gameThread;
+        private List<ulong> _gamesTmp; // To be sure that two players don't start a game at the same time in the same chan
     }
 }

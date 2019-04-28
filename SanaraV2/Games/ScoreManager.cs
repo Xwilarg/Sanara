@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Games
@@ -40,6 +41,28 @@ namespace SanaraV2.Games
                 ranking.Add(biggests.Select(x => x.Value).ToArray());
             }
             return (string.Join("$", ranking.Select(x => string.Join("|", x.Select(y => y?.Item2 + "|" + y?.Item1)))));
+        }
+
+        public static string GetInformation(ulong guildId, ref int yes, ref int no)
+        {
+            StringBuilder finalStr = new StringBuilder();
+            foreach (var game in Constants.allGames)
+            {
+                APreload preload = (APreload)Activator.CreateInstance(game.Item1);
+                finalStr.Append("**" + preload.GetGameSentence(guildId) + ":** ");
+                if (game.Item3 == null)
+                {
+                    finalStr.Append(Sentences.NotLoaded(guildId));
+                    no++;
+                }
+                else
+                {
+                    finalStr.Append(game.Item3.Count + " " + Sentences.Words(guildId));
+                    yes++;
+                }
+                finalStr.Append(Environment.NewLine);
+            }
+            return finalStr.ToString();
         }
     }
 }

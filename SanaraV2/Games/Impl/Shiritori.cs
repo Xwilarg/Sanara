@@ -27,7 +27,7 @@ namespace SanaraV2.Games.Impl
 {
     public class ShiritoriPreload : APreload
     {
-        public ShiritoriPreload() : base(LoadDictionnary(), new[] { "shiritori" }, 15, Sentences.ShiritoriGame)
+        public ShiritoriPreload() : base(new[] { "shiritori" }, 15, Sentences.ShiritoriGame)
         { }
 
         public override bool IsNsfw()
@@ -38,13 +38,6 @@ namespace SanaraV2.Games.Impl
 
         public override string GetRules(ulong guildId)
             => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
-
-        private static List<string> LoadDictionnary()
-        {
-            if (!File.Exists("Saves/shiritoriWords.dat"))
-                return (null);
-            return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
-        }
     }
 
     public class Shiritori : AGame
@@ -170,5 +163,12 @@ namespace SanaraV2.Games.Impl
 
         private List<string>    _alreadySaid; // We make sure that the user don't say the same word twice
         private string          _currWord; // The current word
+
+        public static List<string> LoadDictionnary()
+        {
+            if (!File.Exists("Saves/shiritoriWords.dat"))
+                return (null);
+            return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
+        }
     }
 }

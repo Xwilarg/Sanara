@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using System.IO;
 using Discord;
 using System.Linq;
+using SanaraV2.Games;
 
 namespace Sanara_UnitTests
 {
@@ -57,44 +58,6 @@ namespace Sanara_UnitTests
             Assert.True(IsLinkValid(result.answer.url));
         }
 
-        // GAME MODULE
-        [Fact]
-        public async Task TestBooruGame()
-        {
-            var dict = SanaraV2.Features.Entertainment.Game.LoadBooru();
-            Assert.NotNull(dict);
-        }
-
-        [Fact]
-        public async Task TestShiritoriGame()
-        {
-            var dict = SanaraV2.Features.Entertainment.Game.LoadShiritori();
-            Assert.NotNull(dict);
-        }
-
-        [Fact]
-        public async Task TestAnimeGame()
-        {
-            var dict = SanaraV2.Features.Entertainment.Game.LoadAnime();
-            Assert.NotNull(dict);
-        }
-
-        [Fact]
-        public async Task TestKancolleGame()
-        {
-            var dict = await SanaraV2.Features.Entertainment.Game.LoadKancolle();
-            Assert.NotNull(dict);
-            Assert.True(dict.Count > 220);
-        }
-
-        [Fact]
-        public async Task TestAzurLaneGame()
-        {
-            var dict = await SanaraV2.Features.Entertainment.Game.LoadAzurLane();
-            Assert.NotNull(dict);
-            Assert.True(dict.Count > 300);
-        }
-
         // BOORU MODULE
         [Fact]
         public async Task TestBooruSafe()
@@ -103,6 +66,17 @@ namespace Sanara_UnitTests
             Assert.Equal(Error.Booru.None, result.error);
             Assert.Equal(Color.Green, result.answer.colorRating);
             Assert.True(IsLinkValid(result.answer.url));
+        }
+
+        // GAMES MODULE
+        [Fact]
+        public async Task TestGames()
+        {
+            foreach (var game in Constants.allGames)
+            {
+                Assert.NotNull(game.Item3);
+                Assert.True(game.Item3.Count > 100);
+            }
         }
 
         [Fact]

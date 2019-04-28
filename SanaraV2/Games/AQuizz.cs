@@ -14,7 +14,9 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
+using SanaraV2.Modules.Base;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Games
@@ -26,7 +28,10 @@ namespace SanaraV2.Games
 
         protected override void Init()
         {
+            _toGuess = null;
         }
+
+        protected abstract Task<string[]> GetPostInternalAsync();
 
         protected override bool CongratulateOnGuess()
             => true;
@@ -34,19 +39,29 @@ namespace SanaraV2.Games
         protected override PostType GetPostType()
             => PostType.Url;
 
-        protected override Task<string> GetCheckCorrectAsync(string userAnswer)
+        protected override async Task<string[]> GetPostAsync()
         {
-            throw new System.NotImplementedException();
+            _toGuess = _dictionnary[Program.p.rand.Next(_dictionnary.Count)];
+            return await GetPostInternalAsync();
         }
 
-        protected override Task<string> GetLoose()
+        protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
-            throw new System.NotImplementedException();
+            string cleanUserAnswer = Utilities.CleanWord(userAnswer);
+            string cleanToGuess = Utilities.CleanWord(_toGuess);
+            if (cleanUserAnswer == cleanToGuess)
+                return null;
+            if (cleanUserAnswer.Contains(cleanToGuess) || cleanToGuess.Contains(cleanUserAnswer))
+                return Sentences.BooruGuessClose(GetGuildId(), userAnswer);
+            return (Sentences.GuessBad(GetGuildId(), userAnswer));
         }
 
-        protected override Task<string[]> GetPostAsync()
-        {
-            throw new System.NotImplementedException();
-        }
+        protected override async Task<string> GetLoose()
+            => Sentences.GoodAnswerWas(GetGuildId(), FormatAnswer());
+
+        private string FormatAnswer()
+            => new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess.Replace('_', ' '));
+
+        protected string _toGuess; // Word the player have to guess
     }
 }

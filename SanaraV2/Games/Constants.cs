@@ -15,14 +15,15 @@
 
 using SanaraV2.Games.Impl;
 using System;
+using System.Collections.Generic;
 
 namespace SanaraV2.Games
 {
     public static class Constants
     {
-        public static Tuple<Type, Type>[] allGames = new Tuple<Type, Type>[] // All games need to be added here!
+        public static Tuple<Type, Type, List<string>>[] allGames = new Tuple<Type, Type, List<string>>[] // All games need to be added here!
         {
-            new Tuple<Type, Type>(typeof(ShiritoriPreload), typeof(Shiritori))
+            new Tuple<Type, Type, List<string>>(typeof(ShiritoriPreload), typeof(Shiritori), Shiritori.LoadDictionnary())
         };
     }
 }

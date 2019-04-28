@@ -63,16 +63,6 @@ namespace SanaraV2
 
         public GameManager gm;
 
-        // GAME DICTIONARIES
-        public List<string> kancolleDict { private set; get; }
-        public List<string> animeDict { private set; get; }
-        public List<string> animeFullDict { private set; get; }
-        public List<string> booruDict { private set; get; }
-        public List<string> shiritoriDict { private set; get; }
-        public List<string> azurLaneDict { private set; get; }
-
-        public List<ulong> gamesTmp; // To be sure that two players don't start a game at the same time in the same chan
-
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
@@ -114,9 +104,6 @@ namespace SanaraV2
             db = new Db.Db();
             await db.InitAsync();
 
-            gamesTmp = new List<ulong>();
-
-            await InitDictionaries();
             gm = new GameManager();
 
             p = this;
@@ -183,86 +170,6 @@ namespace SanaraV2
         {
             Environment.Exit(1);
             return Task.CompletedTask;
-        }
-
-        private async Task InitDictionaries()
-        {
-            Task taskDict1 = Task.Run(async () =>
-            {
-                shiritoriDict = Features.Entertainment.Game.LoadShiritori();
-                if (shiritoriDict == null || shiritoriDict.Count < 100)
-                {
-                    shiritoriDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Shiritori dictionary"));
-                }
-                else
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Shiritori dictionary was succesfully loaded"));
-            });
-
-            Task taskDict2 = Task.Run(async () =>
-            {
-                booruDict = Features.Entertainment.Game.LoadBooru();
-                if (booruDict == null || booruDict.Count < 100)
-                {
-                    booruDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Booru dictionary"));
-                }
-                else
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Booru dictionary was succesfully loaded"));
-            });
-
-            Task taskDict3 = Task.Run(async () =>
-            {
-                var tmp = Features.Entertainment.Game.LoadAnime();
-                if (tmp == null)
-                {
-                    animeFullDict = null;
-                    animeDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Anime dictionary"));
-                }
-                else
-                {
-                    animeFullDict = tmp.Item1;
-                    animeDict = tmp.Item2;
-                    if (animeDict.Count < 100)
-                    {
-                        animeFullDict = null;
-                        animeDict = null;
-                        await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Anime dictionary"));
-                    }
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Anime dictionary was succesfully loaded"));
-                }
-            });
-
-            Task taskDict4 = Task.Run(async () =>
-            {
-                kancolleDict = await Features.Entertainment.Game.LoadKancolle();
-                if (kancolleDict == null || kancolleDict.Count < 100)
-                {
-                    kancolleDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load KanColle dictionary"));
-                }
-                else
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "KanColle dictionary was succesfully loaded"));
-            });
-
-            Task taskDict5 = Task.Run(async () =>
-            {
-                azurLaneDict = await Features.Entertainment.Game.LoadAzurLane();
-                if (azurLaneDict == null || azurLaneDict.Count < 100)
-                {
-                    azurLaneDict = null;
-                    await Log(new LogMessage(LogSeverity.Warning, "Sanara", "Impossible to load Azur Lane dictionary"));
-                }
-                else
-                    await Log(new LogMessage(LogSeverity.Verbose, "Sanara", "Azur Lane dictionary was succesfully loaded"));
-            });
-
-            await taskDict1;
-            await taskDict2;
-            await taskDict3;
-            await taskDict4;
-            await taskDict5;
         }
 
         private void InitServices()

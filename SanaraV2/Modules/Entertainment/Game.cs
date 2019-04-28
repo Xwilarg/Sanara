@@ -172,7 +172,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             public Kancolle(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, kancolleTimer, "kancolle", isEasy, false)
             {
-                m_shipNames = Program.p.kancolleDict;
+                m_shipNames = null;// Program.p.kancolleDict;
                 if (m_shipNames == null)
                     throw new NullReferenceException("Dictionary not available.");
                 m_toGuess = null;
@@ -278,7 +278,7 @@ namespace SanaraV2.Modules.Entertainment
             public BooruGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, booruTimer, "booru", isEasy, false)
             {
                 m_toGuess = null;
-                m_allTags = Program.p.booruDict;
+                m_allTags = null;// Program.p.booruDict;
                 if (m_allTags == null)
                     throw new NullReferenceException("Dictionary not available.");
                 m_time = DateTime.MinValue;
@@ -356,7 +356,7 @@ namespace SanaraV2.Modules.Entertainment
             public AnimeGame(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy, bool isFull) : base(chan, guild, charac, animeTimer, "anime", isEasy, isFull)
             {
                 m_toGuess = null;
-                m_allTags = isFull ? Program.p.animeFullDict : Program.p.animeDict;
+                m_allTags = null;//isFull ? Program.p.animeFullDict : Program.p.animeDict;
                 if (m_allTags == null)
                     throw new NullReferenceException("Dictionary not available.");
                 m_time = DateTime.MinValue;
@@ -427,7 +427,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             public AzurLane(IMessageChannel chan, IGuild guild, IUser charac, bool isEasy) : base(chan, guild, charac, azurlaneTimer, "azurlane", isEasy, false)
             {
-                m_shipNames = Program.p.azurLaneDict;
+                m_shipNames = null;// Program.p.azurLaneDict;
                 if (m_shipNames == null)
                     throw new NullReferenceException("Dictionary not available.");
                 m_toGuess = null;
