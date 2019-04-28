@@ -33,7 +33,7 @@ namespace SanaraV2.Games
             _dictionnary = dictionnary;
             _config = config;
             _contributors = new List<ulong>();
-            _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "");
+            _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "");
             _score = 0;
             _postImage = false;
             _checkingAnswer = false;

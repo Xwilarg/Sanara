@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,11 +21,12 @@ namespace SanaraV2.Games
 {
     public abstract class APreload
     {
-        public APreload(List<string> dictionnary, string[] names, int timer)
+        public APreload(List<string> dictionnary, string[] names, int timer, Func<ulong, string> gameSentence)
         {
             _dictionnary = dictionnary;
             _names = names;
             _timer = timer;
+            _gameSentence = gameSentence;
         }
 
         public abstract bool IsNsfw();
@@ -40,8 +42,15 @@ namespace SanaraV2.Games
         public int GetTimer()
             => _timer;
 
+        public string GetGameName()
+            => _names[0];
+
+        public string GetGameSentence(ulong guildId)
+            => _gameSentence(guildId);
+
         private List<string> _dictionnary;
         private string[] _names;
         private int _timer;
+        private Func<ulong, string> _gameSentence;
     }
 }

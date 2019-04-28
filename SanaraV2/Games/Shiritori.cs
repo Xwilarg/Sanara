@@ -27,7 +27,7 @@ namespace SanaraV2.Games
 {
     public class ShiritoriPreload : APreload
     {
-        public ShiritoriPreload() : base(LoadDictionnary(), new[] { "shiritori" }, 15)
+        public ShiritoriPreload() : base(LoadDictionnary(), new[] { "shiritori" }, 15, Sentences.ShiritoriGame)
         { }
 
         public override bool IsNsfw()
@@ -51,7 +51,7 @@ namespace SanaraV2.Games
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, List<string> dictionnary, Difficulty difficulty, bool isFull, int timer) : base(chan, dictionnary, new Config(timer, difficulty, "shiritori", isFull))
+        public Shiritori(ITextChannel chan, List<string> dictionnary, Config config) : base(chan, dictionnary, config)
         { }
 
         protected override void Init()
@@ -81,7 +81,7 @@ namespace SanaraV2.Games
             _dictionnary.Remove(word);
             _alreadySaid.Add(splitWord[0]);
             _currWord = Linguist.ToHiragana(splitWord[0]);
-            return (new string[] { splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + " ) - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1] });
+            return (new string[] { splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1] });
         }
 
         protected override PostType GetPostType()

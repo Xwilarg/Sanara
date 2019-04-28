@@ -105,7 +105,7 @@ namespace SanaraV2.Games
                             Sentences.RulesReset(chan.GuildId));
                         lock(_games)
                         {
-                            _games.Add((AGame)Activator.CreateInstance(game.Item2, chan, preload.GetDictionnary(), difficulty, isFull, preload.GetTimer()));
+                            _games.Add((AGame)Activator.CreateInstance(game.Item2, chan, preload.GetDictionnary(), new Config(preload.GetTimer(),  difficulty, preload.GetGameName(), isFull)));
                         }
                         return null;
                     }
