@@ -17,6 +17,7 @@ using Discord;
 using SanaraV2.Modules.Base;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Games
@@ -32,6 +33,7 @@ namespace SanaraV2.Games
         }
 
         protected abstract Task<string[]> GetPostInternalAsync();
+        protected abstract bool IsDictionnaryFull(); // Does dictionnary contains all possibility ?
 
         protected override bool CongratulateOnGuess()
             => true;
@@ -51,6 +53,11 @@ namespace SanaraV2.Games
             string cleanToGuess = Utilities.CleanWord(_toGuess);
             if (cleanUserAnswer == cleanToGuess)
                 return null;
+            if (IsDictionnaryFull())
+            {
+                if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
+                    return GetStringFromSentence(Sentences.guessDontExist);
+            }
             if (cleanUserAnswer.Contains(cleanToGuess) || cleanToGuess.Contains(cleanUserAnswer))
                 return Sentences.BooruGuessClose(GetGuildId(), userAnswer);
             return (Sentences.GuessBad(GetGuildId(), userAnswer));

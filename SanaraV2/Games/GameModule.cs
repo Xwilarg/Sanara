@@ -25,7 +25,7 @@ namespace SanaraV2.Games
 {
     public class GameModule : ModuleBase
     {
-        [Command("Play")]
+        [Command("Play", RunMode = RunMode.Async)]
         public async Task Play(params string[] args)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);

@@ -44,6 +44,9 @@ namespace SanaraV2.Games.Impl
         public KanColle(ITextChannel chan, List<string> dictionnary, Config config) : base(chan, dictionnary, config)
         { }
 
+        protected override bool IsDictionnaryFull()
+            => true;
+
         protected override async Task<string[]> GetPostInternalAsync()
         {
             using (HttpClient hc = new HttpClient())
@@ -56,7 +59,7 @@ namespace SanaraV2.Games.Impl
             }
         }
 
-        public List<string> LoadDictionnary()
+        public static List<string> LoadDictionnary()
         {
             List<string> ships = new List<string>();
             using (HttpClient hc = new HttpClient())

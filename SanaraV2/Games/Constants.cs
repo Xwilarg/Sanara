@@ -23,7 +23,8 @@ namespace SanaraV2.Games
     {
         public static Tuple<Type, Type, List<string>>[] allGames = new Tuple<Type, Type, List<string>>[] // All games need to be added here!
         {
-            new Tuple<Type, Type, List<string>>(typeof(ShiritoriPreload), typeof(Shiritori), Shiritori.LoadDictionnary())
+            new Tuple<Type, Type, List<string>>(typeof(ShiritoriPreload), typeof(Shiritori), Shiritori.LoadDictionnary()),
+            new Tuple<Type, Type, List<string>>(typeof(KanCollePreload), typeof(KanColle), KanColle.LoadDictionnary())
         };
     }
 }
