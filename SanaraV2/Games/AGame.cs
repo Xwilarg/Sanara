@@ -40,11 +40,15 @@ namespace SanaraV2.Games
             _startTime = DateTime.Now;
             _timer = config.refTime * (int)config.difficulty;
             Init();
-            PostAsync().GetAwaiter().GetResult();
         }
 
         public bool IsSelf(ulong chanId) // Allow to check if a game is running in this channel
             => _chan.Id == chanId;
+
+        public void Cancel()
+        {
+            _didLost = true;
+        }
 
         protected abstract void Init(); // User must not use the ctor, they must init things in this function (because GetPost is called from this ctor, who is called before the child ctor)
         protected abstract Task<string[]> GetPostAsync();
@@ -62,6 +66,8 @@ namespace SanaraV2.Games
             int counter = 0;
             while (true)
             {
+                if (_didLost) // Can happen if the game is canceled
+                    return;
                 try
                 {
                     if (GetPostType() == PostType.Text)

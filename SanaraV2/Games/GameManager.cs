@@ -36,24 +36,18 @@ namespace SanaraV2.Games
         // Cancel the current game
         public bool Cancel(ulong chanId)
         {
-            lock(_games)
-            {
-                AGame game = _games.Find(x => x.IsSelf(chanId));
-                if (game == null)
-                    return false;
-                _games.Remove(game);
-            }
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game == null)
+                return false;
+            game.Cancel();
             return true;
         }
 
         // If failure return an error message, else return null
         public async Task<Func<ulong, string>> Play(string[] args, ITextChannel chan)
         {
-            lock(_games)
-            {
-                if (_games.Any(x => x.IsSelf(chan.Id)))
-                    return Sentences.GameAlreadyRunning;
-            }
+            if (_games.Any(x => x.IsSelf(chan.Id)))
+                return Sentences.GameAlreadyRunning;
             _gamesTmp.Add(chan.Id);
             var elem = await PlayInternal(args, chan);
             _gamesTmp.Remove(chan.Id);
@@ -104,10 +98,9 @@ namespace SanaraV2.Games
                         await chan.SendMessageAsync(preload.GetRules(chan.GuildId) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer()) + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        lock(_games)
-                        {
-                            _games.Add((AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(),  difficulty, preload.GetGameName(), isFull)));
-                        }
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull));
+                         _games.Add(newGame);
+                        await newGame.PostAsync();
                         return null;
                     }
                     catch (NoDictionnaryException)
@@ -121,26 +114,20 @@ namespace SanaraV2.Games
 
         public async Task ReceiveMessageAsync(string message, SocketUser user, ulong chanId) // Called everytimes a message is sent somewhere
         {
-            lock(_games)
-            {
-                AGame game = _games.Find(x => x.IsSelf(chanId));
-                if (game != null)
-                    game.CheckCorrectAsync(user, message).GetAwaiter().GetResult();
-            }
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game != null)
+            game.CheckCorrectAsync(user, message).GetAwaiter().GetResult();
         }
 
         private void GameLoop()
         {
             while (Thread.CurrentThread.IsAlive)
             {
-                lock (_games)
+                for (int i = _games.Count - 1; i >= 0; i--)
                 {
-                    foreach (AGame game in _games)
-                    {
-                        game.LooseTimerAsync().GetAwaiter().GetResult();
-                    }
-                    _games.RemoveAll(x => x.DidLost());
+                    _games[i].LooseTimerAsync().GetAwaiter().GetResult();
                 }
+                _games.RemoveAll(x => x.DidLost());
                 Thread.Sleep(250);
             }
         }
