@@ -42,7 +42,7 @@ namespace SanaraV2.Games.Impl
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, List<string> dictionnary, Config config) : base(chan, dictionnary, config)
+        public Shiritori(ITextChannel chan, Config config) : base(chan, Constants.shiritoriDictionnary, config)
         { }
 
         protected override void Init()
@@ -80,6 +80,9 @@ namespace SanaraV2.Games.Impl
 
         protected override bool CongratulateOnGuess()
             => false;
+
+        protected override string Help()
+            => null;
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {

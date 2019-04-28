@@ -52,6 +52,7 @@ namespace SanaraV2.Games
         protected abstract Task<string> GetCheckCorrectAsync(string userAnswer); // Return null if suceed, else return error message
         protected abstract Task<string> GetLoose();
         protected abstract bool CongratulateOnGuess(); // Say "Congratulation you found the right answer" on a guess
+        protected abstract string Help(); // null is no help
 
         public async Task PostAsync()
         {
@@ -114,6 +115,9 @@ namespace SanaraV2.Games
                     }
                 }
             }
+            string help = Help();
+            if (help != null)
+                await PostText(help);
             _postImage = false;
         }
 

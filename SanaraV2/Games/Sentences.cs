@@ -12,7 +12,9 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+
 using SanaraV2.Modules.Base;
+using System;
 
 namespace SanaraV2.Games
 {
@@ -68,5 +70,6 @@ namespace SanaraV2.Games
         public static string ExceptionGameCheck(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionGameCheck")); }
         public static string Words(ulong guildId) { return (Translation.GetTranslation(guildId, "words")); }
         public static string NotLoaded(ulong guildId) { return (Translation.GetTranslation(guildId, "notLoaded")); }
+        public static string AnimeFull(ulong guildId) { return (AnimeGame(guildId) + " (" + Translation.GetTranslation(guildId, "full") + ")"); }
     }
 }

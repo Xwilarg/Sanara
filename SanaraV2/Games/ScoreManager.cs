@@ -46,18 +46,17 @@ namespace SanaraV2.Games
         public static string GetInformation(ulong guildId, ref int yes, ref int no)
         {
             StringBuilder finalStr = new StringBuilder();
-            foreach (var game in Constants.allGames)
+            foreach (var game in Constants.allDictionnaries)
             {
-                APreload preload = (APreload)Activator.CreateInstance(game.Item1);
-                finalStr.Append("**" + preload.GetGameSentence(guildId) + ":** ");
-                if (game.Item3 == null)
+                finalStr.Append("**" + game.Item1(guildId) + ":** ");
+                if (game.Item2 == null)
                 {
                     finalStr.Append(Sentences.NotLoaded(guildId));
                     no++;
                 }
                 else
                 {
-                    finalStr.Append(game.Item3.Count + " " + Sentences.Words(guildId));
+                    finalStr.Append(game.Item2.Count + " " + Sentences.Words(guildId));
                     yes++;
                 }
                 finalStr.Append(Environment.NewLine);

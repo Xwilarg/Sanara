@@ -21,10 +21,23 @@ namespace SanaraV2.Games
 {
     public static class Constants
     {
-        public static Tuple<Type, Type, List<string>>[] allGames = new Tuple<Type, Type, List<string>>[] // All games need to be added here!
+        public static Tuple<Type, Type>[] allGames = new Tuple<Type, Type>[] // All games need to be added here!
         {
-            new Tuple<Type, Type, List<string>>(typeof(ShiritoriPreload), typeof(Shiritori), Shiritori.LoadDictionnary()),
-            new Tuple<Type, Type, List<string>>(typeof(KanCollePreload), typeof(KanColle), KanColle.LoadDictionnary())
+            new Tuple<Type, Type>(typeof(ShiritoriPreload), typeof(Shiritori)),
+            new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
+            new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime))
+        };
+
+        public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
+        public static List<string> kanColleDictionnary = KanColle.LoadDictionnary();
+        public static Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
+
+        public static Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
+        {
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2)
         };
     }
 }

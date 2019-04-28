@@ -72,10 +72,10 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestGames()
         {
-            foreach (var game in Constants.allGames)
+            foreach (var game in Constants.allDictionnaries)
             {
-                Assert.NotNull(game.Item3);
-                Assert.True(game.Item3.Count > 100);
+                Assert.NotNull(game.Item2);
+                Assert.True(game.Item2.Count > 100);
             }
         }
 

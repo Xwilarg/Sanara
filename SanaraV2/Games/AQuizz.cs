@@ -15,6 +15,7 @@
 
 using Discord;
 using SanaraV2.Modules.Base;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -32,8 +33,9 @@ namespace SanaraV2.Games
             _toGuess = null;
         }
 
-        protected abstract Task<string[]> GetPostInternalAsync();
+        protected abstract Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr);
         protected abstract bool IsDictionnaryFull(); // Does dictionnary contains all possibility ?
+        protected abstract bool DoesDisplayHelp();
 
         protected override bool CongratulateOnGuess()
             => true;
@@ -43,23 +45,30 @@ namespace SanaraV2.Games
 
         protected override async Task<string[]> GetPostAsync()
         {
-            _toGuess = _dictionnary[Program.p.rand.Next(_dictionnary.Count)];
-            return await GetPostInternalAsync();
+            var elem = await GetPostInternalAsync(_dictionnary[Program.p.rand.Next(_dictionnary.Count)]);
+            _toGuess = elem.Item2;
+            return elem.Item1;
         }
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
             string cleanUserAnswer = Utilities.CleanWord(userAnswer);
-            string cleanToGuess = Utilities.CleanWord(_toGuess);
-            if (cleanUserAnswer == cleanToGuess)
-                return null;
-            if (IsDictionnaryFull())
+            foreach (string s in _toGuess)
             {
-                if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
-                    return GetStringFromSentence(Sentences.guessDontExist);
+                if (cleanUserAnswer == Utilities.CleanWord(s))
+                    return null;
             }
-            if (cleanUserAnswer.Contains(cleanToGuess) || cleanToGuess.Contains(cleanUserAnswer))
-                return Sentences.BooruGuessClose(GetGuildId(), userAnswer);
+            foreach (string s in _toGuess)
+            {
+                if (IsDictionnaryFull())
+                {
+                    if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
+                        return GetStringFromSentence(Sentences.guessDontExist);
+                }
+                string cleanGuess = Utilities.CleanWord(s);
+                if (cleanUserAnswer.Contains(cleanGuess) || cleanGuess.Contains(cleanUserAnswer))
+                    return Sentences.BooruGuessClose(GetGuildId(), userAnswer);
+            }
             return (Sentences.GuessBad(GetGuildId(), userAnswer));
         }
 
@@ -67,8 +76,23 @@ namespace SanaraV2.Games
             => Sentences.GoodAnswerWas(GetGuildId(), FormatAnswer());
 
         private string FormatAnswer()
-            => new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess.Replace('_', ' '));
+            => new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess[0].Replace('_', ' '));
 
-        protected string _toGuess; // Word the player have to guess
+        protected override string Help()
+        {
+            if (!DoesDisplayHelp())
+                return null;
+            string help = _toGuess[0].First().ToString().ToUpper();
+            foreach (char c in _toGuess[0].Skip(1))
+            {
+                if (c == '_')
+                    help += ' ';
+                else
+                    help += "\\*";
+            }
+            return help;
+        }
+
+        protected string[] _toGuess; // Word the player have to guess
     }
 }
