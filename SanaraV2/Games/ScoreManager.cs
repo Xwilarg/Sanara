@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,16 +30,34 @@ namespace SanaraV2.Games
             // Output format: Game1Place1Server | Game1Place1Score | Game1Place2Server..... Game1Place3Score $ Game2Place1Server | Game2Place1Score
             foreach (var game in Constants.allGames)
             {
-                string bestServer = null;
-                int bestScore = -1;
-                foreach (var elem in scores)
+                APreload preload = (APreload)Activator.CreateInstance(game.Item1);
+                string gameName = preload.GetGameName();
+                if (scores.ContainsKey(gameName))
                 {
-                    APreload preload = (APreload)Activator.CreateInstance(game.Item1);
-                    string gameName = preload.GetGameName();
+                    List<Tuple<string, int>> best = new List<Tuple<string, int>>();
+                    var allScores = scores[gameName];
+                    string bestServer;
+                    int bestScore;
+                    while (best.Count < 3 && allScores.Count > 0)
+                    {
+                        bestServer = null;
+                        bestScore = -1;
+                        foreach (var elem in allScores)
+                        {
+                            int score = int.Parse(elem.Value);
+                            if (bestServer == null || score > bestScore)
+                            {
+                                bestServer = elem.Key;
+                                bestScore = score;
+                            }
+                        }
+                        allScores.Remove(bestServer);
+                        best.Add(new Tuple<string, int>(Program.p.GetName(bestServer), bestScore));
+                    }
+                    finalStr.Append(string.Join("|", best.Select(x => x.Item1 + "|" + x.Item2)));
                 }
             }
-            return null;
-            //return (string.Join("$", ranking.Select(x => string.Join("|", x.Select(y => y?.Item2 + "|" + y?.Item1)))));
+            return (finalStr.ToString());
         }
 
         public static string GetInformation(ulong guildId, ref int yes, ref int no)
