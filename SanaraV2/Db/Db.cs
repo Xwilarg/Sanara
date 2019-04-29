@@ -15,6 +15,7 @@
 using Newtonsoft.Json;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
+using SanaraV2.Games;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,11 +158,12 @@ namespace SanaraV2.Db
             foreach (var elem in json)
             {
                 Dictionary<string, string> currDict = new Dictionary<string, string>();
-                if (elem.shiritori != null) currDict.Add("shiritori", elem.shiritori.ToString());
-                if (elem.anime != null) currDict.Add("anime", elem.anime.ToString());
-                if (elem.booru != null) currDict.Add("booru", elem.booru.ToString());
-                if (elem.kancolle != null) currDict.Add("kancolle", elem.kancolle.ToString());
-                if (elem.azurlane != null) currDict.Add("azurlane", elem.azurlane.ToString());
+                foreach (var game in Constants.allGames)
+                {
+                    APreload preload = (APreload)Activator.CreateInstance(game.Item1);
+                    string gameName = preload.GetGameName();
+                    if (elem[gameName] != null) currDict.Add(gameName, elem[gameName].ToString());
+                }
                 if (currDict.Count > 0)
                     allScores.Add(elem.id.ToString(), currDict);
             }

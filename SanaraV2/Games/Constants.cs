@@ -21,12 +21,14 @@ namespace SanaraV2.Games
 {
     public static class Constants
     {
-        public static Tuple<Type, Type>[] allGames = new Tuple<Type, Type>[] // All games need to be added here!
+        // Order in Db: Shiritori, Anime, Booru, KanColle, AzurLane
+        // The order matter and must be preserved
+        public static Tuple<Type, Type>[] allGames = new Tuple<Type, Type>[]
         {
             new Tuple<Type, Type>(typeof(ShiritoriPreload), typeof(Shiritori)),
-            new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
             new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime)),
             new Tuple<Type, Type>(typeof(BooruPreload), typeof(Booru)),
+            new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
             new Tuple<Type, Type>(typeof(AzurLanePreload), typeof(AzurLane))
         };
 
@@ -42,6 +44,7 @@ namespace SanaraV2.Games
             new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
         };
     }
