@@ -26,7 +26,7 @@ namespace SanaraV2.Games.Impl
 {
     public class AzurLanePreload : APreload
     {
-        public AzurLanePreload() : base(new[] { "azurlane" }, 15, Sentences.AzurLaneGame)
+        public AzurLanePreload() : base(new[] { "azurlane", "al" }, 15, Sentences.AzurLaneGame)
         { }
 
         public override bool IsNsfw()

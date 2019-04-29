@@ -26,7 +26,7 @@ namespace SanaraV2.Games.Impl
 {
     public class KanCollePreload : APreload
     {
-        public KanCollePreload() : base(new[] { "kancolle" }, 15, Sentences.KancolleGame)
+        public KanCollePreload() : base(new[] { "kancolle", "kc", "kantaicollection" }, 15, Sentences.KancolleGame)
         { }
 
         public override bool IsNsfw()
