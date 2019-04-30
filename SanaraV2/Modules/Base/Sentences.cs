@@ -19,10 +19,11 @@ namespace SanaraV2.Modules.Base
     public static class Sentences
     {
         /// --------------------------- ID ---------------------------
+        public readonly static string ownerStr = "Zirk#0001";
         public readonly static ulong ownerId = 144851584478740481;
 
         /// --------------------------- General ---------------------------
-        public static string OnlyMasterStr(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(ownerId).ToString())); }
+        public static string OnlyMasterStr(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyMaster", ownerStr)); }
         public static string OnlyOwnerStr(ulong guildId, ulong guildOwnerId) { return (Translation.GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(guildOwnerId).ToString())); }
         public static string ChanIsNotNsfw(ulong guildId) { return (Translation.GetTranslation(guildId, "chanIsNotNsfw")); }
         private static string TagNotFoundInternal(ulong guildId, string tag) { return Translation.GetTranslation(guildId, "tagNotFound", tag); }
