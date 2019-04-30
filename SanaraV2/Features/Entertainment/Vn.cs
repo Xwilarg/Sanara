@@ -69,7 +69,7 @@ namespace SanaraV2.Features.Entertainment
                 originalTitle = vn.OriginalName,
                 title = vn.Name,
                 imageUrl = (isChanSfw && vn.IsImageNsfw) ? null : vn.Image,
-                description = vn.Description != null ? string.Join("\n", vn.Description.Split('\n').Where(x => !x.Contains("[/url]"))) : null,
+                description = Utilities.RemoveExcess(vn.Description != null ? string.Join("\n", vn.Description.Split('\n').Where(x => !x.Contains("[/url]"))) : null),
                 isAvailableEnglish = vn.Languages.Contains("en"),
                 isAvailableWindows = vn.Platforms.Contains("win"),
                 rating = vn.Rating,

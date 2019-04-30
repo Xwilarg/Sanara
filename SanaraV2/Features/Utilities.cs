@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -21,6 +22,24 @@ namespace SanaraV2.Features
 {
     public static class Utilities
     {
+        /// <summary>
+        /// Discord messages must be less than 2048 characters
+        /// This function allow to "properly cut" them to remove the excess of characters
+        /// (Properly mean that the text is cut by new lines)
+        /// </summary>
+        /// <param name="text">The text to clean</param>
+        public static string RemoveExcess(string text)
+        {
+            if (text == null)
+                return null;
+            while (text.Length > 2048)
+            {
+                string[] tmp = text.Split('\n');
+                text = string.Join(", ", tmp.Take(tmp.Length - 1));
+            }
+            return text;
+        }
+
         /// <summary>
         /// Every commands take a string[] in parameter so they can be called with any number of arguments.
         /// This function transform it to a string adding spaces between each elements of the array

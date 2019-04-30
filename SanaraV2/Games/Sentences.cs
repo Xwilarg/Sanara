@@ -25,7 +25,6 @@ namespace SanaraV2.Games
         public static string RulesKancolle(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesKancolle")); }
         public static string RulesBooru(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesBooru")); }
         public static string RulesAnime(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesAnime")); }
-        public static string RulesFireEmblem(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesFireEmblem")); }
         public static string RulesTimer(ulong guildId, int timerRef) { return (Translation.GetTranslation(guildId, "rulesTimer", timerRef.ToString())); }
         public static string RulesReset(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesReset")); }
         public static string ResetNone(ulong guildId) { return (Translation.GetTranslation(guildId, "resetNone")); }
@@ -51,7 +50,6 @@ namespace SanaraV2.Games
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
         public static string GuessBad(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "guessBad", attempt)); }
         public static string BooruGuessClose(ulong guildId, string attempt) { return (Translation.GetTranslation(guildId, "booruGuessClose", attempt)); }
-        public static string LostStr(ulong guildId) { return (Translation.GetTranslation(guildId, "lost")); }
         public static string InvalidDifficulty(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidDifficulty")); }
         public static string NoDictionnary(ulong guildId) { return (Translation.GetTranslation(guildId, "noDictionnary")); }
         public static string ExceptionGame(ulong guildId, string url) { return (Translation.GetTranslation(guildId, "exceptionGame", url)); }
