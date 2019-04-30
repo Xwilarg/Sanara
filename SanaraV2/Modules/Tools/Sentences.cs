@@ -124,6 +124,7 @@ namespace SanaraV2.Modules.Tools
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
                 return Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAzurLane")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFateGO")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")
                     + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore")

@@ -271,6 +271,7 @@
     <Compile Include="Games\Impl\Anime.cs" />
     <Compile Include="Games\Impl\AzurLane.cs" />
     <Compile Include="Games\Impl\Booru.cs" />
+    <Compile Include="Games\Impl\FateGO.cs" />
     <Compile Include="Games\Impl\KanColle.cs" />
     <Compile Include="Games\LooseException.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />

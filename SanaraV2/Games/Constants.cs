@@ -29,7 +29,8 @@ namespace SanaraV2.Games
             new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime)),
             new Tuple<Type, Type>(typeof(BooruPreload), typeof(Booru)),
             new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
-            new Tuple<Type, Type>(typeof(AzurLanePreload), typeof(AzurLane))
+            new Tuple<Type, Type>(typeof(AzurLanePreload), typeof(AzurLane)),
+            new Tuple<Type, Type>(typeof(FateGOPreload), typeof(FateGO))
         };
 
         public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
@@ -37,6 +38,7 @@ namespace SanaraV2.Games
         public static Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
         public static List<string> booruDictionnary = Booru.LoadDictionnary();
         public static List<string> azurLaneDictionnary = AzurLane.LoadDictionnary();
+        public static List<string> fateGODictionnary = FateGO.LoadDictionnary();
 
         public static Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
         {
@@ -46,6 +48,7 @@ namespace SanaraV2.Games
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary)
         };
     }
 }
