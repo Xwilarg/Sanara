@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
+using SanaraV2.Features;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -75,7 +76,11 @@ namespace SanaraV2.Games
                             await PostText(s);
                     else
                         foreach (string s in await GetPostAsync())
+                        {
+                            if (!Utilities.IsLinkValid(s))
+                                throw new ArgumentException("Invalid link " + s);
                             await PostFromUrl(s);
+                        }
                     _startTime = DateTime.Now;
                     break;
                 }
