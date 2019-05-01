@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using DynamicExpresso;
 using SanaraV2.Modules.Base;
 using System;
 using System.Linq;
@@ -24,6 +25,32 @@ namespace SanaraV2.Modules.Tools
     public class Settings : ModuleBase
     {
         Program p = Program.p;
+
+
+        [Command("Eval")]
+        public async Task EvalFct(params string[] args)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            if (Context.User.Id != Base.Sentences.ownerId)
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+            else if (args.Length == 0)
+                await ReplyAsync(Sentences.EvalHelp(Context.Guild.Id));
+            else
+            {
+                Interpreter interpreter = new Interpreter()
+                    .SetVariable("Context", Context)
+                    .SetVariable("p", Program.p)
+                    .EnableReflection();
+                try
+                {
+                    await ReplyAsync(interpreter.Eval(string.Join(" ", args)).ToString());
+                }
+                catch (Exception e)
+                {
+                    await ReplyAsync(Sentences.EvalError(Context.Guild.Id, e.Message));
+                }
+            }
+        }
 
         [Command("Language"), Summary("Set the language of the bot for this server")]
         public async Task SetLanguage(params string[] language)
@@ -163,9 +190,9 @@ namespace SanaraV2.Modules.Tools
         private async Task ManageModule(IMessageChannel chan, string[] args, int enable)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Base.Sentences.ownerId)
+            if (Context.User.Id != ((ITextChannel)chan).Guild.OwnerId)
             {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
                 return;
             }
             if (args.Length == 0)
