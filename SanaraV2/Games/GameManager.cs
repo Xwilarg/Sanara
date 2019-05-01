@@ -101,6 +101,8 @@ namespace SanaraV2.Games
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull));
                          _games.Add(newGame);
                         await newGame.PostAsync();
+                        if (Program.p.sendStats)
+                            await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });
                         return null;
                     }
                     catch (NoDictionnaryException)
