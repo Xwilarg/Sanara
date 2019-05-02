@@ -59,7 +59,7 @@ namespace SanaraV2.Games.Impl
 
                 List<string> allAnswer = new List<string>();
                 allAnswer.Add(curr);
-                allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace(" & Amp;", ""));
+                allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("&Amp;", "&"));
                 if (html.Contains("AKA:"))
                 {
                     string aliases = html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0];
