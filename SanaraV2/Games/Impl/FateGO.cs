@@ -59,6 +59,7 @@ namespace SanaraV2.Games.Impl
 
                 List<string> allAnswer = new List<string>();
                 allAnswer.Add(curr);
+                allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace(" & Amp;", ""));
                 if (html.Contains("AKA:"))
                 {
                     string aliases = html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0];
@@ -79,14 +80,14 @@ namespace SanaraV2.Games.Impl
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Servant_List").GetAwaiter().GetResult();
-                foreach (Match r in Regex.Matches(html, "<a href=\"(\\/wiki\\/Sub:Servant_List\\/[a-zA-Z_]+)\" title"))
+                string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Servant_List_by_ID").GetAwaiter().GetResult();
+                foreach (string s in html.Split(new[] { "<tr>" }, StringSplitOptions.None))
                 {
-                    html = hc.GetStringAsync("https://fategrandorder.fandom.com" + r.Groups[1].Value).GetAwaiter().GetResult();
-                    foreach (Match r2 in Regex.Matches(html, "<td> ?<a href=\\\"\\/wiki\\/[^\"]+\" title=\"([^\"]+)\">"))
+                    Match match = Regex.Match(s, "<a href=\"\\/wiki\\/[^\"]+\"[ \\t]+class=\"[^\"]+\"[ \\t]+title=\"([^\"]+)\"");
+                    if (match.Success)
                     {
-                        string name = Regex.Replace(r2.Groups[1].Value, "\\([^\\)]+\\)", "");
-                        if (!characters.Contains(name))
+                        string name = match.Groups[1].Value;
+                        if (!s.Contains("Unplayable Servants") && !characters.Contains(name))
                             characters.Add(name);
                     }
                 }
