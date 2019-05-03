@@ -62,10 +62,14 @@ namespace SanaraV2.Games.Impl
                 allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("&Amp;", "&"));
                 if (html.Contains("AKA:"))
                 {
-                    string aliases = html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0];
-                    Match m = Regex.Match(aliases, "<b>([^<]+)<\\/b>");
-                    if (m.Success)
-                        allAnswer.Add(m.Groups[1].Value);
+                    foreach (string s in Regex.Replace(html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0], "\\([^\\)]+\\)", "").Split(','))
+                    {
+                        string name = s;
+                        Match m = Regex.Match(name, "<[^>]+>([^<]+)<\\/[^>]+>");
+                        if (m.Success)
+                            name = m.Groups[1].Value;
+                        allAnswer.Add(name.Trim());
+                    }
                 }
                 return (new Tuple<string[], string[]>(
                     new[] { Regex.Match(html.Split(new[] { "pi-image-collection-tab-content current" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0] },
