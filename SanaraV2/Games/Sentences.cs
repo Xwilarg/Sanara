@@ -56,7 +56,7 @@ namespace SanaraV2.Games
         public static string ExceptionGame(ulong guildId, string url) { return (Translation.GetTranslation(guildId, "exceptionGame", url)); }
         public static string ExceptionGameStop(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionGameStop")); }
         public static string AnimeGame(ulong guildId) { return (Translation.GetTranslation(guildId, "animeGame")); }
-        public static string BooruGame(ulong guildId) { return (Translation.GetTranslation(guildId, "animeGame")); }
+        public static string BooruGame(ulong guildId) { return (Translation.GetTranslation(guildId, "booruGame")); }
         public static string KancolleGame(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGame")); }
         public static string ShiritoriGame(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriGame")); }
         public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
