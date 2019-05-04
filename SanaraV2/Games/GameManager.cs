@@ -91,7 +91,7 @@ namespace SanaraV2.Games
                 {
                     if (!chan.IsNsfw && preload.IsNsfw())
                         return Modules.Base.Sentences.ChanIsNotNsfw;
-                    if (isFull && preload.DoesAllowFull())
+                    if (isFull && !preload.DoesAllowFull())
                         return Sentences.FullNotAvailable;
                     try
                     {
