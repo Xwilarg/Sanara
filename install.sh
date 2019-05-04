@@ -3,14 +3,9 @@ set -e
 curl -LO https://download.rethinkdb.com/windows/rethinkdb-2.3.6.zip
 yes | unzip rethinkdb-2.3.6.zip
 rm rethinkdb-2.3.6.zip
-if [ ! -d SanaraV2\\bin\\Debug\\Saves ]
-then
-	mkdir -p SanaraV2\\bin\\Debug\\Saves
-fi
-if [ ! -d Sanara-UnitTests\\bin\\Debug\\Saves ]
-then
-	mkdir -p Sanara-UnitTests\\bin\\Debug\\Saves
-fi
+mkdir -p SanaraV2\\bin\\Debug\\Saves
+mkdir -p Sanara-UnitTests\\bin\\Debug\\Saves
+mkdir -p Sanara-UnitTests\\bin\\Debug\\Keys
 curl -LO https://files.zirk.eu/Sanara/AnimeTags.dat
 cp AnimeTags.dat Sanara-UnitTests\\bin\\Debug\\Saves
 mv AnimeTags.dat SanaraV2\\bin\\Debug\\Saves
