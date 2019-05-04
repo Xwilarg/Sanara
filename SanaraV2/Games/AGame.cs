@@ -77,8 +77,8 @@ namespace SanaraV2.Games
                     else
                         foreach (string s in await GetPostAsync())
                         {
-                            if (!Utilities.IsLinkValid(s))
-                                throw new ArgumentException("Invalid link " + s);
+                            using (HttpClient hc = new HttpClient())
+                                await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
                             await PostFromUrl(s);
                         }
                     _startTime = DateTime.Now;

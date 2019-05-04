@@ -150,9 +150,11 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Sentences.NumberGuilds(Context.Guild.Id), p.client.Guilds.Count, true);
                 embed.AddField(Sentences.Uptime(Context.Guild.Id), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
-                embed.AddField(Sentences.Website(Context.Guild.Id), "https://zirk.eu/sanara.html");
-                embed.AddField("Invitation link", "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");
+                embed.AddField(Sentences.Website(Context.Guild.Id), "https://sanara.zirk.eu");
+                embed.AddField(Sentences.InvitationLink(Context.Guild.Id), "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");
                 embed.AddField(Sentences.OfficialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");
+                embed.AddField("Discord Bot List", "https://discordbots.org/bot/329664361016721408");
+                embed.AddField(Sentences.ProfilePicture(Context.Guild.Id), "BlankSensei");
             }
             embed.AddField(Sentences.Roles(Context.Guild.Id), ((roles == "") ? (Sentences.NoRole(Context.Guild.Id)) : (roles)));
             await ReplyAsync("", false, embed.Build());

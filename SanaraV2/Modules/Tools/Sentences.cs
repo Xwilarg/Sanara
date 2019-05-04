@@ -39,6 +39,8 @@ namespace SanaraV2.Modules.Tools
         public static string Disabled(ulong guildId) { return (Translation.GetTranslation(guildId, "disabled")); }
         public static string EvalHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "evalHelp")); }
         public static string EvalError(ulong guildId, string msg) { return (Translation.GetTranslation(guildId, "evalError", msg)); }
+        public static string InvitationLink(ulong guildId) { return (Translation.GetTranslation(guildId, "invitationLink")); }
+        public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
 
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
