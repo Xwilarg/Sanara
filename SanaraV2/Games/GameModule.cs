@@ -63,7 +63,11 @@ namespace SanaraV2.Games
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                 string gameName = preload.GetGameName();
                 if (!me.ContainsKey(preload.GetGameName()))
+                {
+                    finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
+                       Sentences.NotRanked(Context.Guild.Id) + Environment.NewLine + Environment.NewLine);
                     continue;
+                }
                 string[] myElems = me[gameName].Split('|');
                 var users = await Context.Guild.GetUsersAsync();
                 int myScore = int.Parse(myElems[0]);

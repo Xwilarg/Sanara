@@ -71,5 +71,6 @@ namespace SanaraV2.Games
         public static string Words(ulong guildId) { return (Translation.GetTranslation(guildId, "words")); }
         public static string NotLoaded(ulong guildId) { return (Translation.GetTranslation(guildId, "notLoaded")); }
         public static string AnimeFull(ulong guildId) { return (AnimeGame(guildId) + " (" + Translation.GetTranslation(guildId, "full") + ")"); }
+        public static string NotRanked(ulong guildId) { return (Translation.GetTranslation(guildId, "notRanked")); }
     }
 }
