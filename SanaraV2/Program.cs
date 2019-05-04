@@ -411,7 +411,7 @@ namespace SanaraV2
             if (msg == null) return;
 
             /// When playing games
-            await gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id);
+            Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id); });
 
             int pos = 0;
             if (arg.Channel as ITextChannel == null)
