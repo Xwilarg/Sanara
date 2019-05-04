@@ -58,7 +58,7 @@ namespace SanaraV2.Games.Impl
 
                 List<string> allAnswer = new List<string>();
                 allAnswer.Add(curr);
-                allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("&", "And"));
+                allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("ð", "d").Replace(" & ", "And"));
                 if (html.Contains("AKA:"))
                 {
                     foreach (string s in Regex.Replace(html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0], "\\([^\\)]+\\)", "").Split(','))
@@ -67,7 +67,10 @@ namespace SanaraV2.Games.Impl
                         Match m = Regex.Match(name, "<[^>]+>([^<]+)<\\/[^>]+>");
                         if (m.Success)
                             name = m.Groups[1].Value;
-                        allAnswer.Add(name.Trim());
+                        name = Regex.Replace(name, "<[^>]+>", "");
+                        name = Regex.Replace(name, "<\\/[^>]+>", "");
+                        if (!string.IsNullOrWhiteSpace(name))
+                            allAnswer.Add(name.Trim());
                     }
                 }
                 return (new Tuple<string[], string[]>(
