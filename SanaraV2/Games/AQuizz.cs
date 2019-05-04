@@ -45,8 +45,10 @@ namespace SanaraV2.Games
 
         protected override async Task<string[]> GetPostAsync()
         {
-            var elem = await GetPostInternalAsync(_dictionnary[Program.p.rand.Next(_dictionnary.Count)]);
+            int index = Program.p.rand.Next(_dictionnary.Count);
+            var elem = await GetPostInternalAsync(_dictionnary[index]);
             _toGuess = elem.Item2;
+            _dictionnary.RemoveAt(index);
             return elem.Item1;
         }
 
