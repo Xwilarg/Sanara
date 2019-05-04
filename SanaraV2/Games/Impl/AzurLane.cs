@@ -76,13 +76,18 @@ namespace SanaraV2.Games.Impl
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                string json = hc.GetStringAsync("https://azurlane.koumakan.jp/List_of_Ships").GetAwaiter().GetResult();
-                MatchCollection matches = Regex.Matches(json, "<a href=\"\\/[^\"]+\" title=\"([^\"]+)\">[0-9]+<\\/a>");
-                foreach (Match match in matches)
+                string html = hc.GetStringAsync("https://azurlane.koumakan.jp/List_of_Ships").GetAwaiter().GetResult();
+                foreach (string s in html.Split(new string[] { "title=\"Category:" }, StringSplitOptions.None))
                 {
-                    string str = match.Groups[1].Value;
-                    if (!ships.Contains(str))
-                        ships.Add(str);
+                    if (s.Contains("Unreleased")) // We skip ships that weren't released and were found by data mining
+                        continue;
+                    Match match = Regex.Match(s, "<a href=\"\\/[^\"]+\" title=\"([^\"]+)\">[0-9]+<\\/a>");
+                    if (match.Success)
+                    {
+                        string str = match.Groups[1].Value;
+                        if (!ships.Contains(str))
+                            ships.Add(str);
+                    }
                 }
             }
             return (ships);
