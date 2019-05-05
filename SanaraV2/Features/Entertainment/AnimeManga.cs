@@ -35,22 +35,32 @@ namespace SanaraV2.Features.Entertainment
                 return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.Help));
             dynamic json;
             using (HttpClient hc = new HttpClient())
-                json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=1&filter[text]=" + searchName)).Content.ReadAsStringAsync());
+                json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
             if (json.data.Count == 0)
                 return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound));
-            dynamic data = json.data[0].attributes;
+            dynamic finalData = null;
+            foreach (dynamic data in json.data)
+            {
+                if (data.attributes.subtype == "TV")
+                {
+                    finalData = data.attributes;
+                    break;
+                }
+            }
+            if (finalData == null)
+                finalData = json.data[0].attributes;
             return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(new Response.AnimeManga()
             {
-                name = data.canonicalTitle,
-                imageUrl = data.posterImage.original,
-                alternativeTitles = data.abbreviatedTitles.ToObject<string[]>(),
-                episodeCount = data.episodeCount,
-                episodeLength = data.episodeLength,
-                rating = data.averageRating,
-                startDate = data.startDate ?? DateTime.ParseExact((string)data.startDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
-                endDate = data.endDate ?? DateTime.ParseExact((string)data.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
-                ageRating = data.ageRatingGuide,
-                synopsis = data.synopsis
+                name = finalData.canonicalTitle,
+                imageUrl = finalData.posterImage.original,
+                alternativeTitles = finalData.abbreviatedTitles.ToObject<string[]>(),
+                episodeCount = finalData.episodeCount,
+                episodeLength = finalData.episodeLength,
+                rating = finalData.averageRating,
+                startDate = finalData.startDate ?? DateTime.ParseExact((string)finalData.startDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
+                endDate = finalData.endDate ?? DateTime.ParseExact((string)finalData.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
+                ageRating = finalData.ageRatingGuide,
+                synopsis = finalData.synopsis
             }, Error.AnimeManga.None));
         }
     }
