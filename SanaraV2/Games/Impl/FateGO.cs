@@ -57,7 +57,7 @@ namespace SanaraV2.Games.Impl
                 html = await hc.GetStringAsync(Regex.Match(html, "<a href=\"(https:\\/\\/fategrandorder\\.fandom\\.com\\/wiki\\/[^\"]+)\" class=\"result-link").Groups[1].Value);
 
                 List<string> allAnswer = new List<string>();
-                allAnswer.Add(curr.Replace("&Amp;", "And").Replace("&#39;", "'"));
+                allAnswer.Add(curr.Replace("&amp;", "And").Replace("&#39;", "'"));
                 allAnswer.Add(curr.Replace("ō", "ou").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("ð", "d").Replace("&Amp;", "And").Replace("&#39;", "'"));
                 if (html.Contains("AKA:"))
                 {
