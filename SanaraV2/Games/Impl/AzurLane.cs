@@ -64,7 +64,7 @@ namespace SanaraV2.Games.Impl
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 return (new Tuple<string[], string[]>(
                     new[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync(nameArray[0]).GetAwaiter().GetResult(),
-                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + curr.Replace(" ", "_") + ".png)").Groups[1].Value },
+                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(curr.Replace(" ", "_")) + ".png)").Groups[1].Value },
                     new[] { curr }
                 ));
             }
