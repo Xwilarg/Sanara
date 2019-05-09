@@ -17,7 +17,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using SanaraV2.Games;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
@@ -218,6 +221,26 @@ namespace SanaraV2.Modules.Tools
                 yes++;
             int max = yes + no;
             embed.Color = new Color(no * 255 / max, yes * 255 / max, 0);
+            Dictionary<string, int> allTrads = new Dictionary<string, int>();
+            foreach (var elem in Program.p.allLanguages)
+                allTrads.Add(elem.Key, 0);
+            foreach (var s in Program.p.translations)
+            {
+                if (s.Value.Any(x => x.language == "en"))
+                {
+                    foreach (var trad in s.Value)
+                    {
+                        allTrads[trad.language]++;
+                    }
+                }
+            }
+            string finalLanguage = "";
+            int enRef = allTrads["en"];
+            foreach (var s in allTrads)
+            {
+                finalLanguage += CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Program.p.allLanguages[s.Key][0]) + ": " + (s.Value * 100 / enRef) + "%" + Environment.NewLine;
+            }
+            embed.AddField("Translation availability", finalLanguage);
             await ReplyAsync("", false, embed.Build());
         }
 
