@@ -138,7 +138,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_process = Process.Start(new ProcessStartInfo
                 {
                     FileName = "ffmpeg.exe",
-                    Arguments = $"-hide_banner -loglevel panic -i \"{m_musics[0].path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+                    Arguments = $"-hide_banner -loglevel panic -i \"{m_musics[0].path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                 });
@@ -166,7 +166,7 @@ namespace SanaraV2.Modules.Entertainment
                 m_musics.RemoveAt(0);
                 if (m_musics.Count == 0)
                 {
-                    Stop();
+                    await Stop();
                     Program.p.radios.Remove(this);
                 }
                 else
