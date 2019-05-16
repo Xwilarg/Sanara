@@ -495,11 +495,11 @@ namespace SanaraV2
                 return Task.CompletedTask;
             }
             Log(msg);
-            if (ravenClient != null)
-                ravenClient.Capture(new SentryEvent(msg.Exception));
             CommandException ce = msg.Exception as CommandException;
             if (ce != null)
             {
+                if (ravenClient != null)
+                    ravenClient.Capture(new SentryEvent(new Exception(msg.Message + Environment.NewLine + ce.Context.Message, msg.Exception)));
                 ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                 {
                     Color = Color.Red,
@@ -509,8 +509,13 @@ namespace SanaraV2
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());
             }
-            else if (sendStats)
-                AddError("Unknown error");
+            else
+            {
+                if (ravenClient != null)
+                    ravenClient.Capture(new SentryEvent(msg.Exception));
+                if (sendStats)
+                    AddError("Unknown error");
+            }
             return Task.CompletedTask;
         }
     }
