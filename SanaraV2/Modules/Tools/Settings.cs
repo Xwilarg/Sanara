@@ -26,6 +26,13 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        private bool CanModify(IUser user, ulong ownerId)
+        {
+            if (user.Id == ownerId)
+                return true;
+            IGuildUser guildUser = (IGuildUser)user;
+            return guildUser.GuildPermissions.ManageGuild;
+        }
 
         [Command("Eval")]
         public async Task EvalFct(params string[] args)
@@ -56,7 +63,7 @@ namespace SanaraV2.Modules.Tools
         public async Task SetLanguage(params string[] language)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Context.Guild.OwnerId)
+            if (!CanModify(Context.User, Context.Guild.OwnerId))
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
@@ -80,7 +87,7 @@ namespace SanaraV2.Modules.Tools
         public async Task SetPrefix(params string[] command)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Context.Guild.OwnerId)
+            if (!CanModify(Context.User, Context.Guild.OwnerId))
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
@@ -190,7 +197,7 @@ namespace SanaraV2.Modules.Tools
         private async Task ManageModule(IMessageChannel chan, string[] args, int enable)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != ((ITextChannel)chan).Guild.OwnerId)
+            if (!CanModify(Context.User, Context.Guild.OwnerId))
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
                 return;
