@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace SanaraV2.Features.GamesInfo
             string html;
             using (HttpClient hc = new HttpClient())
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1"));
                 string id = json.items[0].id;
                 string url = json.items[0].url + "?action=raw";
@@ -228,11 +230,10 @@ namespace SanaraV2.Features.GamesInfo
         {
             string html;
             using (HttpClient hc = new HttpClient())
-                html = hc.GetStringAsync("http://kancolle.wikia.com/wiki/Internals/Translations").GetAwaiter().GetResult();
-            string allShips = html.Split(new string[] { "</table>" }, StringSplitOptions.None)[0].Split(new string[] { "</th></tr>" }, StringSplitOptions.None)[1];
-            MatchCollection matches = Regex.Matches(allShips, "<td>([^<]*)<\\/td><td><a href=\"\\/wiki\\/[^\"]*\" title=\"[^\"]*\"( class=\"mw-redirect\")?>([^<]*)<\\/a>");
+                html = hc.GetStringAsync("https://raw.githubusercontent.com/KC3Kai/kc3-translations/master/data/en/ships.json").GetAwaiter().GetResult();
+            MatchCollection matches = Regex.Matches(html, "\"([^\"]+)\": ?\"([^\"]+)\"");
             foreach (Match match in matches)
-                if (Utilities.CleanWord(match.Groups[3].Value) == englishName)
+                if (Utilities.CleanWord(match.Groups[2].Value) == englishName)
                     return (match.Groups[1].Value);
             return (null);
         }

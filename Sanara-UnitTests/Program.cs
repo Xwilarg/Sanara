@@ -68,6 +68,41 @@ namespace Sanara_UnitTests
             Assert.True(IsLinkValid(result.answer.url));
         }
 
+        // GAMES INFO
+        [Fact]
+        public async Task TestKancolleCharac()
+        {
+            var result = await SanaraV2.Features.GamesInfo.Kancolle.SearchCharac(new[] { "Ryuujou" });
+            Assert.Equal(SanaraV2.Features.GamesInfo.Error.Charac.None, result.error);
+            Assert.Equal("https://vignette.wikia.nocookie.net/kancolle/images/5/59/Ryuujou_Card.png", result.answer.thumbnailUrl);
+            Assert.Equal("Ryuujou", result.answer.name);
+            Assert.Contains(result.answer.allCategories, x => x.Item1 == "Appearance");
+            Assert.Contains(result.answer.allCategories, x => x.Item1 == "Personality");
+            Assert.Contains(result.answer.allCategories, x => x.Item1 == "Trivia");
+        }
+
+        [Fact]
+        public async Task TestKancolleMap()
+        {
+            var result = await SanaraV2.Features.GamesInfo.Kancolle.SearchDropMap(new[] { "Shimakaze" });
+            Assert.Equal(SanaraV2.Features.GamesInfo.Error.Drop.None, result.error);
+            Assert.InRange(result.answer.dropMap.Count, 5, 30); // Shimakaze drop will probably ever be between 5 and 20 maps
+        }
+
+        [Fact]
+        public async Task TestKancolleConstruction()
+        {
+            var result = await SanaraV2.Features.GamesInfo.Kancolle.SearchDropConstruction(new[] { "Taihou" });
+            Assert.Equal(SanaraV2.Features.GamesInfo.Error.Drop.None, result.error);
+            Assert.NotEmpty(result.answer.elems);
+            Assert.InRange(int.Parse(result.answer.elems[0].chance.Split('.')[0]), 2, 10);
+            Assert.InRange(int.Parse(result.answer.elems[0].ammos), 1000, 10000);
+            Assert.InRange(int.Parse(result.answer.elems[0].fuel), 1000, 10000);
+            Assert.InRange(int.Parse(result.answer.elems[0].bauxite), 1000, 10000);
+            Assert.InRange(int.Parse(result.answer.elems[0].iron), 1000, 10000);
+            Assert.InRange(int.Parse(result.answer.elems[0].devMat), 1, 100);
+        }
+
         // GAMES MODULE
         [Fact]
         public async Task TestGames()
