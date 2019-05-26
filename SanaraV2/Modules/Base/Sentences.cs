@@ -19,8 +19,8 @@ namespace SanaraV2.Modules.Base
     public static class Sentences
     {
         /// --------------------------- ID ---------------------------
-        public readonly static string ownerStr = "Zirk#0001";
-        public readonly static ulong ownerId = 144851584478740481;
+        public static string ownerStr;
+        public static ulong ownerId;
 
         /// --------------------------- General ---------------------------
         public static string OnlyMasterStr(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyMaster", ownerStr)); }

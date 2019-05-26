@@ -116,8 +116,11 @@ namespace SanaraV2
             if (botToken == null && !File.Exists("Keys/Credentials.json"))
                 throw new FileNotFoundException("You must have a Credentials.json file located in " + AppDomain.CurrentDomain.BaseDirectory + "Keys, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
             dynamic json = JsonConvert.DeserializeObject(File.ReadAllText("Keys/Credentials.json"));
-            if (botToken == null && json.botToken == null)
-                throw new NullReferenceException("Your Credentials.json must at least contains your bot token, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
+            if (botToken == null && (json.botToken == null || json.ownerId == null || json.ownerStr == null))
+                throw new NullReferenceException("Your Credentials.json is missing mandatory information, it must at least contains botToken, ownerId and ownerStr. More information at https://sanara.zirk.eu/documentation.html?display=Clone");
+            Modules.Base.Sentences.ownerId = ulong.Parse((string)json.ownerId);
+            Modules.Base.Sentences.ownerStr = json.ownerStr;
+
             websiteStats = json.websiteStats;
             websiteStatsToken = json.websiteStatsToken;
             sendStats = websiteStats != null && websiteStatsToken != null;
