@@ -74,7 +74,7 @@ namespace SanaraV2
         public YouTubeService youtubeService;
 
         private string websiteStats, websiteStatsToken;
-        AuthDiscordBotListApi dblApi;
+        private AuthDiscordBotListApi dblApi;
 
         public List<RadioChannel> radios;
 
