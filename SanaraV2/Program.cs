@@ -20,6 +20,7 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
+using Newtonsoft.Json;
 using SanaraV2.Games;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
@@ -67,6 +68,8 @@ namespace SanaraV2
 
         public YouTubeService youtubeService;
 
+        public string websiteStats, websiteStatsToken;
+
         public List<RadioChannel> radios;
 
         public DateTime startTime;
@@ -110,9 +113,15 @@ namespace SanaraV2
             rand = new Random();
 
             UpdateLanguageFiles();
-
-            sendStats = File.Exists("Keys/websiteToken.dat");
-            await InitServices();
+            if (botToken == null && !File.Exists("Keys/Credentials.json"))
+                throw new FileNotFoundException("You must have a Credentials.json file located in " + AppDomain.CurrentDomain.BaseDirectory + "Keys, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
+            dynamic json = JsonConvert.DeserializeObject(File.ReadAllText("Keys/Credentials.json"));
+            if (botToken == null && json.botToken == null)
+                throw new NullReferenceException("Your Credentials.json must at least contains your bot token, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
+            websiteStats = json.websiteStats;
+            websiteStatsToken = json.websiteStatsToken;
+            sendStats = websiteStats != null && websiteStatsToken != null;
+            await InitServices(json);
 
             await commands.AddModuleAsync<Information>(null);
             await commands.AddModuleAsync<Settings>(null);
@@ -122,7 +131,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<VnModule>(null);
             await commands.AddModuleAsync<Doujinshi>(null);
             await commands.AddModuleAsync<AnimeManga>(null);
-            await commands.AddModuleAsync<SanaraV2.Games.GameModule>(null);
+            await commands.AddModuleAsync<GameModule>(null);
             await commands.AddModuleAsync<Youtube>(null);
             await commands.AddModuleAsync<RadioModule>(null);
             await commands.AddModuleAsync<Xkcd>(null);
@@ -135,7 +144,7 @@ namespace SanaraV2
             client.Disconnected += Disconnected;
             client.UserVoiceStateUpdated += VoiceUpdate;
 
-            await client.LoginAsync(TokenType.Bot, (botToken == null) ? File.ReadAllText("Keys/token.dat") : botToken);
+            await client.LoginAsync(TokenType.Bot, (botToken == null) ? (string)json.botToken : botToken);
             startTime = DateTime.Now;
             await client.StartAsync();
 
@@ -171,7 +180,7 @@ namespace SanaraV2
             return Task.CompletedTask;
         }
 
-        private async Task InitServices()
+        private async Task InitServices(dynamic json)
         {
             if (File.Exists("youtube-dl.exe"))
             {
@@ -183,11 +192,11 @@ namespace SanaraV2
             }
 
             translationClient = null;
-            if (File.Exists("Keys/Sanara-7430da57d6af.json"))
+            if (json.googleTranslateJson != null)
             {
                 try
                 {
-                    credential = GoogleCredential.FromFile("Keys/Sanara-7430da57d6af.json");
+                    credential = GoogleCredential.FromFile((string)json.googleTranslateJson);
                     translationClient = TranslationClient.Create(credential);
                 } catch (Exception e) {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
@@ -195,12 +204,12 @@ namespace SanaraV2
             }
 
             youtubeService = null;
-            if (File.Exists("Keys/YoutubeAPIKey.dat"))
+            if (json.youtubeKey != null)
             {
                 try {
                     youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        ApiKey = File.ReadAllText("Keys/YoutubeAPIKey.dat")
+                        ApiKey = json.youtubeKey
                     });
                 } catch (Exception e) {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
@@ -210,20 +219,20 @@ namespace SanaraV2
             radios = new List<RadioModule.RadioChannel>();
 
             ravenClient = null;
-            if (File.Exists("Keys/raven.dat"))
+            if (json.ravenKey != null)
             {
                 try {
-                    ravenClient = new RavenClient(File.ReadAllText("Keys/raven.dat"));
+                    ravenClient = new RavenClient((string)json.ravenKey);
                 } catch (Exception e) {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
 
             visionClient = null;
-            if (File.Exists("Keys/visionAPI.json"))
+            if (json.googleVisionJson != null)
             {
                 try {
-                    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Keys/visionAPI.json");
+                    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", (string)json.googleVisionJson);
                     visionClient = ImageAnnotatorClient.Create();
                 } catch (Exception e) {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
@@ -348,7 +357,7 @@ namespace SanaraV2
         {
             HttpClient httpClient = new HttpClient();
             var values = new Dictionary<string, string> {
-                           { "token", File.ReadAllLines("Keys/websiteToken.dat")[1] },
+                           { "token", websiteStatsToken },
                            { "action", "add" },
                            { "name", "Sanara" }
                         };
@@ -356,7 +365,7 @@ namespace SanaraV2
             {
                 values.Add(elem.Item1, elem.Item2);
             }
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, File.ReadAllLines("Keys/websiteToken.dat")[0]);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, websiteStats);
             msg.Content = new FormUrlEncodedContent(values);
 
             try
