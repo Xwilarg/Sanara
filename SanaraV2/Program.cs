@@ -15,6 +15,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotsList.Api;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
@@ -49,6 +50,10 @@ namespace SanaraV2
             {
                 await new Program().MainAsync();
             }
+            catch (FileNotFoundException e) // This probably means a dll is missing
+            {
+                throw e;
+            }
             catch (Exception e) // If an exception occur, the program exit and is relaunched
             {
                 if (Debugger.IsAttached)
@@ -68,7 +73,8 @@ namespace SanaraV2
 
         public YouTubeService youtubeService;
 
-        public string websiteStats, websiteStatsToken;
+        private string websiteStats, websiteStatsToken;
+        AuthDiscordBotListApi dblApi;
 
         public List<RadioChannel> radios;
 
@@ -80,6 +86,8 @@ namespace SanaraV2
         private RavenClient ravenClient;
         public ImageAnnotatorClient visionClient;
         public bool sendStats { private set; get; }
+
+        private DateTime lastDiscordBotsSent; // We make sure to wait at least 10 mins before sending stats to DiscordBots.org so we don't spam the API
 
         public Db.Db db;
 
@@ -124,7 +132,13 @@ namespace SanaraV2
             websiteStats = json.websiteStats;
             websiteStatsToken = json.websiteStatsToken;
             sendStats = websiteStats != null && websiteStatsToken != null;
+            if (json.discordBotsId != null && json.discordBotsToken != null)
+                dblApi = new AuthDiscordBotListApi(ulong.Parse((string)json.discordBotsId), (string)json.discordBotsToken);
+            else
+
+                dblApi = null;
             await InitServices(json);
+            lastDiscordBotsSent = DateTime.MinValue;
 
             await commands.AddModuleAsync<Information>(null);
             await commands.AddModuleAsync<Settings>(null);
@@ -144,8 +158,11 @@ namespace SanaraV2
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
             client.JoinedGuild += GuildJoin;
+            client.JoinedGuild += GuildCountChange;
+            client.LeftGuild += GuildCountChange;
             client.Disconnected += Disconnected;
             client.UserVoiceStateUpdated += VoiceUpdate;
+            client.Connected += UpdateDiscordBots;
 
             await client.LoginAsync(TokenType.Bot, (botToken == null) ? (string)json.botToken : botToken);
             startTime = DateTime.Now;
@@ -165,6 +182,20 @@ namespace SanaraV2
 
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
+        }
+
+        private async Task GuildCountChange(SocketGuild _)
+        {
+            await UpdateDiscordBots();
+        }
+
+        private async Task UpdateDiscordBots()
+        {
+            if (dblApi != null && lastDiscordBotsSent.AddMinutes(10).CompareTo(DateTime.Now) < 0)
+            {
+                lastDiscordBotsSent = DateTime.Now;
+                await dblApi.UpdateStats(client.Guilds.Count);
+            }
         }
 
         private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
