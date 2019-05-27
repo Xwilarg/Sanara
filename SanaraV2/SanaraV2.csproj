@@ -262,6 +262,7 @@
     <Compile Include="Features\NSFW\Doujinshi.cs" />
     <Compile Include="Features\NSFW\Error.cs" />
     <Compile Include="Features\NSFW\Response.cs" />
+    <Compile Include="Features\Tools\Code.cs" />
     <Compile Include="Features\Tools\Error.cs" />
     <Compile Include="Features\Tools\Image.cs" />
     <Compile Include="Features\Tools\Linguist.cs" />
