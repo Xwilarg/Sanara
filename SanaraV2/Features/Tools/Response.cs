@@ -23,6 +23,8 @@ namespace SanaraV2.Features.Tools
         public class Shell
         {
             public List<Tuple<string, string>> explanations; // Each element is a tuple Command name / Command description
+            public string title;
+            public string url;
         }
 
         public class Image

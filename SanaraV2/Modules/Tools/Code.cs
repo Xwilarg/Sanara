@@ -12,16 +12,47 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Discord.Commands;
+using System;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
 {
     public class Code : ModuleBase
     {
+        [Command("Shell")]
         public async Task Shell(params string[] args)
         {
 
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            var result = await Features.Tools.Code.Shell(args);
+            switch (result.error)
+            {
+                case Features.Tools.Error.Shell.Help:
+                    await ReplyAsync("Help");
+                    break;
+
+                case Features.Tools.Error.Shell.NotFound:
+                    await ReplyAsync("Not Found");
+                    break;
+
+                case Features.Tools.Error.Shell.None:
+                    EmbedBuilder em = new EmbedBuilder()
+                    {
+                        Color = Color.Green,
+                        Title = result.answer.title,
+                        Url = result.answer.url
+                    };
+                    foreach (var ex in result.answer.explanations)
+                        em.AddField(ex.Item1, ex.Item2);
+                    await ReplyAsync("", false, em.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }
