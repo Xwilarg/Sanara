@@ -35,10 +35,10 @@ namespace SanaraV2.Features.Tools
             if (html.Contains("No man page found for"))
                 return (new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.NotFound));
             List<Tuple<string, string>> explanations = new List<Tuple<string, string>>();
-            foreach (Match m in Regex.Matches(html, "<pre class=\"help-box\" id=\"help-[0-9]+\">"))
+            foreach (Match m in Regex.Matches(html, "helpref=\"help-([0-9]+)\"[^>]*>"))
             {
-                explanations.Add(new Tuple<string, string>("###",
-                    ReduceSize(FormatShell(html.Split(new[] { m.Value }, StringSplitOptions.None)[1].Split(new[] { "</pre>" }, StringSplitOptions.None)[0]))));
+                explanations.Add(new Tuple<string, string>(FormatShell(html.Split(new[] { m.Value }, StringSplitOptions.None)[1].Split(new[] { "</span>" }, StringSplitOptions.None)[0]),
+                    ReduceSize(FormatShell(html.Split(new[] { "<pre class=\"help-box\" id=\"help-" + m.Groups[1].Value + "\">" }, StringSplitOptions.None)[1].Split(new[] { "</pre>" }, StringSplitOptions.None)[0]))));
             }
             return (new FeatureRequest<Response.Shell, Error.Shell>(new Response.Shell()
             {
@@ -53,7 +53,9 @@ namespace SanaraV2.Features.Tools
             => HttpUtility.HtmlDecode(
                 Regex.Replace(
                     Regex.Replace(
-                        input,
+                        Regex.Replace(
+                            input,
+                            "<a[^>]+>([^<]+)<\\/a>", "$1"),
                         "<b>([^<]+)<\\/b>", "**$1**"),
                     "<u>([^<]+)<\\/u>", "__$1__"))
                 .Replace("\n\n", "%5Cn").Replace("\n", " ").Replace("%5Cn", "\n\n");
