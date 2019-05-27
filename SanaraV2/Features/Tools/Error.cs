@@ -17,6 +17,13 @@ namespace SanaraV2.Features.Tools
 {
     public static class Error
     {
+        public enum Shell
+        {
+            None,
+            Help,
+            NotFound
+        }
+
         public enum Image
         {
             None,

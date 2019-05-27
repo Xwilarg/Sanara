@@ -13,11 +13,18 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
+using System;
+using System.Collections.Generic;
 
 namespace SanaraV2.Features.Tools
 {
     public static class Response
     {
+        public class Shell
+        {
+            public List<Tuple<string, string>> explanations; // Each element is a tuple Command name / Command description
+        }
+
         public class Image
         {
             public Color discordColor;

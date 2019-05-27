@@ -154,6 +154,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<Xkcd>(null);
             await commands.AddModuleAsync<Modules.Tools.Image>(null);
             await commands.AddModuleAsync<Communication>(null);
+            await commands.AddModuleAsync<Code>(null);
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
