@@ -50,6 +50,8 @@ namespace SanaraV2.Games
         [Command("Score")]
         public async Task Score(params string[] _)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             var scores = await Program.p.db.GetAllScores();
             if (!scores.Any(x => x.Key == Context.Guild.Id.ToString()))
             {
