@@ -117,6 +117,23 @@ namespace Sanara_UnitTests
             Assert.InRange(int.Parse(result.answer.elems[0].devMat), 1, 100);
         }
 
+        // CODE
+        [Fact]
+        public async Task TestShell()
+        {
+            var result = await SanaraV2.Features.Tools.Code.Shell(new[] { "ls", "-la" });
+            Assert.Equal(SanaraV2.Features.Tools.Error.Shell.None, result.error);
+            Assert.Equal("https://explainshell.com/explain?cmd=ls%20-la", result.answer.url);
+            Assert.Equal("ls -la", result.answer.title);
+            Assert.Equal(3, result.answer.explanations.Count);
+            Assert.Equal("ls(1)", result.answer.explanations[0].Item1);
+            Assert.Equal("-l", result.answer.explanations[1].Item1);
+            Assert.Equal("a", result.answer.explanations[2].Item1);
+            Assert.NotEmpty(result.answer.explanations[0].Item2);
+            Assert.NotEmpty(result.answer.explanations[1].Item2);
+            Assert.NotEmpty(result.answer.explanations[2].Item2);
+        }
+
         // GAMES MODULE
         [Fact]
         public async Task TestGames()

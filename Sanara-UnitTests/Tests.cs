@@ -21,8 +21,9 @@ namespace Sanara_UnitTests
     {
         public void Dispose()
         {
-            foreach (var msg in SkipIfNoToken.chan.GetMessagesAsync().FlattenAsync().GetAwaiter().GetResult())
-                msg.DeleteAsync().GetAwaiter().GetResult();
+            if (SkipIfNoToken.chan != null)
+                foreach (var msg in SkipIfNoToken.chan.GetMessagesAsync().FlattenAsync().GetAwaiter().GetResult())
+                    msg.DeleteAsync().GetAwaiter().GetResult();
         }
     }
 }

@@ -48,6 +48,8 @@ namespace SanaraV2.Features.Tools
                     helpref.Add(value, 2);
                 else
                     helpref[value]++;
+                if (explanations.Count == 25)
+                    break;
             }
             return (new FeatureRequest<Response.Shell, Error.Shell>(new Response.Shell()
             {
