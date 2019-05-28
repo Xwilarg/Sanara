@@ -35,10 +35,19 @@ namespace SanaraV2.Features.Tools
             if (html.Contains("No man page found for"))
                 return (new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.NotFound));
             List<Tuple<string, string>> explanations = new List<Tuple<string, string>>();
+            /// helpref-X indicade the name of the command and help-X it description
+            /// We can have many time the same X so we count to not do always the same
+            Dictionary<string, int> helpref = new Dictionary<string, int>();
             foreach (Match m in Regex.Matches(html, "helpref=\"help-([0-9]+)\"[^>]*>"))
             {
-                explanations.Add(new Tuple<string, string>(FormatShell(html.Split(new[] { m.Value }, StringSplitOptions.None)[1].Split(new[] { "</span>" }, StringSplitOptions.None)[0]),
-                    ReduceSize(FormatShell(html.Split(new[] { "<pre class=\"help-box\" id=\"help-" + m.Groups[1].Value + "\">" }, StringSplitOptions.None)[1].Split(new[] { "</pre>" }, StringSplitOptions.None)[0]))));
+                string value = m.Groups[1].Value;
+                int arrayValue = helpref.ContainsKey(value) ? helpref[value] : 1;
+                explanations.Add(new Tuple<string, string>(FormatShell(html.Split(new[] { m.Value }, StringSplitOptions.None)[arrayValue].Split(new[] { "</span>" }, StringSplitOptions.None)[0]),
+                    ReduceSize(FormatShell(html.Split(new[] { "<pre class=\"help-box\" id=\"help-" + value + "\">" }, StringSplitOptions.None)[1].Split(new[] { "</pre>" }, StringSplitOptions.None)[0]))));
+                if (!helpref.ContainsKey(value))
+                    helpref.Add(value, 2);
+                else
+                    helpref[value]++;
             }
             return (new FeatureRequest<Response.Shell, Error.Shell>(new Response.Shell()
             {
