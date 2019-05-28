@@ -42,6 +42,10 @@ namespace SanaraV2.Modules.Tools
         public static string InvitationLink(ulong guildId) { return (Translation.GetTranslation(guildId, "invitationLink")); }
         public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
 
+        /// --------------------------- Shell ---------------------------
+        public static string ShellNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "shellNotFound")); }
+        public static string ShellHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "shellHelp")); }
+
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
         public static string HelpColor(ulong guildId) { return (Translation.GetTranslation(guildId, "helpColor")); }
@@ -77,6 +81,7 @@ namespace SanaraV2.Modules.Tools
         /// --------------------------- Help Module Name ---------------------------
         public static string AnimeMangaModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "animeMangaModuleName")); }
         public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }
+        public static string CodeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "codeModuleName")); }
         public static string CommunicationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communicationModuleName")); }
         public static string DoujinshiModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "doujinshiModuleName")); }
         public static string GameModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "gameModuleName")); }
@@ -102,6 +107,12 @@ namespace SanaraV2.Modules.Tools
                 return Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
                 + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
                 + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string CodeHelp(ulong guildId)
+        {
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
+                return Translation.GetTranslation(guildId, "codeModuleShell");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string CommunicationHelp(ulong guildId)

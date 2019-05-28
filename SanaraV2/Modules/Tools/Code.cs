@@ -31,11 +31,11 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Shell.Help:
-                    await ReplyAsync("Help");
+                    await ReplyAsync(Sentences.ShellHelp(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Shell.NotFound:
-                    await ReplyAsync("Not Found");
+                    await ReplyAsync(Sentences.ShellNotFound(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Shell.None:
