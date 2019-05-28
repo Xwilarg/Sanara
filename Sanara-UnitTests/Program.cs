@@ -17,8 +17,6 @@ using System;
 using SanaraV2.Features.NSFW;
 using System.Net;
 using System.Threading.Tasks;
-using Discord.WebSocket;
-using System.IO;
 using Discord;
 using System.Linq;
 using SanaraV2.Games;
