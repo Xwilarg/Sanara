@@ -163,7 +163,7 @@ namespace SanaraV2
             client.LeftGuild += GuildCountChange;
             client.Disconnected += Disconnected;
             client.UserVoiceStateUpdated += VoiceUpdate;
-            client.Connected += UpdateDiscordBots;
+            client.Connected += Connected;
 
             await client.LoginAsync(TokenType.Bot, (botToken == null) ? (string)json.botToken : botToken);
             startTime = DateTime.Now;
@@ -183,6 +183,12 @@ namespace SanaraV2
 
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
+        }
+
+        private async Task Connected()
+        {
+            await client.SetGameAsync("https://sanara.zirk.eu", null, ActivityType.Watching);
+            await UpdateDiscordBots();
         }
 
         private async Task GuildCountChange(SocketGuild _)
