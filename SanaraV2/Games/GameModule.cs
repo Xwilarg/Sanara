@@ -58,6 +58,9 @@ namespace SanaraV2.Games
             }
             var me = scores[Context.Guild.Id.ToString()];
             StringBuilder finalStr = new StringBuilder();
+            float finalScore = 0;
+            bool ranked = false;
+            int nbGuilds = scores.Count(x => x.Value.Count > 0);
             foreach (var game in Constants.allGames)
             {
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
@@ -68,17 +71,37 @@ namespace SanaraV2.Games
                        Sentences.NotRanked(Context.Guild.Id) + Environment.NewLine + Environment.NewLine);
                     continue;
                 }
+                ranked = true;
                 string[] myElems = me[gameName].Split('|');
                 var users = await Context.Guild.GetUsersAsync();
                 int myScore = int.Parse(myElems[0]);
-                string[] contributors = myElems.Skip(1).Select(x => users.Where(y => y.Id.ToString() == x).ElementAt(0).ToString()).ToArray();
+                string[] contributors = myElems.Skip(1).Select(x => users.Where(y => y.Id.ToString() == x).FirstOrDefault()?.ToString() ?? "(Unknown)").ToArray();
                 int rankedNumber = scores.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(gameName)).Count();
                 int myRanking = scores.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(gameName) && int.Parse(x.Value[gameName].Split('|')[0]) > myScore).Count() + 1;
+                int bestScore = scores.Where(x => x.Value.ContainsKey(gameName)).Max(x => int.Parse(x.Value[gameName].Split('|')[0]));
                 finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
-                    Sentences.ScoreText(Context.Guild.Id, myRanking, rankedNumber, myScore) + Environment.NewLine +
+                    Sentences.ScoreText(Context.Guild.Id, myRanking, rankedNumber, myScore, bestScore) + Environment.NewLine +
                     Sentences.ScoreContributors(Context.Guild.Id) + " " + string.Join(", ", contributors) + Environment.NewLine + Environment.NewLine);
+                finalScore += myScore * 100 / bestScore;
             }
-            await ReplyAsync(finalStr.ToString());
+            int myGlobalRanking = 1;
+            if (ranked)
+            {
+                foreach (var s in scores)
+                {
+                    int sScore = 0;
+                    foreach (var elem in s.Value)
+                    {
+                        int best = scores.Where(x => x.Value.ContainsKey(elem.Key)).Max(x => int.Parse(x.Value[elem.Key].Split('|')[0]));
+                        sScore += int.Parse(elem.Value.Split('|')[0]) * 100 / best;
+                    }
+                    if (sScore > finalScore)
+                        myGlobalRanking++;
+                }
+            }
+            await ReplyAsync((ranked ? Sentences.GlobalRanking(Context.Guild.Id, myGlobalRanking, nbGuilds, finalScore / Constants.allGames.Length)
+                : Sentences.NoGlobalRanking(Context.Guild.Id))+ Environment.NewLine + Environment.NewLine +
+                finalStr.ToString());
         }
     }
 }

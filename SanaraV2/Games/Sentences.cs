@@ -14,7 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using SanaraV2.Modules.Base;
-using System;
+using System.Globalization;
 
 namespace SanaraV2.Games
 {
@@ -63,7 +63,7 @@ namespace SanaraV2.Games
         public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
         public static string FateGOGame(ulong guildId) { return (Translation.GetTranslation(guildId, "fateGOGame")); }
         public static string PokemonGame(ulong guildId) { return (Translation.GetTranslation(guildId, "pokemonGame")); }
-        public static string ScoreText(ulong guildId, int rank, int total, int score) { return (Translation.GetTranslation(guildId, "scoreText", rank.ToString(), total.ToString(), score.ToString())); }
+        public static string ScoreText(ulong guildId, int rank, int total, int score, int bestScore) { return (Translation.GetTranslation(guildId, "scoreText", rank.ToString(), total.ToString(), score.ToString(), bestScore.ToString())); }
         public static string ScoreContributors(ulong guildId) { return (Translation.GetTranslation(guildId, "scoreContributors")); }
         public static string NoScore(ulong guildId) { return (Translation.GetTranslation(guildId, "noScore")); }
         public static string FullNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "fullNotAvailable")); }
@@ -74,5 +74,7 @@ namespace SanaraV2.Games
         public static string NotLoaded(ulong guildId) { return (Translation.GetTranslation(guildId, "notLoaded")); }
         public static string AnimeFull(ulong guildId) { return (AnimeGame(guildId) + " (" + Translation.GetTranslation(guildId, "full") + ")"); }
         public static string NotRanked(ulong guildId) { return (Translation.GetTranslation(guildId, "notRanked")); }
+        public static string GlobalRanking(ulong guildId, int myRank, int nbServers, float myScore) { return (Translation.GetTranslation(guildId, "globalRanking", myRank.ToString(), nbServers.ToString(), myScore.ToString("0.00", CultureInfo.InvariantCulture))); }
+        public static string NoGlobalRanking(ulong guildId) { return (Translation.GetTranslation(guildId, "NoGlobalRanking")); }
     }
 }
