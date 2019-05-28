@@ -79,7 +79,7 @@ namespace SanaraV2.Modules.Entertainment
             string orStr = Base.Sentences.OrStr(guildId);
             EmbedBuilder embed = new EmbedBuilder()
             {
-                Title = res.name + ((res.alternativeTitles.Length == 0) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")")),
+                Title = res.name + ((res.alternativeTitles == null || res.alternativeTitles.Length == 0) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")")),
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
                 Description = res.synopsis
