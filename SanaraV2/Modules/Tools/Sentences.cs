@@ -73,11 +73,16 @@ namespace SanaraV2.Modules.Tools
         public static string ModuleDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleDisabled", moduleName)); }
         public static string ModuleAlreadyEnabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyEnabled", moduleName)); }
         public static string ModuleAlreadyDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyDisabled", moduleName)); }
+        public static string AllModulesEnabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesEnabled")); }
+        public static string AllModulesDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesDisabled")); }
+        public static string AllModulesAlreadyEnabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyEnabled")); }
+        public static string AllModulesAlreadyDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyDisabled")); }
 
         /// --------------------------- Help ---------------------------
         public static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
         public static string HelpHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "helpHelp")); }
         public static string Help(ulong guildId) { return (Translation.GetTranslation(guildId, "help")); }
+
         /// --------------------------- Help Module Name ---------------------------
         public static string AnimeMangaModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "animeMangaModuleName")); }
         public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }

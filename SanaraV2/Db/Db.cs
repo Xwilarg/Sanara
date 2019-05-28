@@ -115,6 +115,12 @@ namespace SanaraV2.Db
             return (Availability[guildId][(int)module] == '1');
         }
 
+        public bool AreAllAvailable(ulong guildId)
+            => Availability[guildId].All(x => x == '1');
+
+        public bool AreNoneAvailable(ulong guildId)
+            => Availability[guildId].Count(x => x == '0') == 2;
+
         public async Task<string> GetGuild(ulong guildId)
         {
             return (JsonConvert.SerializeObject(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn)));

@@ -138,21 +138,21 @@ namespace SanaraV2.Modules.Tools
             else
             {
                 embed.Description = Sentences.HelpHelp(Context.Guild.Id) + Environment.NewLine +
-                    "**1**: " + animeMangaModule + Environment.NewLine +
-                    "**2**: " + booruModule + Environment.NewLine +
-                    "**3**: " + codeModule + Environment.NewLine +
-                    "**4**: " + communicationModule + Environment.NewLine +
-                    "**5**: " + doujinshiModule + Environment.NewLine +
-                    "**6**: " + gameModule + Environment.NewLine +
-                    "**7**: " + imageModule + Environment.NewLine +
-                    "**8**: " + informationModule + Environment.NewLine +
-                    "**9**: " + kantaiCollectionModule + Environment.NewLine +
-                    "**10**: " + linguisticModule + Environment.NewLine +
-                    "**11**: " + radioModule + Environment.NewLine +
-                    "**12**: " + settingsModule + Environment.NewLine +
-                    "**13**: " + visualNovelModule + Environment.NewLine +
-                    "**14**: " + xkcdModule + Environment.NewLine +
-                    "**15**: " + youtubeModule + Environment.NewLine;
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.AnimeManga) ? "**1**: " + animeMangaModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Booru) ? "**2**: " + booruModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Code) ? "**3**: " + codeModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Communication) ? "**4**: " + communicationModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Doujinshi) ? "**5**: " + doujinshiModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Game) ? "**6**: " + gameModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Image) ? "**7**: " + imageModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Information) ? "**8**: " + informationModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Kancolle) ? "**9**: " + kantaiCollectionModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Linguistic) ? "**10**: " + linguisticModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio) ? "**11**: " + radioModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Settings) ? "**12**: " + settingsModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Vn) ? "**13**: " + visualNovelModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Xkcd) ? "**14**: " + xkcdModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube) ? "**15**: " + youtubeModule + Environment.NewLine: "");
             }
             await ReplyAsync("", false, embed.Build());
         }

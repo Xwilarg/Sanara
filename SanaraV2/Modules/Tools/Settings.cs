@@ -209,6 +209,27 @@ namespace SanaraV2.Modules.Tools
             }
             Program.Module? module = null;
             string name = Utilities.AddArgs(args).Replace(" ", "");
+            if (name == "all") // Enable/Disable all modules at once
+            {
+                if (enable == 1 && Program.p.db.AreAllAvailable(Context.Guild.Id))
+                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild.Id));
+                else if (enable == 0 && Program.p.db.AreNoneAvailable(Context.Guild.Id))
+                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild.Id));
+                else
+                {
+                    for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
+                    {
+                        if (i == Program.Module.Settings || i == Program.Module.Information)
+                           continue;
+                        await Program.p.db.SetAvailability(Context.Guild.Id, i, enable);
+                    }
+                    if (enable == 1)
+                        await chan.SendMessageAsync(Sentences.AllModulesEnabled(Context.Guild.Id));
+                    else
+                        await chan.SendMessageAsync(Sentences.AllModulesDisabled(Context.Guild.Id));
+                }
+                return;
+            }
             for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
             {
                 if (i == Program.Module.Settings || i == Program.Module.Information)
