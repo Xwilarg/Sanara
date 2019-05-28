@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using DynamicExpresso;
 using SanaraV2.Modules.Base;
 using System;
@@ -34,10 +35,16 @@ namespace SanaraV2.Modules.Tools
             return guildUser.GuildPermissions.ManageGuild;
         }
 
+        private struct Eval
+        {
+            public DiscordSocketClient Client { set; get; }
+            public ICommandContext Context { set; get; }
+        }
+
         [Command("Eval")]
         public async Task EvalFct(params string[] args)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
                 await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             else if (args.Length == 0)

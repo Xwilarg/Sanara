@@ -42,7 +42,14 @@ namespace SanaraV2.Modules.Tools
         public static string InvitationLink(ulong guildId) { return (Translation.GetTranslation(guildId, "invitationLink")); }
         public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
 
-        /// --------------------------- Shell ---------------------------
+        /// --------------------------- Information ---------------------------
+        public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }
+        public static string ServicesAvailability(ulong guildId) { return (Translation.GetTranslation(guildId, "servicesAvailability")); }
+        public static string TranslationsAvailability(ulong guildId) { return (Translation.GetTranslation(guildId, "translationsAvailability")); }
+        public static string LatestChanges(ulong guildId) { return (Translation.GetTranslation(guildId, "latestChanges")); }
+        public static string ByStr(ulong guildId) { return (Translation.GetTranslation(guildId, "by")); }
+
+        /// --------------------------- Code ---------------------------
         public static string ShellNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "shellNotFound")); }
         public static string ShellHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "shellHelp")); }
 
@@ -162,7 +169,8 @@ namespace SanaraV2.Modules.Tools
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
                 return Translation.GetTranslation(guildId, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleGdpr")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite");
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleLogs");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string KantaiCollectionHelp(ulong guildId)

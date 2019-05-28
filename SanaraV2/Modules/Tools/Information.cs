@@ -14,13 +14,14 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
+using Newtonsoft.Json;
 using SanaraV2.Games;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
@@ -29,10 +30,32 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
-        private struct Eval
+        [Command("Logs"), Alias("Log", "Changes", "Change")]
+        public async Task Logs(params string[] args)
         {
-            public DiscordSocketClient Client { set; get; }
-            public ICommandContext Context { set; get; }
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            if (p.GitHubKey == null)
+            {
+                await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
+                return;
+            }
+            dynamic json;
+            EmbedBuilder eb = new EmbedBuilder()
+            {
+                Title = Sentences.LatestChanges(Context.Guild.Id),
+                Color = Color.Green
+            };
+            using (HttpClient hc = new HttpClient())
+            {
+                hc.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5&access_token=" + p.GitHubKey));
+            }
+            foreach (var j in json)
+            {
+                eb.AddField(DateTime.ParseExact((string)j.commit.author.date, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture).ToString(Base.Sentences.DateHourFormat(Context.Guild.Id))
+                    + " " + Sentences.ByStr(Context.Guild.Id) + " " + j.commit.author.name, j.commit.message);
+            }
+            await ReplyAsync("", false, eb.Build());
         }
 
         [Command("Help"), Summary("Give the help"), Alias("Commands")]
@@ -164,7 +187,7 @@ namespace SanaraV2.Modules.Tools
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Color = Color.Blue,
-                Title = "Datas saved about " + Context.Guild.Name,
+                Title = Sentences.DataSaved(Context.Guild.Id, Context.Guild.Name),
                 Description = await Program.p.db.GetGuild(Context.Guild.Id)
             }.Build());
         }
@@ -177,7 +200,7 @@ namespace SanaraV2.Modules.Tools
             int no = 0;
             EmbedBuilder embed = new EmbedBuilder()
             {
-                Title = "Services availability"
+                Title = Sentences.ServicesAvailability(Context.Guild.Id)
             };
             string description = "";
             for (Program.Module i = 0; i < Program.Module.Youtube; i++)
@@ -216,6 +239,11 @@ namespace SanaraV2.Modules.Tools
                 else
                     no += 2;
             }
+            embed.AddField("Information Module - Logs", "**GitHub API key: " + (p.GitHubKey != null ? "Yes" : "No"));
+            if (p.GitHubKey != null)
+                yes++;
+            else
+                no++;
             if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube))
             {
                 embed.AddField("YouTube Module", "**YouTube API key:** " + ((p.youtubeService != null) ? ("Yes") : ("No")));
@@ -247,7 +275,7 @@ namespace SanaraV2.Modules.Tools
             {
                 finalLanguage += CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Program.p.allLanguages[s.Key][0]) + ": " + (s.Value * 100 / enRef) + "%" + Environment.NewLine;
             }
-            embed.AddField("Translation availability", finalLanguage);
+            embed.AddField(Sentences.TranslationsAvailability(Context.Guild.Id), finalLanguage);
             await ReplyAsync("", false, embed.Build());
         }
 
