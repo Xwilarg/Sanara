@@ -554,7 +554,11 @@ namespace SanaraV2
                 {
                     Color = Color.Red,
                     Title = msg.Exception.InnerException.GetType().ToString(),
-                    Description = Modules.Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message)
+                    Description = Modules.Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message),
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = Modules.Base.Sentences.ExceptionReported(ce.Context.Guild.Id)
+                    }
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());
