@@ -232,7 +232,7 @@ namespace SanaraV2.Modules.Tools
                 else
                     no += 2;
             }
-            embed.AddField("Information Module - Logs", "**GitHub API key: " + (p.GitHubKey != null ? "Yes" : "No"));
+            embed.AddField("Information Module - Logs", "**GitHub API key:** " + (p.GitHubKey != null ? "Yes" : "No"));
             if (p.GitHubKey != null)
                 yes++;
             else
