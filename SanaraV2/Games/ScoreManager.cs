@@ -27,6 +27,29 @@ namespace SanaraV2.Games
         public static async Task<string> GetBestScores()
         {
             var scores = await Program.p.db.GetAllScores();
+            string globalRankingStr = "";
+            Dictionary<string, int> globalRanking = new Dictionary<string, int>();
+            foreach (var s in scores)
+            {
+                int sScore = 0;
+                foreach (var elem in s.Value)
+                {
+                    int best = scores.Where(x => x.Value.ContainsKey(elem.Key)).Max(x => int.Parse(x.Value[elem.Key].Split('|')[0]));
+                    sScore += int.Parse(elem.Value.Split('|')[0]) * 100 / best;
+                }
+                if (sScore > 0)
+                    globalRanking.Add(s.Key, sScore);
+            }
+            int i = 0;
+            while (i < 5 && globalRanking.Count > 0)
+            {
+                var elem = globalRanking.First(x => x.Value.Equals(globalRanking.Values.Max()));
+                if (globalRankingStr != "")
+                    globalRankingStr += "|";
+                globalRankingStr += Program.p.GetName(Program.p.client.GetGuild(ulong.Parse(elem.Key)).Name) + "|" + (elem.Value / Constants.allGames.Length);
+                globalRanking.Remove(elem.Key);
+                i++;
+            }
             StringBuilder finalStr = new StringBuilder();
             // Output format: Game1Place1Server | Game1Place1Score | Game1Place2Server..... Game1Place3Score $ Game2Place1Server | Game2Place1Score
             foreach (var game in Constants.allGames)
@@ -45,7 +68,7 @@ namespace SanaraV2.Games
                 string bestServer;
                 int bestScore;
                 List<string> alreadySaid = new List<string>();
-                while (best.Count < 3 && allScores.Count > alreadySaid.Count)
+                while (best.Count < 5 && allScores.Count > alreadySaid.Count)
                 {
                     bestServer = null;
                     bestScore = -1;
@@ -65,7 +88,7 @@ namespace SanaraV2.Games
                 }
                 finalStr.Append(string.Join("|", best.Select(x => x.Item1 + "|" + x.Item2)) + "$");
             }
-            return (finalStr.ToString());
+            return (globalRankingStr + "$" + finalStr.ToString());
         }
 
         public static string GetInformation(ulong guildId, ref int yes, ref int no)
