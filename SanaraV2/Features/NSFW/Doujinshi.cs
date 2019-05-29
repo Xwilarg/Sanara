@@ -91,7 +91,7 @@ namespace SanaraV2.Features.NSFW
                     allTags.Add((string)d.name);
                 return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
                 {
-                    url = "https://nhentai.net/g/" + matches[r.Next(0, matches.Count)].Groups[1].Value,
+                    url = "https://nhentai.net/g/" + id,
                     imageUrl = "https://i.nhentai.net/galleries/" + json.media_id + "/1." + (json.images.cover.t == "j" ? "jpg" : "png"),
                     title = json.title.pretty,
                     tags = allTags.ToArray()
