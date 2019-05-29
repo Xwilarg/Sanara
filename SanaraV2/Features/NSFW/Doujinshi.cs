@@ -12,10 +12,13 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV2.Features.NSFW
 {
@@ -28,6 +31,9 @@ namespace SanaraV2.Features.NSFW
             string html;
             string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(string.Join(" ", tags));
             int randomDoujinshi;
+            string imageUrl;
+            List<string> allTags = new List<string>();
+            string finalUrl;
             using (HttpClient hc = new HttpClient())
             {
                 html = await hc.GetStringAsync(url);
@@ -36,10 +42,23 @@ namespace SanaraV2.Features.NSFW
                     return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
                 randomDoujinshi = r.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
                 html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
+                finalUrl = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"")[randomDoujinshi % 25].Groups[1].Value;
+                html = await hc.GetStringAsync(finalUrl);
+
+                string htmlTags = html.Split(new[] { "taglist" }, StringSplitOptions.None)[1].Split(new[] { "Showing" }, StringSplitOptions.None)[0];
+                foreach (Match match in Regex.Matches(htmlTags, ">([^<]+)<\\/a><\\/div>"))
+                    allTags.Add(match.Groups[1].Value);
+
+                // To get the cover image, we first must go the first image of the gallery then we get it
+                string htmlCover = await hc.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0+1\"").Groups[1].Value);
+                imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
             }
             return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
             {
-                url = Regex.Match(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"").Groups[1].Value
+                url = finalUrl,
+                imageUrl = imageUrl,
+                title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
+                tags = allTags.ToArray()
             }, Error.Doujinshi.None));
         }
 
@@ -65,9 +84,17 @@ namespace SanaraV2.Features.NSFW
                 else
                     url += "&page=" + page;
                 MatchCollection matches = Regex.Matches(await (await hc.GetAsync(url)).Content.ReadAsStringAsync(), "<div class=\"gallery\" data-tags=\"[^\"]+\"><a href=\"\\/g\\/([0-9]+)");
+                string id = matches[r.Next(0, matches.Count)].Groups[1].Value;
+                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://nhentai.net/api/gallery/" + id));
+                List<string> allTags = new List<string>();
+                foreach (dynamic d in json.tags)
+                    allTags.Add((string)d.name);
                 return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
                 {
-                    url = "https://nhentai.net/g/" + matches[r.Next(0, matches.Count)].Groups[1].Value
+                    url = "https://nhentai.net/g/" + matches[r.Next(0, matches.Count)].Groups[1].Value,
+                    imageUrl = "https://i.nhentai.net/galleries/" + json.media_id + "/1." + (json.images.cover.t == "j" ? "jpg" : "png"),
+                    title = json.title.pretty,
+                    tags = allTags.ToArray()
                 }, Error.Doujinshi.None));
             }
         }

@@ -40,7 +40,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync(result.answer.url);
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
                     break;
 
                 default:
@@ -65,12 +65,28 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync(result.answer.url);
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
                     break;
 
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public Embed CreateFinalEmbed(Features.NSFW.Response.Doujinshi result, ulong guildId)
+        {
+            return new EmbedBuilder()
+            {
+                Color = new Color(255, 20, 147),
+                Description = string.Join(", ", result.tags),
+                Title = result.title,
+                Url = result.url,
+                ImageUrl = result.imageUrl,
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = Sentences.ClickFull(guildId)
+                }
+            }.Build();
         }
     }
 }

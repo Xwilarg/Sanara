@@ -43,6 +43,9 @@ namespace SanaraV2.Features.NSFW
         public class Doujinshi
         {
             public string url;
+            public string title;
+            public string[] tags;
+            public string imageUrl;
         }
     }
 }

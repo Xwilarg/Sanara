@@ -29,5 +29,8 @@ namespace SanaraV2.Modules.NSFW
         public static string Artist(ulong guildId) { return (Translation.GetTranslation(guildId, "artist")); }
         public static string Artists(ulong guildId) { return (Translation.GetTranslation(guildId, "artists")); }
         public static string ImageInfo(ulong guildId, string id) { return (Translation.GetTranslation(guildId, "imageInfo", id)); }
+
+        /// --------------------------- Doujinshi ---------------------------
+        public static string ClickFull(ulong guildId) { return (Translation.GetTranslation(guildId, "clickFull")); }
     }
 }
