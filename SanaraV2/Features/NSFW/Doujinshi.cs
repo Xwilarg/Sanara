@@ -21,6 +21,28 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
+        public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchCosplay(bool isChanSafe, string[] tags, Random r)
+        {
+            if (isChanSafe)
+                return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW));
+            string html;
+            string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(string.Join(" ", tags));
+            int randomDoujinshi;
+            using (HttpClient hc = new HttpClient())
+            {
+                html = await hc.GetStringAsync(url);
+                Match m = Regex.Match(html, "Showing ([0-9,]+) result");
+                if (!m.Success)
+                    return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
+                randomDoujinshi = r.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
+                html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
+            }
+            return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
+            {
+                url = Regex.Match(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"").Groups[1].Value
+            }, Error.Doujinshi.None));
+        }
+
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchDoujinshi(bool isChanSafe, string[] tags, Random r)
         {
             if (isChanSafe)
