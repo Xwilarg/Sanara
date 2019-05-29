@@ -154,7 +154,6 @@ namespace SanaraV2
             await commands.AddModuleAsync<Youtube>(null);
             await commands.AddModuleAsync<RadioModule>(null);
             await commands.AddModuleAsync<Xkcd>(null);
-            await commands.AddModuleAsync<Modules.Tools.Image>(null);
             await commands.AddModuleAsync<Communication>(null);
             await commands.AddModuleAsync<Code>(null);
 
@@ -373,7 +372,6 @@ namespace SanaraV2
             Communication,
             Doujinshi,
             Game,
-            Image,
             Information,
             Kancolle,
             Linguistic,

@@ -265,7 +265,6 @@
     <Compile Include="Features\NSFW\Response.cs" />
     <Compile Include="Features\Tools\Code.cs" />
     <Compile Include="Features\Tools\Error.cs" />
-    <Compile Include="Features\Tools\Image.cs" />
     <Compile Include="Features\Tools\Linguist.cs" />
     <Compile Include="Features\Tools\Response.cs" />
     <Compile Include="Features\Utilities.cs" />
@@ -300,7 +299,6 @@
     <Compile Include="Modules\Tools\Code.cs" />
     <Compile Include="Modules\Tools\Communication.cs" />
     <Compile Include="Modules\Tools\Information.cs" />
-    <Compile Include="Modules\Tools\Image.cs" />
     <Compile Include="Modules\Tools\Linguist.cs" />
     <Compile Include="Modules\GamesInfo\Kancolle.cs" />
     <Compile Include="Modules\Entertainment\AnimeManga.cs" />

@@ -54,5 +54,37 @@ namespace SanaraV2.Modules.Tools
                     throw new NotImplementedException();
             }
         }
+
+        [Command("Color", RunMode = RunMode.Async), Summary("Display a RGB color")]
+        public async Task SearchColor(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            var result = await Features.Tools.Code.SearchColor(args);
+            switch (result.error)
+            {
+                case Features.Tools.Error.Image.InvalidArg:
+                    await ReplyAsync(Sentences.HelpColor(Context.Guild.Id));
+                    break;
+
+                case Features.Tools.Error.Image.InvalidColor:
+                    await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
+                    break;
+
+                case Features.Tools.Error.Image.None:
+                    await ReplyAsync("", false, new EmbedBuilder()
+                    {
+                        Title = result.answer.name,
+                        Color = result.answer.discordColor,
+                        ImageUrl = result.answer.colorUrl,
+                        Description = Sentences.Rgb(Context.Guild.Id) + ": " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
+                        Sentences.Hex(Context.Guild.Id) + ": #" + result.answer.colorHex
+                    }.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

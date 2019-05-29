@@ -124,7 +124,7 @@ namespace SanaraV2.Modules.Tools
         public static string CodeHelp(ulong guildId)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                return Translation.GetTranslation(guildId, "codeModuleShell");
+                return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string CommunicationHelp(ulong guildId)
@@ -157,12 +157,6 @@ namespace SanaraV2.Modules.Tools
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote2")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote3")
                     + ((!isChanNsfw) ? (Environment.NewLine + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*") : (""));
-            return Base.Sentences.NotAvailable(guildId);
-        }
-        public static string ImageHelp(ulong guildId)
-        {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Image))
-                return Translation.GetTranslation(guildId, "imageModuleColor");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string InformationHelp(ulong guildId)
