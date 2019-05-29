@@ -72,6 +72,7 @@ namespace SanaraV2
         public TranslationClient translationClient;
 
         public YouTubeService youtubeService;
+        public string GitHubKey;
 
         private string websiteStats, websiteStatsToken;
         private AuthDiscordBotListApi dblApi;
@@ -129,6 +130,7 @@ namespace SanaraV2
             Modules.Base.Sentences.ownerId = ulong.Parse((string)json.ownerId);
             Modules.Base.Sentences.ownerStr = json.ownerStr;
 
+            GitHubKey = json.githubKey;
             websiteStats = json.websiteStats;
             websiteStatsToken = json.websiteStatsToken;
             sendStats = websiteStats != null && websiteStatsToken != null;

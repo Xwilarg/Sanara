@@ -37,7 +37,7 @@ namespace SanaraV2.Features.NSFW
                 Match match = Regex.Match(await (await hc.GetAsync(url)).Content.ReadAsStringAsync(), "<a href=\"\\?(q=[^&]+&amp;)?page=([0-9]+)\" class=\"last\">");
                 if (!match.Success)
                     return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
-                int page = r.Next(0, int.Parse(match.Groups[2].Value));
+                int page = r.Next(1, int.Parse(match.Groups[2].Value) + 1);
                 if (noTags)
                     url += "?page=" + page;
                 else
