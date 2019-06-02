@@ -14,7 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -37,6 +36,8 @@ namespace SanaraV2.Features.Entertainment
             match = Regex.Match(args[0], "https:\\/\\/youtu.be\\/([^&]+)");
             if (match.Success)
                 id = match.Groups[1].Value;
+            else if (Regex.Match(args[0], "^[0-9a-zA-Z_-]{11}$").Success)
+                id = args[0];
             if (id != null)
             {
                 VideosResource.ListRequest r = service.Videos.List("snippet");
