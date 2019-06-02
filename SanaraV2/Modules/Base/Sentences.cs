@@ -49,6 +49,7 @@ namespace SanaraV2.Modules.Base
         public static string ExceptionReported(ulong guildId) { return (Translation.GetTranslation(guildId, "exceptionReported")); }
         public static string NeedEmbedLinks(ulong guildId) { return (Translation.GetTranslation(guildId, "needEmbedLinks"));  }
         public static string NotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "notAvailable")); }
+        public static string NotWorking(ulong guildId) { return (Translation.GetTranslation(guildId, "notWorking")); }
 
         /// --------------------------- Parts ---------------------------
         public static string DateHourFormat(ulong guildId) { return (Translation.GetTranslation(guildId, "dateHourFormat")); }

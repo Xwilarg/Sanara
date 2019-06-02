@@ -182,6 +182,7 @@ namespace SanaraV2.Modules.Tools
         }
         public static string RadioHelp(ulong guildId)
         {
+            return Base.Sentences.NotWorking(guildId);
             if (Program.p.db.IsAvailable(guildId, Program.Module.Radio))
                 return Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip")
