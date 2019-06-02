@@ -14,7 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
-using SanaraV2.Features;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,14 +68,19 @@ namespace SanaraV2.Games
             {
                 if (_didLost) // Can happen if the game is canceled
                     return;
+                string finding = "";
                 try
                 {
                     if (GetPostType() == PostType.Text)
                         foreach (string s in await GetPostAsync())
+                        {
+                            finding = s;
                             await PostText(s);
+                        }
                     else
                         foreach (string s in await GetPostAsync())
                         {
+                            finding = s;
                             using (HttpClient hc = new HttpClient())
                                 await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
                             await PostFromUrl(s);
@@ -93,6 +97,7 @@ namespace SanaraV2.Games
                 catch (Exception e)
                 {
                     counter++;
+                    string msg = "Error posting " + finding;
                     if (counter == 3)
                     {
                         await _chan.SendMessageAsync("", false, new EmbedBuilder()
@@ -105,7 +110,7 @@ namespace SanaraV2.Games
                                 Text = e.Message
                             }
                         }.Build());
-                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, new GameException(msg, e)));
                         _postImage = false;
                         await LooseAsync(null);
                         break;
@@ -122,7 +127,7 @@ namespace SanaraV2.Games
                                 Text = e.Message
                             }
                         }.Build());
-                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, new GameException(msg, e)));
                     }
                 }
             }

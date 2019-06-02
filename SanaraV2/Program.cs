@@ -568,7 +568,7 @@ namespace SanaraV2
                 if (ravenClient != null)
                     ravenClient.Capture(new SentryEvent(msg.Exception));
                 if (sendStats)
-                    AddError("Unknown error");
+                    AddError(msg.Exception != null ? msg.Exception.Message.GetType().ToString() : "Unknown error");
             }
             return Task.CompletedTask;
         }
