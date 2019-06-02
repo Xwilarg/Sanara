@@ -50,7 +50,7 @@ namespace SanaraV2.Features.NSFW
                     allTags.Add(match.Groups[1].Value);
 
                 // To get the cover image, we first must go the first image of the gallery then we get it
-                string htmlCover = await hc.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0+1\"").Groups[1].Value);
+                string htmlCover = await hc.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
                 imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
             }
             return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
