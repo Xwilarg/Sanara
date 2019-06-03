@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using System;
+using System.Linq;
 
 namespace SanaraV2.Modules.Base
 {
@@ -39,10 +40,12 @@ namespace SanaraV2.Modules.Base
             {
                 TranslationData value = Program.p.translations[id].Find(x => x.language == language);
                 string elem;
-                if (value.language == null)
+                if (value.language != null)
+                    elem = value.content;
+                else if (Program.p.translations[id].Any(x => x.language == "en"))
                     elem = Program.p.translations[id].Find(x => x.language == "en").content;
                 else
-                    elem = value.content;
+                    return ("An error occured in the translation submodule: The id " + id + " doesn't exist.");
                 for (int i = 0; i < args.Length; i++)
                 {
                     elem = elem.Replace("{" + i + "}", args[i]);

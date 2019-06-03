@@ -51,16 +51,16 @@ namespace SanaraV2.Modules.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Information);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             await InfosUser(await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id) as IGuildUser);
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
         public async Task Quote(string id = null)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Information);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IUser author = (id == null) ? (null) : (await Utilities.GetUser(id, Context.Guild));
             if (id == null || author != null)
             {
