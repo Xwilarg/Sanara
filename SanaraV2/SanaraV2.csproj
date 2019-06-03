@@ -149,8 +149,11 @@
     <Reference Include="Miki.Net.Http, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Miki.Net.Http.2.1.0\lib\netstandard1.6\Miki.Net.Http.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHentaiSharp.1.0.0\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NHentaiSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHentaiSharp.1.0.0\lib\net45\NHentaiSharp.dll</HintPath>
     </Reference>
     <Reference Include="RethinkDb.Driver, Version=2.3.100.0, Culture=neutral, PublicKeyToken=289e75d5145ae4e6, processorArchitecture=MSIL">
       <HintPath>..\packages\RethinkDb.Driver.2.3.100\lib\net45\RethinkDb.Driver.dll</HintPath>
