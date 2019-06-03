@@ -117,8 +117,10 @@ namespace SanaraV2.Modules.Tools
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
                 return Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
-                + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
-                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
+                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
+                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : (""))
+                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleTags")
+                + (isChanNsfw ? "" : Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string CodeHelp(ulong guildId)
