@@ -16,7 +16,7 @@ namespace SanaraV2.Games
 {
     public struct Config
     {
-        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, bool isMultiplayer)
+        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, APreload.Multiplayer isMultiplayer)
         {
             this.refTime = refTime;
             this.difficulty = difficulty;
@@ -29,7 +29,7 @@ namespace SanaraV2.Games
         public Difficulty difficulty;
         public string gameName; // Used to store the score in the db
         public bool isFull; // Some game have a full mode containing a bigger dictionnary (not filtered)
-        public bool isMultiplayer; // Some game have a multiplayer mode
+        public APreload.Multiplayer isMultiplayer; // Some game have a multiplayer mode
     }
 
     public enum Difficulty // Easy mode give twice more time

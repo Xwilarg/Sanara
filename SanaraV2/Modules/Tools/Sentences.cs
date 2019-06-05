@@ -149,17 +149,7 @@ namespace SanaraV2.Modules.Tools
         }
         public static string GameHelp(ulong guildId, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Game))
-                return Translation.GetTranslation(guildId, "gameModuleKancolle") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAzurLane")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleFateGO")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleShiritori")
-                     + Environment.NewLine + Translation.GetTranslation(guildId, "gameModulePokemon")
-                    + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleBooru")) : (""))
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleReset") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleScore")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote") + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote2")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "gameModuleNote3")
-                    + ((!isChanNsfw) ? (Environment.NewLine + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*") : (""));
-            return Base.Sentences.NotAvailable(guildId);
+            return Games.GameModule.DisplayHelp(guildId, isChanNsfw);
         }
         public static string InformationHelp(ulong guildId)
         {
