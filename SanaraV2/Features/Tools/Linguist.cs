@@ -207,6 +207,15 @@ namespace SanaraV2.Features.Tools
             return (finalStr);
         }
 
+        private static char GetNextCharacter(char c)
+        {
+            if (c == 'o')
+                return 'u';
+            if (c == 'e')
+                return 'i';
+            return c;
+        }
+
         private static string FromKatakanaInternal(string name)
         {
             ResourceManager manager = KatakanaToRomaji.ResourceManager;
@@ -222,7 +231,7 @@ namespace SanaraV2.Features.Tools
                 if (curr == 'ッ')
                     doubleVoy = 2;
                 else if (curr == 'ー' && finalStr.Length > 0)
-                    finalName += finalStr.Substring(finalStr.Length - 1, 1);
+                    finalName += GetNextCharacter(finalStr.Substring(finalStr.Length - 1, 1)[0]);
                 else
                     finalName += TranscriptInternal(curr, next, ref i, manager);
                 if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
