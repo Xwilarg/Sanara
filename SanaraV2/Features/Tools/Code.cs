@@ -61,7 +61,7 @@ namespace SanaraV2.Features.Tools
             }, Error.Shell.None));
         }
 
-        /// Clean input to put bold and stuffs depending HTML
+        /// Clean input to put bold and stuffs depending of HTML
         private static string FormatShell(string input)
             => HttpUtility.HtmlDecode(
                 Regex.Replace(

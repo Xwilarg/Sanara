@@ -257,6 +257,9 @@ namespace SanaraV2.Features.Tools
             return ("" + curr);
         }
 
+        private static bool IsRomanLetter(char c)
+            => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+
         private static string ToHiraganaInternal(string name)
         {
             ResourceManager manager = RomajiToHiragana.ResourceManager;
@@ -268,7 +271,7 @@ namespace SanaraV2.Features.Tools
                 char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
                 char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
                 if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
+                    && curr == next && IsRomanLetter(curr))
                 {
                     finalName += "っ";
                     i--;
@@ -290,7 +293,7 @@ namespace SanaraV2.Features.Tools
                 char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
                 char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
                 if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
+                    && curr == next && IsRomanLetter(curr))
                 {
                     finalName += "ッ";
                     i--;
