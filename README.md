@@ -23,3 +23,5 @@ If you want to, you can also see [stats about her usage](https://sanara.zirk.eu/
 I'm also open to contributions if you want to translate the bot to your own language or to add features, more information on the [developper documentation page](https://sanara.zirk.eu/documentation.html).
 
 If you have any wonder about what the bot collect on you and how you can get/delete these information, you can check the [GDPR page](https://sanara.zirk.eu/gdpr.html).
+
+You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
