@@ -17,6 +17,7 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,63 @@ namespace SanaraV2.Games
 {
     public class GameModule : ModuleBase
     {
+        public static string DisplayHelp(ulong guildId, bool isChanNsfw)
+        {
+
+            if (!Program.p.db.IsAvailable(guildId, Program.Module.Game))
+                return Modules.Base.Sentences.NotAvailable(guildId);
+            List<Tuple<APreload, string>> soloOnly = new List<Tuple<APreload, string>>();
+            List<Tuple<APreload, string>> multiOnly = new List<Tuple<APreload, string>>();
+            List<Tuple<APreload, string>> both = new List<Tuple<APreload, string>>();
+            // Put all games on lists to know if they are multiplayer or not
+            foreach (var game in Constants.allGames)
+            {
+                APreload preload = (APreload)Activator.CreateInstance(game.Item1);
+                switch (preload.DoesAllowMultiplayer())
+                {
+                    case APreload.Multiplayer.SoloOnly:
+                        soloOnly.Add(new Tuple<APreload, string>(preload, game.Item3));
+                        break;
+
+                    case APreload.Multiplayer.MultiOnly:
+                        multiOnly.Add(new Tuple<APreload, string>(preload, game.Item3));
+                        break;
+
+                    case APreload.Multiplayer.Both:
+                        both.Add(new Tuple<APreload, string>(preload, game.Item3));
+                        break;
+                }
+            }
+            // Display help
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleSoloOnly") + "**");
+            AppendHelp(soloOnly, str, isChanNsfw, guildId);
+            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleMultiOnly") + "**");
+            AppendHelp(multiOnly, str, isChanNsfw, guildId);
+            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleBoth") + "**");
+            AppendHelp(both, str, isChanNsfw, guildId);
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleReset"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleScore"));
+            str.AppendLine(Environment.NewLine);
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote2"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote3"));
+            str.AppendLine(Environment.NewLine);
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleMultiHelp"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleSoloHelp"));
+            if (!isChanNsfw)
+                str.AppendLine(Environment.NewLine + Translation.GetTranslation(guildId, "nsfwForFull"));
+            return str.ToString();
+        }
+
+        private static void AppendHelp(List<Tuple<APreload, string>> dict, StringBuilder str, bool isChanNsfw, ulong guildId)
+        {
+            foreach (var game in dict)
+                if (isChanNsfw || (!game.Item1.IsNsfw() && !isChanNsfw))
+                    str.AppendLine(Translation.GetTranslation(guildId, game.Item2));
+            str.AppendLine(Environment.NewLine);
+        }
+
         [Command("Play", RunMode = RunMode.Async)]
         public async Task Play(params string[] args)
         {

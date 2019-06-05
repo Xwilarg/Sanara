@@ -23,15 +23,15 @@ namespace SanaraV2.Games
     {
         // Order in Db: Shiritori, Anime, Booru, KanColle, AzurLane
         // The order matter and must be preserved
-        public static Tuple<Type, Type>[] allGames = new Tuple<Type, Type>[]
+        public static Tuple<Type, Type, string>[] allGames = new Tuple<Type, Type, string>[]
         {
-            new Tuple<Type, Type>(typeof(ShiritoriPreload), typeof(Shiritori)),
-            new Tuple<Type, Type>(typeof(AnimePreload), typeof(Anime)),
-            new Tuple<Type, Type>(typeof(BooruPreload), typeof(Booru)),
-            new Tuple<Type, Type>(typeof(KanCollePreload), typeof(KanColle)),
-            new Tuple<Type, Type>(typeof(AzurLanePreload), typeof(AzurLane)),
-            new Tuple<Type, Type>(typeof(FateGOPreload), typeof(FateGO)),
-            new Tuple<Type, Type>(typeof(PokemonPreload), typeof(Pokemon))
+            new Tuple<Type, Type, string>(typeof(ShiritoriPreload), typeof(Shiritori), "gameModuleShiritori"),
+            new Tuple<Type, Type, string>(typeof(AnimePreload), typeof(Anime), "gameModuleAnime"),
+            new Tuple<Type, Type, string>(typeof(BooruPreload), typeof(Booru), "gameModuleBooru"),
+            new Tuple<Type, Type, string>(typeof(KanCollePreload), typeof(KanColle), "gameModuleKancolle"),
+            new Tuple<Type, Type, string>(typeof(AzurLanePreload), typeof(AzurLane), "gameModuleAzurLane"),
+            new Tuple<Type, Type, string>(typeof(FateGOPreload), typeof(FateGO), "gameModuleFateGO"),
+            new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon")
         };
 
         public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
