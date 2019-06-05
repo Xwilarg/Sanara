@@ -207,6 +207,15 @@ namespace SanaraV2.Features.Tools
             return (finalStr);
         }
 
+        private static char GetNextCharacter(char c)
+        {
+            if (c == 'o')
+                return 'u';
+            if (c == 'e')
+                return 'i';
+            return c;
+        }
+
         private static string FromKatakanaInternal(string name)
         {
             ResourceManager manager = KatakanaToRomaji.ResourceManager;
@@ -222,7 +231,7 @@ namespace SanaraV2.Features.Tools
                 if (curr == 'ッ')
                     doubleVoy = 2;
                 else if (curr == 'ー' && finalStr.Length > 0)
-                    finalName += finalStr.Substring(finalStr.Length - 1, 1);
+                    finalName += GetNextCharacter(finalStr.Substring(finalStr.Length - 1, 1)[0]);
                 else
                     finalName += TranscriptInternal(curr, next, ref i, manager);
                 if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
@@ -257,6 +266,9 @@ namespace SanaraV2.Features.Tools
             return ("" + curr);
         }
 
+        private static bool IsRomanLetter(char c)
+            => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+
         private static string ToHiraganaInternal(string name)
         {
             ResourceManager manager = RomajiToHiragana.ResourceManager;
@@ -268,7 +280,7 @@ namespace SanaraV2.Features.Tools
                 char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
                 char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
                 if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
+                    && curr == next && IsRomanLetter(curr))
                 {
                     finalName += "っ";
                     i--;
@@ -290,7 +302,7 @@ namespace SanaraV2.Features.Tools
                 char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
                 char nnext = ((i < name.Length - 2) ? (name[i + 2]) : (' '));
                 if (curr != 'a' && curr != 'i' && curr != 'u' && curr != 'e' && curr != 'o' && curr != 'n'
-                    && curr == next)
+                    && curr == next && IsRomanLetter(curr))
                 {
                     finalName += "ッ";
                     i--;

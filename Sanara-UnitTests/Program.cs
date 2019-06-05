@@ -115,6 +115,19 @@ namespace Sanara_UnitTests
             Assert.InRange(int.Parse(result.answer.elems[0].devMat), 1, 100);
         }
 
+        // LINGUISTIC
+        [Theory]
+        [InlineData("neko", "ネコ", "ねこ", "neko")]
+        [InlineData("sasayaki", "ササヤキ", "ささやき", "sasayaki")]
+        [InlineData("くま", "クマ", "くま", "kuma")]
+        [InlineData("ローマじ", "ローマジ", "ろうまじ", "roumaji")]
+        public void TestLinguistic(string original, string katakana, string hiragana, string romaji)
+        {
+            Assert.Equal(hiragana, SanaraV2.Features.Tools.Linguist.ToHiragana(original));
+            Assert.Equal(katakana, SanaraV2.Features.Tools.Linguist.ToKatakana(original));
+            Assert.Equal(romaji, SanaraV2.Features.Tools.Linguist.ToRomaji(original));
+        }
+
         // CODE
         [Fact]
         public async Task TestShell()

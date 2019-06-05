@@ -116,7 +116,7 @@ namespace SanaraV2.Games.Impl
                     }
                 }
             }
-            ContinueCheck:
+        ContinueCheck:
             if (!isCorrect)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             string lastCharac = GetLastCharacter(_currWord);

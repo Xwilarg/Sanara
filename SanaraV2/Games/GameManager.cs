@@ -98,7 +98,7 @@ namespace SanaraV2.Games
                         await chan.SendMessageAsync(preload.GetRules(chan.GuildId) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull));
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer: false));
                          _games.Add(newGame);
                         await newGame.PostAsync();
                         if (Program.p.sendStats)
