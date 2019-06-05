@@ -30,6 +30,13 @@ namespace SanaraV2.Games
 
         public abstract bool IsNsfw();
         public abstract bool DoesAllowFull(); // Allow 'full' attribute
+        public abstract Multiplayer DoesAllowMultiplayer(); // Allow 'multi' attribute
+        public enum Multiplayer
+        {
+            SoloOnly,
+            MultiOnly,
+            Both
+        }
         public abstract string GetRules(ulong guildId);
 
         public bool ContainsName(string name)

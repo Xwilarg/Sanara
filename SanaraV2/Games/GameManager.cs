@@ -61,6 +61,7 @@ namespace SanaraV2.Games
             string gameName = args[0];
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
+            APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
             if (args.Length > 1)
             {
                 foreach (string s in args.Skip(1).Select(x => x.ToLower()))
@@ -71,13 +72,18 @@ namespace SanaraV2.Games
                             isFull = true;
                             break;
 
+                        case "multi":
+                        case "multiplayer":
+                            isMultiplayer = APreload.Multiplayer.MultiOnly;
+                            break;
+
                         case "easy":
                             difficulty = Difficulty.Easy;
                             break;
 
                         case "normal":
-                            difficulty = Difficulty.Normal;
-                            break;
+                        case "solo":
+                            break; // These case exist so the user can precise them, but they do nothing
 
                         default:
                             return Sentences.InvalidDifficulty;
@@ -91,6 +97,10 @@ namespace SanaraV2.Games
                 {
                     if (!chan.IsNsfw && preload.IsNsfw())
                         return Modules.Base.Sentences.ChanIsNotNsfw;
+                    if (isMultiplayer == APreload.Multiplayer.MultiOnly && preload.DoesAllowMultiplayer() == APreload.Multiplayer.SoloOnly)
+                        return Sentences.MultiNotAvailable;
+                    if (isMultiplayer == APreload.Multiplayer.SoloOnly && preload.DoesAllowMultiplayer() == APreload.Multiplayer.MultiOnly)
+                        return Sentences.SoloNotAvailable;
                     if (isFull && !preload.DoesAllowFull())
                         return Sentences.FullNotAvailable;
                     try
@@ -98,7 +108,7 @@ namespace SanaraV2.Games
                         await chan.SendMessageAsync(preload.GetRules(chan.GuildId) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer: false));
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer));
                          _games.Add(newGame);
                         await newGame.PostAsync();
                         if (Program.p.sendStats)

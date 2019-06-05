@@ -36,6 +36,9 @@ namespace SanaraV2.Games.Impl
         public override bool DoesAllowFull()
             => false;
 
+        public override Multiplayer DoesAllowMultiplayer()
+            => Multiplayer.Both;
+
         public override string GetRules(ulong guildId)
             => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
     }
