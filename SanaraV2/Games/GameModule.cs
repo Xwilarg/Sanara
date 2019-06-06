@@ -63,6 +63,8 @@ namespace SanaraV2.Games
             AppendHelp(both, str, isChanNsfw, guildId);
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleReset"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleScore"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleJoin"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleLeave"));
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote2"));
@@ -83,13 +85,29 @@ namespace SanaraV2.Games
             str.AppendLine(Environment.NewLine);
         }
 
+        [Command("Join")]
+        public async Task Join(params string[] _)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            var error = Program.p.gm.JoinGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
+        }
+
+        [Command("Leave")]
+        public async Task Leave(params string[] _)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            var error = Program.p.gm.LeaveGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
+        }
+
         [Command("Play", RunMode = RunMode.Async)]
         public async Task Play(params string[] args)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             ITextChannel chan = (ITextChannel)Context.Channel;
-            var error = await Program.p.gm.Play(args, chan);
+            var error = await Program.p.gm.Play(args, chan, Context.User.Id);
             if (error != null)
                 await ReplyAsync(error(Context.Guild.Id));
         }

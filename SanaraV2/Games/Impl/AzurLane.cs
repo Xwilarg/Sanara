@@ -44,7 +44,7 @@ namespace SanaraV2.Games.Impl
 
     public class AzurLane : AQuizz
     {
-        public AzurLane(ITextChannel chan, Config config) : base(chan, Constants.azurLaneDictionnary, config)
+        public AzurLane(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.azurLaneDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

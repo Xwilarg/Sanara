@@ -45,7 +45,7 @@ namespace SanaraV2.Games.Impl
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, Config config) : base(chan, Constants.shiritoriDictionnary, config)
+        public Shiritori(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.shiritoriDictionnary, config, playerId)
         { }
 
         protected override void Init()

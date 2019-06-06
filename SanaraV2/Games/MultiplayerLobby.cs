@@ -25,27 +25,31 @@ namespace SanaraV2.Games
     {
         public MultiplayerLobby(ulong owner)
         {
-            players = new List<ulong>();
-            players.Add(owner);
-            startTime = DateTime.Now;
+            _players = new List<ulong>();
+            _players.Add(owner);
+            _startTime = DateTime.Now;
         }
 
-        public bool AddPlayer(ulong player)
-        {
-            if (players.Contains(player))
-                return false;
-            players.Add(player);
-            return true;
-        }
+        public void AddPlayer(ulong player)
+            => _players.Add(player);
+
+        public bool RemovePlayer(ulong player)
+            => _players.Remove(player);
+
+        public bool IsPlayerIn(ulong player)
+            => _players.Contains(player);
+
+        public bool IsLobbyEmpty()
+            => _players.Count == 0;
 
         public bool IsReady()
-            => startTime.AddSeconds(lobbyTime).CompareTo(DateTime.Now) <= 0;
+            => _startTime.AddSeconds(lobbyTime).CompareTo(DateTime.Now) <= 0;
 
         public bool HaveEnoughPlayer()
-            => players.Count > 1;
+            => _players.Count > 1;
 
-        private List<ulong> players; // Players in the lobby
-        private DateTime startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
+        private List<ulong> _players; // Players in the lobby
+        private DateTime    _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
 
         private const int lobbyTime = 10; // Seconds the lobby stay open before the game start
     }

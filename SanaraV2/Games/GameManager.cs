@@ -43,18 +43,53 @@ namespace SanaraV2.Games
             return true;
         }
 
+        public string JoinGame(ulong guildId, ulong chanId, ulong playerId)
+        {
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game == null)
+                return Sentences.LobbyNoWaiting(guildId);
+            if (!game.IsWaitingForPlayers())
+                return Sentences.LobbyAlreadyStarted(guildId);
+            if (!game.HaveMultiplayerLobby())
+                return Sentences.LobbySoloJoin(guildId);
+            if (game.HaveEnoughPlayer())
+                return Sentences.LobbyFull(guildId);
+            if (game.IsPlayerInLobby(playerId))
+                return Sentences.LobbyAlreadyInThis(guildId);
+            if (_games.Any(x => x.IsPlayerInLobby(playerId)))
+                return Sentences.LobbyAlreadyIn(guildId);
+            game.AddPlayerToLobby(playerId);
+            return Sentences.LobbyJoined(guildId, game.GetName());
+        }
+
+        public string LeaveGame(ulong guildId, ulong chanId, ulong playerId)
+        {
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game == null)
+                return Sentences.LobbyNoWaiting(guildId);
+            if (!game.IsWaitingForPlayers())
+                return Sentences.LobbyAlreadyStarted(guildId);
+            if (!game.HaveMultiplayerLobby())
+                return Sentences.LobbySoloJoin(guildId);
+            if (!game.IsPlayerInLobby(playerId))
+                return Sentences.LobbyAlreadyOut(guildId);
+            game.RemovePlayerFromLobby(playerId);
+            return Sentences.LobbyLeaved(guildId) + (game.IsLobbyEmpty() ? Environment.NewLine + Sentences.LobbyEmpty(guildId) : "");
+        }
+
         // If failure return an error message, else return null
-        public async Task<Func<ulong, string>> Play(string[] args, ITextChannel chan)
+        // The error message is a callback to the function to display it
+        public async Task<Func<ulong, string>> Play(string[] args, ITextChannel chan, ulong playerId)
         {
             if (_games.Any(x => x.IsSelf(chan.Id)))
                 return Sentences.GameAlreadyRunning;
             _gamesTmp.Add(chan.Id);
-            var elem = await PlayInternal(args, chan);
+            var elem = await PlayInternal(args, chan, playerId);
             _gamesTmp.Remove(chan.Id);
             return (elem);
         }
 
-        private async Task<Func<ulong, string>> PlayInternal(string[] args, ITextChannel chan)
+        private async Task<Func<ulong, string>> PlayInternal(string[] args, ITextChannel chan, ulong playerId)
         {
             if (args.Length == 0)
                 return Sentences.InvalidGameName;
@@ -108,7 +143,7 @@ namespace SanaraV2.Games
                         await chan.SendMessageAsync(preload.GetRules(chan.GuildId) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer));
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer), playerId);
                          _games.Add(newGame);
                         await newGame.PostAsync();
                         if (Program.p.sendStats)

@@ -42,7 +42,7 @@ namespace SanaraV2.Games.Impl
 
     public class Booru : AQuizz
     {
-        public Booru(ITextChannel chan, Config config) : base(chan, Constants.booruDictionnary, config)
+        public Booru(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.booruDictionnary, config, playerId)
         { }
 
         protected override void Init()

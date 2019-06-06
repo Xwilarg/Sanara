@@ -77,6 +77,17 @@ namespace SanaraV2.Games
         public static string AnimeFull(ulong guildId) { return (AnimeGame(guildId) + " (" + Translation.GetTranslation(guildId, "full") + ")"); }
         public static string NotRanked(ulong guildId) { return (Translation.GetTranslation(guildId, "notRanked")); }
         public static string GlobalRanking(ulong guildId, int myRank, int nbServers, float myScore) { return (Translation.GetTranslation(guildId, "globalRanking", myRank.ToString(), nbServers.ToString(), myScore.ToString("0.00", CultureInfo.InvariantCulture))); }
-        public static string NoGlobalRanking(ulong guildId) { return (Translation.GetTranslation(guildId, "NoGlobalRanking")); }
+        public static string NoGlobalRanking(ulong guildId) { return (Translation.GetTranslation(guildId, "noGlobalRanking")); }
+        public static string LobbyAlreadyIn(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyAlreadyIn")); }
+        public static string LobbyAlreadyInThis(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyAlreadyInThis")); }
+        public static string LobbyAlreadyOut(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyAlreadyOut")); }
+        public static string LobbyEmpty(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyEmpty")); }
+        public static string LobbyJoined(ulong guildId, string gameName) { return (Translation.GetTranslation(guildId, "lobbyJoined", gameName)); }
+        public static string LobbyLeaved(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyLeaved")); }
+        public static string LobbyNoWaiting(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNoWaiting")); }
+        public static string LobbyFull(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyFull")); }
+        public static string LobbyAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyAlreadyStarted")); }
+        public static string LobbySoloJoin(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbySoloJoin")); }
+        public static string LobbySoloLeave(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbySoloLeave")); }
     }
 }

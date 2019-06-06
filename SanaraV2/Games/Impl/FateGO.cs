@@ -43,7 +43,7 @@ namespace SanaraV2.Games.Impl
 
     public class FateGO : AQuizz
     {
-        public FateGO(ITextChannel chan, Config config) : base(chan, Constants.fateGODictionnary, config)
+        public FateGO(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.fateGODictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

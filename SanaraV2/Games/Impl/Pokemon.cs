@@ -42,7 +42,7 @@ namespace SanaraV2.Games.Impl
 
     public class Pokemon : AQuizz
     {
-        public Pokemon(ITextChannel chan, Config config) : base(chan, Constants.pokemonDictionnary, config)
+        public Pokemon(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.pokemonDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

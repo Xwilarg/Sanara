@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -33,6 +34,7 @@ namespace SanaraV2.Games
             _dictionnary = new List<string>(dictionnary); // We create a new one to be sure to not modify the common one
             _contributors = new List<ulong>();
             _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "");
+            _gameName = new CultureInfo("en-US").TextInfo.ToTitleCase(config.gameName);
             _score = 0;
             _postImage = false;
             _checkingAnswer = false;
@@ -59,11 +61,33 @@ namespace SanaraV2.Games
         protected abstract bool CongratulateOnGuess(); // Say "Congratulation you found the right answer" on a guess
         protected abstract string Help(); // null is no help
 
+        public string GetName()
+            => _gameName;
+
         public bool IsReady() // Check if the game is ready to start (if multiplayer, have to wait for people to join)
             => _lobby != null ? _lobby.IsReady() : true;
 
-        public bool HaveEnoughPlayer() // Check if the game have enough player to start (multiplyaer games need at least 2 people)
+        public bool HaveEnoughPlayer() // Check if the game have enough player to start (multiplayer games need at least 2 people)
             => _lobby != null ? _lobby.HaveEnoughPlayer() : true;
+
+        public bool HaveMultiplayerLobby()
+            => _lobby != null;
+
+        // Should only be called if the game is in WaitingForPlayers state, call IsWaitingForPlayers() to be sure
+        // Also make sure that the game can receive any player with HaveEnoughPlayer()
+        // And make sure that he isn't already in with IsPlayerInLobby(ulong)
+        public void AddPlayerToLobby(ulong player)
+            => _lobby.AddPlayer(player);
+
+        // Make sure the player is in the lobby using IsPlayerInLobby(ulong)
+        public void RemovePlayerFromLobby(ulong player)
+            => _lobby.RemovePlayer(player);
+
+        public bool IsPlayerInLobby(ulong playerId)
+            => _lobby.IsPlayerIn(playerId);
+
+        public bool IsLobbyEmpty()
+            => _lobby.IsLobbyEmpty();
 
         public void Start()
         {
@@ -281,6 +305,7 @@ namespace SanaraV2.Games
         private ITextChannel    _chan; // Channel where the game is
         private List<ulong>     _contributors; // Ids of the users that contributed to the current score
         private string          _saveName; // Name the game will have in the db
+        private string          _gameName;
         private int             _score; // Current score
         protected List<string>  _dictionnary; // Game dictionnary
         private bool            _postImage; // True is Sanara is busy posting an image

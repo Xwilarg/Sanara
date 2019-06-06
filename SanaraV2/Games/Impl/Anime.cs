@@ -43,7 +43,7 @@ namespace SanaraV2.Games.Impl
 
     public class Anime : AQuizz
     {
-        public Anime(ITextChannel chan, Config config) : base(chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config)
+        public Anime(ITextChannel chan, Config config, ulong playerId) : base(chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config, playerId)
         { }
 
         protected override void Init()

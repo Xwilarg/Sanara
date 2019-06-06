@@ -284,6 +284,7 @@
     <Compile Include="Games\Impl\KanColle.cs" />
     <Compile Include="Games\Impl\Pokemon.cs" />
     <Compile Include="Games\LooseException.cs" />
+    <Compile Include="Games\MultiplayerLobby.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />
     <Compile Include="Games\ScoreManager.cs" />
     <Compile Include="Games\Sentences.cs" />
