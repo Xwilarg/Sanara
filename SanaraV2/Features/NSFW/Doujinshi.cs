@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Newtonsoft.Json;
 using NHentaiSharp.Core;
+using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,14 @@ namespace SanaraV2.Features.NSFW
         {
             if (isChanSafe)
                 return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW));
-            SearchResult result = await (tags.Length == 0 ? SearchClient.SearchAsync() : SearchClient.SearchWithTagsAsync(tags));
+            SearchResult result;
+            try
+            {
+                result = await (tags.Length == 0 ? SearchClient.SearchAsync() : SearchClient.SearchWithTagsAsync(tags));
+            } catch (InvalidArgumentException)
+            {
+                return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
+            }
             int page = r.Next(0, result.numPages) + 1;
             result = await (tags.Length == 0 ? SearchClient.SearchAsync(page) : SearchClient.SearchWithTagsAsync(tags, page));
             var doujinshi = result.elements[r.Next(0, result.elements.Length)];
