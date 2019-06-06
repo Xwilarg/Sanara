@@ -203,11 +203,16 @@ namespace SanaraV2.Games
             if (_gameState != GameState.Running)
                 return;
             _checkingAnswer = true;
-            if (HaveMultiplayerLobby() && !_lobby.IsMyTurn(user.Id))
+            if (HaveMultiplayerLobby())
             {
-                await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
-                _checkingAnswer = false;
-                return;
+                if (!_lobby.IsPlayerIn(user.Id))
+                    return;
+                else if (!_lobby.IsMyTurn(user.Id))
+                {
+                    await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
+                    _checkingAnswer = false;
+                    return;
+                }
             }
             if (_postImage)
             {
