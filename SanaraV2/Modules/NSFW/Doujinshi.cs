@@ -53,6 +53,9 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            await ReplyAsync("This command is temporarily unavailable and will be back tomorrow." + Environment.NewLine +
+                "We are sorry for the inconveniance.");
+            return;
             var result = await Features.NSFW.Doujinshi.SearchDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, keywords, Program.p.rand);
             switch (result.error)
             {
