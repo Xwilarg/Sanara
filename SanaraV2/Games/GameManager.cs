@@ -137,7 +137,19 @@ namespace SanaraV2.Games
             {
                 for (int i = _games.Count - 1; i >= 0; i--)
                 {
-                    _games[i].LooseTimerAsync().GetAwaiter().GetResult();
+                    AGame g = _games[i];
+                    if (g.IsWaitingForPlayers())
+                    {
+                        if (g.IsReady())
+                        {
+                            if (g.HaveEnoughPlayer())
+                                g.Start();
+                            else
+                                ;// TODO: ERROR
+                        }
+                    }
+                    else
+                        _games[i].LooseTimerAsync().GetAwaiter().GetResult();
                 }
                 _games.RemoveAll(x => x.DidLost());
                 Thread.Sleep(250);
