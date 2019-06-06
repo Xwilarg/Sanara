@@ -90,7 +90,7 @@ namespace SanaraV2.Games
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            var error = Program.p.gm.JoinGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
+            await ReplyAsync(Program.p.gm.JoinGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id));
         }
 
         [Command("Leave")]
@@ -98,7 +98,7 @@ namespace SanaraV2.Games
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            var error = Program.p.gm.LeaveGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
+            await ReplyAsync(Program.p.gm.LeaveGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id));
         }
 
         [Command("Play", RunMode = RunMode.Async)]
