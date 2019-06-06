@@ -65,6 +65,7 @@ namespace SanaraV2.Games
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleScore"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleJoin"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleLeave"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleStart"));
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote2"));
@@ -99,6 +100,16 @@ namespace SanaraV2.Games
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
             await ReplyAsync(Program.p.gm.LeaveGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id));
+        }
+
+        [Command("Start")]
+        public async Task Start(params string[] _)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            string error = await Program.p.gm.StartGame(Context.Guild.Id, Context.Channel.Id);
+            if (error != null)
+                await ReplyAsync(error);
         }
 
         [Command("Play", RunMode = RunMode.Async)]
@@ -160,7 +171,7 @@ namespace SanaraV2.Games
                 finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
                     Sentences.ScoreText(Context.Guild.Id, myRanking, rankedNumber, myScore, bestScore) + Environment.NewLine +
                     Sentences.ScoreContributors(Context.Guild.Id) + " " + string.Join(", ", contributors) + Environment.NewLine + Environment.NewLine);
-                finalScore += myScore * 100 / bestScore;
+                finalScore += myScore * 100f / bestScore;
             }
             int myGlobalRanking = 1;
             if (ranked)

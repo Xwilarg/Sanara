@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV2.Games
 {
@@ -48,9 +49,12 @@ namespace SanaraV2.Games
         public bool HaveEnoughPlayer()
             => _players.Count > 1;
 
+        public string GetReadyMessage(ulong guildId)
+            => Sentences.Participants(guildId) + ":" + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
+
         private List<ulong> _players; // Players in the lobby
         private DateTime    _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
 
-        private const int lobbyTime = 10; // Seconds the lobby stay open before the game start
+        public static readonly int lobbyTime = 10; // Seconds the lobby stay open before the game start
     }
 }

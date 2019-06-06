@@ -49,10 +49,10 @@ namespace SanaraV2.Games
             if (game == null)
                 return Sentences.LobbyNoWaiting(guildId);
             if (!game.IsWaitingForPlayers())
-                return Sentences.LobbyAlreadyStarted(guildId);
+                return Sentences.LobbyNoWaiting(guildId);
             if (!game.HaveMultiplayerLobby())
                 return Sentences.LobbySoloJoin(guildId);
-            if (game.HaveEnoughPlayer())
+            if (game.IsFull())
                 return Sentences.LobbyFull(guildId);
             if (game.IsPlayerInLobby(playerId))
                 return Sentences.LobbyAlreadyInThis(guildId);
@@ -70,11 +70,24 @@ namespace SanaraV2.Games
             if (!game.IsWaitingForPlayers())
                 return Sentences.LobbyAlreadyStarted(guildId);
             if (!game.HaveMultiplayerLobby())
-                return Sentences.LobbySoloJoin(guildId);
+                return Sentences.LobbySoloLeave(guildId);
             if (!game.IsPlayerInLobby(playerId))
                 return Sentences.LobbyAlreadyOut(guildId);
             game.RemovePlayerFromLobby(playerId);
             return Sentences.LobbyLeaved(guildId) + (game.IsLobbyEmpty() ? Environment.NewLine + Sentences.LobbyEmpty(guildId) : "");
+        }
+
+        public async Task<string> StartGame(ulong guildId, ulong chanId)
+        {
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game == null)
+                return Sentences.LobbyNoWaiting(guildId);
+            if (!game.IsWaitingForPlayers())
+                return Sentences.LobbyNoWaiting(guildId);
+            if (!game.HaveEnoughPlayer())
+                return Sentences.LobbyNotEnoughPlayer(guildId);
+            await game.Start();
+            return null;
         }
 
         // If failure return an error message, else return null
@@ -140,8 +153,12 @@ namespace SanaraV2.Games
                         return Sentences.FullNotAvailable;
                     try
                     {
-                        await chan.SendMessageAsync(preload.GetRules(chan.GuildId) + Environment.NewLine +
-                            Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine +
+                        await chan.SendMessageAsync(
+                            (isMultiplayer == APreload.Multiplayer.MultiOnly
+                                ? Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine : "") +
+                            "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
+                            preload.GetRules(chan.GuildId) + Environment.NewLine +
+                            Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer), playerId);
                          _games.Add(newGame);
@@ -163,7 +180,7 @@ namespace SanaraV2.Games
         {
             AGame game = _games.Find(x => x.IsSelf(chanId));
             if (game != null)
-            game.CheckCorrectAsync(user, message).GetAwaiter().GetResult();
+                await game.CheckCorrectAsync(user, message);
         }
 
         private void GameLoop()
@@ -178,9 +195,9 @@ namespace SanaraV2.Games
                         if (g.IsReady())
                         {
                             if (g.HaveEnoughPlayer())
-                                g.Start();
+                                g.Start().GetAwaiter().GetResult();
                             else
-                                ;// TODO: ERROR
+                                g.DisplayCantStart().GetAwaiter().GetResult();
                         }
                     }
                     else

@@ -89,5 +89,10 @@ namespace SanaraV2.Games
         public static string LobbyAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyAlreadyStarted")); }
         public static string LobbySoloJoin(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbySoloJoin")); }
         public static string LobbySoloLeave(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbySoloLeave")); }
+        public static string LobbyCreation(ulong guildId, string timerValue) { return (Translation.GetTranslation(guildId, "lobbyCreation", timerValue)); }
+        public static string Rules(ulong guildId) { return (Translation.GetTranslation(guildId, "rules")); }
+        public static string LobbyNotEnoughPlayerFatal(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayerFatal")); }
+        public static string LobbyNotEnoughPlayer(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayer")); }
+        public static string Participants(ulong guildId) { return (Translation.GetTranslation(guildId, "participants")); }
     }
 }

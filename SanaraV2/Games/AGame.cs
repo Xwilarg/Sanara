@@ -70,8 +70,17 @@ namespace SanaraV2.Games
         public bool HaveEnoughPlayer() // Check if the game have enough player to start (multiplayer games need at least 2 people)
             => _lobby != null ? _lobby.HaveEnoughPlayer() : true;
 
-        public bool HaveMultiplayerLobby()
+        public bool HaveMultiplayerLobby() // Is the current game multiplayer (true) or solo (false)
             => _lobby != null;
+
+        public bool IsFull() // Games doesn't have a maximum capacity for now
+            => false;
+
+        public async Task DisplayCantStart()
+        {
+            await _chan.SendMessageAsync(Sentences.LobbyNotEnoughPlayerFatal(_chan.GuildId));
+            _gameState = GameState.Lost;
+        }
 
         // Should only be called if the game is in WaitingForPlayers state, call IsWaitingForPlayers() to be sure
         // Also make sure that the game can receive any player with HaveEnoughPlayer()
@@ -89,9 +98,12 @@ namespace SanaraV2.Games
         public bool IsLobbyEmpty()
             => _lobby.IsLobbyEmpty();
 
-        public void Start()
+        public async Task Start()
         {
+            if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself
+                return;
             _gameState = GameState.Running;
+            await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
         }
 
         public async Task PostAsync()
