@@ -37,7 +37,7 @@ namespace SanaraV2.Games
             MultiOnly,
             Both
         }
-        public abstract string GetRules(ulong guildId);
+        public abstract string GetRules(ulong guildId, bool isMultiplayer);
 
         public bool ContainsName(string name)
             => _names.Contains(name);

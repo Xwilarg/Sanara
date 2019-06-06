@@ -21,6 +21,7 @@ namespace SanaraV2.Games
     public static class Sentences
     {
         public static string RulesShiritori(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesShiritori")); }
+        public static string RulesShiritoriMulti(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesShiritoriMulti")); }
         public static string RulesShiritori2(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesShiritori2")); }
         public static string RulesKancolle(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesKancolle")); }
         public static string RulesBooru(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesBooru")); }
@@ -47,6 +48,7 @@ namespace SanaraV2.Games
         public static string ShiritoriEndWithN(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriEndWithN")); }
         public static string ShiritoriNoMoreWord(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriNoMoreWord")); }
         public static string ShiritoriSuggestion(ulong guildId, string suggestionHiragana, string suggestionRomaji, string suggestionTranslation) { return (Translation.GetTranslation(guildId, "shiritoriSuggestion", suggestionHiragana, suggestionRomaji, suggestionTranslation)); }
+        public static string ShiritoriExplainBegin(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriExplainBegin")); }
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string guessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "guessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
@@ -94,5 +96,8 @@ namespace SanaraV2.Games
         public static string LobbyNotEnoughPlayerFatal(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayerFatal")); }
         public static string LobbyNotEnoughPlayer(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayer")); }
         public static string Participants(ulong guildId) { return (Translation.GetTranslation(guildId, "participants")); }
+        public static string AnnounceTurn(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "annouceTurn", name)); }
+        public static string AnnounceTurnError(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "announceTurnError", name)); }
+        public static string LobbyLeftChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyLeftChannel")); }
     }
 }

@@ -36,7 +36,7 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 
-        public override string GetRules(ulong guildId)
+        public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesBooru(guildId);
     }
 

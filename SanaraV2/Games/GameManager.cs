@@ -157,7 +157,7 @@ namespace SanaraV2.Games
                             (isMultiplayer == APreload.Multiplayer.MultiOnly
                                 ? Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine : "") +
                             "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
-                            preload.GetRules(chan.GuildId) + Environment.NewLine +
+                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer), playerId);

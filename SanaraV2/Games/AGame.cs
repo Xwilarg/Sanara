@@ -102,8 +102,17 @@ namespace SanaraV2.Games
         {
             if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself
                 return;
-            _gameState = GameState.Running;
-            await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+            if (await _lobby.LoadNames(_chan))
+            {
+                _gameState = GameState.Running;
+                await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+            }
+            else
+            {
+                _gameState = GameState.Lost;
+                await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
+            }
+            await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
         }
 
         public async Task PostAsync()
@@ -122,12 +131,16 @@ namespace SanaraV2.Games
                     if (GetPostType() == PostType.Text)
                         foreach (string s in await GetPostAsync())
                         {
+                            if (s == null)
+                                continue;
                             finding = s;
                             await PostText(s);
                         }
                     else
                         foreach (string s in await GetPostAsync())
                         {
+                            if (s == null)
+                                continue;
                             finding = s;
                             using (HttpClient hc = new HttpClient())
                                 await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
@@ -190,6 +203,12 @@ namespace SanaraV2.Games
             if (_gameState != GameState.Running)
                 return;
             _checkingAnswer = true;
+            if (HaveMultiplayerLobby() && !_lobby.IsMyTurn(user.Id))
+            {
+                await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
+                _checkingAnswer = false;
+                return;
+            }
             if (_postImage)
             {
                 await PostText(Sentences.WaitImage(_chan.GuildId));
@@ -226,8 +245,18 @@ namespace SanaraV2.Games
             }
             if (!_contributors.Contains(user.Id))
                 _contributors.Add(user.Id);
+            string finalStr = "";
             if (CongratulateOnGuess())
-                await PostText(Sentences.GuessGood(_chan.GuildId));
+                finalStr += Sentences.GuessGood(_chan.GuildId);
+            if (HaveMultiplayerLobby())
+            {
+                _lobby.NextTurn();
+                if (finalStr != "")
+                    finalStr += Environment.NewLine;
+                finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
+            }
+            if (finalStr != "")
+                await PostText(finalStr);
             _score++;
             await PostAsync();
             _checkingAnswer = false;
@@ -297,7 +326,7 @@ namespace SanaraV2.Games
             }
         }
 
-        private async Task PostText(string msg)
+        protected async Task PostText(string msg)
         {
             await _chan.SendMessageAsync(msg);
         }

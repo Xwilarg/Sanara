@@ -13,9 +13,11 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SanaraV2.Games
 {
@@ -28,6 +30,7 @@ namespace SanaraV2.Games
         {
             _players = new List<ulong>();
             _players.Add(owner);
+            _names = new List<string>();
             _startTime = DateTime.Now;
         }
 
@@ -50,10 +53,38 @@ namespace SanaraV2.Games
             => _players.Count > 1;
 
         public string GetReadyMessage(ulong guildId)
-            => Sentences.Participants(guildId) + ":" + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
+            => Sentences.Participants(guildId) + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
+
+        public void NextTurn()
+        {
+            _currTurn++;
+            if (_currTurn == _players.Count)
+                _currTurn = 0;
+        }
+
+        public async Task<bool> LoadNames(ITextChannel chan)
+        {
+            _currTurn = Program.p.rand.Next(0, _players.Count);
+            foreach (ulong id in _players)
+            {
+                IGuildUser user = await chan.GetUserAsync(id);
+                if (user == null)
+                    return false;
+                _names.Add(user.Nickname ?? user.Username);
+            }
+            return true;
+        }
+
+        public bool IsMyTurn(ulong player)
+            => _players[_currTurn] == player;
+
+        public string GetTurnName()
+            => _names[_currTurn];
 
         private List<ulong> _players; // Players in the lobby
+        private List<string> _names;
         private DateTime    _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
+        private int         _currTurn; // Keep track of which turn is it
 
         public static readonly int lobbyTime = 10; // Seconds the lobby stay open before the game start
     }

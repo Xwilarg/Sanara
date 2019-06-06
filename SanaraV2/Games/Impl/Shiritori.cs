@@ -39,8 +39,8 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.Both;
 
-        public override string GetRules(ulong guildId)
-            => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
+        public override string GetRules(ulong guildId, bool isMultiplayer)
+            => (isMultiplayer ? Sentences.RulesShiritoriMulti(guildId) : Sentences.RulesShiritori(guildId)) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
     }
 
     public class Shiritori : AGame
@@ -56,12 +56,19 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string[]> GetPostAsync()
         {
+            if (HaveMultiplayerLobby())
+                return new string[] { null };
+            return new[] { await GetPostSolo() };
+        }
+
+        private async Task<string> GetPostSolo()
+        {
             if (_currWord == null) // The bot start the game by saying しりとり
             {
                 _currWord = "しりとり";
                 _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == _currWord));
                 _alreadySaid.Add("しりとり");
-                return (new string[] { "しりとり (shiritori)" });
+                return "しりとり (shiritori)";
             }
             string[] validWords = GetValidWords();
             if (validWords.Length == 0) // Not supposed to happen
@@ -75,7 +82,7 @@ namespace SanaraV2.Games.Impl
             _dictionnary.Remove(word);
             _alreadySaid.Add(splitWord[0]);
             _currWord = Linguist.ToHiragana(splitWord[0]);
-            return (new string[] { splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1] });
+            return splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1];
         }
 
         protected override PostType GetPostType()
@@ -90,6 +97,15 @@ namespace SanaraV2.Games.Impl
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
             userAnswer = Linguist.ToHiragana(userAnswer);
+            if (_currWord == null) // Multiplayer only
+            {
+                if (userAnswer != "しりとり")
+                    return GetStringFromSentence(Sentences.ShiritoriExplainBegin);
+                _currWord = "しりとり";
+                _alreadySaid.Add(_currWord);
+                _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == _currWord));
+                return null;
+            }
             if (userAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 return GetStringFromSentence(Sentences.OnlyHiraganaKatakanaRomaji);
             dynamic json;
@@ -139,7 +155,12 @@ namespace SanaraV2.Games.Impl
                 await LooseAsync(GetStringFromSentence(Sentences.ShiritoriEndWithN));
                 return "";
             }
-            _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == userAnswer));
+            var elem = _dictionnary.Find(x => x.Split('$')[0] == userAnswer);
+            if (HaveMultiplayerLobby())
+            {
+                await PostText(_currWord + ": " + elem.Split('$')[1]);
+            }
+            _dictionnary.Remove(elem);
             _alreadySaid.Add(userAnswer);
             _currWord = userAnswer;
             return null;
