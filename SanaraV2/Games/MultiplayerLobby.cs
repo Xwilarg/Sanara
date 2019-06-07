@@ -100,6 +100,6 @@ namespace SanaraV2.Games
         private DateTime    _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
         private int         _currTurn; // Keep track of which turn is it
 
-        public static readonly int lobbyTime = 10; // Seconds the lobby stay open before the game start
+        public static readonly int lobbyTime = 15; // Seconds the lobby stay open before the game start
     }
 }
