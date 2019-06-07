@@ -162,7 +162,7 @@ namespace SanaraV2.Games.Impl
             }
             var elem = _dictionnary.Find(x => x.Split('$')[0] == userAnswer);
             if (HaveMultiplayerLobby())
-                _endTurnMsg = userAnswer + ": (" + Linguist.ToRomaji(userAnswer) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + string.Join(", ", meanings.Select(x => "\"" + x + "\""));
+                _endTurnMsg = userAnswer + " (" + Linguist.ToRomaji(userAnswer) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + string.Join(", ", meanings.Select(x => "\"" + x + "\""));
             _dictionnary.Remove(elem);
             _alreadySaid.Add(userAnswer);
             _currWord = userAnswer;
