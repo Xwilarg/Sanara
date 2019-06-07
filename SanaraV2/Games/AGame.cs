@@ -102,17 +102,20 @@ namespace SanaraV2.Games
         {
             if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself
                 return;
-            if (await _lobby.LoadNames(_chan))
+            _gameState = GameState.Running;
+            if (HaveMultiplayerLobby())
             {
-                _gameState = GameState.Running;
-                await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                // Setup for multiplayer:
+                if (await _lobby.LoadNames(_chan)) // We try to load the nickname of everyone in the lobby
+                    await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                else
+                {
+                    _gameState = GameState.Lost;
+                    await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
+                }
+                await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
             }
-            else
-            {
-                _gameState = GameState.Lost;
-                await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
-            }
-            await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+            await PostAsync();
         }
 
         public async Task PostAsync()
