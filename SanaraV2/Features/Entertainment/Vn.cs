@@ -28,7 +28,7 @@ namespace SanaraV2.Features.Entertainment
         public static async Task<FeatureRequest<Response.Vn, Error.Vn>> SearchVn(string[] args, bool isChanSfw)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.Vn, Error.Vn>(null, Error.Vn.Help));
+                return new FeatureRequest<Response.Vn, Error.Vn>(null, Error.Vn.Help);
             string vnName = string.Join("", args);
             string cleanVnName = Utilities.CleanWord(vnName);
             Vndb client = new Vndb();
@@ -58,12 +58,12 @@ namespace SanaraV2.Features.Entertainment
             if (id == 0)
             {
                 if (matches.Count == 0)
-                    return (new FeatureRequest<Response.Vn, Error.Vn>(null, Error.Vn.NotFound));
+                    return new FeatureRequest<Response.Vn, Error.Vn>(null, Error.Vn.NotFound);
                 else
                     id = uint.Parse(matches[0].Groups[1].Value);
             }
             VisualNovel vn = (await client.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
-            return (new FeatureRequest<Response.Vn, Error.Vn>(new Response.Vn()
+            return new FeatureRequest<Response.Vn, Error.Vn>(new Response.Vn()
             {
                 originalTitle = vn.OriginalName,
                 title = vn.Name,
@@ -76,7 +76,7 @@ namespace SanaraV2.Features.Entertainment
                 releaseMonth = vn.Released.Month,
                 releaseDay = vn.Released.Day,
                 length = vn.Length
-            }, Error.Vn.None));
+            }, Error.Vn.None);
         }
     }
 }

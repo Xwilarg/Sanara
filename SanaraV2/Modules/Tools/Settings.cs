@@ -261,7 +261,7 @@ namespace SanaraV2.Modules.Tools
                 finalStr += ", " + i.ToString();
             }
             finalStr += " " + Base.Sentences.OrStr(guildId) + " " + Program.Module.Youtube.ToString();
-            return (finalStr);
+            return finalStr;
         }
     }
 }

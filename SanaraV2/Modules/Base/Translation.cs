@@ -45,15 +45,15 @@ namespace SanaraV2.Modules.Base
                 else if (Program.p.translations[id].Any(x => x.language == "en"))
                     elem = Program.p.translations[id].Find(x => x.language == "en").content;
                 else
-                    return ("An error occured in the translation submodule: The id " + id + " doesn't exist.");
+                    return "An error occured in the translation submodule: The id " + id + " doesn't exist.";
                 for (int i = 0; i < args.Length; i++)
                 {
                     elem = elem.Replace("{" + i + "}", args[i]);
                 }
                 elem = elem.Replace("\\n", Environment.NewLine);
-                return (elem);
+                return elem;
             }
-            return ("An error occured in the translation submodule: The id " + id + " doesn't exist.");
+            return "An error occured in the translation submodule: The id " + id + " doesn't exist.";
         }
     }
 }

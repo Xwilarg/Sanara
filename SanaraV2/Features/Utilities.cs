@@ -48,18 +48,15 @@ namespace SanaraV2.Features
         public static string AddArgs(string[] args)
         {
             if (args == null || args.Length == 0)
-                return ("");
-            return (string.Join(" ", args));
+                return "";
+            return string.Join(" ", args);
         }
 
         /// <summary>
         /// Check if file extension is the one of an image
         /// </summary>
         public static bool IsImage(string extension)
-        {
-            return (extension == "gif" || extension == "png" || extension == "jpg"
-                || extension == "jpeg");
-        }
+            => extension == "gif" || extension == "png" || extension == "jpg" || extension == "jpeg";
 
         /// <summary>
         /// Generate a random code containing numbers
@@ -70,7 +67,7 @@ namespace SanaraV2.Features
             StringBuilder code = new StringBuilder();
             for (int i = 0; i < nbDigits; i++)
                 code.Append(r.Next(10));
-            return (code.ToString());
+            return code.ToString();
         }
         
         /// <summary>
@@ -85,7 +82,7 @@ namespace SanaraV2.Features
                 if (char.IsLetterOrDigit(c))
                     finalStr += char.ToUpper(c);
             }
-            return (finalStr);
+            return finalStr;
         }
         
         /// <summary>
@@ -106,7 +103,7 @@ namespace SanaraV2.Features
                     break;
                 }
             }
-            return (lang);
+            return lang;
         }
         
         /// <summary>
@@ -117,8 +114,8 @@ namespace SanaraV2.Features
         {
             languageName = languageName.ToLower();
             if (allLanguages.ContainsKey(languageName))
-                return (allLanguages[languageName][0]);
-            return (languageName);
+                return allLanguages[languageName][0];
+            return languageName;
         }
 
         /// <summary>
@@ -134,14 +131,14 @@ namespace SanaraV2.Features
                     WebRequest request = WebRequest.Create(url);
                     request.Method = "HEAD";
                     request.GetResponse();
-                    return (true);
+                    return true;
                 }
                 catch (WebException)
                 {
-                    return (false);
+                    return false;
                 }
             }
-            return (false);
+            return false;
         }
     }
 }

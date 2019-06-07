@@ -38,7 +38,7 @@ namespace SanaraV2.Features.NSFW
         public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, BooruSharp.Booru.Booru booru, Random r)
         {
             if (isChanSafe && !booru.IsSafe())
-                return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW));
+                return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW);
             BooruSharp.Search.Post.SearchResult res;
             try
             {
@@ -71,7 +71,7 @@ namespace SanaraV2.Features.NSFW
                 }
                 catch (BooruSharp.Search.InvalidTags)
                 {
-                    return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
+                    return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound);
                 }
             }
             Error.Booru error = Error.Booru.None;
@@ -81,21 +81,21 @@ namespace SanaraV2.Features.NSFW
             Color color = GetColorFromRating(res.rating);
             string saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
             tagInfos.Add(saveId, new Tuple<Type, BooruSharp.Search.Post.SearchResult>(booru.GetType(), res));
-            return (new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
-                    url = url,
-                    colorRating = color,
-                    saveId = saveId,
-                    tags = res.tags
-                }, error));
+            return new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
+                url = url,
+                colorRating = color,
+                saveId = saveId,
+                tags = res.tags
+            }, error);
         }
 
         public static async Task<FeatureRequest<Response.BooruTags, Error.BooruTags>> SearchTags(string[] idArgs)
         {
             if (idArgs.Length == 0)
-                return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.Help));
+                return new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.Help);
             string id = idArgs[0];
             if (!tagInfos.ContainsKey(id))
-                return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.NotFound));
+                return new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.NotFound);
             var elem = tagInfos[id];
             BooruSharp.Booru.Booru b = (BooruSharp.Booru.Booru)Activator.CreateInstance(elem.Item1, (BooruSharp.Booru.BooruAuth)null);
             List<string> artists = new List<string>();
@@ -135,7 +135,7 @@ namespace SanaraV2.Features.NSFW
                 { }
             }
             uint pgcd = PGCD((uint)elem.Item2.height, (uint)elem.Item2.width);
-            return (new FeatureRequest<Response.BooruTags, Error.BooruTags>(new Response.BooruTags()
+            return new FeatureRequest<Response.BooruTags, Error.BooruTags>(new Response.BooruTags()
             {
                 artistTags = artists.ToArray(),
                 characTags = characs.ToArray(),
@@ -146,7 +146,7 @@ namespace SanaraV2.Features.NSFW
                 height = elem.Item2.height,
                 width = elem.Item2.width,
                 aspectRatio = new Tuple<long, long>(elem.Item2.width / pgcd, elem.Item2.height / pgcd)
-            }, Error.BooruTags.None));
+            }, Error.BooruTags.None);
         }
 
         private static uint PGCD(uint a, uint b)
@@ -167,13 +167,13 @@ namespace SanaraV2.Features.NSFW
             switch (rating)
             {
                 case BooruSharp.Search.Post.Rating.Explicit:
-                    return (Color.Red);
+                    return Color.Red;
 
                 case BooruSharp.Search.Post.Rating.Questionable:
-                    return (new Color(255, 255, 0));
+                    return new Color(255, 255, 0);
 
                 case BooruSharp.Search.Post.Rating.Safe:
-                    return (Color.Green);
+                    return Color.Green;
 
                 default:
                     throw new NotImplementedException();

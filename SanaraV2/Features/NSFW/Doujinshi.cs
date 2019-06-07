@@ -31,7 +31,7 @@ namespace SanaraV2.Features.NSFW
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchCosplay(bool isChanSafe, string[] tags, Random r)
         {
             if (isChanSafe)
-                return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW));
+                return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
             string html;
             string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(string.Join(" ", tags));
             int randomDoujinshi;
@@ -43,7 +43,7 @@ namespace SanaraV2.Features.NSFW
                 html = await hc.GetStringAsync(url);
                 Match m = Regex.Match(html, "Showing ([0-9,]+) result");
                 if (!m.Success)
-                    return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
+                    return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound);
                 randomDoujinshi = r.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
                 html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
                 finalUrl = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"")[randomDoujinshi % 25].Groups[1].Value;
@@ -57,37 +57,37 @@ namespace SanaraV2.Features.NSFW
                 string htmlCover = await hc.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
                 imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
             }
-            return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
+            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
             {
                 url = finalUrl,
                 imageUrl = imageUrl,
                 title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
                 tags = allTags.ToArray()
-            }, Error.Doujinshi.None));
+            }, Error.Doujinshi.None);
         }
 
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchDoujinshi(bool isChanSafe, string[] tags, Random r)
         {
             if (isChanSafe)
-                return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW));
+                return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
             SearchResult result;
             try
             {
                 result = await (tags.Length == 0 ? SearchClient.SearchAsync() : SearchClient.SearchWithTagsAsync(tags));
             } catch (InvalidArgumentException)
             {
-                return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound));
+                return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound);
             }
             int page = r.Next(0, result.numPages) + 1;
             result = await (tags.Length == 0 ? SearchClient.SearchAsync(page) : SearchClient.SearchWithTagsAsync(tags, page));
             var doujinshi = result.elements[r.Next(0, result.elements.Length)];
-            return (new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
+            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
             {
                 url = doujinshi.url.AbsoluteUri,
                 imageUrl = doujinshi.pages[0].imageUrl.AbsoluteUri,
                 title = doujinshi.prettyTitle,
                 tags = doujinshi.tags.Select(x => x.name).ToArray()
-            }, Error.Doujinshi.None));
+            }, Error.Doujinshi.None);
         }
     }
 }

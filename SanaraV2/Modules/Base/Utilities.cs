@@ -80,23 +80,23 @@ namespace SanaraV2.Modules.Base
                         if (char.IsNumber(c))
                             val += c;
                     }
-                    return (await guild.GetUserAsync(Convert.ToUInt64(val)));
+                    return await guild.GetUserAsync(Convert.ToUInt64(val));
                 }
                 catch (Exception)
                 { }
             }
             try
             {
-                return (await guild.GetUserAsync(Convert.ToUInt64(name)));
+                return await guild.GetUserAsync(Convert.ToUInt64(name));
             }
             catch (Exception)
             { }
             foreach (IGuildUser user in await guild.GetUsersAsync())
             {
                 if (user.Nickname == name || user.Username == name)
-                    return (user);
+                    return user;
             }
-            return (null);
+            return null;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SanaraV2.Modules.Base
                 finalStr = Sentences.TimeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Minutes > 0)
                 finalStr = Sentences.TimeMinutes(guildId, ts.Minutes.ToString(), finalStr);
-            return (finalStr);
+            return finalStr;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace SanaraV2.Modules.Base
                     break;
                 }
             }
-            return (lang);
+            return lang;
         }
     }
 }

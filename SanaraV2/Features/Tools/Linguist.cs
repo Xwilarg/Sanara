@@ -31,16 +31,16 @@ namespace SanaraV2.Features.Tools
         public static async Task<FeatureRequest<Response.Urban, Error.Urban>> UrbanSearch(bool isChanSafe, string[] args)
         {
             if (isChanSafe)
-                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.ChanNotNSFW));
+                return new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.ChanNotNSFW);
             if (args.Length == 0)
-                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.Help));
+                return new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.Help);
             string searchUrl = "http://api.urbandictionary.com/v0/define?term=" + Utilities.AddArgs(args);
             string html;
             using (HttpClient hc = new HttpClient())
                 html = await hc.GetStringAsync(searchUrl);
             dynamic json = JsonConvert.DeserializeObject(html);
             if (json.list.Count == 0)
-                return (new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.NotFound));
+                return new FeatureRequest<Response.Urban, Error.Urban>(null, Error.Urban.NotFound);
             string definition = json.list[0].definition;
             bool definitionComplete = true;
             while (definition.Length > 1015)
@@ -57,29 +57,29 @@ namespace SanaraV2.Features.Tools
                 string[] tmp = example.Split(new string[] { "\n\n" }, StringSplitOptions.None);
                 example = string.Join("\n\n", tmp.Take(tmp.Length - 1));
             }
-            return (new FeatureRequest<Response.Urban, Error.Urban>(new Response.Urban()
+            return new FeatureRequest<Response.Urban, Error.Urban>(new Response.Urban()
             {
                 definition = definition + ((definitionComplete) ? ("") : (Environment.NewLine + Environment.NewLine + "[...]")),
                 example = example + ((exampleComplete) ? ("") : (Environment.NewLine + Environment.NewLine + "[...]")),
                 link = json.list[0].permalink,
                 word = json.list[0].word
-            }, Error.Urban.None));
+            }, Error.Urban.None);
         }
 
         public static async Task<FeatureRequest<Response.Translation, Error.Translation>> Translate(string[] args, TranslationClient translationClient,
             ImageAnnotatorClient visionClient, Dictionary<string, List<string>> allLanguages)
         {
             if (translationClient == null)
-                return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidApiKey));
+                return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidApiKey);
             if (args.Length < 2)
-                return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.Help));
+                return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.Help);
             string language;
             if (args[0].Length == 2)
                 language = args[0];
             else
                 language = Utilities.GetLanguage(args[0], allLanguages);
             if (language == null)
-                return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidLanguage));
+                return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidLanguage);
             List<string> newWords = args.ToList();
             newWords.RemoveAt(0);
             try
@@ -88,7 +88,7 @@ namespace SanaraV2.Features.Tools
                 if (newWords.Count == 1 && Utilities.IsLinkValid(newWords[0]))
                 {
                     if (visionClient == null)
-                        return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidApiKey));
+                        return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidApiKey);
                     Image image = await Image.FetchFromUriAsync(newWords[0]);
                     TextAnnotation response;
                     try
@@ -97,34 +97,34 @@ namespace SanaraV2.Features.Tools
                     }
                     catch (AnnotateImageException)
                     {
-                        return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.NotAnImage));
+                        return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.NotAnImage);
                     }
                     if (response == null)
-                        return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.NoTextOnImage));
+                        return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.NoTextOnImage);
                     toTranslate = response.Text;
                 }
                 TranslationResult translation = await translationClient.TranslateTextAsync(toTranslate, language);
-                return (new FeatureRequest<Response.Translation, Error.Translation>(new Response.Translation()
+                return new FeatureRequest<Response.Translation, Error.Translation>(new Response.Translation()
                 {
                     sentence = translation.TranslatedText,
                     sourceLanguage = Utilities.GetFullLanguage(translation.DetectedSourceLanguage, allLanguages)
-                }, Error.Translation.None));
+                }, Error.Translation.None);
             }
             catch (GoogleApiException)
             {
-                return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidLanguage));
+                return new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidLanguage);
             }
         }
 
         public static async Task<FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>> JapaneseTranslate(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(null, Error.JapaneseTranslation.Help));
+                return new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(null, Error.JapaneseTranslation.Help);
             dynamic json;
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await (await hc.GetAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Utilities.AddArgs(args).ToLower())).Content.ReadAsStringAsync());
             if (json.data.Count == 0)
-                return (new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(null, Error.JapaneseTranslation.NotFound));
+                return new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(null, Error.JapaneseTranslation.NotFound);
             List<Response.JapaneseTranslation> translations = new List<Response.JapaneseTranslation>();
             foreach (var data in json.data)
             {
@@ -143,40 +143,28 @@ namespace SanaraV2.Features.Tools
                     speechPart = data.parts_of_speech?.ToObject<string[]>()
                 });
             }
-            return (new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(translations.ToArray(), Error.JapaneseTranslation.None));
+            return new FeatureRequest<Response.JapaneseTranslation[], Error.JapaneseTranslation>(translations.ToArray(), Error.JapaneseTranslation.None);
         }
 
         public static string ToHiragana(string word)
-        {
-            if (word == null)
-                return (null);
-            return (ToHiraganaInternal(FromKatakanaInternal(word)));
-        }
+            => word == null ? null : ToHiraganaInternal(FromKatakanaInternal(word));
 
         public static string ToRomaji(string word)
-        {
-            if (word == null)
-                return (null);
-            return (FromKatakanaInternal(FromHiraganaInternal(word)));
-        }
+            => word == null ? null : FromKatakanaInternal(FromHiraganaInternal(word));
 
         public static string ToKatakana(string word)
-        {
-            if (word == null)
-                return (null);
-            return (ToKatakanaInternal(FromHiraganaInternal(word)));
-        }
+            => word == null ? null : ToKatakanaInternal(FromHiraganaInternal(word));
 
         private static string TranscriptInternal(char curr, char next, ref int i, ResourceManager transcriptionArray)
         {
             if (next != ' ' && transcriptionArray.GetString("" + curr + next) != null)
             {
                 i++;
-                return (transcriptionArray.GetString("" + curr + next));
+                return transcriptionArray.GetString("" + curr + next);
             }
             if (transcriptionArray.GetString("" + curr) != null)
-                return (transcriptionArray.GetString("" + curr));
-            return ("" + curr);
+                return transcriptionArray.GetString("" + curr);
+            return "" + curr;
         }
 
         private static string FromHiraganaInternal(string name)
@@ -204,7 +192,7 @@ namespace SanaraV2.Features.Tools
                 finalName = "";
             }
             finalStr += finalName;
-            return (finalStr);
+            return finalStr;
         }
 
         private static char GetNextCharacter(char c)
@@ -243,7 +231,7 @@ namespace SanaraV2.Features.Tools
                 finalName = "";
             }
             finalStr += finalName;
-            return (finalStr);
+            return finalStr;
         }
 
         private static string TranscriptInvertInternal(char curr, char next, char nnext, ref int i, ResourceManager transcriptionArray)
@@ -253,17 +241,17 @@ namespace SanaraV2.Features.Tools
                 if (nnext != ' ' && transcriptionArray.GetString("" + curr + next + nnext) != null)
                 {
                     i++;
-                    return (transcriptionArray.GetString("" + curr + next + nnext));
+                    return transcriptionArray.GetString("" + curr + next + nnext);
                 }
                 if (curr == 'd' && next == 'o')
-                    return (transcriptionArray.GetString("_do"));
+                    return transcriptionArray.GetString("_do");
                 if (transcriptionArray.GetString("" + curr + next) != null)
-                    return (transcriptionArray.GetString("" + curr + next));
+                    return transcriptionArray.GetString("" + curr + next);
             }
             i--;
             if (transcriptionArray.GetString("" + curr) != null)
-                return (transcriptionArray.GetString("" + curr));
-            return ("" + curr);
+                return transcriptionArray.GetString("" + curr);
+            return "" + curr;
         }
 
         private static bool IsRomanLetter(char c)
@@ -288,7 +276,7 @@ namespace SanaraV2.Features.Tools
                 else
                     finalName += TranscriptInvertInternal(curr, next, nnext, ref i, manager);
             }
-            return (finalName);
+            return finalName;
         }
 
         private static string ToKatakanaInternal(string name)
@@ -316,7 +304,7 @@ namespace SanaraV2.Features.Tools
                 else
                     finalName += TranscriptInvertInternal(curr, next, nnext, ref i, manager);
             }
-            return (finalName);
+            return finalName;
         }
     }
 }

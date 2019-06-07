@@ -90,7 +90,7 @@ namespace SanaraV2.Modules.Entertainment
             embed.AddField(Sentences.ReleaseDate(Context.Guild.Id), ((res.startDate != null) ? res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)) + " - " + ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId))) : (Sentences.ToBeAnnounced(guildId))), true);
             if (!string.IsNullOrEmpty(res.ageRating))
                 embed.AddField(Sentences.AnimeAudiance(Context.Guild.Id), res.ageRating, true);
-            return (embed.Build());
+            return embed.Build();
         }
     }
 }

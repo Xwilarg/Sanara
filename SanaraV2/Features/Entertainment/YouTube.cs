@@ -26,9 +26,9 @@ namespace SanaraV2.Features.Entertainment
         public static async Task<FeatureRequest<Response.YouTube, Error.YouTube>> SearchYouTube(string[] args, YouTubeService service)
         {
             if (service == null)
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.InvalidApiKey));
+                return new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.InvalidApiKey);
             if (args.Length == 0)
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.Help));
+                return new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.Help);
             string id = null;
             Match match = Regex.Match(args[0], "https:\\/\\/www.youtube.com\\/watch\\?v=([^&]+)");
             if (match.Success)
@@ -45,22 +45,22 @@ namespace SanaraV2.Features.Entertainment
                 var resp = (await r.ExecuteAsync()).Items;
                 if (resp.Count() == 0)
                     return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
+                return new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
                 {
                     url = "https://www.youtube.com/watch?v=" + resp[0].Id,
                     name = resp[0].Snippet.Title,
                     imageUrl = resp[0].Snippet.Thumbnails.High.Url
-                }, Error.YouTube.None));
+                }, Error.YouTube.None);
             }
             SearchResource.ListRequest listRequest = service.Search.List("snippet");
             listRequest.Q = Utilities.AddArgs(args);
             listRequest.MaxResults = 5;
             IList<SearchResult> searchListResponse = (await listRequest.ExecuteAsync()).Items;
             if (searchListResponse.Count == 0)
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
+                return new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound);
             IEnumerable<SearchResult> correctVideos = searchListResponse.Where(x => x.Id.Kind == "youtube#video");
             if (correctVideos.Count() == 0)
-                return (new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound));
+                return new FeatureRequest<Response.YouTube, Error.YouTube>(null, Error.YouTube.NotFound);
             VideosResource.ListRequest videoRequest = service.Videos.List("snippet,statistics");
             videoRequest.Id = string.Join(",", correctVideos.Select(x => x.Id.VideoId));
             IList<Video> videoResponse = (await videoRequest.ExecuteAsync()).Items;
@@ -79,12 +79,12 @@ namespace SanaraV2.Features.Entertainment
                     biggest = res;
                 }
             }
-            return (new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
+            return new FeatureRequest<Response.YouTube, Error.YouTube>(new Response.YouTube()
             {
                 url = "https://www.youtube.com/watch?v=" + biggest.Id,
                 name = biggest.Snippet.Title,
                 imageUrl = biggest.Snippet.Thumbnails.High.Url
-            }, Error.YouTube.None));
+            }, Error.YouTube.None);
         }
     }
 }
