@@ -36,13 +36,13 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 
-        public override string GetRules(ulong guildId)
+        public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesBooru(guildId);
     }
 
     public class Booru : AQuizz
     {
-        public Booru(ITextChannel chan, Config config) : base(chan, Constants.booruDictionnary, config)
+        public Booru(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.booruDictionnary, config, playerId)
         { }
 
         protected override void Init()

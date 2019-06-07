@@ -128,8 +128,8 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("Leave"), Summary("Leave the server")]
-        public async Task Leave(string serverName = null)
+        [Command("Exit"), Summary("Leave the server")]
+        public async Task Exit(string serverName = null)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
@@ -181,16 +181,6 @@ namespace SanaraV2.Modules.Tools
                     }
                 }
             }
-        }
-
-        [Command("Exit"), Summary("Exit the program")]
-        public async Task Exit(string serverName = null)
-        {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (Context.User.Id != Base.Sentences.ownerId)
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
-            else
-                Environment.Exit(0);
         }
 
         [Command("Enable"), Summary("Enable a module")]

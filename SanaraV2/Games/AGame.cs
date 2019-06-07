@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -25,7 +26,7 @@ namespace SanaraV2.Games
 {
     public abstract class AGame
     {
-        protected AGame(ITextChannel chan, List<string> dictionnary, Config config)
+        protected AGame(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId)
         {
             _chan = chan;
             if (dictionnary == null) // Dictionnary failed to load
@@ -33,12 +34,14 @@ namespace SanaraV2.Games
             _dictionnary = new List<string>(dictionnary); // We create a new one to be sure to not modify the common one
             _contributors = new List<ulong>();
             _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "");
+            _gameName = new CultureInfo("en-US").TextInfo.ToTitleCase(config.gameName);
             _score = 0;
             _postImage = false;
             _checkingAnswer = false;
-            _didLost = false;
+            _gameState = GameState.WaitingForPlayers;
             _startTime = DateTime.Now;
             _timer = config.refTime * (int)config.difficulty;
+            _lobby = (config.isMultiplayer == APreload.Multiplayer.MultiOnly ? new MultiplayerLobby(playerId) : null);
             Init();
         }
 
@@ -47,7 +50,7 @@ namespace SanaraV2.Games
 
         public void Cancel()
         {
-            _didLost = true;
+            _gameState = GameState.Lost;
         }
 
         protected abstract void Init(); // User must not use the ctor, they must init things in this function (because GetPost is called from this ctor, who is called before the child ctor)
@@ -58,15 +61,72 @@ namespace SanaraV2.Games
         protected abstract bool CongratulateOnGuess(); // Say "Congratulation you found the right answer" on a guess
         protected abstract string Help(); // null is no help
 
+        public string GetName()
+            => _gameName;
+
+        public bool IsReady() // Check if the game is ready to start (if multiplayer, have to wait for people to join)
+            => _lobby != null ? _lobby.IsReady() : true;
+
+        public bool HaveEnoughPlayer() // Check if the game have enough player to start (multiplayer games need at least 2 people)
+            => _lobby != null ? _lobby.HaveEnoughPlayer() : true;
+
+        public bool HaveMultiplayerLobby() // Is the current game multiplayer (true) or solo (false)
+            => _lobby != null;
+
+        public bool IsFull() // Games doesn't have a maximum capacity for now
+            => false;
+
+        public async Task DisplayCantStart()
+        {
+            await _chan.SendMessageAsync(Sentences.LobbyNotEnoughPlayerFatal(_chan.GuildId));
+            _gameState = GameState.Lost;
+        }
+
+        // Should only be called if the game is in WaitingForPlayers state, call IsWaitingForPlayers() to be sure
+        // Also make sure that the game can receive any player with HaveEnoughPlayer()
+        // And make sure that he isn't already in with IsPlayerInLobby(ulong)
+        public void AddPlayerToLobby(ulong player)
+            => _lobby.AddPlayer(player);
+
+        // Make sure the player is in the lobby using IsPlayerInLobby(ulong)
+        public void RemovePlayerFromLobby(ulong player)
+            => _lobby.RemovePlayer(player);
+
+        public bool IsPlayerInLobby(ulong playerId)
+            => _lobby.IsPlayerIn(playerId);
+
+        public bool IsLobbyEmpty()
+            => _lobby.IsLobbyEmpty();
+
+        public async Task Start()
+        {
+            if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself
+                return;
+            _gameState = GameState.Running;
+            if (HaveMultiplayerLobby())
+            {
+                // Setup for multiplayer:
+                if (await _lobby.LoadNames(_chan)) // We try to load the nickname of everyone in the lobby
+                    await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                else
+                {
+                    _gameState = GameState.Lost;
+                    await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
+                }
+                await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+            }
+            await PostAsync();
+        }
+
         public async Task PostAsync()
         {
-            if (_didLost)
+            if (_gameState != GameState.Running)
                 return;
             _postImage = true;
             int counter = 0;
             while (true)
             {
-                if (_didLost) // Can happen if the game is canceled
+                if (_gameState != GameState.Running) // Can happen if the game is canceled
                     return;
                 string finding = "";
                 try
@@ -74,12 +134,16 @@ namespace SanaraV2.Games
                     if (GetPostType() == PostType.Text)
                         foreach (string s in await GetPostAsync())
                         {
+                            if (s == null)
+                                continue;
                             finding = s;
                             await PostText(s);
                         }
                     else
                         foreach (string s in await GetPostAsync())
                         {
+                            if (s == null)
+                                continue;
                             finding = s;
                             using (HttpClient hc = new HttpClient())
                                 await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
@@ -139,9 +203,20 @@ namespace SanaraV2.Games
 
         public async Task CheckCorrectAsync(IUser user, string userAnswer)
         {
-            if (_didLost)
+            if (_gameState != GameState.Running)
                 return;
             _checkingAnswer = true;
+            if (HaveMultiplayerLobby())
+            {
+                if (!_lobby.IsPlayerIn(user.Id))
+                    return;
+                else if (!_lobby.IsMyTurn(user.Id))
+                {
+                    await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
+                    _checkingAnswer = false;
+                    return;
+                }
+            }
             if (_postImage)
             {
                 await PostText(Sentences.WaitImage(_chan.GuildId));
@@ -178,16 +253,30 @@ namespace SanaraV2.Games
             }
             if (!_contributors.Contains(user.Id))
                 _contributors.Add(user.Id);
+            string finalStr = AnnounceNextTurnInternal();
             if (CongratulateOnGuess())
-                await PostText(Sentences.GuessGood(_chan.GuildId));
+                finalStr += Sentences.GuessGood(_chan.GuildId);
+            if (HaveMultiplayerLobby())
+            {
+                _lobby.NextTurn();
+                if (finalStr != "")
+                    finalStr += Environment.NewLine;
+                finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
+            }
+            if (finalStr != "")
+                await PostText(finalStr);
             _score++;
             await PostAsync();
             _checkingAnswer = false;
         }
+        protected virtual string AnnounceNextTurnInternal()
+        {
+            return "";
+        }
 
         public async Task LooseTimerAsync()
         {
-            if (_didLost) // No need to check if we already lost
+            if (_gameState != GameState.Running) // No need to check if we already lost
                 return;
             if (_postImage || _checkingAnswer) // If we are already doing something (posting image or checking answer) we wait for it
                 return;
@@ -196,16 +285,30 @@ namespace SanaraV2.Games
         }
 
         public bool DidLost()
-            => _didLost;
+            => _gameState == GameState.Lost;
+
+        public bool IsWaitingForPlayers()
+            => _gameState == GameState.WaitingForPlayers;
 
         public async Task LooseAsync(string reason)
         {
+            reason = Sentences.YouLost(_chan.GuildId) + reason;
             _postImage = true; // We make sure that the user isn't able to send things anymore
-            if (reason == null)
-                await SaveScores(await GetLoose());
+            if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
+            {
+                if (reason == null)
+                    await _chan.SendMessageAsync(await GetLoose());
+                else
+                    await _chan.SendMessageAsync(reason + Environment.NewLine + await GetLoose());
+            }
             else
-                await SaveScores(reason + Environment.NewLine + await GetLoose());
-            _didLost = true;
+            {
+                if (reason == null)
+                    await SaveScores(await GetLoose());
+                else
+                    await SaveScores(reason + Environment.NewLine + await GetLoose());
+            }
+            _gameState = GameState.Lost;
         }
 
         private async Task SaveScores(string reason)
@@ -236,7 +339,7 @@ namespace SanaraV2.Games
             }
         }
 
-        private async Task PostText(string msg)
+        protected async Task PostText(string msg)
         {
             await _chan.SendMessageAsync(msg);
         }
@@ -256,15 +359,24 @@ namespace SanaraV2.Games
             Text
         }
 
+        private enum GameState
+        {
+            WaitingForPlayers,
+            Running,
+            Lost
+        }
+
         private ITextChannel    _chan; // Channel where the game is
         private List<ulong>     _contributors; // Ids of the users that contributed to the current score
         private string          _saveName; // Name the game will have in the db
+        private string          _gameName;
         private int             _score; // Current score
         protected List<string>  _dictionnary; // Game dictionnary
         private bool            _postImage; // True is Sanara is busy posting an image
         private bool            _checkingAnswer; // Used for timer
-        private bool            _didLost; // True if the game is lost
+        private GameState       _gameState; // True if the game is lost
         private DateTime        _startTime; // When the game started
         private int             _timer; // Number of seconds before the player loose
+        private MultiplayerLobby _lobby; // Null if game session is solo
     }
 }

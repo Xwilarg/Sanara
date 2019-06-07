@@ -36,13 +36,13 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 
-        public override string GetRules(ulong guildId)
+        public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesPokemon(guildId);
     }
 
     public class Pokemon : AQuizz
     {
-        public Pokemon(ITextChannel chan, Config config) : base(chan, Constants.pokemonDictionnary, config)
+        public Pokemon(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.pokemonDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

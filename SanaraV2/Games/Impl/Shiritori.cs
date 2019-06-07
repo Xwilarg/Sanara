@@ -15,6 +15,7 @@
 
 using Discord;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SanaraV2.Features.Tools;
 using System;
 using System.Collections.Generic;
@@ -39,13 +40,13 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.Both;
 
-        public override string GetRules(ulong guildId)
-            => Sentences.RulesShiritori(guildId) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
+        public override string GetRules(ulong guildId, bool isMultiplayer)
+            => (isMultiplayer ? Sentences.RulesShiritoriMulti(guildId) : Sentences.RulesShiritori(guildId)) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
     }
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, Config config) : base(chan, Constants.shiritoriDictionnary, config)
+        public Shiritori(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.shiritoriDictionnary, config, playerId)
         { }
 
         protected override void Init()
@@ -56,12 +57,19 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string[]> GetPostAsync()
         {
+            if (HaveMultiplayerLobby())
+                return new string[] { null };
+            return new[] { await GetPostSolo() };
+        }
+
+        private async Task<string> GetPostSolo()
+        {
             if (_currWord == null) // The bot start the game by saying しりとり
             {
                 _currWord = "しりとり";
                 _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == _currWord));
                 _alreadySaid.Add("しりとり");
-                return (new string[] { "しりとり (shiritori)" });
+                return "しりとり (shiritori)";
             }
             string[] validWords = GetValidWords();
             if (validWords.Length == 0) // Not supposed to happen
@@ -75,7 +83,7 @@ namespace SanaraV2.Games.Impl
             _dictionnary.Remove(word);
             _alreadySaid.Add(splitWord[0]);
             _currWord = Linguist.ToHiragana(splitWord[0]);
-            return (new string[] { splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1] });
+            return splitWord[0] + " (" + Linguist.ToRomaji(splitWord[0]) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + splitWord[1];
         }
 
         protected override PostType GetPostType()
@@ -90,6 +98,15 @@ namespace SanaraV2.Games.Impl
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
             userAnswer = Linguist.ToHiragana(userAnswer);
+            if (_currWord == null) // Multiplayer only
+            {
+                if (userAnswer != "しりとり")
+                    return GetStringFromSentence(Sentences.ShiritoriExplainBegin);
+                _currWord = "しりとり";
+                _alreadySaid.Add(_currWord);
+                _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == _currWord));
+                return null;
+            }
             if (userAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 return GetStringFromSentence(Sentences.OnlyHiraganaKatakanaRomaji);
             dynamic json;
@@ -98,11 +115,14 @@ namespace SanaraV2.Games.Impl
             if (json.data.Count == 0)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             bool isCorrect = false, isNoun = false;
+            string reading;
+            string[] meanings = new string[] { };
             foreach (dynamic s in json.data)
             {
                 foreach (dynamic jp in s.japanese)
                 {
-                    if (Linguist.ToHiragana((string)jp.reading) == userAnswer)
+                    reading = Linguist.ToHiragana((string)jp.reading);
+                    if (reading == userAnswer)
                     {
                         isCorrect = true;
                         foreach (dynamic meaning in s.senses)
@@ -112,6 +132,7 @@ namespace SanaraV2.Games.Impl
                                 if (partSpeech == "Noun")
                                 {
                                     isNoun = true;
+                                    meanings = ((JArray)meaning.english_definitions).Select(x => (string)x).ToArray();
                                     goto ContinueCheck;
                                 }
                             }
@@ -139,7 +160,10 @@ namespace SanaraV2.Games.Impl
                 await LooseAsync(GetStringFromSentence(Sentences.ShiritoriEndWithN));
                 return "";
             }
-            _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == userAnswer));
+            var elem = _dictionnary.Find(x => x.Split('$')[0] == userAnswer);
+            if (HaveMultiplayerLobby())
+                _endTurnMsg = userAnswer + ": (" + Linguist.ToRomaji(userAnswer) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + string.Join(", ", meanings.Select(x => "\"" + x + "\""));
+            _dictionnary.Remove(elem);
             _alreadySaid.Add(userAnswer);
             _currWord = userAnswer;
             return null;
@@ -154,6 +178,9 @@ namespace SanaraV2.Games.Impl
             string[] splitWord = word.Split('$');
             return Sentences.ShiritoriSuggestion(GetGuildId(), splitWord[0], Linguist.ToRomaji(splitWord[0]), splitWord[1]);
         }
+
+        protected override string AnnounceNextTurnInternal()
+            => Environment.NewLine + _endTurnMsg;
 
         private string[] GetValidWords()
             => _dictionnary.Where(x => x.StartsWith(GetLastCharacter(_currWord))).ToArray(); // Sanara word must begin by the ending of the player word
@@ -176,5 +203,7 @@ namespace SanaraV2.Games.Impl
                 return (null);
             return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
         }
+
+        private string _endTurnMsg;
     }
 }

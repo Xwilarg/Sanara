@@ -38,13 +38,13 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 
-        public override string GetRules(ulong guildId)
+        public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesKancolle(guildId);
     }
 
     public class KanColle : AQuizz
     {
-        public KanColle(ITextChannel chan, Config config) : base(chan, Constants.kanColleDictionnary, config)
+        public KanColle(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.kanColleDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

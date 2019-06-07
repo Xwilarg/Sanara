@@ -37,13 +37,13 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 
-        public override string GetRules(ulong guildId)
+        public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesCharacter(guildId);
     }
 
     public class FateGO : AQuizz
     {
-        public FateGO(ITextChannel chan, Config config) : base(chan, Constants.fateGODictionnary, config)
+        public FateGO(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.fateGODictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()
