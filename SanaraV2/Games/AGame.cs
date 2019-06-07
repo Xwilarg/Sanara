@@ -301,9 +301,9 @@ namespace SanaraV2.Games
                 _lobby.RemoveCurrentPlayer();
                 if (_lobby.HaveEnoughPlayer())
                 {
+                    _startTime = DateTime.Now;
                     await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
                     _postImage = false;
-                    _startTime = DateTime.Now;
                     return;
                 }
                 await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
