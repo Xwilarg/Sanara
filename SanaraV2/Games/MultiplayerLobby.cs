@@ -79,6 +79,14 @@ namespace SanaraV2.Games
         public async Task<bool> LoadNames(ITextChannel chan)
         {
             _currTurn = Program.p.rand.Next(0, _players.Count);
+            List<ulong> newPlayers = new List<ulong>();
+            while (_players.Count > 0)
+            {
+                int randomPlayer = Program.p.rand.Next(0, _players.Count);
+                newPlayers.Add(_players[randomPlayer]);
+                _players.RemoveAt(randomPlayer);
+            }
+            _players = newPlayers;
             foreach (ulong id in _players)
             {
                 IGuildUser user = await chan.GetUserAsync(id);

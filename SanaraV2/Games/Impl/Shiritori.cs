@@ -171,6 +171,8 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string> GetLoose()
         {
+            if (_currWord == null) // Multiplayer, if nobody say anything
+                return Sentences.ShiritoriExplainBegin(GetGuildId());
             string[] validWords = GetValidWords();
             if (validWords.Length == 0)
                 return GetStringFromSentence(Sentences.ShiritoriNoMoreWord);
