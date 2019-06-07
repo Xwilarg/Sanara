@@ -18,8 +18,5 @@ using System;
 namespace SanaraV2.Games
 {
     public class NoDictionnaryException : Exception // Automatically make the player to loose
-    {
-        public NoDictionnaryException()
-        { }
-    }
+    { }
 }

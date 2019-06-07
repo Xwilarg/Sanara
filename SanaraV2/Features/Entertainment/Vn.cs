@@ -15,7 +15,6 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VndbSharp;
@@ -24,7 +23,7 @@ using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV2.Features.Entertainment
 {
-    public class Vn
+    public static class Vn
     {
         public static async Task<FeatureRequest<Response.Vn, Error.Vn>> SearchVn(string[] args, bool isChanSfw)
         {

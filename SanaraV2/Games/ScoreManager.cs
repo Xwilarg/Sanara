@@ -88,7 +88,7 @@ namespace SanaraV2.Games
                 }
                 finalStr.Append(string.Join("|", best.Select(x => x.Item1 + "|" + x.Item2)) + "$");
             }
-            return (globalRankingStr + "$" + finalStr.ToString());
+            return (globalRankingStr + "$" + finalStr);
         }
 
         public static string GetInformation(ulong guildId, ref int yes, ref int no)

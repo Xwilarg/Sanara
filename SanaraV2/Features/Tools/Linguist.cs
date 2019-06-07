@@ -89,7 +89,7 @@ namespace SanaraV2.Features.Tools
                 {
                     if (visionClient == null)
                         return (new FeatureRequest<Response.Translation, Error.Translation>(null, Error.Translation.InvalidApiKey));
-                    Google.Cloud.Vision.V1.Image image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(newWords[0]);
+                    Image image = await Image.FetchFromUriAsync(newWords[0]);
                     TextAnnotation response;
                     try
                     {

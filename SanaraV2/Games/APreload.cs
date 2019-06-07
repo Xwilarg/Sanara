@@ -14,14 +14,13 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SanaraV2.Games
 {
     public abstract class APreload
     {
-        public APreload(string[] names, int timer, Func<ulong, string> gameSentence)
+        protected APreload(string[] names, int timer, Func<ulong, string> gameSentence)
         {
             _names = names;
             _timer = timer;

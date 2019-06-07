@@ -119,7 +119,7 @@ namespace SanaraV2.Modules.Entertainment
                 return (m_musics.Count <= 11);
             }
 
-            public async void Play()
+            public async Task Play()
             {
                 if (m_musics.Count == 0 || (m_process != null && !m_process.HasExited) || m_musics[0].downloading)
                     return;
@@ -170,7 +170,7 @@ namespace SanaraV2.Modules.Entertainment
                     Program.p.radios.Remove(this);
                 }
                 else
-                    Play();
+                    await Play();
             }
 
             private readonly IVoiceChannel m_chan;
@@ -223,7 +223,7 @@ namespace SanaraV2.Modules.Entertainment
                     youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
                     Process.Start(youtubeDownload).WaitForExit();
                     radio.StopDownloading(result.answer.url);
-                    radio.Play();
+                    await radio.Play();
                 }
                 else
                     await ReplyAsync("YouTube error: " + result.error);

@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.Features.GamesInfo
 {
-    public class Kancolle
+    public static class Kancolle
     {
         public static async Task<FeatureRequest<Response.Charac, Error.Charac>> SearchCharac(string[] args)
         {
