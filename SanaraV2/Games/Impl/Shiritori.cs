@@ -148,7 +148,7 @@ namespace SanaraV2.Games.Impl
                 return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (!isNoun)
                 return GetStringFromSentence(Sentences.ShiritoriNotNoun);
-            if (userAnswer.Length == 1)
+            if (GetLastCharacter(userAnswer) == userAnswer)
                 return GetStringFromSentence(Sentences.ShiritoriTooSmall);
             if (_alreadySaid.Contains(userAnswer))
             {
