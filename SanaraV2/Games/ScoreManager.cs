@@ -46,9 +46,13 @@ namespace SanaraV2.Games
                 var elem = globalRanking.First(x => x.Value.Equals(globalRanking.Values.Max()));
                 if (globalRankingStr != "")
                     globalRankingStr += "|";
-                globalRankingStr += Program.p.GetName(Program.p.client.GetGuild(ulong.Parse(elem.Key)).Name) + "|" + (elem.Value / Constants.allGames.Length);
+                IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
+                if (guild != null)
+                {
+                    globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allGames.Length);
+                    i++;
+                }
                 globalRanking.Remove(elem.Key);
-                i++;
             }
             StringBuilder finalStr = new StringBuilder();
             // Output format: Game1Place1Server | Game1Place1Score | Game1Place2Server..... Game1Place3Score $ Game2Place1Server | Game2Place1Score
