@@ -76,7 +76,6 @@ namespace SanaraV2.Modules.Entertainment
 
         private Embed CreateEmbed(bool isAnime, Response.AnimeManga res, ulong guildId)
         {
-            string orStr = Base.Sentences.OrStr(guildId);
             EmbedBuilder embed = new EmbedBuilder()
             {
                 Title = res.name + ((res.alternativeTitles == null || res.alternativeTitles.Length == 0) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")")),
@@ -91,7 +90,7 @@ namespace SanaraV2.Modules.Entertainment
             embed.AddField(Sentences.ReleaseDate(Context.Guild.Id), ((res.startDate != null) ? res.startDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId)) + " - " + ((res.endDate != null) ? (res.endDate.Value.ToString(Base.Sentences.DateHourFormatShort(guildId))) : (Sentences.Unknown(guildId))) : (Sentences.ToBeAnnounced(guildId))), true);
             if (!string.IsNullOrEmpty(res.ageRating))
                 embed.AddField(Sentences.AnimeAudiance(Context.Guild.Id), res.ageRating, true);
-            return (embed.Build());
+            return embed.Build();
         }
     }
 }

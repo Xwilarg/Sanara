@@ -52,12 +52,12 @@ namespace SanaraV2
             }
             catch (FileNotFoundException e) // This probably means a dll is missing
             {
-                throw e;
+                throw;
             }
-            catch (Exception e) // If an exception occur, the program exit and is relaunched
+            catch (Exception) // If an exception occur, the program exit and is relaunched
             {
                 if (Debugger.IsAttached)
-                    throw e;
+                    throw;
             }
         }
 
@@ -206,7 +206,7 @@ namespace SanaraV2
             }
         }
 
-        private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState state2)
+        private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState _)
         {
             RadioChannel radio = radios.Find(x => x.m_guildId == ((IGuildUser)user).GuildId);
             if (radio != null && await radio.IsChanEmpty())
@@ -216,7 +216,7 @@ namespace SanaraV2
             }
         }
 
-        private Task Disconnected(Exception e)
+        private Task Disconnected(Exception _)
         {
             Environment.Exit(1);
             return Task.CompletedTask;

@@ -24,12 +24,12 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.Features.GamesInfo
 {
-    public class Kancolle
+    public static class Kancolle
     {
         public static async Task<FeatureRequest<Response.Charac, Error.Charac>> SearchCharac(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.Help));
+                return new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.Help);
             string thumbnailUrl, name;
             string html;
             using (HttpClient hc = new HttpClient())
@@ -41,7 +41,7 @@ namespace SanaraV2.Features.GamesInfo
                 name = json.items[0].title;
                 html = await hc.GetStringAsync(url);
                 if (!html.StartsWith("{{ShipPageHeader") && !html.StartsWith("{{Ship/Header"))
-                    return (new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound));
+                    return new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound);
                 html = html.Split(new string[] { "{{ShipPageFooter}}" }, StringSplitOptions.None)[0];
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Articles/Details?ids=" + id));
                 thumbnailUrl = json.items[id].thumbnail;
@@ -84,22 +84,22 @@ namespace SanaraV2.Features.GamesInfo
                         allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 3)", lastTmp));
                 }
             }
-            return (new FeatureRequest<Response.Charac, Error.Charac>(new Response.Charac()
+            return new FeatureRequest<Response.Charac, Error.Charac>(new Response.Charac()
             {
                 name = name,
                 allCategories = allCats,
                 thumbnailUrl = thumbnailUrl
-            }, Error.Charac.None));
+            }, Error.Charac.None);
         }
 
         public static async Task<FeatureRequest<Response.DropConstruction, Error.Drop>> SearchDropConstruction(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.Help));
+                return new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.Help);
             string shipName = Utilities.CleanWord(Utilities.AddArgs(args));
             string japaneseName = GetJapaneseShipName(shipName);
             if (japaneseName == null)
-                return (new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.NotFound));
+                return new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.NotFound);
             string html;
             using (HttpClient hc = new HttpClient())
             {
@@ -122,7 +122,7 @@ namespace SanaraV2.Features.GamesInfo
                 }
             }
             if (id == null)
-                return (new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.NotReferenced));
+                return new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.NotReferenced);
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.Add("User-Agent", "Sanara");
@@ -147,21 +147,21 @@ namespace SanaraV2.Features.GamesInfo
                     break;
             }
             if (elems.Count == 0)
-                return (new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.DontDrop));
-            return (new FeatureRequest<Response.DropConstruction, Error.Drop>(new Response.DropConstruction()
+                return new FeatureRequest<Response.DropConstruction, Error.Drop>(null, Error.Drop.DontDrop);
+            return new FeatureRequest<Response.DropConstruction, Error.Drop>(new Response.DropConstruction()
             {
                 elems = elems.ToArray()
-            }, Error.Drop.None));
+            }, Error.Drop.None);
         }
 
         public static async Task<FeatureRequest<Response.DropMap, Error.Drop>> SearchDropMap(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.Help));
+                return new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.Help);
             string shipName = Utilities.CleanWord(Utilities.AddArgs(args));
             string japaneseName = GetJapaneseShipName(shipName);
             if (japaneseName == null)
-                return (new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.NotFound));
+                return new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.NotFound);
             string html;
             using (HttpClient hc = new HttpClient())
                 html = await hc.GetStringAsync("https://wikiwiki.jp/kancolle/%E7%AC%AC%E4%B8%80%E6%9C%9F/%E8%89%A6%E5%A8%98%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E9%80%86%E5%BC%95%E3%81%8D");
@@ -177,7 +177,7 @@ namespace SanaraV2.Features.GamesInfo
             string[] allDrops = htmlShip.Split(new string[] { "<tr>" }, StringSplitOptions.None);
             string shipgirl = allDrops.ToList().Find(x => x.Contains(japaneseName));
             if (shipgirl == null)
-                return (new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.NotReferenced));
+                return new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.NotReferenced);
             MatchCollection matches = Regex.Matches(shipgirl, ">([^<]*)<\\/td>");
             int index = 1;
             int i = 0;
@@ -214,16 +214,16 @@ namespace SanaraV2.Features.GamesInfo
                 i++;
             }
             if (dropMap.Count == 0)
-                return (new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.DontDrop));
+                return new FeatureRequest<Response.DropMap, Error.Drop>(null, Error.Drop.DontDrop);
             int rating;
             int? finalRating = null;
             if (int.TryParse(matches[2].Groups[2].Value, out rating))
                 finalRating = rating;
-            return (new FeatureRequest<Response.DropMap, Error.Drop>(new Response.DropMap()
+            return new FeatureRequest<Response.DropMap, Error.Drop>(new Response.DropMap()
             {
                 dropMap = dropMap,
                 rarity = finalRating
-            }, Error.Drop.None));
+            }, Error.Drop.None);
         }
 
         private static string GetJapaneseShipName(string englishName)
@@ -234,8 +234,8 @@ namespace SanaraV2.Features.GamesInfo
             MatchCollection matches = Regex.Matches(html, "\"([^\"]+)\": ?\"([^\"]+)\"");
             foreach (Match match in matches)
                 if (Utilities.CleanWord(match.Groups[2].Value) == englishName)
-                    return (match.Groups[1].Value);
-            return (null);
+                    return match.Groups[1].Value;
+            return null;
         }
     }
 }

@@ -35,12 +35,6 @@ namespace SanaraV2.Modules.Tools
             return guildUser.GuildPermissions.ManageGuild;
         }
 
-        private struct Eval
-        {
-            public DiscordSocketClient Client { set; get; }
-            public ICommandContext Context { set; get; }
-        }
-
         [Command("Eval")]
         public async Task EvalFct(params string[] args)
         {
@@ -211,7 +205,7 @@ namespace SanaraV2.Modules.Tools
                 if (enable == 1 && Program.p.db.AreAllAvailable(Context.Guild.Id))
                     await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild.Id));
                 else if (enable == 0 && Program.p.db.AreNoneAvailable(Context.Guild.Id))
-                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild.Id));
+                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyDisabled(Context.Guild.Id));
                 else
                 {
                     for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
@@ -267,7 +261,7 @@ namespace SanaraV2.Modules.Tools
                 finalStr += ", " + i.ToString();
             }
             finalStr += " " + Base.Sentences.OrStr(guildId) + " " + Program.Module.Youtube.ToString();
-            return (finalStr);
+            return finalStr;
         }
     }
 }

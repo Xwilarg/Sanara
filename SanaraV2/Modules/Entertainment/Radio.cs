@@ -68,7 +68,7 @@ namespace SanaraV2.Modules.Entertainment
 
             public async Task<bool> IsChanEmpty()
             {
-                return ((await m_chan.GetUsersAsync().FlattenAsync()).Count() == 1); // 1 because the bot is in the channel
+                return (await m_chan.GetUsersAsync().FlattenAsync()).Count() == 1; // 1 because the bot is in the channel
             }
 
             public void StopDownloading(string url)
@@ -89,10 +89,10 @@ namespace SanaraV2.Modules.Entertainment
             public async Task<bool> Skip(IMessageChannel chan)
             {
                 if (m_process == null)
-                    return (false);
+                    return false;
                 await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, m_musics[0].title));
                 m_process.Kill();
-                return (true);
+                return true;
             }
 
             public async Task Stop()
@@ -107,19 +107,19 @@ namespace SanaraV2.Modules.Entertainment
             public string GetPlaylist(ulong guildId)
             {
                 if (m_process == null || m_process.HasExited)
-                    return (Sentences.RadioNoSong(guildId));
+                    return Sentences.RadioNoSong(guildId);
                 string finalStr = "🎵 " + Sentences.Current(guildId) + " " + m_musics[0].title + Environment.NewLine;
                 for (int i = 1; i < m_musics.Count; i++)
                     finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + Environment.NewLine;
-                return (finalStr);
+                return finalStr;
             }
 
             public bool CanAddMusic()
             {
-                return (m_musics.Count <= 11);
+                return m_musics.Count <= 11;
             }
 
-            public async void Play()
+            public async Task Play()
             {
                 if (m_musics.Count == 0 || (m_process != null && !m_process.HasExited) || m_musics[0].downloading)
                     return;
@@ -170,7 +170,7 @@ namespace SanaraV2.Modules.Entertainment
                     Program.p.radios.Remove(this);
                 }
                 else
-                    Play();
+                    await Play();
             }
 
             private readonly IVoiceChannel m_chan;
@@ -223,7 +223,7 @@ namespace SanaraV2.Modules.Entertainment
                     youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
                     Process.Start(youtubeDownload).WaitForExit();
                     radio.StopDownloading(result.answer.url);
-                    radio.Play();
+                    await radio.Play();
                 }
                 else
                     await ReplyAsync("YouTube error: " + result.error);
@@ -279,17 +279,17 @@ namespace SanaraV2.Modules.Entertainment
             if (p.radios.Any(x => x.m_guildId == Context.Guild.Id))
             {
                 await chan.SendMessageAsync(Sentences.RadioAlreadyStarted(Context.Guild.Id));
-                return (true);
+                return true;
             }
             IGuildUser guildUser = Context.User as IGuildUser;
             if (guildUser.VoiceChannel == null)
             {
                 await chan.SendMessageAsync(Sentences.RadioNeedChannel(Context.Guild.Id));
-                return (false);
+                return false;
             }
             IAudioClient audioClient = await guildUser.VoiceChannel.ConnectAsync();
             p.radios.Add(new RadioChannel(guildUser.VoiceChannel, Context.Channel, audioClient)); // You need opus.dll and libsodium.dll
-            return (true);
+            return true;
         }
 
         [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop", "Radio quit", "Quit radio")]

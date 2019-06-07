@@ -96,7 +96,7 @@ namespace SanaraV2.Modules.NSFW
                         Title = result.answer.booruName,
                         ImageUrl = result.answer.imageUrl.AbsoluteUri,
                         Description = result.answer.width + " x " + result.answer.height +
-                        ((result.answer.width == result.answer.aspectRatio.Item1) ? ("") : (" (" + result.answer.aspectRatio.Item1 + ":" + result.answer.aspectRatio.Item2 + ")"))
+                        (result.answer.width == result.answer.aspectRatio.Item1 ? "" : " (" + result.answer.aspectRatio.Item1 + ":" + result.answer.aspectRatio.Item2 + ")")
                     };
                     eb.AddField(((result.answer.sourceTags.Length > 1) ? (Sentences.Sources(Context.Guild.Id)) : (Sentences.Source(Context.Guild.Id))), "`" + string.Join(", ", result.answer.sourceTags) + "`");
                     eb.AddField(((result.answer.characTags.Length > 1) ? (Sentences.Characters(Context.Guild.Id)) : (Sentences.Character(Context.Guild.Id))), "`" + string.Join(", ", result.answer.characTags) + "`");

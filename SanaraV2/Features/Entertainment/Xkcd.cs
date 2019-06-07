@@ -30,7 +30,7 @@ namespace SanaraV2.Features.Entertainment
                 if (int.TryParse(Utilities.AddArgs(args), out tmp))
                     myNb = tmp;
                 else
-                    return (new FeatureRequest<Response.Xkcd, Error.Xkcd>(null, Error.Xkcd.InvalidNumber));
+                    return new FeatureRequest<Response.Xkcd, Error.Xkcd>(null, Error.Xkcd.InvalidNumber);
             }
             dynamic json;
             int max;
@@ -44,13 +44,13 @@ namespace SanaraV2.Features.Entertainment
                     myNb = r.Next(max) + 1;
                 json = JsonConvert.DeserializeObject(await (await hc.GetAsync("https://xkcd.com/" + myNb + "/info.0.json")).Content.ReadAsStringAsync());
             }
-            return (new FeatureRequest<Response.Xkcd, Error.Xkcd>(new Response.Xkcd()
+            return new FeatureRequest<Response.Xkcd, Error.Xkcd>(new Response.Xkcd()
             {
                 imageUrl = json.img,
                 maxNb = max,
                 title = json.title,
                 alt = json.alt
-            }, Error.Xkcd.None));
+            }, Error.Xkcd.None);
         }
     }
 }

@@ -62,39 +62,6 @@ namespace SanaraV2.Modules.Base
         }
 
         /// <summary>
-        /// Get an element in a string
-        /// </summary>
-        /// <param name="tag">The tag where we begin to take the element</param>
-        /// <param name="file">The string to search in</param>
-        /// <param name="stopCharac">The character after with we stop looking for</param>
-        /// <returns></returns>
-        public static string GetElementXml(string tag, string file, char stopCharac)
-        {
-            string saveString = "";
-            int prog = 0;
-            char lastChar = ' ';
-            foreach (char c in file)
-            {
-                if (prog == tag.Length)
-                {
-                    if (c == stopCharac
-                        && ((stopCharac == '"' && lastChar != '\\') || stopCharac != '"'))
-                        break;
-                    saveString += c;
-                }
-                else
-                {
-                    if (c == tag[prog])
-                        prog++;
-                    else
-                        prog = 0;
-                }
-                lastChar = c;
-            }
-            return (saveString);
-        }
-
-        /// <summary>
         /// Get a user by his username/nickname/id
         /// </summary>
         /// <param name="name">The name/id of the user</param>
@@ -113,23 +80,23 @@ namespace SanaraV2.Modules.Base
                         if (char.IsNumber(c))
                             val += c;
                     }
-                    return (await guild.GetUserAsync(Convert.ToUInt64(val)));
+                    return await guild.GetUserAsync(Convert.ToUInt64(val));
                 }
                 catch (Exception)
                 { }
             }
             try
             {
-                return (await guild.GetUserAsync(Convert.ToUInt64(name)));
+                return await guild.GetUserAsync(Convert.ToUInt64(name));
             }
             catch (Exception)
             { }
             foreach (IGuildUser user in await guild.GetUsersAsync())
             {
                 if (user.Nickname == name || user.Username == name)
-                    return (user);
+                    return user;
             }
-            return (null);
+            return null;
         }
 
         /// <summary>
@@ -146,7 +113,7 @@ namespace SanaraV2.Modules.Base
                 finalStr = Sentences.TimeHours(guildId, ts.Hours.ToString(), ts.Minutes.ToString(), finalStr);
             else if (ts.Minutes > 0)
                 finalStr = Sentences.TimeMinutes(guildId, ts.Minutes.ToString(), finalStr);
-            return (finalStr);
+            return finalStr;
         }
 
         /// <summary>
@@ -166,7 +133,7 @@ namespace SanaraV2.Modules.Base
                     break;
                 }
             }
-            return (lang);
+            return lang;
         }
     }
 }

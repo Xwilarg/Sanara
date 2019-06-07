@@ -29,13 +29,13 @@ namespace SanaraV2.Features.Tools
         public static async Task<FeatureRequest<Response.Shell, Error.Shell>> Shell(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.Help));
+                return new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.Help);
             string html;
             string url = "https://explainshell.com/explain?cmd=" + Uri.EscapeDataString(string.Join(" ", args));
             using (HttpClient hc = new HttpClient())
                 html = await hc.GetStringAsync(url);
             if (html.Contains("No man page found for"))
-                return (new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.NotFound));
+                return new FeatureRequest<Response.Shell, Error.Shell>(null, Error.Shell.NotFound);
             List<Tuple<string, string>> explanations = new List<Tuple<string, string>>();
             /// helpref-X indicade the name of the command and help-X it description
             /// We can have many time the same X so we count to not do always the same
@@ -53,12 +53,12 @@ namespace SanaraV2.Features.Tools
                 if (explanations.Count == 25)
                     break;
             }
-            return (new FeatureRequest<Response.Shell, Error.Shell>(new Response.Shell()
+            return new FeatureRequest<Response.Shell, Error.Shell>(new Response.Shell()
             {
                 explanations = explanations,
                 title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>explainshell\\.com - ([^<]+)<\\/title>").Groups[1].Value),
                 url = "https://explainshell.com/explain?cmd=" + Uri.EscapeDataString(string.Join(" ", args))
-            }, Error.Shell.None));
+            }, Error.Shell.None);
         }
 
         /// Clean input to put bold and stuffs depending of HTML
@@ -87,7 +87,7 @@ namespace SanaraV2.Features.Tools
         public static async Task<FeatureRequest<Response.Image, Error.Image>> SearchColor(string[] args)
         {
             if (args.Length == 0)
-                return (new FeatureRequest<Response.Image, Error.Image>(null, Error.Image.InvalidArg));
+                return new FeatureRequest<Response.Image, Error.Image>(null, Error.Image.InvalidArg);
             string color = Utilities.AddArgs(args);
             if (color[0] == '#')
                 color = color.Substring(1);
@@ -109,7 +109,7 @@ namespace SanaraV2.Features.Tools
                 {
                     finalColor = Color.FromArgb(int.Parse(args[0]), int.Parse(args[1]), int.Parse(args[2]));
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     finalColor = null;
                 }
@@ -120,19 +120,19 @@ namespace SanaraV2.Features.Tools
             {
                 finalColor = Color.FromName(color);
                 if (finalColor.Value.R == 0 && finalColor.Value.B == 0 && finalColor.Value.G == 0)
-                    return (new FeatureRequest<Response.Image, Error.Image>(null, Error.Image.InvalidColor));
+                    return new FeatureRequest<Response.Image, Error.Image>(null, Error.Image.InvalidColor);
             }
             string hexValue = finalColor.Value.R.ToString("X2") + finalColor.Value.G.ToString("X2") + finalColor.Value.B.ToString("X2");
             dynamic json;
             using (HttpClient hc = new HttpClient())
                 json = JsonConvert.DeserializeObject(await (await hc.GetAsync("http://www.thecolorapi.com/id?hex=" + hexValue)).Content.ReadAsStringAsync());
-            return (new FeatureRequest<Response.Image, Error.Image>(new Response.Image()
+            return new FeatureRequest<Response.Image, Error.Image>(new Response.Image()
             {
                 discordColor = new Discord.Color(finalColor.Value.R, finalColor.Value.G, finalColor.Value.B),
                 colorUrl = string.Format("https://dummyimage.com/500x500/{0}/000000.png&text=+", hexValue),
                 colorHex = hexValue,
                 name = ((bool)json.name.exact_match_name) ? (json.name.value) : (null)
-            }, Error.Image.None));
+            }, Error.Image.None);
         }
     }
 }

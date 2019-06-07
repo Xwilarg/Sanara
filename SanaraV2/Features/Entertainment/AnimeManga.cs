@@ -32,12 +32,12 @@ namespace SanaraV2.Features.Entertainment
         {
             string searchName = Utilities.AddArgs(args);
             if (searchName.Length == 0)
-                return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.Help));
+                return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.Help);
             dynamic json;
             using (HttpClient hc = new HttpClient())
-                json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
+                json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + (isAnime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
             if (json.data.Count == 0)
-                return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound));
+                return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound);
             dynamic finalData = null;
             foreach (dynamic data in json.data)
             {
@@ -49,7 +49,7 @@ namespace SanaraV2.Features.Entertainment
             }
             if (finalData == null)
                 finalData = json.data[0].attributes;
-            return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(new Response.AnimeManga()
+            return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(new Response.AnimeManga()
             {
                 name = finalData.canonicalTitle,
                 imageUrl = finalData.posterImage.original,
@@ -61,7 +61,7 @@ namespace SanaraV2.Features.Entertainment
                 endDate = finalData.endDate ?? DateTime.ParseExact((string)finalData.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
                 ageRating = finalData.ageRatingGuide,
                 synopsis = finalData.synopsis
-            }, Error.AnimeManga.None));
+            }, Error.AnimeManga.None);
         }
     }
 }

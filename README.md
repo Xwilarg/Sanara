@@ -4,16 +4,15 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)<br/>
 # Sanara
 
-
-### What is Sanara
+## What is Sanara
 Sanara is a multipurpose bot that is now in more than 200 servers (05/2019).
 
 Her most used features are games, doujinshi and images but there are a lot more, you can see the full list on [the command page](https://zirk.eu/sanara.html#commands)
 
-### How to invite her on my server
+## How to invite her on my server
 Just click [here](https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot).
 
-### More information
+## More information
 
 The bot is in constant developpement, I'm always improving her by adding features and fixing bugs.<br/>
 If you have any idea of some new ones, you can come [open an issue](https://github.com/Xwilarg/Sanara/issues), [come to her official server](https://discordapp.com/invite/H6wMRYV) or contact Zirk#0001 on Discord.
