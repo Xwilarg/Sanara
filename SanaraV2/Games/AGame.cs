@@ -253,7 +253,7 @@ namespace SanaraV2.Games
             }
             if (!_contributors.Contains(user.Id))
                 _contributors.Add(user.Id);
-            string finalStr = "";
+            string finalStr = AnnounceNextTurnInternal();
             if (CongratulateOnGuess())
                 finalStr += Sentences.GuessGood(_chan.GuildId);
             if (HaveMultiplayerLobby())
@@ -268,6 +268,10 @@ namespace SanaraV2.Games
             _score++;
             await PostAsync();
             _checkingAnswer = false;
+        }
+        protected virtual string AnnounceNextTurnInternal()
+        {
+            return "";
         }
 
         public async Task LooseTimerAsync()
@@ -288,6 +292,7 @@ namespace SanaraV2.Games
 
         public async Task LooseAsync(string reason)
         {
+            reason = Sentences.YouLost(_chan.GuildId) + reason;
             _postImage = true; // We make sure that the user isn't able to send things anymore
             if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
             {
