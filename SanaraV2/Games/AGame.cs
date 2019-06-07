@@ -295,21 +295,25 @@ namespace SanaraV2.Games
 
         public async Task LooseAsync(string reason)
         {
-            reason = Sentences.YouLost(_chan.GuildId) + reason;
             _postImage = true; // We make sure that the user isn't able to send things anymore
             if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
             {
-                if (reason == null)
-                    await _chan.SendMessageAsync(await GetLoose());
-                else
-                    await _chan.SendMessageAsync(reason + Environment.NewLine + await GetLoose());
+                _lobby.RemoveCurrentPlayer();
+                if (_lobby.HaveEnoughPlayer())
+                {
+                    await PostText((reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+                    _postImage = false;
+                    _startTime = DateTime.Now;
+                    return;
+                }
+                await PostText((reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
             }
             else
             {
                 if (reason == null)
-                    await SaveScores(await GetLoose());
+                    await SaveScores(Sentences.YouLost(_chan.GuildId) + await GetLoose());
                 else
-                    await SaveScores(reason + Environment.NewLine + await GetLoose());
+                    await SaveScores(Sentences.YouLost(_chan.GuildId) + reason + Environment.NewLine + await GetLoose());
             }
             _gameState = GameState.Lost;
         }

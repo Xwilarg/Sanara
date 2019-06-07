@@ -40,6 +40,14 @@ namespace SanaraV2.Games
         public bool RemovePlayer(ulong player)
             => _players.Remove(player);
 
+        public void RemoveCurrentPlayer()
+        {
+            _players.RemoveAt(_currTurn);
+            _names.RemoveAt(_currTurn);
+            if (_currTurn == _players.Count)
+                _currTurn = 0;
+        }
+
         public bool IsPlayerIn(ulong player)
             => _players.Contains(player);
 
@@ -54,6 +62,9 @@ namespace SanaraV2.Games
 
         public int GetNumberPlayers()
             => _players.Count;
+
+        public string GetLastStanding() // Name of last standing player, called at the end of the game to know the winner
+            => _names[0];
 
         public string GetReadyMessage(ulong guildId)
             => Sentences.Participants(guildId) + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));

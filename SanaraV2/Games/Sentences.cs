@@ -100,5 +100,6 @@ namespace SanaraV2.Games
         public static string AnnounceTurnError(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "announceTurnError", name)); }
         public static string LobbyLeftChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyLeftChannel")); }
         public static string YouLost(ulong guildId) { return (Translation.GetTranslation(guildId, "youLost")); }
+        public static string WonMulti(ulong guildId, string lastName) { return (Translation.GetTranslation(guildId, "wonMulti", lastName)); }
     }
 }
