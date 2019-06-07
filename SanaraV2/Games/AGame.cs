@@ -60,6 +60,8 @@ namespace SanaraV2.Games
         protected abstract Task<string> GetLoose();
         protected abstract bool CongratulateOnGuess(); // Say "Congratulation you found the right answer" on a guess
         protected abstract string Help(); // null is no help
+        protected virtual int? GetMaximumMultiplayer() // Maximum number of player if the game allow multiplayer
+            => null;
 
         public string GetName()
             => _gameName;
@@ -73,8 +75,8 @@ namespace SanaraV2.Games
         public bool HaveMultiplayerLobby() // Is the current game multiplayer (true) or solo (false)
             => _lobby != null;
 
-        public bool IsFull() // Games doesn't have a maximum capacity for now
-            => false;
+        public bool IsFull()
+            => GetMaximumMultiplayer() != null && _lobby.GetNumberPlayers() == GetMaximumMultiplayer();
 
         public async Task DisplayCantStart()
         {

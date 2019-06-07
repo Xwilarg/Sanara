@@ -52,6 +52,9 @@ namespace SanaraV2.Games
         public bool HaveEnoughPlayer()
             => _players.Count > 1;
 
+        public int GetNumberPlayers()
+            => _players.Count;
+
         public string GetReadyMessage(ulong guildId)
             => Sentences.Participants(guildId) + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
 
