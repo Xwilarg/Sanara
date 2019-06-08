@@ -134,7 +134,7 @@ namespace SanaraV2.Games
                             break; // These case exist so the user can precise them, but they do nothing
 
                         default:
-                            return Sentences.InvalidDifficulty;
+                            return Sentences.InvalidGameArgument;
                     }
                 }
             }
