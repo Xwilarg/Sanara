@@ -185,8 +185,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task AddRadio(params string[] words)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
-            await ReplyAsync(Base.Sentences.NotWorking(Context.Guild.Id));
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
@@ -234,8 +232,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task LaunchRadio(params string[] words)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
-            await ReplyAsync(Base.Sentences.NotWorking(Context.Guild.Id));
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (p.youtubeService == null)
                 await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
@@ -247,8 +243,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task ListRadio(params string[] words)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
-            await ReplyAsync(Base.Sentences.NotWorking(Context.Guild.Id));
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             if (!p.radios.Any(x => x.m_guildId == Context.Guild.Id))
                 await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
@@ -260,8 +254,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task SkipRadio(params string[] words)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
-            await ReplyAsync(Base.Sentences.NotWorking(Context.Guild.Id));
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
@@ -296,8 +288,6 @@ namespace SanaraV2.Modules.Entertainment
         public async Task StopRadio(params string[] words)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
-            await ReplyAsync(Base.Sentences.NotWorking(Context.Guild.Id));
-            return;
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
             RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
             if (radio == null)
