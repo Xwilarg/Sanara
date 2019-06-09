@@ -50,7 +50,7 @@ namespace SanaraV2
             {
                 await new Program().MainAsync();
             }
-            catch (FileNotFoundException e) // This probably means a dll is missing
+            catch (FileNotFoundException) // This probably means a dll is missing
             {
                 throw;
             }

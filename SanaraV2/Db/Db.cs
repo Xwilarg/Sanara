@@ -164,7 +164,7 @@ namespace SanaraV2.Db
             foreach (var elem in json)
             {
                 Dictionary<string, string> currDict = new Dictionary<string, string>();
-                foreach (var game in Constants.allGames)
+                foreach (var game in Constants.allRankedGames)
                 {
                     APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                     string gameName = preload.GetGameName();

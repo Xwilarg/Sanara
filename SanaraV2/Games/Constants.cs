@@ -23,7 +23,7 @@ namespace SanaraV2.Games
     {
         // Order in Db: Shiritori, Anime, Booru, KanColle, AzurLane
         // The order matter and must be preserved
-        public static Tuple<Type, Type, string>[] allGames = new Tuple<Type, Type, string>[]
+        public static Tuple<Type, Type, string>[] allRankedGames = new Tuple<Type, Type, string>[]
         {
             new Tuple<Type, Type, string>(typeof(ShiritoriPreload), typeof(Shiritori), "gameModuleShiritori"),
             new Tuple<Type, Type, string>(typeof(AnimePreload), typeof(Anime), "gameModuleAnime"),
@@ -33,6 +33,8 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(FateGOPreload), typeof(FateGO), "gameModuleFateGO"),
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon")
         };
+
+        public static Tuple<Type, Type, string>[] allGames = allRankedGames;
 
         public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
         public static List<string> kanColleDictionnary = KanColle.LoadDictionnary();
