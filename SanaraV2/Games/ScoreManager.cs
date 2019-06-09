@@ -44,11 +44,11 @@ namespace SanaraV2.Games
             while (i < 5 && globalRanking.Count > 0)
             {
                 var elem = globalRanking.First(x => x.Value.Equals(globalRanking.Values.Max()));
-                if (globalRankingStr != "")
-                    globalRankingStr += "|";
                 IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
                 if (guild != null)
                 {
+                    if (globalRankingStr != "")
+                        globalRankingStr += "|";
                     globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allGames.Length);
                     i++;
                 }
