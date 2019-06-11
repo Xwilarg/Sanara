@@ -46,7 +46,7 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
         }
 
-        private static readonly string defaultAvailability = "111111111111111";
+        private static readonly string defaultAvailability = "11111111111111";
 
         public async Task ResetGuild(ulong guildId)
         {

@@ -210,7 +210,9 @@ namespace SanaraV2.Modules.Tools
                 {
                     for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
                     {
-                        if (i == Program.Module.Settings || i == Program.Module.Information)
+                        // We can't disable Settings and Information module
+                        // We however can enable them, just in case
+                        if (enable == 0 && (i == Program.Module.Settings || i == Program.Module.Information))
                            continue;
                         await Program.p.db.SetAvailability(Context.Guild.Id, i, enable);
                     }

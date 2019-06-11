@@ -164,7 +164,7 @@ namespace SanaraV2.Modules.Tools
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Information) ? "**7**: " + informationModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Kancolle) ? "**8**: " + kantaiCollectionModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Linguistic) ? "**9**: " + linguisticModule + Environment.NewLine : "") +
-                    //(Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio) ? "**10**: " + radioModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio) ? "**10**: " + radioModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Settings) ? "**11**: " + settingsModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Vn) ? "**12**: " + visualNovelModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Xkcd) ? "**13**: " + xkcdModule + Environment.NewLine : "") +
