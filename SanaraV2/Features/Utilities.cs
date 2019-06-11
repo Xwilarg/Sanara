@@ -53,12 +53,6 @@ namespace SanaraV2.Features
         }
 
         /// <summary>
-        /// Check if file extension is the one of an image
-        /// </summary>
-        public static bool IsImage(string extension)
-            => extension == "gif" || extension == "png" || extension == "jpg" || extension == "jpeg";
-
-        /// <summary>
         /// Generate a random code containing numbers
         /// </summary>
         /// <param name="nbDigits">The number of digits in the code</param>

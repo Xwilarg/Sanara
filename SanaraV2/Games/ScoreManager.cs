@@ -49,14 +49,14 @@ namespace SanaraV2.Games
                 {
                     if (globalRankingStr != "")
                         globalRankingStr += "|";
-                    globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allGames.Length);
+                    globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allRankedGames.Length);
                     i++;
                 }
                 globalRanking.Remove(elem.Key);
             }
             StringBuilder finalStr = new StringBuilder();
             // Output format: Game1Place1Server | Game1Place1Score | Game1Place2Server..... Game1Place3Score $ Game2Place1Server | Game2Place1Score
-            foreach (var game in Constants.allGames)
+            foreach (var game in Constants.allRankedGames)
             {
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                 string gameName = preload.GetGameName();

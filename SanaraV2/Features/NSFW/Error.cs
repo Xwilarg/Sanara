@@ -21,7 +21,6 @@ namespace SanaraV2.Features.NSFW
         {
             None,
             ChanNotNSFW,
-            InvalidFile,
             NotFound
         }
 

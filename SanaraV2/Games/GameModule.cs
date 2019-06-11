@@ -150,7 +150,7 @@ namespace SanaraV2.Games
             float finalScore = 0;
             bool ranked = false;
             int nbGuilds = scores.Count(x => x.Value.Count > 0);
-            foreach (var game in Constants.allGames)
+            foreach (var game in Constants.allRankedGames)
             {
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                 string gameName = preload.GetGameName();
@@ -188,7 +188,7 @@ namespace SanaraV2.Games
                         myGlobalRanking++;
                 }
             }
-            await ReplyAsync((ranked ? Sentences.GlobalRanking(Context.Guild.Id, myGlobalRanking, nbGuilds, finalScore / Constants.allGames.Length)
+            await ReplyAsync((ranked ? Sentences.GlobalRanking(Context.Guild.Id, myGlobalRanking, nbGuilds, finalScore / Constants.allRankedGames.Length)
                 : Sentences.NoGlobalRanking(Context.Guild.Id))+ Environment.NewLine + Environment.NewLine +
                 finalStr.ToString());
         }

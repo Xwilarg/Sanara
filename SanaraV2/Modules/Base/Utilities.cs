@@ -135,5 +135,11 @@ namespace SanaraV2.Modules.Base
             }
             return lang;
         }
+
+        /// <summary>
+        /// Check if file extension is the one of an image
+        /// </summary>
+        public static bool IsImage(string extension)
+            => extension == "gif" || extension == "png" || extension == "jpg" || extension == "jpeg";
     }
 }
