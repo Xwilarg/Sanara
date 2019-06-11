@@ -76,8 +76,6 @@ namespace SanaraV2.Features.NSFW
             }
             Error.Booru error = Error.Booru.None;
             string url = res.fileUrl.AbsoluteUri;
-            if (!Utilities.IsImage(url.Split('.').Last()))
-                error = Error.Booru.InvalidFile;
             Color color = GetColorFromRating(res.rating);
             string saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
             tagInfos.Add(saveId, new Tuple<Type, BooruSharp.Search.Post.SearchResult>(booru.GetType(), res));

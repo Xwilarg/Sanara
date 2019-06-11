@@ -18,6 +18,7 @@ using Discord;
 using System.Threading.Tasks;
 using BooruSharp.Booru;
 using System.Linq;
+using SanaraV2.Modules.Base;
 
 namespace SanaraV2.Modules.NSFW
 {
@@ -118,23 +119,27 @@ namespace SanaraV2.Modules.NSFW
                     await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
                     break;
 
-                case Features.NSFW.Error.Booru.InvalidFile:
-                    await chan.SendMessageAsync(Sentences.InvalidExtension(chan.GuildId));
-                    break;
-
                 case Features.NSFW.Error.Booru.NotFound:
                     await chan.SendMessageAsync(Base.Sentences.TagsNotFound(guildId, tags));
                     break;
 
                 case Features.NSFW.Error.Booru.None:
-                    await chan.SendMessageAsync("", false, new EmbedBuilder() {
-                        Color = result.answer.colorRating,
-                        ImageUrl = result.answer.url,
-                        Footer = new EmbedFooterBuilder()
+                    if (!Utilities.IsImage(result.answer.url.Split('.').Last()))
+                    {
+                        await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guildId, result.answer.saveId) + "*");
+                    }
+                    else
+                    {
+                        await chan.SendMessageAsync("", false, new EmbedBuilder()
                         {
-                            Text = Sentences.ImageInfo(guildId, result.answer.saveId)
-                        }
-                    }.Build());
+                            Color = result.answer.colorRating,
+                            ImageUrl = result.answer.url,
+                            Footer = new EmbedFooterBuilder()
+                            {
+                                Text = Sentences.ImageInfo(guildId, result.answer.saveId)
+                            }
+                        }.Build());
+                    }
                     if (Program.p.sendStats)
                         await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString().Split('.').Last().ToLower()) });
                     break;
