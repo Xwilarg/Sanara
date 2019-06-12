@@ -27,7 +27,7 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
-        private bool CanModify(IUser user, ulong ownerId)
+        public static bool CanModify(IUser user, ulong ownerId)
         {
             if (user.Id == ownerId)
                 return true;
