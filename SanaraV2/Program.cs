@@ -93,6 +93,8 @@ namespace SanaraV2
 
         private ulong inamiToken;
 
+        public Dictionary<string, string> kitsuAuth;
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -131,6 +133,16 @@ namespace SanaraV2
 
             websiteStats = json.websiteStats;
             websiteStatsToken = json.websiteStatsToken;
+            if (json.kitsuEmail != null && json.kitsuPassword != null)
+            {
+                kitsuAuth = new Dictionary<string, string> {
+                    { "grant_type", "password" },
+                    { "username", (string)json.kitsuEmail },
+                    { "password", (string)json.kitsuPassword }
+                };
+            }
+            else
+                kitsuAuth = null;
             sendStats = websiteStats != null && websiteStatsToken != null;
             if (json.discordBotsId != null && json.discordBotsToken != null)
                 dblApi = new AuthDiscordBotListApi(ulong.Parse((string)json.discordBotsId), (string)json.discordBotsToken);

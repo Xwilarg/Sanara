@@ -14,34 +14,61 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Features.Entertainment
 {
     public static class AnimeManga
     {
+        private static bool ContainsCheckNull(string s1, string s2)
+        {
+            if (s1 == null)
+                return false;
+            return s1.Contains(s2);
+        }
+
         /// <summary>
         /// Search for an anime/manga using kitsu.io API
         /// </summary>
         /// <param name="isAnime">Is the search an anime (true) or a manga (false)</param>
         /// <param name="args">Name</param>
         /// <returns>Embed containing anime/manga informations (if found)</returns>
-        public static async Task<FeatureRequest<Response.AnimeManga, Error.AnimeManga>> SearchAnime(bool isAnime, string[] args)
+        public static async Task<FeatureRequest<Response.AnimeManga, Error.AnimeManga>> SearchAnime(bool isAnime, string[] args, Dictionary<string, string> auth)
         {
             string searchName = Utilities.AddArgs(args);
             if (searchName.Length == 0)
                 return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.Help));
+            string token = null;
+            if (auth != null)
+            {
+                using (HttpClient hc = new HttpClient())
+                {
+                    var msg = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token");
+                    msg.Content = new FormUrlEncodedContent(auth);
+                    dynamic j = JsonConvert.DeserializeObject(await (await hc.SendAsync(msg)).Content.ReadAsStringAsync());
+                    token = j.access_token;
+                }
+            }
             dynamic json;
             using (HttpClient hc = new HttpClient())
-                json = JsonConvert.DeserializeObject(await(await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
+            {
+                hc.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                json = JsonConvert.DeserializeObject(await (await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
+            }
             if (json.data.Count == 0)
                 return (new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound));
             dynamic finalData = null;
+            string cleanUserInput = Utilities.CleanWord(searchName);
             foreach (dynamic data in json.data)
             {
-                if (data.attributes.subtype == "TV")
+                if (data.attributes.subtype == "TV" &&
+                    (ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en), cleanUserInput)
+                    || ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en_jp), cleanUserInput)
+                    || ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en_us), cleanUserInput)))
                 {
                     finalData = data.attributes;
                     break;
@@ -60,7 +87,8 @@ namespace SanaraV2.Features.Entertainment
                 startDate = finalData.startDate ?? DateTime.ParseExact((string)finalData.startDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
                 endDate = finalData.endDate ?? DateTime.ParseExact((string)finalData.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
                 ageRating = finalData.ageRatingGuide,
-                synopsis = finalData.synopsis
+                synopsis = finalData.synopsis,
+                nsfw = finalData.nsfw
             }, Error.AnimeManga.None));
         }
     }

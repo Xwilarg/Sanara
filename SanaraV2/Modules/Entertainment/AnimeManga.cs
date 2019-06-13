@@ -29,7 +29,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.SearchAnime(true, animeNameArr);
+            var result = await Features.Entertainment.AnimeManga.SearchAnime(true, animeNameArr, Program.p.kitsuAuth);
             switch (result.error)
             {
                 case Error.AnimeManga.Help:
@@ -41,7 +41,10 @@ namespace SanaraV2.Modules.Entertainment
                     break;
 
                 case Error.AnimeManga.None:
-                    await ReplyAsync("", false, CreateEmbed(true, result.answer, Context.Guild.Id));
+                    if (result.answer.nsfw && !((ITextChannel)Context.Channel).IsNsfw)
+                        await ReplyAsync(Base.Sentences.AnswerNsfw(Context.Guild.Id));
+                    else
+                        await ReplyAsync("", false, CreateEmbed(true, result.answer, Context.Guild.Id));
                     break;
 
                 default:
@@ -54,7 +57,7 @@ namespace SanaraV2.Modules.Entertainment
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.SearchAnime(false, mangaNameArr);
+            var result = await Features.Entertainment.AnimeManga.SearchAnime(false, mangaNameArr, Program.p.kitsuAuth);
             switch (result.error)
             {
                 case Error.AnimeManga.Help:
@@ -66,7 +69,10 @@ namespace SanaraV2.Modules.Entertainment
                     break;
 
                 case Error.AnimeManga.None:
-                    await ReplyAsync("", false, CreateEmbed(false, result.answer, Context.Guild.Id));
+                    if (result.answer.nsfw && !((ITextChannel)Context.Channel).IsNsfw)
+                        await ReplyAsync(Base.Sentences.AnswerNsfw(Context.Guild.Id));
+                    else
+                        await ReplyAsync("", false, CreateEmbed(false, result.answer, Context.Guild.Id));
                     break;
 
                 default:

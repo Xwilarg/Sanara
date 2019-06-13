@@ -43,6 +43,7 @@ namespace SanaraV2.Features.Entertainment
             public DateTime? endDate;
             public string ageRating;
             public string synopsis;
+            public bool nsfw;
         }
 
         public class Xkcd
