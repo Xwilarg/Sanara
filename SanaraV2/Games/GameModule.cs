@@ -107,7 +107,7 @@ namespace SanaraV2.Games
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            string error = await Program.p.gm.StartGame(Context.Guild.Id, Context.Channel.Id);
+            string error = await Program.p.gm.StartGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
             if (error != null)
                 await ReplyAsync(error);
         }

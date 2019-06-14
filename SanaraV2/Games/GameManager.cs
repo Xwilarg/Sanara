@@ -77,13 +77,15 @@ namespace SanaraV2.Games
             return Sentences.LobbyLeaved(guildId) + (game.IsLobbyEmpty() ? Environment.NewLine + Sentences.LobbyEmpty(guildId) : "");
         }
 
-        public async Task<string> StartGame(ulong guildId, ulong chanId)
+        public async Task<string> StartGame(ulong guildId, ulong chanId, ulong playerId)
         {
             AGame game = _games.Find(x => x.IsSelf(chanId));
             if (game == null)
                 return Sentences.LobbyNoWaiting(guildId);
             if (!game.IsWaitingForPlayers())
                 return Sentences.LobbyNoWaiting(guildId);
+            if (!game.IsPlayerInLobby(playerId))
+                return Sentences.LobbyAlreadyOut(guildId);
             if (!game.HaveEnoughPlayer())
                 return Sentences.LobbyNotEnoughPlayer(guildId);
             await game.Start();
