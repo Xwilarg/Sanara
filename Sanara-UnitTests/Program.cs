@@ -46,7 +46,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestAnime()
         {
-            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchAnime(true, ("Gochuumon wa Usagi desu ka?").Split(' '));
+            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchAnime(true, ("Gochuumon wa Usagi desu ka?").Split(' '), null);
             Assert.Equal(SanaraV2.Features.Entertainment.Error.AnimeManga.None, result.error);
             Assert.NotNull(result.answer);
             Assert.Equal("Gochuumon wa Usagi desu ka?", result.answer.name);

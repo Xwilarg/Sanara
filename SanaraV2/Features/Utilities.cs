@@ -70,6 +70,8 @@ namespace SanaraV2.Features
         /// <param name="word">The string to deal with</param>
         public static string CleanWord(string word)
         {
+            if (word == null)
+                return null;
             string finalStr = "";
             foreach (char c in word)
             {

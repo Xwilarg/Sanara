@@ -26,6 +26,7 @@ namespace SanaraV2.Modules.Base
         public static string OnlyMasterStr(ulong guildId) { return (Translation.GetTranslation(guildId, "onlyMaster", ownerStr)); }
         public static string OnlyOwnerStr(ulong guildId, ulong guildOwnerId) { return (Translation.GetTranslation(guildId, "onlyMaster", Program.p.client.GetGuild(guildId).GetUser(guildOwnerId).ToString())); }
         public static string ChanIsNotNsfw(ulong guildId) { return (Translation.GetTranslation(guildId, "chanIsNotNsfw")); }
+        public static string AnswerNsfw(ulong guildId) { return (Translation.GetTranslation(guildId, "answerNsfw")); }
         private static string TagNotFoundInternal(ulong guildId, string tag) { return Translation.GetTranslation(guildId, "tagNotFound", tag); }
         private static string TagsNotFoundInternal(ulong guildId, string[] tags) {
             string finalStr = string.Join(", ", tags.ToList().Take(tags.Length - 1).Select(x => "'" + x + "'"));
