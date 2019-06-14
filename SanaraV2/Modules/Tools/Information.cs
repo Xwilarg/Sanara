@@ -135,7 +135,7 @@ namespace SanaraV2.Modules.Tools
             else if (page != "" && (page == "11" || settingsModule.ToLower().Contains(page)))
             {
                 embed.Title += " (" + settingsModule + ")";
-                embed.Description = Sentences.SettingsHelp(Context.Guild.Id, Context.User.Id == Context.Guild.OwnerId, Context.User.Id == Base.Sentences.ownerId);
+                embed.Description = Sentences.SettingsHelp(Context.Guild.Id, Settings.CanModify(Context.User, Base.Sentences.ownerId), Context.User.Id == Base.Sentences.ownerId);
             }
             else if (page != "" && (page == "12" || visualNovelModule.ToLower().Contains(page)))
             {
