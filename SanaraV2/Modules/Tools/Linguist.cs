@@ -76,6 +76,12 @@ namespace SanaraV2.Modules.Tools
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            if (Context.Message.Attachments.Count > 0)
+            {
+                var list = words.ToList();
+                list.Add(Context.Message.Attachments.ToArray()[0].Url);
+                words = list.ToArray();
+            }
             var result = await Features.Tools.Linguist.Translate(words, Program.p.translationClient, Program.p.visionClient, Program.p.allLanguages);
             switch (result.error)
             {
