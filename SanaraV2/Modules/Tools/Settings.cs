@@ -75,7 +75,7 @@ namespace SanaraV2.Modules.Tools
                 string nextLanguage = Utilities.AddArgs(language);
                 string lang = Utilities.GetLanguage(nextLanguage);
                 if (lang == null)
-                    await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild.Id));
                 else
                 {
                     await p.db.SetLanguage(Context.Guild.Id, lang);
