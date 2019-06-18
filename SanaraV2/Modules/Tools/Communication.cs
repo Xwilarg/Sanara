@@ -57,12 +57,12 @@ namespace SanaraV2.Modules.Tools
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
-        public async Task Quote(string id = null)
+        public async Task Quote(params string[] id)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
-            IUser author = (id == null) ? (null) : (await Utilities.GetUser(id, Context.Guild));
-            if (id == null || author != null)
+            IUser author = (id.Length == 0) ? (null) : (await Utilities.GetUser(string.Join("", id), Context.Guild));
+            if (id.Length == 0 || author != null)
             {
                 if (author == null)
                     author = Context.User;

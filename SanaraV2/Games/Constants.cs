@@ -15,7 +15,7 @@
 
 using SanaraV2.Games.Impl;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace SanaraV2.Games
 {
@@ -23,7 +23,7 @@ namespace SanaraV2.Games
     {
         // Order in Db: Shiritori, Anime, Booru, KanColle, AzurLane
         // The order matter and must be preserved
-        public static Tuple<Type, Type, string>[] allRankedGames = new Tuple<Type, Type, string>[]
+        public static ImmutableArray<Tuple<Type, Type, string>> allRankedGames = new ImmutableArray<Tuple<Type, Type, string>>
         {
             new Tuple<Type, Type, string>(typeof(ShiritoriPreload), typeof(Shiritori), "gameModuleShiritori"),
             new Tuple<Type, Type, string>(typeof(AnimePreload), typeof(Anime), "gameModuleAnime"),
@@ -34,26 +34,26 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon")
         };
 
-        public static Tuple<Type, Type, string>[] allGames = allRankedGames;
+        public static ImmutableArray<Tuple<Type, Type, string>> allGames = allRankedGames;
 
-        public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
-        public static List<string> kanColleDictionnary = KanColle.LoadDictionnary();
-        public static Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
-        public static List<string> booruDictionnary = Booru.LoadDictionnary();
-        public static List<string> azurLaneDictionnary = AzurLane.LoadDictionnary();
-        public static List<string> fateGODictionnary = FateGO.LoadDictionnary();
-        public static List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
+        public static ImmutableList<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
+        public static ImmutableList<string> kanColleDictionnary = KanColle.LoadDictionnary();
+        public static Tuple<ImmutableList<string>, ImmutableList<string>> animeDictionnaries = Anime.LoadDictionnaries();
+        public static ImmutableList<string> booruDictionnary = Booru.LoadDictionnary();
+        public static ImmutableList<string> azurLaneDictionnary = AzurLane.LoadDictionnary();
+        public static ImmutableList<string> fateGODictionnary = FateGO.LoadDictionnary();
+        public static ImmutableList<string> pokemonDictionnary = Pokemon.LoadDictionnary();
 
-        public static Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
+        public static ImmutableArray<Tuple<Func<ulong, string>, ImmutableList<string>>> allDictionnaries = new ImmutableArray<Tuple<Func<ulong, string>, ImmutableList<string>>>
         {
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary)
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.KancolleGame, kanColleDictionnary),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.BooruGame, booruDictionnary),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.FateGOGame, fateGODictionnary),
+            new Tuple<Func<ulong, string>, ImmutableList<string>>(Sentences.PokemonGame, pokemonDictionnary)
         };
     }
 }

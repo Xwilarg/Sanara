@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -67,7 +68,7 @@ namespace SanaraV2.Games.Impl
             ));
         }
 
-        public static List<string> LoadDictionnary()
+        public static ImmutableList<string> LoadDictionnary()
         {
             List<string> pokemons = new List<string>();
             using (HttpClient hc = new HttpClient())
@@ -76,7 +77,7 @@ namespace SanaraV2.Games.Impl
                 foreach (Match m in Regex.Matches(html, "<a href=\"\\/pokedex\\/([^\"]+)\">"))
                     pokemons.Add(m.Groups[1].Value);
             }
-            return (pokemons);
+            return (pokemons.ToImmutableList());
         }
     }
 }

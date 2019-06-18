@@ -17,6 +17,7 @@ using BooruSharp.Booru;
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,7 +70,7 @@ namespace SanaraV2.Games.Impl
 
         private Sakugabooru _booru;
 
-        public static Tuple<List<string>, List<string>> LoadDictionnaries()
+        public static Tuple<ImmutableList<string>, ImmutableList<string>> LoadDictionnaries()
         {
             if (!File.Exists("Saves/AnimeTags.dat"))
                 return (null);
@@ -83,7 +84,7 @@ namespace SanaraV2.Games.Impl
                     tags.Add(line.Split(' ')[0]);
                 tagsFull.Add(line.Split(' ')[0]);
             }
-            return (new Tuple<List<string>, List<string>>(tags, tagsFull));
+            return (new Tuple<ImmutableList<string>, ImmutableList<string>>(tags.ToImmutableList(), tagsFull.ToImmutableList()));
         }
     }
 }

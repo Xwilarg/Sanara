@@ -16,7 +16,7 @@
 using Discord;
 using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +25,7 @@ namespace SanaraV2.Games
 {
     public abstract class AQuizz : AGame
     {
-        protected AQuizz(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId) : base(chan, dictionnary, config, playerId)
+        protected AQuizz(ITextChannel chan, ImmutableList<string> dictionnary, Config config, ulong playerId) : base(chan, dictionnary, config, playerId)
         { }
 
         protected override void Init()

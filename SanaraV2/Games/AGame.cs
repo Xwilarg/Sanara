@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace SanaraV2.Games
 {
     public abstract class AGame
     {
-        protected AGame(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId)
+        protected AGame(ITextChannel chan, ImmutableList<string> dictionnary, Config config, ulong playerId)
         {
             _chan = chan;
             if (dictionnary == null) // Dictionnary failed to load
