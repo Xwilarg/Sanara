@@ -283,6 +283,7 @@
     <Compile Include="Games\Impl\FateGO.cs" />
     <Compile Include="Games\Impl\KanColle.cs" />
     <Compile Include="Games\Impl\Pokemon.cs" />
+    <Compile Include="Games\Impl\Reversi.cs" />
     <Compile Include="Games\LooseException.cs" />
     <Compile Include="Games\MultiplayerLobby.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />
