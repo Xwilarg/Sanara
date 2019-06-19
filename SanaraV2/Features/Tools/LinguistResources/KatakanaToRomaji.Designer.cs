@@ -637,7 +637,7 @@ namespace SanaraV2.Features.Tools.LinguistResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to dei.
+        ///   Looks up a localized string similar to di.
         /// </summary>
         internal static string ディ {
             get {

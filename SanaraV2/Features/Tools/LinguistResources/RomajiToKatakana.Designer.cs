@@ -234,9 +234,9 @@ namespace SanaraV2.Features.Tools.LinguistResources {
         /// <summary>
         ///   Looks up a localized string similar to ディ.
         /// </summary>
-        internal static string dei {
+        internal static string di {
             get {
-                return ResourceManager.GetString("dei", resourceCulture);
+                return ResourceManager.GetString("di", resourceCulture);
             }
         }
         
