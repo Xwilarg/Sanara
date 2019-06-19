@@ -16,6 +16,7 @@
 using SanaraV2.Games.Impl;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV2.Games
 {
@@ -34,7 +35,14 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon")
         };
 
-        public static readonly Tuple<Type, Type, string>[] allGames = allRankedGames;
+        public static readonly Tuple<Type, Type, string>[] allGames = InitAllGames();
+
+        private static Tuple<Type, Type, string>[] InitAllGames()
+        {
+            List<Tuple<Type, Type, string>> allRanked = allRankedGames.ToList();
+            allRanked.Add(new Tuple<Type, Type, string>(typeof(ReversiPreload), typeof(Reversi), "gameModuleReversi"));
+            return allRanked.ToArray();
+        }
 
         public static readonly List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
         public static readonly List<string> kanColleDictionnary = KanColle.LoadDictionnary();
@@ -44,6 +52,7 @@ namespace SanaraV2.Games
         public static readonly List<string> fateGODictionnary = FateGO.LoadDictionnary();
         public static readonly List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
 
+        // Used by information module to display stats
         public static readonly Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
         {
             new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),

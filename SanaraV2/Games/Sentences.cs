@@ -27,6 +27,7 @@ namespace SanaraV2.Games
         public static string RulesBooru(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesBooru")); }
         public static string RulesAnime(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesAnime")); }
         public static string RulesPokemon(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesPokemon")); }
+        public static string RulesReversi(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesReversi")); }
         public static string RulesCharacter(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesCharacter")); }
         public static string RulesTimer(ulong guildId, int timerRef) { return (Translation.GetTranslation(guildId, "rulesTimer", timerRef.ToString())); }
         public static string RulesReset(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesReset")); }
@@ -65,6 +66,7 @@ namespace SanaraV2.Games
         public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
         public static string FateGOGame(ulong guildId) { return (Translation.GetTranslation(guildId, "fateGOGame")); }
         public static string PokemonGame(ulong guildId) { return (Translation.GetTranslation(guildId, "pokemonGame")); }
+        public static string ReversiGame(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiGame")); }
         public static string ScoreText(ulong guildId, int rank, int total, int score, int bestScore) { return (Translation.GetTranslation(guildId, "scoreText", rank.ToString(), total.ToString(), score.ToString(), bestScore.ToString())); }
         public static string ScoreContributors(ulong guildId) { return (Translation.GetTranslation(guildId, "scoreContributors")); }
         public static string NoScore(ulong guildId) { return (Translation.GetTranslation(guildId, "noScore")); }
