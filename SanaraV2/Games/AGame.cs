@@ -273,6 +273,8 @@ namespace SanaraV2.Games
                     finalStr += Environment.NewLine;
                 finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
             }
+            if (_gameState != GameState.Running)
+                return;
             if (!string.IsNullOrWhiteSpace(finalStr))
                 await PostText(finalStr);
             _score++;

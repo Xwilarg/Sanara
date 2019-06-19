@@ -78,7 +78,7 @@ namespace SanaraV2.Games
 
         public async Task<bool> LoadNames(ITextChannel chan)
         {
-            _currTurn = Program.p.rand.Next(0, _players.Count);
+            _currTurn = 0;
             List<ulong> newPlayers = new List<ulong>();
             while (_players.Count > 0)
             {
