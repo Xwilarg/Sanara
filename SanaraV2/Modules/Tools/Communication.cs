@@ -80,7 +80,7 @@ namespace SanaraV2.Modules.Tools
                 ulong uId;
                 try
                 {
-                    uId = Convert.ToUInt64(id);
+                    uId = Convert.ToUInt64(id[0]);
                 }
                 catch (FormatException)
                 {
