@@ -49,6 +49,10 @@ namespace SanaraV2.Games.Impl
             for (int i = 0; i < 8; i++)
                 for (int y = 0; y < 8; y++)
                     _board[i, y] = ' ';
+            _board[3, 3] = 'X';
+            _board[4, 4] = 'X';
+            _board[3, 4] = 'O';
+            _board[4, 3] = 'O';
             _player1 = true;
         }
 
@@ -74,9 +78,38 @@ namespace SanaraV2.Games.Impl
             case2--;
             if (_board[case2, case1] != ' ')
                 return "Can't play here";
+            bool moveValid = false;
+            for (int i = -1; i <= 1; i++)
+                for (int y = -1; y <= 1; y++)
+                {if (i == 0 && y == 0)
+                        continue;
+                    if (CheckLine(case2 + i, case1 + y, i, y, false))
+                    {
+                        moveValid = true;
+                        CheckLine(case2 + i, case1 + y, i, y, true);
+                    }
+                }
+            if (!moveValid)
+                return "You can't play here";
             _board[case2, case1] = _player1 ? 'X' : 'O';
             _player1 = !_player1;
             return null;
+        }
+
+        private bool CheckLine(int x, int y, int xMove, int yMove, bool replace)
+        {
+            if (_board[x, y] == (_player1 ? 'X' : 'O'))
+                return false;
+            while (x >= 0 && x < 8 && y >= 0 && y < 8)
+            {
+                if (_board[x, y] == (_player1 ? 'X' : 'O'))
+                    return true;
+                if (replace)
+                    _board[x, y] = _player1 ? 'X' : 'O';
+                x += xMove;
+                y += yMove;
+            }
+            return false;
         }
 
         protected override async Task<string> GetLoose()
