@@ -69,11 +69,15 @@ namespace SanaraV2.Games.Impl
         {
             if (!CanPlay())
             {
+                await PostText(GetStringFromSentence(Sentences.ReversiCantPlay));
                 _nbSkips++;
                 if (_nbSkips == 2)
                     await EndOfGame();
                 else
-                    ForceNextTurn();
+                {
+                    _player1 = !_player1;
+                    await ForceNextTurn();
+                }
             }
         }
 
@@ -113,7 +117,7 @@ namespace SanaraV2.Games.Impl
             if (IsBoardFull())
             {
                 await EndOfGame();
-                return;
+                return null;
             }
             _player1 = !_player1;
             _nbSkips = 0;
@@ -125,7 +129,7 @@ namespace SanaraV2.Games.Impl
             CalculateScore();
             if ((_scorePlayer1 > _scorePlayer2 && !_player1)
                 || (_scorePlayer1 < _scorePlayer2 && _player1))
-                ForceNextTurn();
+                await ForceNextTurn();
             await LooseAsync(GetStringFromSentence(Sentences.ReversiGameEnded));
         }
 
