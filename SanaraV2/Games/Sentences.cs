@@ -50,6 +50,11 @@ namespace SanaraV2.Games
         public static string ShiritoriNoMoreWord(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriNoMoreWord")); }
         public static string ShiritoriSuggestion(ulong guildId, string suggestionHiragana, string suggestionRomaji, string suggestionTranslation) { return (Translation.GetTranslation(guildId, "shiritoriSuggestion", suggestionHiragana, suggestionRomaji, suggestionTranslation)); }
         public static string ShiritoriExplainBegin(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriExplainBegin")); }
+        public static string ReversiFinalScore(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiFinalScore")); }
+        public static string ReversiInvalidMove(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiInvalidMove")); }
+        public static string ReversiInvalidPos(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiInvalidPos")); }
+        public static string ReversiGameEnded(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiGameEnded")); }
+        public static string ReversiCantPlay(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiCantPlay")); }
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string guessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "guessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }

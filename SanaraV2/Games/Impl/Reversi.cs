@@ -54,6 +54,8 @@ namespace SanaraV2.Games.Impl
             _board[3, 4] = 'O';
             _board[4, 3] = 'O';
             _player1 = true;
+            _scorePlayer1 = 0;
+            _scorePlayer2 = 0;
         }
 
         protected override bool CongratulateOnGuess()
@@ -68,20 +70,23 @@ namespace SanaraV2.Games.Impl
             if (move.Length == 1 && userAnswer.Length == 2)
                 move = new string[] { userAnswer[0].ToString().ToLower(), userAnswer[1].ToString().ToLower() };
             if (move.Length != 2)
-                return "Invalid move";
+                return GetStringFromSentence(Sentences.ReversiInvalidMove);
+            if (char.IsLetter(move[1][0]))
+                move = new string[] { userAnswer[1].ToString().ToLower(), userAnswer[0].ToString().ToLower() };
             int case1, case2;
             if (move[0].Length != 1 || move[0][0] < 'a' || move[0][0] > 'h')
-                return "Must be between A and H";
+                return GetStringFromSentence(Sentences.ReversiInvalidMove);
             if (!int.TryParse(move[1], out case2) || case2 < 1 || case2 > 8)
-                return "Must be between 1 and 8";
+                return GetStringFromSentence(Sentences.ReversiInvalidMove);
             case1 = move[0][0] - 'a';
             case2--;
             if (_board[case2, case1] != ' ')
-                return "Can't play here";
+                return GetStringFromSentence(Sentences.ReversiInvalidPos);
             bool moveValid = false;
             for (int i = -1; i <= 1; i++)
                 for (int y = -1; y <= 1; y++)
-                {if (i == 0 && y == 0)
+                {
+                    if (i == 0 && y == 0)
                         continue;
                     if (CheckLine(case2 + i, case1 + y, i, y, false))
                     {
@@ -90,15 +95,45 @@ namespace SanaraV2.Games.Impl
                     }
                 }
             if (!moveValid)
-                return "You can't play here";
+                return GetStringFromSentence(Sentences.ReversiInvalidPos);
             _board[case2, case1] = _player1 ? 'X' : 'O';
+            if (IsBoardFull())
+            {
+                CalculateScore();
+                if ((_scorePlayer1 > _scorePlayer2 && !_player1)
+                    || (_scorePlayer1 < _scorePlayer2 && _player1))
+                    ForceNextTurn();
+                await LooseAsync(GetStringFromSentence(Sentences.ReversiGameEnded));
+            }
             _player1 = !_player1;
             return null;
         }
 
+        private void CalculateScore()
+        {
+            for (int i = 0; i < 8; i++)
+                for (int y = 0; y < 8; y++)
+                {
+                    if (_board[i, y] == 'X')
+                        _scorePlayer1++;
+                    else if (_board[i, y] == 'O')
+                        _scorePlayer2++;
+                }
+        }
+
+        private bool IsBoardFull()
+        {
+            for (int i = 0; i < 8; i++)
+                for (int y = 0; y < 8; y++)
+                    if (_board[i, y] == ' ')
+                        return false;
+            return true;
+        }
+
         private bool CheckLine(int x, int y, int xMove, int yMove, bool replace)
         {
-            if (_board[x, y] == (_player1 ? 'X' : 'O'))
+            if (x < 0 || x >= 8 || y < 0 || y >= 8
+                || _board[x, y] != (_player1 ? 'O' : 'X'))
                 return false;
             while (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
@@ -114,7 +149,11 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string> GetLoose()
         {
-            throw new NotImplementedException();
+            if (_scorePlayer1 == 0 && _scorePlayer2 == 0)
+                CalculateScore();
+            return GetStringFromSentence(Sentences.ReversiFinalScore) + Environment.NewLine +
+                GetPlayerName(0) + ": " + _scorePlayer1 + Environment.NewLine +
+                GetPlayerName(1) + ": " + _scorePlayer2;
         }
 
         protected override async Task<string[]> GetPostAsync()
@@ -148,5 +187,8 @@ namespace SanaraV2.Games.Impl
 
         private char[,] _board; // Game board
         private bool _player1; // Is it player 1 or player 2 turn
+
+        // Used at the end of the game for scores
+        private int _scorePlayer1, _scorePlayer2;
     }
 }

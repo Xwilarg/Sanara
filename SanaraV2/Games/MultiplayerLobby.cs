@@ -94,6 +94,7 @@ namespace SanaraV2.Games
                     return false;
                 _names.Add(user.Nickname ?? user.Username);
             }
+            _allNames = new List<string>(_names).ToArray();
             return true;
         }
 
@@ -103,10 +104,14 @@ namespace SanaraV2.Games
         public string GetTurnName()
             => _names[_currTurn];
 
-        private List<ulong> _players; // Players in the lobby
-        private List<string> _names;
-        private DateTime    _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
-        private int         _currTurn; // Keep track of which turn is it
+        public string GetName(int index)
+            => _allNames[index];
+
+        private List<ulong>     _players; // Players in the lobby
+        private List<string>    _names;
+        private string[]        _allNames; // Isn't modified when a player loose
+        private DateTime        _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
+        private int             _currTurn; // Keep track of which turn is it
 
         public static readonly int lobbyTime = 15; // Seconds the lobby stay open before the game start
     }

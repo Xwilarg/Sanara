@@ -100,6 +100,9 @@ namespace SanaraV2.Games
         public bool IsLobbyEmpty()
             => _lobby.IsLobbyEmpty();
 
+        protected string GetPlayerName(int index)
+            => _lobby.GetName(index);
+
         public async Task Start()
         {
             if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself
@@ -275,6 +278,11 @@ namespace SanaraV2.Games
         protected virtual string AnnounceNextTurnInternal()
         {
             return "";
+        }
+
+        protected void ForceNextTurn()
+        {
+            _lobby.NextTurn();
         }
 
         public async Task LooseTimerAsync()
