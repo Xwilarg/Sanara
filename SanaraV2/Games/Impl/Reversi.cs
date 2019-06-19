@@ -90,6 +90,7 @@ namespace SanaraV2.Games.Impl
                     str.AppendLine("├─┼─┼─┼─┼─┼─┼─┼─┤");
             }
             str.AppendLine("└─┴─┴─┴─┴─┴─┴─┴─┘");
+            str.AppendLine("```");
             return new[] { str.ToString() };
         }
 
