@@ -35,7 +35,10 @@ namespace SanaraV2.Features.GamesInfo
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1"));
+                HttpResponseMessage msg = await hc.GetAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(string.Join("%20", args)) + "&limit=1");
+                if (msg.StatusCode == HttpStatusCode.NotFound)
+                    return new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound);
+                dynamic json = JsonConvert.DeserializeObject(await msg.Content.ReadAsStringAsync());
                 string id = json.items[0].id;
                 string url = json.items[0].url + "?action=raw";
                 name = json.items[0].title;
