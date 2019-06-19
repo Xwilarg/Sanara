@@ -31,7 +31,7 @@ namespace SanaraV2.Games
             _chan = chan;
             if (!ignoreDictionnarycheck && (dictionnary == null || dictionnary.Count < 200)) // Dictionnary failed to load
                 throw new NoDictionnaryException();
-            _dictionnary = new List<string>(dictionnary); // We create a new one to be sure to not modify the common one
+            _dictionnary = dictionnary != null ? new List<string>(dictionnary) : null; // We create a new one to be sure to not modify the common one
             _contributors = new List<ulong>();
             _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "");
             _gameName = new CultureInfo("en-US").TextInfo.ToTitleCase(config.gameName);

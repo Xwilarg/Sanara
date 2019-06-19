@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace SanaraV2.Games.Impl
 {
     public class ReversiPreload : APreload
     {
-        public ReversiPreload() : base(new[] { "reversi" }, 15, Sentences.ReversiGame)
+        public ReversiPreload() : base(new[] { "reversi" }, 60, Sentences.ReversiGame)
         { }
 
         public override bool IsNsfw()
@@ -59,37 +60,49 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
-            string[] move = userAnswer.Split(' ', ',', ';');
+            string[] move = userAnswer.ToLower().Split(' ', ',', ';');
             if (move.Length == 1 && userAnswer.Length == 2)
-                move = new string[] { userAnswer[0].ToString(), userAnswer[1].ToString() };
+                move = new string[] { userAnswer[0].ToString().ToLower(), userAnswer[1].ToString().ToLower() };
+            if (move.Length != 2)
+                return "Invalid move";
+            int case1, case2;
+            if (move[0].Length != 1 || move[0][0] < 'a' || move[0][0] > 'h')
+                return "Must be between A and H";
+            if (!int.TryParse(move[1], out case2) || case2 < 1 || case2 > 8)
+                return "Must be between 1 and 8";
+            case1 = move[0][0] - 'a';
+            case2--;
+            if (_board[case2, case1] != ' ')
+                return "Can't play here";
+            _board[case2, case1] = _player1 ? 'X' : 'O';
             _player1 = !_player1;
             return null;
         }
 
         protected override async Task<string> GetLoose()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         protected override async Task<string[]> GetPostAsync()
         {
             StringBuilder str = new StringBuilder();
             str.AppendLine("```");
-            str.AppendLine("┌─┬─┬─┬─┬─┬─┬─┬─┐");
+            str.AppendLine("  A B C D E F G H");
+            str.AppendLine(" ┌─┬─┬─┬─┬─┬─┬─┬─┐");
             for (int i = 0; i < 8; i++)
             {
-                str.Append("│");
+                str.Append((i + 1).ToString() + "│");
                 for (int y = 0; y < 8; y++)
                 {
                     str.Append(_board[i, y]);
-                    if (i != 7)
-                        str.Append("│");
+                    str.Append("│");
                 }
-                str.AppendLine("│");
+                str.AppendLine();
                 if (i != 7)
-                    str.AppendLine("├─┼─┼─┼─┼─┼─┼─┼─┤");
+                    str.AppendLine(" ├─┼─┼─┼─┼─┼─┼─┼─┤");
             }
-            str.AppendLine("└─┴─┴─┴─┴─┴─┴─┴─┘");
+            str.AppendLine(" └─┴─┴─┴─┴─┴─┴─┴─┘");
             str.AppendLine("```");
             return new[] { str.ToString() };
         }
