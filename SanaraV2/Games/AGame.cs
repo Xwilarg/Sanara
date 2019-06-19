@@ -105,6 +105,9 @@ namespace SanaraV2.Games
         protected string GetPlayerName(int index)
             => _lobby.GetName(index);
 
+        protected string GetTurnName()
+            => _lobby.GetTurnName();
+
         public async Task Start()
         {
             if (_gameState != GameState.WaitingForPlayers) // In case someone use the 'Start' command right when the game was about to be launched by itself

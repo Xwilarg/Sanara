@@ -67,9 +67,11 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task NextTurnInternal()
         {
+            if (_nbSkips == 2)
+                return;
             if (!CanPlay())
             {
-                await PostText(GetStringFromSentence(Sentences.ReversiCantPlay));
+                await PostText((_nbSkips == 0 ? (await GetPostAsync())[0] + Environment.NewLine : "") + Sentences.ReversiCantPlay(GetGuildId(), GetTurnName()));
                 _nbSkips++;
                 if (_nbSkips == 2)
                     await EndOfGame();
@@ -127,8 +129,8 @@ namespace SanaraV2.Games.Impl
         private async Task EndOfGame()
         {
             CalculateScore();
-            if ((_scorePlayer1 > _scorePlayer2 && !_player1)
-                || (_scorePlayer1 < _scorePlayer2 && _player1))
+            if ((_scorePlayer1 < _scorePlayer2 && !_player1)
+                || (_scorePlayer1 > _scorePlayer2 && _player1))
                 await ForceNextTurn();
             await LooseAsync(GetStringFromSentence(Sentences.ReversiGameEnded));
         }

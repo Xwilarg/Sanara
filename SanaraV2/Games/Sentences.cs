@@ -54,7 +54,7 @@ namespace SanaraV2.Games
         public static string ReversiInvalidMove(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiInvalidMove")); }
         public static string ReversiInvalidPos(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiInvalidPos")); }
         public static string ReversiGameEnded(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiGameEnded")); }
-        public static string ReversiCantPlay(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiCantPlay")); }
+        public static string ReversiCantPlay(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "reversiCantPlay", name)); }
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string guessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "guessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
@@ -103,7 +103,7 @@ namespace SanaraV2.Games
         public static string LobbyNotEnoughPlayerFatal(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayerFatal")); }
         public static string LobbyNotEnoughPlayer(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyNotEnoughPlayer")); }
         public static string Participants(ulong guildId) { return (Translation.GetTranslation(guildId, "participants")); }
-        public static string AnnounceTurn(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "annouceTurn", name)); }
+        public static string AnnounceTurn(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "announceTurn", name)); }
         public static string AnnounceTurnError(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "announceTurnError", name)); }
         public static string LobbyLeftChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "lobbyLeftChannel")); }
         public static string YouLost(ulong guildId) { return (Translation.GetTranslation(guildId, "youLost")); }
