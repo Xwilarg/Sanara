@@ -23,7 +23,7 @@ namespace SanaraV2.Games
     {
         // Order in Db: Shiritori, Anime, Booru, KanColle, AzurLane
         // The order matter and must be preserved
-        public static Tuple<Type, Type, string>[] allRankedGames = new Tuple<Type, Type, string>[]
+        public static readonly Tuple<Type, Type, string>[] allRankedGames = new Tuple<Type, Type, string>[]
         {
             new Tuple<Type, Type, string>(typeof(ShiritoriPreload), typeof(Shiritori), "gameModuleShiritori"),
             new Tuple<Type, Type, string>(typeof(AnimePreload), typeof(Anime), "gameModuleAnime"),
@@ -34,17 +34,17 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon")
         };
 
-        public static Tuple<Type, Type, string>[] allGames = allRankedGames;
+        public static readonly Tuple<Type, Type, string>[] allGames = allRankedGames;
 
-        public static List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
-        public static List<string> kanColleDictionnary = KanColle.LoadDictionnary();
-        public static Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
-        public static List<string> booruDictionnary = Booru.LoadDictionnary();
-        public static List<string> azurLaneDictionnary = AzurLane.LoadDictionnary();
-        public static List<string> fateGODictionnary = FateGO.LoadDictionnary();
-        public static List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
+        public static readonly List<string> shiritoriDictionnary = Shiritori.LoadDictionnary();
+        public static readonly List<string> kanColleDictionnary = KanColle.LoadDictionnary();
+        public static readonly Tuple<List<string>, List<string>> animeDictionnaries = Anime.LoadDictionnaries();
+        public static readonly List<string> booruDictionnary = Booru.LoadDictionnary();
+        public static readonly List<string> azurLaneDictionnary = AzurLane.LoadDictionnary();
+        public static readonly List<string> fateGODictionnary = FateGO.LoadDictionnary();
+        public static readonly List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
 
-        public static Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
+        public static readonly Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
         {
             new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),

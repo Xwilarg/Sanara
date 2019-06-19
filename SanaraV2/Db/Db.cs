@@ -34,7 +34,10 @@ namespace SanaraV2.Db
             Availability = new Dictionary<ulong, string>();
         }
 
-        public async Task InitAsync(string dbName = "Sanara")
+        public async Task InitAsync()
+            => await InitAsync("Sanara");
+
+        public async Task InitAsync(string dbName)
         {
             this.dbName = dbName;
             conn = await R.Connection().ConnectAsync();

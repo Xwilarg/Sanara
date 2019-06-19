@@ -184,7 +184,7 @@ namespace SanaraV2
 
             if (sendStats)
             {
-                var task = Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     for (;;)
                     {

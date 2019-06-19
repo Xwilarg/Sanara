@@ -82,14 +82,14 @@ namespace SanaraV2.Modules.Base
                     }
                     return await guild.GetUserAsync(Convert.ToUInt64(val));
                 }
-                catch (Exception)
+                catch (Exception) // Error while parsing user ID
                 { }
             }
             try
             {
                 return await guild.GetUserAsync(Convert.ToUInt64(name));
             }
-            catch (Exception)
+            catch (Exception) // Error while parsing user ID
             { }
             foreach (IGuildUser user in await guild.GetUsersAsync())
             {

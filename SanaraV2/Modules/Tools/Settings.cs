@@ -75,7 +75,7 @@ namespace SanaraV2.Modules.Tools
                 string nextLanguage = Utilities.AddArgs(language);
                 string lang = Utilities.GetLanguage(nextLanguage);
                 if (lang == null)
-                    await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild.Id));
                 else
                 {
                     await p.db.SetLanguage(Context.Guild.Id, lang);
@@ -123,7 +123,7 @@ namespace SanaraV2.Modules.Tools
         }
 
         [Command("Exit"), Summary("Leave the server")]
-        public async Task Exit(string serverName = null)
+        public async Task Exit(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
@@ -132,10 +132,11 @@ namespace SanaraV2.Modules.Tools
             }
             else
             {
-                if (serverName == null)
+                if (args.Length == 0)
                     await Context.Guild.LeaveAsync();
                 else
                 {
+                    string serverName = string.Join(" ", args);
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
                     if (g == null)
                         await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
@@ -149,7 +150,7 @@ namespace SanaraV2.Modules.Tools
         }
 
         [Command("ResetDb")]
-        public async Task ResetDb(string serverName = null)
+        public async Task ResetDb(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
@@ -158,13 +159,14 @@ namespace SanaraV2.Modules.Tools
             }
             else
             {
-                if (serverName == null)
+                if (args.Length == 0)
                 {
                     await Program.p.db.ResetGuild(Context.Guild.Id);
                     await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
                 }
                 else
                 {
+                    string serverName = string.Join(" ", args);
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
                     if (g == null)
                         await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
