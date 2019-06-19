@@ -17,7 +17,6 @@ using Discord;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -69,7 +68,7 @@ namespace SanaraV2.Games.Impl
             }
         }
 
-        public static ImmutableList<string> LoadDictionnary()
+        public static List<string> LoadDictionnary()
         {
             List<string> ships = new List<string>();
             using (HttpClient hc = new HttpClient())
@@ -85,7 +84,7 @@ namespace SanaraV2.Games.Impl
                         ships.Add(str);
                 }
             }
-            return (ships.ToImmutableList());
+            return (ships);
         }
     }
 }

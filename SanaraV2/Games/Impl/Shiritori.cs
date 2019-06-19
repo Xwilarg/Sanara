@@ -19,7 +19,6 @@ using Newtonsoft.Json.Linq;
 using SanaraV2.Features.Tools;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -200,11 +199,11 @@ namespace SanaraV2.Games.Impl
         private List<string>    _alreadySaid; // We make sure that the user don't say the same word twice
         private string          _currWord; // The current word
 
-        public static ImmutableList<string> LoadDictionnary()
+        public static List<string> LoadDictionnary()
         {
             if (!File.Exists("Saves/shiritoriWords.dat"))
                 return (null);
-            return (File.ReadAllLines("Saves/shiritoriWords.dat").ToImmutableList());
+            return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
         }
 
         private string _endTurnMsg;

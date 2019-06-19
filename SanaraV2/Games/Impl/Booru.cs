@@ -17,7 +17,6 @@ using BooruSharp.Booru;
 using Discord;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -70,7 +69,7 @@ namespace SanaraV2.Games.Impl
 
         private Gelbooru _booru;
 
-        public static ImmutableList<string> LoadDictionnary()
+        public static List<string> LoadDictionnary()
         {
             if (!File.Exists("Saves/BooruTriviaTags.dat"))
                 return (null);
@@ -82,7 +81,7 @@ namespace SanaraV2.Games.Impl
                 if (Convert.ToInt32(linePart[1]) >= 3)
                     tags.Add(linePart[0]);
             }
-            return (tags.ToImmutableList());
+            return (tags);
         }
     }
 }
