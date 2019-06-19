@@ -62,6 +62,8 @@ namespace SanaraV2.Games
         protected abstract string Help(); // null is no help
         protected virtual int? GetMaximumMultiplayer() // Maximum number of player if the game allow multiplayer
             => null;
+        protected virtual async Task NextTurnInternal() // Called at each turn in case the game want to check something, only for multiplayer games
+        { }
 
         public string GetName()
             => _gameName;
@@ -263,7 +265,7 @@ namespace SanaraV2.Games
                 finalStr += Sentences.GuessGood(_chan.GuildId);
             if (HaveMultiplayerLobby())
             {
-                _lobby.NextTurn();
+                await NextTurn();
                 if (finalStr != "")
                     finalStr += Environment.NewLine;
                 finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
@@ -280,9 +282,15 @@ namespace SanaraV2.Games
             return "";
         }
 
-        protected void ForceNextTurn()
+        protected async Task ForceNextTurn()
+        {
+            await NextTurn();
+        }
+
+        private async Task NextTurn()
         {
             _lobby.NextTurn();
+            await NextTurnInternal();
         }
 
         public async Task LooseTimerAsync()

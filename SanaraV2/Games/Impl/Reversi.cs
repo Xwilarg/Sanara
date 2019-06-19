@@ -56,6 +56,7 @@ namespace SanaraV2.Games.Impl
             _player1 = true;
             _scorePlayer1 = 0;
             _scorePlayer2 = 0;
+            _nbSkips = 0;
         }
 
         protected override bool CongratulateOnGuess()
@@ -63,6 +64,18 @@ namespace SanaraV2.Games.Impl
 
         protected override int? GetMaximumMultiplayer()
             => 2;
+
+        protected override async Task NextTurnInternal()
+        {
+            if (!CanPlay())
+            {
+                _nbSkips++;
+                if (_nbSkips == 2)
+                    await EndOfGame();
+                else
+                    ForceNextTurn();
+            }
+        }
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
@@ -99,14 +112,37 @@ namespace SanaraV2.Games.Impl
             _board[case2, case1] = _player1 ? 'X' : 'O';
             if (IsBoardFull())
             {
-                CalculateScore();
-                if ((_scorePlayer1 > _scorePlayer2 && !_player1)
-                    || (_scorePlayer1 < _scorePlayer2 && _player1))
-                    ForceNextTurn();
-                await LooseAsync(GetStringFromSentence(Sentences.ReversiGameEnded));
+                await EndOfGame();
+                return;
             }
             _player1 = !_player1;
+            _nbSkips = 0;
             return null;
+        }
+
+        private async Task EndOfGame()
+        {
+            CalculateScore();
+            if ((_scorePlayer1 > _scorePlayer2 && !_player1)
+                || (_scorePlayer1 < _scorePlayer2 && _player1))
+                ForceNextTurn();
+            await LooseAsync(GetStringFromSentence(Sentences.ReversiGameEnded));
+        }
+
+        // There is probably a better way to do that
+        private bool CanPlay()
+        {
+            for (int xPos = 0; xPos < 8; xPos++)
+                for (int yPos = 0; yPos < 8; yPos++)
+                    for (int i = -1; i <= 1; i++)
+                        for (int y = -1; y <= 1; y++)
+                        {
+                            if (i == 0 && y == 0)
+                                continue;
+                            if (CheckLine(xPos + i, yPos + y, i, y, false))
+                                return true;
+                        }
+            return false;
         }
 
         private void CalculateScore()
@@ -187,6 +223,7 @@ namespace SanaraV2.Games.Impl
 
         private char[,] _board; // Game board
         private bool _player1; // Is it player 1 or player 2 turn
+        private int _nbSkips; // If 2 skips in a row, end of game
 
         // Used at the end of the game for scores
         private int _scorePlayer1, _scorePlayer2;
