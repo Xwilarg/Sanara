@@ -66,8 +66,21 @@ namespace Sanara_UnitTests
         public async Task TestDoujinshi()
         {
            var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
-            Assert.Equal(SanaraV2.Features.NSFW.Error.Doujinshi.None, result.error);
+            Assert.Equal(Error.Doujinshi.None, result.error);
             Assert.True(IsLinkValid(result.answer.url));
+            Assert.True(IsLinkValid(result.answer.imageUrl));
+            Assert.Contains("full color", result.answer.tags);
+            Assert.Contains("english", result.answer.tags);
+        }
+
+        [Fact]
+        public async Task TestCosplay()
+        {
+            var result = await Doujinshi.SearchCosplay(false, new string[] { "kantai", "collection" }, new Random());
+            Assert.Equal(Error.Doujinshi.None, result.error);
+            Assert.True(IsLinkValid(result.answer.url));
+            Assert.True(IsLinkValid(result.answer.imageUrl));
+            Assert.Contains("kantai collection", result.answer.tags);
         }
 
         // GAMES INFO
