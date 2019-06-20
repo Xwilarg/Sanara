@@ -237,6 +237,11 @@ namespace SanaraV2.Modules.Tools
                 yes++;
             else
                 no++;
+            embed.AddField("Anime/Manga Module - NSFW", "**Kitsu logins:** " + (p.kitsuAuth != null ? "Yes" : "No"));
+            if (p.kitsuAuth != null)
+                yes++;
+            else
+                no++;
             if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube))
             {
                 embed.AddField("YouTube Module", "**YouTube API key:** " + ((p.youtubeService != null) ? ("Yes") : ("No")));
