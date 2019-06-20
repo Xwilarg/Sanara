@@ -57,6 +57,7 @@ namespace SanaraV2.Games.Impl
             _scorePlayer1 = 0;
             _scorePlayer2 = 0;
             _nbSkips = 0;
+            _firstTurn = true;
         }
 
         protected override bool CongratulateOnGuess()
@@ -201,6 +202,8 @@ namespace SanaraV2.Games.Impl
         protected override async Task<string[]> GetPostAsync()
         {
             StringBuilder str = new StringBuilder();
+            _firstTurn = false;
+            str.AppendLine(Sentences.ReversiIntro(GetGuildId(), GetTurnName()));
             str.AppendLine("```");
             str.AppendLine("  A B C D E F G H");
             str.AppendLine(" ┌─┬─┬─┬─┬─┬─┬─┬─┐");
@@ -230,6 +233,7 @@ namespace SanaraV2.Games.Impl
         private char[,] _board; // Game board
         private bool _player1; // Is it player 1 or player 2 turn
         private int _nbSkips; // If 2 skips in a row, end of game
+        private bool _firstTurn;
 
         // Used at the end of the game for scores
         private int _scorePlayer1, _scorePlayer2;

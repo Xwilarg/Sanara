@@ -55,6 +55,7 @@ namespace SanaraV2.Games
         public static string ReversiInvalidPos(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiInvalidPos")); }
         public static string ReversiGameEnded(ulong guildId) { return (Translation.GetTranslation(guildId, "reversiGameEnded")); }
         public static string ReversiCantPlay(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "reversiCantPlay", name)); }
+        public static string ReversiIntro(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "reversiIntro", name)); }
         public static string WaitImage(ulong guildId) { return (Translation.GetTranslation(guildId, "waitImage")); }
         public static string guessDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "guessDontExist")); }
         public static string GuessGood(ulong guildId) { return (Translation.GetTranslation(guildId, "guessGood")); }
