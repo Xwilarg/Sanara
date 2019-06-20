@@ -70,16 +70,6 @@ namespace Sanara_UnitTests
             Assert.True(IsLinkValid(result.answer.url));
         }
 
-        // BOORU MODULE
-        [Fact]
-        public async Task TestBooruSafe()
-        {
-            var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
-            Assert.Equal(Error.Booru.None, result.error);
-            Assert.Equal(Color.Green, result.answer.colorRating);
-            Assert.True(IsLinkValid(result.answer.url));
-        }
-
         // GAMES INFO
         [Fact]
         public async Task TestKancolleCharac()
@@ -171,6 +161,16 @@ namespace Sanara_UnitTests
             }
         }
 
+        // BOORU MODULE
+        [Fact]
+        public async Task TestBooruSafe()
+        {
+            var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
+            Assert.Equal(Error.Booru.None, result.error);
+            Assert.Equal(Color.Green, result.answer.colorRating);
+            Assert.True(IsLinkValid(result.answer.url));
+        }
+
         [Fact]
         public async Task TestBooruNotSafe()
         {
@@ -191,6 +191,19 @@ namespace Sanara_UnitTests
             Assert.Contains("hibiki_(kantai_collection)", resultTags.answer.characTags);
             Assert.Contains("kantai_collection", resultTags.answer.sourceTags);
             Assert.Equal("Gelbooru", resultTags.answer.booruName);
+        }
+
+
+        [Fact]
+        public async Task TestBooruTypo()
+        {
+            BooruSharp.Booru.Gelbooru booru = new BooruSharp.Booru.Gelbooru();
+            Random rand = new Random();
+            var resultSearch = await Booru.SearchBooru(false, new string[] { "tsutsukakushi_tsuki" }, booru, rand);
+            Assert.Equal(Error.Booru.None, resultSearch.error);
+            var resultTags = await Booru.SearchTags(new string[] { resultSearch.answer.saveId.ToString() });
+            Assert.Equal(Error.BooruTags.None, resultTags.error);
+            Assert.Contains("tsutsukakushi_tsukiko", resultTags.answer.characTags);
         }
 
         [SkipIfNoToken]
