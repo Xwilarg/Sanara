@@ -145,6 +145,21 @@ namespace Sanara_UnitTests
             Assert.NotEmpty(result.answer.explanations[2].Item2);
         }
 
+        [Theory]
+        [InlineData(new[] { "255", "0", "0" }, 255, 0, 0, "FF0000", "Red")]
+        [InlineData(new[] { "D2B48C" }, 210, 180, 140, "D2B48C", "Tan")]
+        public async Task TestColor(string[] original, byte red, byte green, byte blue, string hexa, string name)
+        {
+            var result = await SanaraV2.Features.Tools.Code.SearchColor(original);
+            Assert.Equal(SanaraV2.Features.Tools.Error.Image.None, result.error);
+            Assert.Equal(red, result.answer.discordColor.R);
+            Assert.Equal(green, result.answer.discordColor.G);
+            Assert.Equal(blue, result.answer.discordColor.B);
+            Assert.Equal(hexa, result.answer.colorHex);
+            Assert.Equal(name, result.answer.name);
+            Assert.True(IsLinkValid(result.answer.colorUrl));
+        }
+
         // GAMES MODULE
         [Fact]
         public async Task TestGames()
