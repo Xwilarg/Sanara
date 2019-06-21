@@ -126,12 +126,9 @@ namespace SanaraV2.Modules.Entertainment
                 await m_msgChan.SendMessageAsync("", false, new EmbedBuilder()
                 {
                     Title = m_musics[0].title,
+                    Url = m_musics[0].url,
                     ImageUrl = m_musics[0].imageUrl,
-                    Color = Color.Blue,
-                    Footer = new EmbedFooterBuilder()
-                    {
-                        Text = m_musics[0].url
-                    }
+                    Color = Color.Blue
                 }.Build());
                 if (!File.Exists("ffmpeg.exe"))
                     throw new FileNotFoundException("ffmpeg.exe was not found. Please put it near the bot executable.");
