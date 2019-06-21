@@ -31,13 +31,14 @@ namespace SanaraV2.Modules.Entertainment
 
         public class Song
         {
-            public Song(string mpath, string mtitle, string murl, string mimageUrl)
+            public Song(string mpath, string mtitle, string murl, string mimageUrl, string mrequester)
             {
                 path = mpath;
                 title = mtitle;
                 url = murl;
                 downloading = true;
                 imageUrl = mimageUrl;
+                requester = mrequester;
             }
 
             public string path;
@@ -45,6 +46,7 @@ namespace SanaraV2.Modules.Entertainment
             public string url;
             public bool downloading;
             public string imageUrl;
+            public string requester;
         }
 
         public class RadioChannel
@@ -81,9 +83,9 @@ namespace SanaraV2.Modules.Entertainment
                 return (m_musics.Any(x => x.url == url));
             }
 
-            public void AddMusic(string path, string title, string url, string imageUrl)
+            public void AddMusic(string path, string title, string url, string imageUrl, string requester)
             {
-                m_musics.Add(new Song(path, title, url, imageUrl));
+                m_musics.Add(new Song(path, title, url, imageUrl, requester));
             }
 
             public async Task<bool> Skip(IMessageChannel chan)
@@ -108,9 +110,9 @@ namespace SanaraV2.Modules.Entertainment
             {
                 if (m_process == null || m_process.HasExited)
                     return Sentences.RadioNoSong(guildId);
-                string finalStr = "🎵 " + Sentences.Current(guildId) + " " + m_musics[0].title + Environment.NewLine;
+                string finalStr = "🎵 " + Sentences.Current(guildId) + " " + m_musics[0].title + " requested by " + m_musics[0].requester + Environment.NewLine;
                 for (int i = 1; i < m_musics.Count; i++)
-                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + Environment.NewLine;
+                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + " requested by " + m_musics[0].requester + Environment.NewLine;
                 return finalStr;
             }
 
@@ -128,7 +130,11 @@ namespace SanaraV2.Modules.Entertainment
                     Title = m_musics[0].title,
                     Url = m_musics[0].url,
                     ImageUrl = m_musics[0].imageUrl,
-                    Color = Color.Blue
+                    Color = Color.Blue,
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = "Requested by " + m_musics[0].requester
+                    }
                 }.Build());
                 if (!File.Exists("ffmpeg.exe"))
                     throw new FileNotFoundException("ffmpeg.exe was not found. Please put it near the bot executable.");
@@ -208,7 +214,7 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     await ReplyAsync(Sentences.SongAdded(Context.Guild.Id, result.answer.name));
                     string fileName = "Saves/Radio/" + radio.m_guildId + "/" + Utilities.CleanWord(result.answer.name) + ".mp3";
-                    radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl);
+                    radio.AddMusic(fileName, result.answer.name, result.answer.url, result.answer.imageUrl, Context.User.ToString());
                     ProcessStartInfo youtubeDownload = new ProcessStartInfo()
                     {
                         FileName = "youtube-dl",
