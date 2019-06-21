@@ -84,15 +84,15 @@ namespace SanaraV2.Features.Tools
             return input;
         }
 
-        public static async Task<FeatureRequest<Response.Image, Error.Image>> SearchColor(string[] args)
+        public static async Task<FeatureRequest<Response.Image, Error.Image>> SearchColor(string[] args, Random r)
         {
-            if (args.Length == 0)
-                return new FeatureRequest<Response.Image, Error.Image>(null, Error.Image.InvalidArg);
             string color = Utilities.AddArgs(args);
-            if (color[0] == '#')
+            if (color.Length > 1 && color[0] == '#')
                 color = color.Substring(1);
             Color? finalColor;
-            if (color.Length == 6 || color.Length == 3)
+            if (color.Length == 0)
+                finalColor = Color.FromArgb(r.Next(0, 256), r.Next(0, 256), r.Next(0, 256));
+            else if (color.Length == 6 || color.Length == 3)
             {
                 try
                 {

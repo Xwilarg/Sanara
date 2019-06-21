@@ -153,7 +153,7 @@ namespace Sanara_UnitTests
         [InlineData(new[] { "D2B48C" }, 210, 180, 140, "D2B48C", "Tan")]
         public async Task TestColor(string[] original, byte red, byte green, byte blue, string hexa, string name)
         {
-            var result = await SanaraV2.Features.Tools.Code.SearchColor(original);
+            var result = await SanaraV2.Features.Tools.Code.SearchColor(original, new Random());
             Assert.Equal(SanaraV2.Features.Tools.Error.Image.None, result.error);
             Assert.Equal(red, result.answer.discordColor.R);
             Assert.Equal(green, result.answer.discordColor.G);

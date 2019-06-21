@@ -60,7 +60,7 @@ namespace SanaraV2.Modules.Tools
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
-            var result = await Features.Tools.Code.SearchColor(args);
+            var result = await Features.Tools.Code.SearchColor(args, Program.p.rand);
             switch (result.error)
             {
                 case Features.Tools.Error.Image.InvalidArg:
