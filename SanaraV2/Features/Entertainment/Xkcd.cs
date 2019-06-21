@@ -24,13 +24,19 @@ namespace SanaraV2.Features.Entertainment
         public static async Task<FeatureRequest<Response.Xkcd, Error.Xkcd>> SearchXkcd(string[] args, Random r)
         {
             int? myNb = null;
+            bool isLast = false;
             if (args.Length > 0)
             {
-                int tmp;
-                if (int.TryParse(Utilities.AddArgs(args), out tmp))
-                    myNb = tmp;
+                if (args[0].ToLower() == "last")
+                    isLast = true;
                 else
-                    return new FeatureRequest<Response.Xkcd, Error.Xkcd>(null, Error.Xkcd.InvalidNumber);
+                {
+                    int tmp;
+                    if (int.TryParse(Utilities.AddArgs(args), out tmp))
+                        myNb = tmp;
+                    else
+                        return new FeatureRequest<Response.Xkcd, Error.Xkcd>(null, Error.Xkcd.InvalidNumber);
+                }
             }
             dynamic json;
             int max;
@@ -38,6 +44,8 @@ namespace SanaraV2.Features.Entertainment
             {
                 json = JsonConvert.DeserializeObject(await (await hc.GetAsync("https://xkcd.com/info.0.json")).Content.ReadAsStringAsync());
                 max = json.num;
+                if (isLast)
+                    myNb = max;
                 if (myNb > max || myNb <= 0)
                     return (new FeatureRequest<Response.Xkcd, Error.Xkcd>(new Response.Xkcd() { maxNb = max }, Error.Xkcd.NotFound));
                 if (myNb == null)
