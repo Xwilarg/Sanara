@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
@@ -77,36 +78,47 @@ namespace SanaraV2.Modules.Tools
             }
             else
             {
-                ulong uId;
-                try
+                IMessage msg = null;
+                Match url = Regex.Match(id[0], "https:\\/\\/discordapp.com\\/channels\\/" + Context.Guild.Id + "\\/([0-9]{18})\\/([0-9]{18})");
+                if (url.Success)
                 {
-                    uId = Convert.ToUInt64(id[0]);
+                    ulong idChan, idMsg;
+                    if (ulong.TryParse(url.Groups[1].Value, out idChan) && ulong.TryParse(url.Groups[2].Value, out idMsg))
+                        msg = await (await Context.Guild.GetTextChannelAsync(idChan))?.GetMessageAsync(idMsg);
                 }
-                catch (FormatException)
+                else
                 {
-                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
-                    return;
-                }
-                catch (OverflowException)
-                {
-                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
-                    return;
-                }
-                IMessage msg = await Context.Channel.GetMessageAsync(uId);
-                if (msg == null)
-                {
-                    foreach (IGuildChannel chan in await Context.Guild.GetChannelsAsync())
+                    ulong uId;
+                    try
                     {
-                        try
+                        uId = Convert.ToUInt64(id[0]);
+                    }
+                    catch (FormatException)
+                    {
+                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                        return;
+                    }
+                    catch (OverflowException)
+                    {
+                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                        return;
+                    }
+                    msg = await Context.Channel.GetMessageAsync(uId);
+                    if (msg == null)
+                    {
+                        foreach (IGuildChannel chan in await Context.Guild.GetChannelsAsync())
                         {
-                            ITextChannel textChan = chan as ITextChannel;
-                            if (textChan == null)
-                                continue;
-                            msg = await textChan.GetMessageAsync(uId);
-                            if (msg != null)
-                                break;
+                            try
+                            {
+                                ITextChannel textChan = chan as ITextChannel;
+                                if (textChan == null)
+                                    continue;
+                                msg = await textChan.GetMessageAsync(uId);
+                                if (msg != null)
+                                    break;
+                            }
+                            catch (HttpException) { }
                         }
-                        catch (HttpException) { }
                     }
                 }
                 if (msg == null)
