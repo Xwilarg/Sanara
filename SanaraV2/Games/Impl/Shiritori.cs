@@ -97,7 +97,7 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
-            userAnswer = Linguist.ToHiragana(userAnswer);
+            userAnswer = ReplaceLocalString(Linguist.ToHiragana(userAnswer));
             if (_currWord == null) // Multiplayer only
             {
                 if (userAnswer != "しりとり")
@@ -121,7 +121,7 @@ namespace SanaraV2.Games.Impl
             {
                 foreach (dynamic jp in s.japanese)
                 {
-                    reading = Linguist.ToHiragana((string)jp.reading);
+                    reading = ReplaceLocalString(Linguist.ToHiragana((string)jp.reading));
                     if (reading == userAnswer)
                     {
                         isCorrect = true;
@@ -144,7 +144,7 @@ namespace SanaraV2.Games.Impl
             if (!isCorrect)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             string lastCharac = GetLastCharacter(_currWord);
-            if (!userAnswer.StartsWith(GetLastCharacter(_currWord)))
+            if (!userAnswer.StartsWith(ReplaceLocalString(GetLastCharacter(_currWord))))
                 return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (!isNoun)
                 return GetStringFromSentence(Sentences.ShiritoriNotNoun);
@@ -168,6 +168,9 @@ namespace SanaraV2.Games.Impl
             _currWord = userAnswer;
             return null;
         }
+
+        private string ReplaceLocalString(string input)
+            => input.Replace('ぢ', 'じ'); // We do that because both characters are pronounced the same way
 
         protected override async Task<string> GetLoose()
         {
