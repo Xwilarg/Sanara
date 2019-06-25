@@ -121,7 +121,10 @@ namespace SanaraV2.Games.Impl
             {
                 foreach (dynamic jp in s.japanese)
                 {
-                    reading = ReplaceLocalString(Linguist.ToHiragana((string)jp.reading));
+                    reading = Linguist.ToHiragana((string)jp.reading);
+                    if (reading == null)
+                        continue;
+                    reading = ReplaceLocalString(reading);
                     if (reading == userAnswer)
                     {
                         isCorrect = true;
