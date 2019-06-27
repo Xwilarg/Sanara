@@ -97,17 +97,17 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
-            userAnswer = ReplaceLocalString(Linguist.ToHiragana(userAnswer));
+            string hiraganaAnswer = ReplaceLocalString(Linguist.ToHiragana(userAnswer));
             if (_currWord == null) // Multiplayer only
             {
-                if (userAnswer != "しりとり")
+                if (hiraganaAnswer != "しりとり")
                     return GetStringFromSentence(Sentences.ShiritoriExplainBegin);
                 _currWord = "しりとり";
                 _alreadySaid.Add(_currWord);
                 _dictionnary.Remove(_dictionnary.Find(x => x.Split('$')[0] == _currWord));
                 return null;
             }
-            if (userAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
+            if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 return GetStringFromSentence(Sentences.OnlyHiraganaKatakanaRomaji);
             dynamic json;
             using (HttpClient hc = new HttpClient())
@@ -125,7 +125,7 @@ namespace SanaraV2.Games.Impl
                     if (reading == null)
                         continue;
                     reading = ReplaceLocalString(reading);
-                    if (reading == userAnswer)
+                    if (reading == hiraganaAnswer)
                     {
                         isCorrect = true;
                         foreach (dynamic meaning in s.senses)
@@ -147,28 +147,28 @@ namespace SanaraV2.Games.Impl
             if (!isCorrect)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             string lastCharac = GetLastCharacter(_currWord);
-            if (!userAnswer.StartsWith(ReplaceLocalString(GetLastCharacter(_currWord))))
+            if (!hiraganaAnswer.StartsWith(ReplaceLocalString(GetLastCharacter(_currWord))))
                 return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (!isNoun)
                 return GetStringFromSentence(Sentences.ShiritoriNotNoun);
-            if (GetLastCharacter(userAnswer) == userAnswer)
+            if (GetLastCharacter(hiraganaAnswer) == hiraganaAnswer)
                 return GetStringFromSentence(Sentences.ShiritoriTooSmall);
-            if (_alreadySaid.Contains(userAnswer))
+            if (_alreadySaid.Contains(hiraganaAnswer))
             {
                 await LooseAsync(GetStringFromSentence(Sentences.ShiritoriAlreadySaid));
                 return "";
             }
-            if (userAnswer.Last() == 'ん')
+            if (hiraganaAnswer.Last() == 'ん')
             {
                 await LooseAsync(GetStringFromSentence(Sentences.ShiritoriEndWithN));
                 return "";
             }
-            var elem = _dictionnary.Find(x => x.Split('$')[0] == userAnswer);
+            var elem = _dictionnary.Find(x => x.Split('$')[0] == hiraganaAnswer);
             if (HaveMultiplayerLobby())
-                _endTurnMsg = userAnswer + " (" + Linguist.ToRomaji(userAnswer) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + string.Join(", ", meanings.Select(x => "\"" + x + "\""));
+                _endTurnMsg = hiraganaAnswer + " (" + Linguist.ToRomaji(hiraganaAnswer) + ") - " + GetStringFromSentence(Sentences.Meaning) + ": " + string.Join(", ", meanings.Select(x => "\"" + x + "\""));
             _dictionnary.Remove(elem);
-            _alreadySaid.Add(userAnswer);
-            _currWord = userAnswer;
+            _alreadySaid.Add(hiraganaAnswer);
+            _currWord = hiraganaAnswer;
             return null;
         }
 
