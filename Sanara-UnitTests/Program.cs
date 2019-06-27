@@ -123,7 +123,7 @@ namespace Sanara_UnitTests
         [InlineData("neko", "ネコ", "ねこ", "neko")]
         [InlineData("sasayaki", "ササヤキ", "ささやき", "sasayaki")]
         [InlineData("くま", "クマ", "くま", "kuma")]
-        [InlineData("ローマじ", "ローマジ", "ろうまじ", "roumaji")]
+        [InlineData("ローマじ", "ロマジ", "ろまじ", "romaji")]
         public void TestLinguistic(string original, string katakana, string hiragana, string romaji)
         {
             Assert.Equal(hiragana, SanaraV2.Features.Tools.Linguist.ToHiragana(original));
