@@ -218,8 +218,8 @@ namespace SanaraV2.Features.Tools
                 char next = ((i < name.Length - 1) ? (name[i + 1]) : (' '));
                 if (curr == 'ッ')
                     doubleVoy = 2;
-                else if (curr == 'ー' && finalStr.Length > 0)
-                    finalName += GetNextCharacter(finalStr.Substring(finalStr.Length - 1, 1)[0]);
+                else if (curr == 'ー')
+                    continue;
                 else
                     finalName += TranscriptInternal(curr, next, ref i, manager);
                 if (doubleVoy == 1 && curr != 'ン' && curr != 'ヴ' && curr != 'ャ' && curr != 'ィ' && curr != 'ュ' && curr != 'ェ' && curr != 'ョ'
