@@ -45,7 +45,7 @@ namespace SanaraV2.Modules.Tools
                     break;
 
                 case Features.Tools.Error.Urban.None:
-                    await ReplyAsync("", false, new EmbedBuilder()
+                    EmbedBuilder em = new EmbedBuilder
                     {
                         Color = Color.Blue,
                         Title = char.ToUpper(result.answer.word[0]) + string.Concat(result.answer.word.Skip(1)),
@@ -55,18 +55,16 @@ namespace SanaraV2.Modules.Tools
                             {
                                 Name = Sentences.Definition(Context.Guild.Id),
                                 Value = result.answer.definition
-                            },
-                            new EmbedFieldBuilder()
-                            {
-                                Name = Sentences.Example(Context.Guild.Id),
-                                Value = result.answer.example
                             }
                         },
                         Footer = new EmbedFooterBuilder()
                         {
                             Text = Base.Sentences.FromStr(Context.Guild.Id, result.answer.link)
                         }
-                    }.Build());
+                    };
+                    if (result.answer.example != "")
+                        em.AddField(Sentences.Example(Context.Guild.Id), result.answer.example);
+                    await ReplyAsync("", false, em.Build());
                     break;
             }
         }
