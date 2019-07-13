@@ -239,6 +239,7 @@ namespace SanaraV2
         {
             if (File.Exists("youtube-dl.exe"))
             {
+                await Log(new LogMessage(LogSeverity.Info, "Setup", "Checking for youtube-dl updates"));
                 ProcessStartInfo startInfo = new ProcessStartInfo("youtube-dl.exe", "-U");
                 startInfo.RedirectStandardOutput = true;
                 startInfo.UseShellExecute = false;
