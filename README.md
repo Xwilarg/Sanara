@@ -5,9 +5,11 @@
 # Sanara
 
 ## What is Sanara
-Sanara is a multipurpose bot that is now in more than 200 servers (05/2019).
+Sanara is a multipurpose bot that is now in more than 200 servers (05/2019).<br/>
+Her most used features are games, doujinshi and images but there are a lot more.
 
-Her most used features are games, doujinshi and images but there are a lot more, you can see the full list on [the command page](https://sanara.zirk.eu/commands.html)
+## Commands
+You can see the full list on [Sanara's command page](https://sanara.zirk.eu/commands.html)
 
 ## How to invite her on my server
 Just click [here](https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot).
@@ -24,3 +26,5 @@ I'm also open to contributions if you want to translate the bot to your own lang
 If you have any wonder about what the bot collect on you and how you can get/delete these information, you can check the [GDPR page](https://sanara.zirk.eu/gdpr.html).
 
 You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
+
+![Preview](https://zirk.eu/img/Slideshow-Sanara.gif)
