@@ -108,7 +108,7 @@ namespace SanaraV2.Games
         {
             if (args.Length == 0)
                 return Sentences.InvalidGameName;
-            string gameName = args[0];
+            string gameName = args[0].ToLower();
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
             APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
