@@ -184,6 +184,17 @@ namespace SanaraV2.Modules.Entertainment
             private IAudioClient m_audioClient;
         }
 
+        [Command("Radio"), Priority(-1)]
+        public async Task Help(params string[] args)
+        {
+            await ReplyAsync("", false, new EmbedBuilder()
+            {
+                Title = Tools.Sentences.Help(Context.Guild.Id) + " (" + Tools.Sentences.RadioModuleName(Context.Guild.Id) + ")",
+                Description = Tools.Sentences.RadioHelp(Context.Guild.Id),
+                Color = Color.Purple
+            }.Build());
+        }
+
         [Command("Add radio", RunMode = RunMode.Async), Summary("Add songs to the radio"), Alias("Radio add")]
         public async Task AddRadio(params string[] words)
         {
