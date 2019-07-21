@@ -23,7 +23,7 @@ namespace Sanara_UnitTests
 {
     public sealed class SkipIfNoToken : FactAttribute
     {
-        private static bool inamiLoad = false, ayamiLoad = false;
+        private static volatile bool inamiLoad = false, ayamiLoad = false;
         private static DiscordSocketClient inamiClient;
         public static ITextChannel chan;
         public static string ayamiMention;

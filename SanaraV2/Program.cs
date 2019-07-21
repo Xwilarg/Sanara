@@ -111,6 +111,7 @@ namespace SanaraV2
 
         public async Task MainAsync(string botToken, ulong inamiId) // botToken is used for unit tests
         {
+            Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot")).GetAwaiter().GetResult();
             inamiToken = inamiId;
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
@@ -124,34 +125,37 @@ namespace SanaraV2
             rand = new Random();
 
             UpdateLanguageFiles();
-            if (botToken == null && !File.Exists("Keys/Credentials.json"))
-                throw new FileNotFoundException("You must have a Credentials.json file located in " + AppDomain.CurrentDomain.BaseDirectory + "Keys, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
-            dynamic json = JsonConvert.DeserializeObject(File.ReadAllText("Keys/Credentials.json"));
-            if (botToken == null && (json.botToken == null || json.ownerId == null || json.ownerStr == null))
-                throw new NullReferenceException("Your Credentials.json is missing mandatory information, it must at least contains botToken, ownerId and ownerStr. More information at https://sanara.zirk.eu/documentation.html?display=Clone");
-            Modules.Base.Sentences.ownerId = ulong.Parse((string)json.ownerId);
-            Modules.Base.Sentences.ownerStr = json.ownerStr;
-
-            GitHubKey = json.githubKey;
-            websiteStats = json.websiteStats;
-            websiteStatsToken = json.websiteStatsToken;
-            if (json.kitsuEmail != null && json.kitsuPassword != null)
+            if (botToken == null)
             {
-                kitsuAuth = new Dictionary<string, string> {
+                if (!File.Exists("Keys/Credentials.json"))
+                    throw new FileNotFoundException("You must have a Credentials.json file located in " + AppDomain.CurrentDomain.BaseDirectory + "Keys, more information at https://sanara.zirk.eu/documentation.html?display=Clone");
+                dynamic json = JsonConvert.DeserializeObject(File.ReadAllText("Keys/Credentials.json"));
+                if (json.botToken == null || json.ownerId == null || json.ownerStr == null)
+                    throw new NullReferenceException("Your Credentials.json is missing mandatory information, it must at least contains botToken, ownerId and ownerStr. More information at https://sanara.zirk.eu/documentation.html?display=Clone");
+                botToken = json.botToken;
+                Modules.Base.Sentences.ownerId = ulong.Parse((string)json.ownerId);
+                Modules.Base.Sentences.ownerStr = json.ownerStr;
+
+                GitHubKey = json.githubKey;
+                websiteStats = json.websiteStats;
+                websiteStatsToken = json.websiteStatsToken;
+                if (json.kitsuEmail != null && json.kitsuPassword != null)
+                {
+                    kitsuAuth = new Dictionary<string, string> {
                     { "grant_type", "password" },
                     { "username", (string)json.kitsuEmail },
                     { "password", (string)json.kitsuPassword }
                 };
+                }
+                else
+                    kitsuAuth = null;
+                sendStats = websiteStats != null && websiteStatsToken != null;
+                if (json.discordBotsId != null && json.discordBotsToken != null)
+                    dblApi = new AuthDiscordBotListApi(ulong.Parse((string)json.discordBotsId), (string)json.discordBotsToken);
+                else
+                    dblApi = null;
+                await InitServices(json);
             }
-            else
-                kitsuAuth = null;
-            sendStats = websiteStats != null && websiteStatsToken != null;
-            if (json.discordBotsId != null && json.discordBotsToken != null)
-                dblApi = new AuthDiscordBotListApi(ulong.Parse((string)json.discordBotsId), (string)json.discordBotsToken);
-            else
-
-                dblApi = null;
-            await InitServices(json);
             lastDiscordBotsSent = DateTime.MinValue;
 
             await commands.AddModuleAsync<Information>(null);
@@ -178,7 +182,7 @@ namespace SanaraV2
             client.UserVoiceStateUpdated += VoiceUpdate;
             client.Connected += Connected;
 
-            await client.LoginAsync(TokenType.Bot, (botToken == null) ? (string)json.botToken : botToken);
+            await client.LoginAsync(TokenType.Bot, botToken);
             startTime = DateTime.Now;
             await client.StartAsync();
 
@@ -371,6 +375,7 @@ namespace SanaraV2
                     }
                 }
             }
+            Log(new LogMessage(LogSeverity.Info, "Setup", "Translations updated")).GetAwaiter().GetResult();
         }
 
         private async Task GuildJoin(SocketGuild arg)

@@ -202,8 +202,9 @@ namespace SanaraV2.Games.Impl
         protected override async Task<string[]> GetPostAsync()
         {
             StringBuilder str = new StringBuilder();
+            if (_firstTurn)
+                str.AppendLine(Sentences.ReversiIntro(GetGuildId(), GetTurnName()));
             _firstTurn = false;
-            str.AppendLine(Sentences.ReversiIntro(GetGuildId(), GetTurnName()));
             str.AppendLine("```");
             str.AppendLine("  A B C D E F G H");
             str.AppendLine(" ┌─┬─┬─┬─┬─┬─┬─┬─┐");
