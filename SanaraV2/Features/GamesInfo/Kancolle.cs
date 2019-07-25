@@ -79,12 +79,12 @@ namespace SanaraV2.Features.GamesInfo
                     newTmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
                     lastTmp += tmp2[tmp2.Length - 1] + "\n";
                 }
-                allCats.Add(new Tuple<string, string>(title.Trim('\''), tmp));
+                allCats.Add(new Tuple<string, string>(title.Trim('\''), tmp.Replace("{{Ship/Footer}}", "")));
                 if (newTmp != "")
                 {
-                    allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 2)", newTmp));
+                    allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 2)", newTmp.Replace("{{Ship/Footer}}", "")));
                     if (lastTmp != "")
-                        allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 3)", lastTmp));
+                        allCats.Add(new Tuple<string, string>(title.Trim('\'') + " (Part 3)", lastTmp.Replace("{{Ship/Footer}}", "")));
                 }
             }
             return new FeatureRequest<Response.Charac, Error.Charac>(new Response.Charac()
