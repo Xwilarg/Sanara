@@ -49,7 +49,8 @@ namespace SanaraV2.Features.Tools
             {
                 kanji = kanji,
                 meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim(),
-                strokeOrder = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)kanji + "_frames.png"
+                strokeOrder = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)kanji + "_frames.png",
+                parts = Regex.Matches(html, "<a href=\"\\/\\/jisho\\.org\\/search\\/[^\"]+\">([^<]+)<\\/a>").Cast<Match>().Select(x => x.Groups[1].Value).ToArray()
             }, Error.Kanji.None);
         }
 

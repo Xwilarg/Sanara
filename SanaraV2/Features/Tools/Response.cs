@@ -25,6 +25,7 @@ namespace SanaraV2.Features.Tools
             public char kanji;
             public string meaning;
             public string strokeOrder;
+            public string[] parts;
         }
 
         public class Shell
