@@ -61,6 +61,7 @@ namespace SanaraV2.Modules.Tools
 
         /// --------------------------- Linguist ---------------------------
         public static string JapaneseHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "japaneseHelp")); }
+        public static string KanjiHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kanjiHelp")); }
         public static string TranslateHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "translateHelp")); }
         public static string InvalidLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidLanguage")); }
         public static string NoJapaneseTranslation(ulong guildId) { return (Translation.GetTranslation(guildId, "noJapaneseTranslation")); }
@@ -168,7 +169,8 @@ namespace SanaraV2.Modules.Tools
         public static string LinguisticHelp(ulong guildId, bool isChanNsfw)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic))
-                return Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
+                return Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleKanji")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
                  + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
             return Base.Sentences.NotAvailable(guildId);
         }

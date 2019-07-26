@@ -33,11 +33,11 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Kanji.Help:
-                    await ReplyAsync("Help");
+                    await ReplyAsync(Sentences.KanjiHelp(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Kanji.NotFound:
-                    await ReplyAsync("Not Found");
+                    await ReplyAsync(Sentences.UrbanNotFound(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Kanji.None:
