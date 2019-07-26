@@ -24,6 +24,36 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        [Command("Kanji", RunMode = RunMode.Async), Summary("Search information for a kanji")]
+        public async Task Kanji(params string[] words)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
+            var result = await Features.Tools.Linguist.Kanji(!((ITextChannel)Context.Channel).IsNsfw, words);
+            switch (result.error)
+            {
+                case Features.Tools.Error.Kanji.Help:
+                    await ReplyAsync("Help");
+                    break;
+
+                case Features.Tools.Error.Kanji.NotFound:
+                    await ReplyAsync("Not Found");
+                    break;
+
+                case Features.Tools.Error.Kanji.None:
+                    await ReplyAsync("", false, new EmbedBuilder
+                    {
+                        Title = result.answer.kanji.ToString(),
+                        Description = result.answer.meaning,
+                        ImageUrl = result.answer.strokeOrder
+                    }.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("Urban", RunMode = RunMode.Async), Summary("Search for a word in Urban Dictionary")]
         public async Task Urban(params string[] words)
         {
@@ -66,6 +96,9 @@ namespace SanaraV2.Modules.Tools
                         em.AddField(Sentences.Example(Context.Guild.Id), result.answer.example);
                     await ReplyAsync("", false, em.Build());
                     break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 

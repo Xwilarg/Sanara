@@ -20,6 +20,13 @@ namespace SanaraV2.Features.Tools
 {
     public static class Response
     {
+        public class Kanji
+        {
+            public char kanji;
+            public string meaning;
+            public string strokeOrder;
+        }
+
         public class Shell
         {
             public List<Tuple<string, string>> explanations; // Each element is a tuple Command name / Command description

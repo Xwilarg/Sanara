@@ -22,12 +22,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Resources;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Features.Tools
 {
     public static class Linguist
     {
+        public static async Task<FeatureRequest<Response.Kanji, Error.Kanji>> Kanji(bool isChanSafe, string[] args)
+        {
+            if (args.Length == 0)
+                return new FeatureRequest<Response.Kanji, Error.Kanji>(null, Error.Kanji.Help);
+            string argsEscape = Uri.EscapeDataString(string.Join(" ", args));
+            string html;
+            dynamic json;
+            char kanji;
+            using (HttpClient hc = new HttpClient())
+            {
+                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + argsEscape));
+                if (json.data.Count == 0 || json.data[0].japanese[0].word == null)
+                    return new FeatureRequest<Response.Kanji, Error.Kanji>(null, Error.Kanji.NotFound);
+                kanji = ((string)json.data[0].japanese[0].word)[0];
+                html = await hc.GetStringAsync("https://jisho.org/search/" + kanji + "%20%23kanji");
+            }
+            return new FeatureRequest<Response.Kanji, Error.Kanji>(new Response.Kanji
+            {
+                kanji = kanji,
+                meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim(),
+                strokeOrder = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)kanji + "_frames.png"
+            }, Error.Kanji.None);
+        }
+
         public static async Task<FeatureRequest<Response.Urban, Error.Urban>> UrbanSearch(bool isChanSafe, string[] args)
         {
             if (isChanSafe)
