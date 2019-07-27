@@ -29,7 +29,7 @@ namespace SanaraV2.Features.Tools
 {
     public static class Linguist
     {
-        public static async Task<FeatureRequest<Response.Kanji, Error.Kanji>> Kanji(bool isChanSafe, string[] args)
+        public static async Task<FeatureRequest<Response.Kanji, Error.Kanji>> Kanji(string[] args)
         {
             if (args.Length == 0)
                 return new FeatureRequest<Response.Kanji, Error.Kanji>(null, Error.Kanji.Help);
@@ -37,6 +37,11 @@ namespace SanaraV2.Features.Tools
             string html;
             dynamic json;
             char kanji;
+            string meaning;
+            Match radicalMatch;
+            Dictionary<string, string> parts = new Dictionary<string, string>();
+            Dictionary<string, string> onyomi = new Dictionary<string, string>();
+            Dictionary<string, string> kunyomi = new Dictionary<string, string>();
             using (HttpClient hc = new HttpClient())
             {
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + argsEscape));
@@ -44,13 +49,33 @@ namespace SanaraV2.Features.Tools
                     return new FeatureRequest<Response.Kanji, Error.Kanji>(null, Error.Kanji.NotFound);
                 kanji = ((string)json.data[0].japanese[0].word)[0];
                 html = await hc.GetStringAsync("https://jisho.org/search/" + kanji + "%20%23kanji");
+                radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
+                meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
+                foreach (var match in Regex.Matches(html, "<a href=\"(\\/\\/jisho\\.org\\/search\\/[^k]+kanji)\">([^<]+)<\\/a>").Cast<Match>())
+                {
+                    string name = match.Groups[2].Value;
+                    if (name[0] == kanji)
+                        parts.Add(name, meaning);
+                    else
+                        parts.Add(name, Regex.Match(await hc.GetStringAsync("https:" + match.Groups[1].Value), "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim());
+                }
+                foreach (var match in Regex.Matches(html.Split(new string[] { "kanji-details__main-readings-list" }, StringSplitOptions.None)[1],
+                    "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                    onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+                foreach (var match in Regex.Matches(html.Split(new string[] { "class=\"inline-list\"" }, StringSplitOptions.None)[0].Split(new string[] { "kanji-details__main-readings-list" }, StringSplitOptions.None)[2],
+                    "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                    kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
             }
             return new FeatureRequest<Response.Kanji, Error.Kanji>(new Response.Kanji
             {
                 kanji = kanji,
-                meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim(),
+                meaning = meaning,
                 strokeOrder = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)kanji + "_frames.png",
-                parts = Regex.Matches(html, "<a href=\"\\/\\/jisho\\.org\\/search\\/[^\"]+\">([^<]+)<\\/a>").Cast<Match>().Select(x => x.Groups[1].Value).ToArray()
+                parts = parts,
+                radicalMeaning = radicalMatch.Groups[1].Value.Trim(),
+                radicalKanji = radicalMatch.Groups[2].Value.Trim(),
+                onyomi = onyomi,
+                kunyomi = kunyomi
             }, Error.Kanji.None);
         }
 

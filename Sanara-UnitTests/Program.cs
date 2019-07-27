@@ -131,6 +131,58 @@ namespace Sanara_UnitTests
             Assert.Equal(romaji, SanaraV2.Features.Tools.Linguist.ToRomaji(original));
         }
 
+        [Fact]
+        public async Task TestKanji()
+        {
+            var result = await SanaraV2.Features.Tools.Linguist.Kanji(new[] { "eat" });
+            Assert.Equal(SanaraV2.Features.Tools.Error.Kanji.None, result.error);
+            Assert.Equal('食', result.answer.kanji);
+            Assert.Equal("食 (飠)", result.answer.radicalKanji);
+            Assert.Equal("eat, food", result.answer.radicalMeaning);
+            Assert.Single(result.answer.parts);
+            Assert.True(result.answer.parts.ContainsKey("食"));
+            Assert.True(result.answer.parts.ContainsValue("eat, food"));
+            Assert.Equal(4, result.answer.onyomi.Count);
+            Assert.True(result.answer.onyomi.ContainsKey("く.う"));
+            Assert.True(result.answer.onyomi.ContainsValue("ku.u"));
+            Assert.True(result.answer.onyomi.ContainsKey("く.らう"));
+            Assert.True(result.answer.onyomi.ContainsValue("ku.rau"));
+            Assert.True(result.answer.onyomi.ContainsKey("た.べる"));
+            Assert.True(result.answer.onyomi.ContainsValue("ta.beru"));
+            Assert.True(result.answer.onyomi.ContainsKey("は.む"));
+            Assert.True(result.answer.onyomi.ContainsValue("ha.mu"));
+            Assert.Equal(2, result.answer.kunyomi.Count);
+            Assert.True(result.answer.kunyomi.ContainsKey("ショク"));
+            Assert.True(result.answer.kunyomi.ContainsValue("shoku"));
+            Assert.True(result.answer.kunyomi.ContainsKey("ジキ"));
+            Assert.True(result.answer.kunyomi.ContainsValue("jiki"));
+            Assert.Equal("http://classic.jisho.org/static/images/stroke_diagrams/39135_frames.png", result.answer.strokeOrder);
+        }
+
+        [Fact]
+        public async Task TestKanji2()
+        {
+            var result = await SanaraV2.Features.Tools.Linguist.Kanji(new[] { "肉" });
+            Assert.Equal(SanaraV2.Features.Tools.Error.Kanji.None, result.error);
+            Assert.Equal('肉', result.answer.kanji);
+            Assert.Equal("肉 (⺼)", result.answer.radicalKanji);
+            Assert.Equal("meat", result.answer.radicalMeaning);
+            Assert.Equal(3, result.answer.parts.Count);
+            Assert.True(result.answer.parts.ContainsKey("肉"));
+            Assert.True(result.answer.parts.ContainsValue("meat"));
+            Assert.True(result.answer.parts.ContainsKey("人"));
+            Assert.True(result.answer.parts.ContainsValue("person"));
+            Assert.True(result.answer.parts.ContainsKey("冂"));
+            Assert.True(result.answer.parts.ContainsValue("upside-down box radical (no. 13)"));
+            Assert.Single(result.answer.onyomi);
+            Assert.True(result.answer.onyomi.ContainsKey("しし"));
+            Assert.True(result.answer.onyomi.ContainsValue("shishi"));
+            Assert.Single(result.answer.kunyomi);
+            Assert.True(result.answer.kunyomi.ContainsKey("ニク"));
+            Assert.True(result.answer.kunyomi.ContainsValue("niku"));
+            Assert.Equal("http://classic.jisho.org/static/images/stroke_diagrams/32905_frames.png", result.answer.strokeOrder);
+        }
+
         // CODE
         [Fact]
         public async Task TestShell()

@@ -25,7 +25,11 @@ namespace SanaraV2.Features.Tools
             public char kanji;
             public string meaning;
             public string strokeOrder;
-            public string[] parts;
+            public Dictionary<string, string> parts; // Each element is kanji and meaning
+            public string radicalKanji;
+            public string radicalMeaning;
+            public Dictionary<string, string> onyomi;
+            public Dictionary<string, string> kunyomi;
         }
 
         public class Shell

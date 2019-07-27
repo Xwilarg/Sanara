@@ -59,5 +59,6 @@ namespace SanaraV2.Modules.Base
         public static string FromStr(ulong guildId, string source) { return (Translation.GetTranslation(guildId, "from", source)); }
         public static string YesStr(ulong guildId) { return (Translation.GetTranslation(guildId, "yes")); }
         public static string NoStr(ulong guildId) { return (Translation.GetTranslation(guildId, "no")); }
+        public static string None(ulong guildId) { return (Translation.GetTranslation(guildId, "none")); }
     }
 }

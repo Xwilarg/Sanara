@@ -71,6 +71,8 @@ namespace SanaraV2.Modules.Tools
         public static string UrbanNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "urbanNotFound")); }
         public static string Definition(ulong guildId) { return (Translation.GetTranslation(guildId, "definition")); }
         public static string Example(ulong guildId) { return (Translation.GetTranslation(guildId, "example")); }
+        public static string Radical(ulong guildId) { return (Translation.GetTranslation(guildId, "radical")); }
+        public static string Parts(ulong guildId) { return (Translation.GetTranslation(guildId, "parts")); }
 
         /// --------------------------- Settings ---------------------------
         public static string NeedLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "needLanguage")); }

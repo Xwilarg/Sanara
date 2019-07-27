@@ -17,6 +17,7 @@ using System;
 using System.Threading.Tasks;
 using Discord;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace SanaraV2.Modules.Tools
 {
@@ -29,7 +30,7 @@ namespace SanaraV2.Modules.Tools
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Linguistic);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Linguistic);
-            var result = await Features.Tools.Linguist.Kanji(!((ITextChannel)Context.Channel).IsNsfw, words);
+            var result = await Features.Tools.Linguist.Kanji(words);
             switch (result.error)
             {
                 case Features.Tools.Error.Kanji.Help:
@@ -45,7 +46,30 @@ namespace SanaraV2.Modules.Tools
                     {
                         Title = result.answer.kanji.ToString(),
                         Description = result.answer.meaning,
-                        ImageUrl = result.answer.strokeOrder
+                        ImageUrl = result.answer.strokeOrder,
+                        Fields = new List<EmbedFieldBuilder>
+                        {
+                            new EmbedFieldBuilder()
+                            {
+                                Name = Sentences.Radical(Context.Guild.Id),
+                                Value = result.answer.radicalKanji + ": " + result.answer.radicalMeaning
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = Sentences.Parts(Context.Guild.Id),
+                                Value = string.Join(Environment.NewLine, result.answer.parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value))
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Onyomi",
+                                Value = result.answer.onyomi.Count == 0 ? Base.Sentences.None(Context.Guild.Id) : string.Join(Environment.NewLine, result.answer.onyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Kunyomi",
+                                Value = result.answer.kunyomi.Count == 0 ? Base.Sentences.None(Context.Guild.Id) : string.Join(Environment.NewLine, result.answer.kunyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                            }
+                        }
                     }.Build());
                     break;
 
