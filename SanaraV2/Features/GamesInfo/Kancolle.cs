@@ -39,6 +39,8 @@ namespace SanaraV2.Features.GamesInfo
                 if (msg.StatusCode == HttpStatusCode.NotFound)
                     return new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound);
                 dynamic json = JsonConvert.DeserializeObject(await msg.Content.ReadAsStringAsync());
+                if (json.items.Count == 0)
+                    return new FeatureRequest<Response.Charac, Error.Charac>(null, Error.Charac.NotFound);
                 string id = json.items[0].id;
                 string url = json.items[0].url + "?action=raw";
                 name = json.items[0].title;
