@@ -57,6 +57,8 @@ namespace SanaraV2.Features.GamesInfo
             foreach (string s in categories.Skip(1))
             {
                 string title = Regex.Match("==" + s, "=[=]+([^=]+)==").Groups[1].Value;
+                if (title.Contains("Quotes") || title.Contains("Hourly Notifications"))
+                    continue;
                 title = title.Trim(' ');
                 if (title.StartsWith("Quotes") || title.StartsWith("Hourly Notifications") || title.StartsWith("Seasonal Quotes") || title.StartsWith("Character") || title.StartsWith("Quests"))
                     continue;
@@ -68,7 +70,7 @@ namespace SanaraV2.Features.GamesInfo
                 foreach (Match match in Regex.Matches(tmp, "\\[https?:\\/\\/[^ ]+ ([^\\]]+)\\]"))
                     tmp = tmp.Replace(match.Value, match.Groups[1].Value);
                 tmp = Regex.Replace(tmp, "\\[https?:\\/\\/[^\\]]+\\]", "").Replace("*", "\\*").Replace("[", "").Replace("]", "");
-                string newTmp = "", lastTmp = "";
+                string newTmp = "", lastTmp = "", discard = "";
                 while (tmp.Length > 1024)
                 {
                     string[] tmp2 = tmp.Split('\n');
@@ -81,6 +83,14 @@ namespace SanaraV2.Features.GamesInfo
                     newTmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
                     lastTmp += tmp2[tmp2.Length - 1] + "\n";
                 }
+                while (lastTmp.Length > 1024)
+                {
+                    string[] tmp2 = lastTmp.Split('\n');
+                    lastTmp = string.Join("\n", tmp2.Take(tmp2.Length - 1));
+                    discard += tmp2[tmp2.Length - 1] + "\n";
+                }
+                if (string.IsNullOrWhiteSpace(tmp.Replace("{{Ship/Footer}}", "")))
+                    continue;
                 allCats.Add(new Tuple<string, string>(title.Trim('\''), tmp.Replace("{{Ship/Footer}}", "")));
                 if (newTmp != "")
                 {
