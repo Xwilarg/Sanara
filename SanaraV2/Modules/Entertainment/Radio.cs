@@ -112,7 +112,7 @@ namespace SanaraV2.Modules.Entertainment
                     return Sentences.RadioNoSong(guildId);
                 string finalStr = "🎵 " + Sentences.Current(guildId) + " " + m_musics[0].title + " requested by " + m_musics[0].requester + Environment.NewLine;
                 for (int i = 1; i < m_musics.Count; i++)
-                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + " requested by " + m_musics[0].requester + Environment.NewLine;
+                    finalStr += i + ". " + m_musics[i].title + ((m_musics[i].downloading) ? (" " + Sentences.Downloading(guildId)) : ("")) + " requested by " + m_musics[i].requester + Environment.NewLine;
                 return finalStr;
             }
 
