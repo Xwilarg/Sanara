@@ -239,10 +239,27 @@ namespace Sanara_UnitTests
 
         [Fact]
         public async Task TestGameAnime()
-        {
-            var game = new SanaraV2.Games.Impl.Anime(null, new Config(0, Difficulty.Normal, "anime", false, APreload.Multiplayer.SoloOnly), 0);
-            await CheckGame(game);
-        }
+            => await CheckGame(new SanaraV2.Games.Impl.Anime(null, new Config(0, Difficulty.Normal, "anime", false, APreload.Multiplayer.SoloOnly), 0));
+
+        [Fact]
+        public async Task TestGameAzurLane()
+            => await CheckGame(new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, APreload.Multiplayer.SoloOnly), 0));
+
+        [Fact]
+        public async Task TestGameBooru()
+            => await CheckGame(new SanaraV2.Games.Impl.Booru(null, new Config(0, Difficulty.Normal, "booru", false, APreload.Multiplayer.SoloOnly), 0));
+
+        [Fact]
+        public async Task TestGameFateGO()
+            => await CheckGame(new SanaraV2.Games.Impl.FateGO(null, new Config(0, Difficulty.Normal, "fatego", false, APreload.Multiplayer.SoloOnly), 0));
+
+        [Fact]
+        public async Task TestGameKanColle()
+            => await CheckGame(new SanaraV2.Games.Impl.KanColle(null, new Config(0, Difficulty.Normal, "kancolle", false, APreload.Multiplayer.SoloOnly), 0));
+
+        [Fact]
+        public async Task TestGamePokemon()
+            => await CheckGame(new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, APreload.Multiplayer.SoloOnly), 0));
 
         // BOORU MODULE
         [Fact]
