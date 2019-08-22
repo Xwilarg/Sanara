@@ -233,7 +233,7 @@ namespace Sanara_UnitTests
             MethodInfo info = type.GetMethod("GetPostAsync", BindingFlags.Instance | BindingFlags.NonPublic);
             foreach (string s in await (Task<string[]>)info.Invoke(game, null))
             {
-                Assert.True(IsLinkValid(s));
+                Assert.True(IsLinkValid(s), "Invalid URL " + s);
             }
         }
 
