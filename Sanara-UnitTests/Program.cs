@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Discord;
 using System.Linq;
 using SanaraV2.Games;
+using System.Reflection;
 
 namespace Sanara_UnitTests
 {
@@ -224,6 +225,23 @@ namespace Sanara_UnitTests
                 Assert.NotNull(game.Item2);
                 Assert.True(game.Item2.Count > 100);
             }
+        }
+
+        private async Task CheckGame(AGame game)
+        {
+            Type type = game.GetType();
+            MethodInfo info = type.GetMethod("GetPostAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+            foreach (string s in await (Task<string[]>)info.Invoke(game, null))
+            {
+                Assert.True(IsLinkValid(s));
+            }
+        }
+
+        [Fact]
+        public async Task TestGameAnime()
+        {
+            var game = new SanaraV2.Games.Impl.Anime(null, new Config(0, Difficulty.Normal, "anime", false, APreload.Multiplayer.SoloOnly), 0);
+            await CheckGame(game);
         }
 
         // BOORU MODULE
