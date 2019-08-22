@@ -30,17 +30,12 @@ namespace Sanara_UnitTests
         {
             if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
-                try
-                {
-                    WebRequest request = WebRequest.Create(url);
-                    request.Method = "HEAD";
-                    request.GetResponse();
-                    return (true);
-                }
-                catch (WebException)
-                { }
+                WebRequest request = WebRequest.Create(url);
+                request.Method = "HEAD";
+                request.GetResponse();
+                return true;
             }
-            return (false);
+            return false;
         }
 
         // ANIME/MANGA MODULE
