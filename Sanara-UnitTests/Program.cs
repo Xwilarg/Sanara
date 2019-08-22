@@ -21,18 +21,18 @@ using Discord;
 using System.Linq;
 using SanaraV2.Games;
 using System.Reflection;
+using System.Net.Http;
 
 namespace Sanara_UnitTests
 {
     public class Program : IClassFixture<Tests>
     {
-        private static bool IsLinkValid(string url)
+        private static async Task<bool> IsLinkValid(string url)
         {
             if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
-                WebRequest request = WebRequest.Create(url);
-                request.Method = "HEAD";
-                request.GetResponse();
+                using (HttpClient hc = new HttpClient())
+                    await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri(url)));
                 return true;
             }
             return false;
@@ -63,8 +63,8 @@ namespace Sanara_UnitTests
         {
            var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
             Assert.Equal(Error.Doujinshi.None, result.error);
-            Assert.True(IsLinkValid(result.answer.url));
-            Assert.True(IsLinkValid(result.answer.imageUrl));
+            Assert.True(await IsLinkValid(result.answer.url));
+            Assert.True(await IsLinkValid(result.answer.imageUrl));
             Assert.Contains("full color", result.answer.tags);
             Assert.Contains("english", result.answer.tags);
         }
@@ -74,8 +74,8 @@ namespace Sanara_UnitTests
         {
             var result = await Doujinshi.SearchCosplay(false, new string[] { "kantai", "collection" }, new Random());
             Assert.Equal(Error.Doujinshi.None, result.error);
-            Assert.True(IsLinkValid(result.answer.url));
-            Assert.True(IsLinkValid(result.answer.imageUrl));
+            Assert.True(await IsLinkValid(result.answer.url));
+            Assert.True(await IsLinkValid(result.answer.imageUrl));
             Assert.Contains("kantai collection", result.answer.tags);
         }
 
@@ -208,7 +208,7 @@ namespace Sanara_UnitTests
             Assert.Equal(blue, result.answer.discordColor.B);
             Assert.Equal(hexa, result.answer.colorHex);
             Assert.Equal(name, result.answer.name);
-            Assert.True(IsLinkValid(result.answer.colorUrl));
+            Assert.True(await IsLinkValid(result.answer.colorUrl));
         }
 
         // GAMES MODULE
@@ -228,7 +228,7 @@ namespace Sanara_UnitTests
             MethodInfo info = type.GetMethod("GetPostAsync", BindingFlags.Instance | BindingFlags.NonPublic);
             foreach (string s in await (Task<string[]>)info.Invoke(game, null))
             {
-                Assert.True(IsLinkValid(s), "Invalid URL " + s);
+                Assert.True(await IsLinkValid(s), "Invalid URL " + s);
             }
         }
 
@@ -263,7 +263,7 @@ namespace Sanara_UnitTests
             var result = await Booru.SearchBooru(false, null, new BooruSharp.Booru.Safebooru(), new Random());
             Assert.Equal(Error.Booru.None, result.error);
             Assert.Equal(Color.Green, result.answer.colorRating);
-            Assert.True(IsLinkValid(result.answer.url));
+            Assert.True(await IsLinkValid(result.answer.url));
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace Sanara_UnitTests
             var result = await Booru.SearchBooru(false, new string[] { "cum_in_pussy" }, new BooruSharp.Booru.Gelbooru(), new Random());
             Assert.Equal(Error.Booru.None, result.error);
             Assert.Equal(Color.Red, result.answer.colorRating);
-            Assert.True(IsLinkValid(result.answer.url));
+            Assert.True(await IsLinkValid(result.answer.url));
         }
 
         [Fact]
@@ -313,7 +313,7 @@ namespace Sanara_UnitTests
                 Assert.Equal(1, arg.Embeds.Count);
                 EmbedImage? img = arg.Embeds.ToArray()[0].Image;
                 Assert.True(img.HasValue);
-                Assert.True(IsLinkValid(img.Value.Url));
+                Assert.True(IsLinkValid(img.Value.Url).GetAwaiter().GetResult());
                 msgReceived = true;
                 return Task.CompletedTask;
             });
