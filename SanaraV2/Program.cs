@@ -111,7 +111,7 @@ namespace SanaraV2
 
         public async Task MainAsync(string botToken, ulong inamiId) // botToken is used for unit tests
         {
-            Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot")).GetAwaiter().GetResult();
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot"));
             inamiToken = inamiId;
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
@@ -125,6 +125,7 @@ namespace SanaraV2
             rand = new Random();
 
             UpdateLanguageFiles();
+
             if (botToken == null)
             {
                 if (!File.Exists("Keys/Credentials.json"))

@@ -42,6 +42,7 @@ namespace SanaraV2.Games
             _startTime = DateTime.Now;
             _timer = config.refTime * (int)config.difficulty;
             _lobby = (config.isMultiplayer == APreload.Multiplayer.MultiOnly ? new MultiplayerLobby(playerId) : null);
+            _isFound = false;
             Init();
         }
 
@@ -160,6 +161,7 @@ namespace SanaraV2.Games
                             await PostFromUrl(s);
                         }
                     _startTime = DateTime.Now;
+                    _isFound = false;
                     break;
                 }
                 catch (LooseException le)
@@ -273,8 +275,9 @@ namespace SanaraV2.Games
                     finalStr += Environment.NewLine;
                 finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
             }
-            if (_gameState != GameState.Running)
+            if (_gameState != GameState.Running || _isFound)
                 return;
+            _isFound = true;
             if (!string.IsNullOrWhiteSpace(finalStr))
                 await PostText(finalStr);
             _score++;
@@ -406,5 +409,6 @@ namespace SanaraV2.Games
         private DateTime        _startTime; // When the game started
         private int             _timer; // Number of seconds before the player loose
         private MultiplayerLobby _lobby; // Null if game session is solo
+        private bool            _isFound; // Fix a bug where 2 users could answer at the same time
     }
 }
