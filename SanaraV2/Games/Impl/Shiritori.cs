@@ -208,7 +208,7 @@ namespace SanaraV2.Games.Impl
         public static List<string> LoadDictionnary()
         {
             if (!File.Exists("Saves/shiritoriWords.dat"))
-                return (null);
+                return (new List<string>());
             return (File.ReadAllLines("Saves/shiritoriWords.dat").ToList());
         }
 

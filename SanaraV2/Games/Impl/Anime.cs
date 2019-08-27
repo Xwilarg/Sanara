@@ -72,7 +72,7 @@ namespace SanaraV2.Games.Impl
         public static Tuple<List<string>, List<string>> LoadDictionnaries()
         {
             if (!File.Exists("Saves/AnimeTags.dat"))
-                return (null);
+                return new Tuple<List<string>, List<string>>(new List<string>(), new List<string>());
             List<string> tags = new List<string>();
             List<string> tagsFull = new List<string>();
             string[] allLines = File.ReadAllLines("Saves/AnimeTags.dat");

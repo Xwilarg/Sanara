@@ -101,7 +101,7 @@ namespace SanaraV2.Games
             foreach (var game in Constants.allDictionnaries)
             {
                 finalStr.Append("**" + game.Item1(guildId) + ":** ");
-                if (game.Item2 == null)
+                if (game.Item2.Count == 0)
                 {
                     finalStr.Append(Sentences.NotLoaded(guildId));
                     no++;

@@ -72,7 +72,7 @@ namespace SanaraV2.Games.Impl
         public static List<string> LoadDictionnary()
         {
             if (!File.Exists("Saves/BooruTriviaTags.dat"))
-                return (null);
+                return (new List<string>());
             List<string> tags = new List<string>();
             string[] allLines = File.ReadAllLines("Saves/BooruTriviaTags.dat");
             foreach (string line in allLines)
