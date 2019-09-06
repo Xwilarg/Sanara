@@ -24,6 +24,7 @@ namespace SanaraV2.Games
         public static string RulesShiritoriMulti(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesShiritoriMulti")); }
         public static string RulesShiritori2(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesShiritori2")); }
         public static string RulesKancolle(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesKancolle")); }
+        public static string RulesGirlsFrontline(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesGirlsFrontline")); }
         public static string RulesBooru(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesBooru")); }
         public static string RulesAnime(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesAnime")); }
         public static string RulesPokemon(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesPokemon")); }
@@ -68,6 +69,7 @@ namespace SanaraV2.Games
         public static string AnimeGame(ulong guildId) { return (Translation.GetTranslation(guildId, "animeGame")); }
         public static string BooruGame(ulong guildId) { return (Translation.GetTranslation(guildId, "booruGame")); }
         public static string KancolleGame(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleGame")); }
+        public static string GirlsFrontlineGame(ulong guildId) { return (Translation.GetTranslation(guildId, "girlsFrontlineGame")); }
         public static string ShiritoriGame(ulong guildId) { return (Translation.GetTranslation(guildId, "shiritoriGame")); }
         public static string AzurLaneGame(ulong guildId) { return (Translation.GetTranslation(guildId, "azurLaneGame")); }
         public static string FateGOGame(ulong guildId) { return (Translation.GetTranslation(guildId, "fateGOGame")); }

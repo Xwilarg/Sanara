@@ -281,6 +281,7 @@
     <Compile Include="Games\Impl\AzurLane.cs" />
     <Compile Include="Games\Impl\Booru.cs" />
     <Compile Include="Games\Impl\FateGO.cs" />
+    <Compile Include="Games\Impl\GirlsFrontline.cs" />
     <Compile Include="Games\Impl\KanColle.cs" />
     <Compile Include="Games\Impl\Pokemon.cs" />
     <Compile Include="Games\Impl\Reversi.cs" />
