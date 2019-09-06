@@ -256,6 +256,10 @@ namespace Sanara_UnitTests
         public async Task TestGamePokemon()
             => await CheckGame(new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, APreload.Multiplayer.SoloOnly), 0));
 
+        [Fact]
+        public async Task TestGameGirlsFrontline()
+            => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, APreload.Multiplayer.SoloOnly), 0));
+
         // BOORU MODULE
         [Fact]
         public async Task TestBooruSafe()
