@@ -62,7 +62,7 @@ namespace SanaraV2.Games.Impl
                 Match m = Regex.Match(html, "src=\"(\\/images\\/thumb\\/[^\"]+)\"");
                 return (new Tuple<string[], string[]>(
                     new[] { "https://en.gfwiki.com" + m.Groups[1].Value },
-                    new[] { curr }
+                    new[] { curr.Replace("%E2%88%95", "/") }
                 ));
             }
         }

@@ -61,7 +61,7 @@ namespace SanaraV2.Games.Impl
 
                 List<string> allAnswer = new List<string>();
                 allAnswer.Add(curr.Replace("&amp;", "And").Replace("&#39;", "'"));
-                allAnswer.Add(curr.Replace("ō", "ou").Replace("ū", "uu").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("ð", "d").Replace("&Amp;", "And").Replace("&#39;", "'"));
+                allAnswer.Add(curr.Replace("ō", "ou").Replace("ū", "uu").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("è", "e").Replace("ð", "d").Replace("&Amp;", "And").Replace("&#39;", "'"));
                 if (html.Contains("AKA:"))
                 {
                     foreach (string s in Regex.Replace(html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0], "\\([^\\)]+\\)", "").Split(','))

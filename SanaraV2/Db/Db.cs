@@ -62,6 +62,8 @@ namespace SanaraV2.Db
 
         public async Task InitGuild(ulong guildId)
         {
+            if (Languages.ContainsKey(guildId)) // If somehow InitGuild is called 2 times for the same guild we ignore it
+                return;
             string guildIdStr = guildId.ToString();
             if (await R.Db(dbName).Table("Guilds").GetAll(guildIdStr).Count().Eq(0).RunAsync<bool>(conn))
             {
