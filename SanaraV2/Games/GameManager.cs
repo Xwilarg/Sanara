@@ -160,7 +160,7 @@ namespace SanaraV2.Games
                     if (isFull && !preload.DoesAllowFull())
                         return Sentences.FullNotAvailable;
                     if (isCropped && !preload.DoesAllowCropped())
-                        return Sentences.FullNotAvailable;
+                        return Sentences.CropNotAvailable;
                     try
                     {
                         await chan.SendMessageAsync(
