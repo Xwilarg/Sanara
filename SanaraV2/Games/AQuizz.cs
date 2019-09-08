@@ -45,6 +45,8 @@ namespace SanaraV2.Games
 
         protected override async Task<string[]> GetPostAsync()
         {
+            if (_dictionnary.Count == 0)
+                throw new LooseException(GetStringFromSentence(Sentences.DictionnaryEmpty));
             int index = Program.p.rand.Next(_dictionnary.Count);
             var elem = await GetPostInternalAsync(_dictionnary[index]);
             _toGuess = elem.Item2;
