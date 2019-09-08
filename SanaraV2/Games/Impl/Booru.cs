@@ -33,6 +33,9 @@ namespace SanaraV2.Games.Impl
         public override bool DoesAllowFull()
             => false;
 
+        public override bool DoesAllowCropped() // Make no sense to crop booru images when the tag can be anywhere
+            => false;
+
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
 

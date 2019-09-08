@@ -111,6 +111,7 @@ namespace SanaraV2.Games
             string gameName = args[0].ToLower();
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
+            bool isCropped = false;
             APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
             if (args.Length > 1)
             {
@@ -135,6 +136,11 @@ namespace SanaraV2.Games
                         case "solo":
                             break; // These case exist so the user can precise them, but they do nothing
 
+                        case "crop":
+                        case "cropped":
+                            isCropped = true;
+                            break;
+
                         default:
                             return Sentences.InvalidGameArgument;
                     }
@@ -153,6 +159,8 @@ namespace SanaraV2.Games
                         return Sentences.SoloNotAvailable;
                     if (isFull && !preload.DoesAllowFull())
                         return Sentences.FullNotAvailable;
+                    if (isCropped && !preload.DoesAllowCropped())
+                        return Sentences.FullNotAvailable;
                     try
                     {
                         await chan.SendMessageAsync(
@@ -162,7 +170,7 @@ namespace SanaraV2.Games
                             preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isMultiplayer), playerId);
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isCropped, isMultiplayer), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });

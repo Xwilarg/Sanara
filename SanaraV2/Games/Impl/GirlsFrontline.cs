@@ -14,11 +14,9 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,6 +33,9 @@ namespace SanaraV2.Games.Impl
 
         public override bool DoesAllowFull()
             => false;
+
+        public override bool DoesAllowCropped()
+            => true;
 
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
