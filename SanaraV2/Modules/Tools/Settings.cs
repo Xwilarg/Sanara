@@ -14,7 +14,6 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using DynamicExpresso;
 using SanaraV2.Modules.Base;
 using System;
@@ -27,6 +26,9 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        /// <summary>
+        /// Only guild owner and users that have "Manage Guild" permission can modify bot settings for the guild
+        /// </summary>
         public static bool CanModify(IUser user, ulong ownerId)
         {
             if (user.Id == ownerId)
@@ -35,7 +37,7 @@ namespace SanaraV2.Modules.Tools
             return guildUser.GuildPermissions.ManageGuild;
         }
 
-        [Command("Eval")]
+        [Command("Eval"), Summary("Allow to check the value of some variables in runtime")]
         public async Task EvalFct(params string[] args)
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);

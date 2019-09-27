@@ -63,18 +63,25 @@ namespace SanaraV2
 
         public readonly DiscordSocketClient client;
         private readonly CommandService commands = new CommandService();
-        public static Program p;
-        public Random rand;
+        public static Program p; // Allow to access the following variables from any module (contains an instance of Program)
+        public Random rand; // Random numbers
 
-        public GameManager gm;
+        public GameManager gm; // See Games.GameManager
 
+        // Translate command
         private GoogleCredential credential;
         public TranslationClient translationClient;
 
+        // YouTube and Radio modules
         public YouTubeService youtubeService;
+
+        // Logs command
         public string GitHubKey;
 
+        // Send stats to website
         private string websiteStats, websiteStatsToken;
+
+        // Discord Bot List
         private AuthDiscordBotListApi dblApi;
 
         public List<RadioChannel> radios;
