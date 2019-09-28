@@ -71,6 +71,7 @@ namespace SanaraV2
         // Translate command
         private GoogleCredential credential;
         public TranslationClient translationClient;
+        public ImageAnnotatorClient visionClient;
 
         // YouTube and Radio modules
         public YouTubeService youtubeService;
@@ -80,27 +81,30 @@ namespace SanaraV2
 
         // Send stats to website
         private string websiteStats, websiteStatsToken;
+        public bool sendStats { private set; get; }
 
         // Discord Bot List
         private AuthDiscordBotListApi dblApi;
+        private DateTime lastDiscordBotsSent; // We make sure to wait at least 10 mins before sending stats to DiscordBots.org so we don't spam the API
 
+        // Information about guilds having launch radio (text channel where radio was launched and vocal channel where the bot is)
         public List<RadioChannel> radios;
 
+        // When the bot was started
         public DateTime startTime;
 
+        // For translation submodule
         public Dictionary<string, List<Translation.TranslationData>> translations;
         public Dictionary<string, List<string>> allLanguages;
 
+        // Sentry (error reporting)
         private RavenClient ravenClient;
-        public ImageAnnotatorClient visionClient;
-        public bool sendStats { private set; get; }
-
-        private DateTime lastDiscordBotsSent; // We make sure to wait at least 10 mins before sending stats to DiscordBots.org so we don't spam the API
 
         public Db.Db db;
 
-        private ulong inamiToken;
+        private ulong inamiToken; // For unit tests
 
+        // Anime/Manga module
         public Dictionary<string, string> kitsuAuth;
 
         public Program()
@@ -133,6 +137,7 @@ namespace SanaraV2
 
             UpdateLanguageFiles();
 
+            // Setting up various credentials
             if (botToken == null)
             {
                 if (!File.Exists("Keys/Credentials.json"))
@@ -194,6 +199,7 @@ namespace SanaraV2
             startTime = DateTime.Now;
             await client.StartAsync();
 
+            // Send stats every minute
             if (sendStats)
             {
                 _ = Task.Run(async () =>
@@ -211,12 +217,18 @@ namespace SanaraV2
                 await Task.Delay(-1);
         }
 
+        /// <summary>
+        /// Once the bot is connected we set his status and update his amount of server on DBL
+        /// </summary>
         private async Task Connected()
         {
             await client.SetGameAsync("https://sanara.zirk.eu", null, ActivityType.Watching);
             await UpdateDiscordBots();
         }
 
+        /// <summary>
+        /// Update amount of guilds on DBL when the bot join/leave a guild
+        /// </summary>
         private async Task GuildCountChange(SocketGuild _)
         {
             await UpdateDiscordBots();
@@ -231,6 +243,7 @@ namespace SanaraV2
             }
         }
 
+        // We remove the bot from empty voice channels
         private async Task VoiceUpdate(SocketUser user, SocketVoiceState state, SocketVoiceState _)
         {
             RadioChannel radio = radios.Find(x => x.m_guildId == ((IGuildUser)user).GuildId);
@@ -241,6 +254,7 @@ namespace SanaraV2
             }
         }
 
+        // If the bot is disconnected we exit the program, an external program will relaunch it
         private Task Disconnected(Exception _)
         {
             Environment.Exit(1);
@@ -249,6 +263,7 @@ namespace SanaraV2
 
         private async Task InitServices(dynamic json)
         {
+            // Update youtube-dl
             if (File.Exists("youtube-dl.exe"))
             {
                 await Log(new LogMessage(LogSeverity.Info, "Setup", "Checking for youtube-dl updates"));
@@ -258,6 +273,9 @@ namespace SanaraV2
                 Process process = Process.Start(startInfo);
                 await Log(new LogMessage(LogSeverity.Info, "Setup", await process.StandardOutput.ReadToEndAsync()));
             }
+
+            // Then we update all others modules
+            // It's basically just checking if the credential file is here
 
             translationClient = null;
             if (json.googleTranslateJson != null)
@@ -284,7 +302,7 @@ namespace SanaraV2
                 }
             }
 
-            radios = new List<RadioModule.RadioChannel>();
+            radios = new List<RadioChannel>();
 
             ravenClient = null;
             if (json.ravenKey != null)
@@ -308,6 +326,9 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Delete the content of a folder recursively
+        /// </summary>
         private void DeleteDirContent(string path)
         {
             foreach (string f in Directory.GetFiles(path))
@@ -319,6 +340,9 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Copy translations from translations submodule to next to the executable
+        /// </summary>
         private void CopyLanguagesFiles()
         {
             if (!Directory.Exists("Saves/Translations"))
@@ -337,6 +361,9 @@ namespace SanaraV2
             }
         }
 
+        /// <summary>
+        /// Parse language files and update dictionnaries
+        /// </summary>
         public void UpdateLanguageFiles()
         {
             allLanguages = new Dictionary<string, List<string>>();
@@ -386,6 +413,9 @@ namespace SanaraV2
             Log(new LogMessage(LogSeverity.Info, "Setup", "Translations updated")).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// Init guilds in the db
+        /// </summary>
         private async Task GuildJoin(SocketGuild arg)
         {
             await db.InitGuild(arg.Id);
@@ -421,6 +451,10 @@ namespace SanaraV2
                 await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
         }
 
+        /// <summary>
+        /// Send stats to the website
+        /// </summary>
+        /// <param name="elems">Each tuple contains the name of the thing sent along with it value</param>
         public async Task UpdateElement(Tuple<string, string>[] elems)
         {
             HttpClient httpClient = new HttpClient();
@@ -440,13 +474,13 @@ namespace SanaraV2
             {
                 await httpClient.SendAsync(msg);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException) // TODO: We should probably retry
             { }
             catch (TaskCanceledException)
             { }
         }
 
-        /// Clean name before sending it to the website for stats (| and & are delimitators so we remove them)
+        /// Clean name before sending it to the website for stats (| and $ are delimitators so we remove them)
         public string GetName(string name)
             => name.Replace("|", "").Replace("$", "");
 
@@ -499,12 +533,12 @@ namespace SanaraV2
             Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id); });
 
             int pos = 0;
-            if (arg.Channel as ITextChannel == null)
+            if (arg.Channel as ITextChannel == null) // The bot doesn't handle private messages
             {
                 await arg.Channel.SendMessageAsync(Modules.Base.Sentences.DontPm(0));
                 return;
             }
-            string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId];
+            string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId]; // We get the bot prefix for this guild
             if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
             {
                 var context = new SocketCommandContext(client, msg);
