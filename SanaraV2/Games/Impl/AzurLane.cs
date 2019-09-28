@@ -87,7 +87,7 @@ namespace SanaraV2.Games.Impl
                 {
                     if (s.Contains("Unreleased")) // We skip ships that weren't released and were found by data mining
                         continue;
-                    Match match = Regex.Match(s, "<a href=\"\\/[^\"]+\" title=\"([^\"]+)\">[0-9]+<\\/a>");
+                    Match match = Regex.Match(s, "\"><a href=\"\\/[^\"]+\" title=\"([^\"]+)\">(Collab|Plan)?[0-9]+<\\/a>");
                     if (match.Success)
                     {
                         string str = match.Groups[1].Value;
