@@ -44,6 +44,9 @@ namespace SanaraV2
 {
     public class Program
     {
+        // If the bot didn't start after like 5 minutes we restart it (because that probably means it got stuck)
+        private static bool isTimerValid;
+
         public static async Task Main()
         {
             try
@@ -122,6 +125,14 @@ namespace SanaraV2
 
         public async Task MainAsync(string botToken, ulong inamiId) // botToken is used for unit tests
         {
+            isTimerValid = true;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(300000);
+                if (isTimerValid)
+                    Environment.Exit(1);
+            });
+
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot"));
             inamiToken = inamiId;
 
@@ -222,6 +233,7 @@ namespace SanaraV2
         /// </summary>
         private async Task Connected()
         {
+            isTimerValid = false;
             await client.SetGameAsync("https://sanara.zirk.eu", null, ActivityType.Watching);
             await UpdateDiscordBots();
         }
