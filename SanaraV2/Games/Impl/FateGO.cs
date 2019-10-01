@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -92,16 +93,19 @@ namespace SanaraV2.Games.Impl
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Servant_List_by_ID").GetAwaiter().GetResult();
-                foreach (string s in html.Split(new[] { "<tr>" }, StringSplitOptions.None))
+                foreach (string servantClass in new[] { "Shielder", "Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin", "Berserker", "Ruler", "Avenger", "Moon_Cancer", "Alter_Ego", "Foreigner" })
                 {
-                    Match match = Regex.Match(s, "<a href=\"\\/wiki\\/[^\"]+\"[ \\t]+class=\"[^\"]+\"[ \\t]+title=\"([^\"]+)\"");
-                    if (match.Success)
+                    string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + servantClass).GetAwaiter().GetResult();
+                    html = string.Join("", html.Split(new[] { "article-thumb tnone show-info-icon" }, StringSplitOptions.None).Skip(1));
+                    foreach (Match match in Regex.Matches(html, "<a href=\"\\/wiki\\/[^\"]+\"[ \\t]+class=\"[^\"]+\"[ \\t]+title=\"([^\"]+)\"").Cast<Match>())
                     {
                         string name = match.Groups[1].Value;
-                        if (!s.Contains("Unplayable Servants") && !characters.Contains(name))
+                        if (!characters.Contains(name))
+                        {
                             characters.Add(name);
+                        }
                     }
+
                 }
             }
             return (characters);
