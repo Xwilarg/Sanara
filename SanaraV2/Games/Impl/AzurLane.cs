@@ -69,9 +69,9 @@ namespace SanaraV2.Games.Impl
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 return (new Tuple<string[], string[]>(
-                    new[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync(nameArray[0]).GetAwaiter().GetResult(),
-                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(curr.Replace(" ", "_")) + ".png)").Groups[1].Value },
-                    new[] { curr }
+                    new[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + curr).GetAwaiter().GetResult(),
+                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + curr + ".png)").Groups[1].Value },
+                    new[] { curr, json[0].ToObject<string>() }
                 ));
             }
         }
@@ -87,10 +87,10 @@ namespace SanaraV2.Games.Impl
                 {
                     if (s.Contains("Unreleased")) // We skip ships that weren't released and were found by data mining
                         continue;
-                    Match match = Regex.Match(s, "\"><a href=\"\\/[^\"]+\" title=\"([^\"]+)\">(Collab|Plan)?[0-9]+<\\/a>");
+                    Match match = Regex.Match(s, "\"><a href=\"\\/[^\"]+\" title=\"[^\"]+\">(Collab|Plan)?[0-9]+<\\/a><\\/td><td><a href=\"\\/([^\"]+)\"");
                     if (match.Success)
                     {
-                        string str = match.Groups[1].Value;
+                        string str = match.Groups[2].Value;
                         if (!ships.Contains(str))
                             ships.Add(str);
                     }
