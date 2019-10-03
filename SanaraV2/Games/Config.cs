@@ -16,13 +16,14 @@ namespace SanaraV2.Games
 {
     public struct Config
     {
-        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, bool isCropped, APreload.Multiplayer isMultiplayer)
+        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, bool isCropped, bool isShaded, APreload.Multiplayer isMultiplayer)
         {
             this.refTime = refTime;
             this.difficulty = difficulty;
             this.gameName = gameName;
             this.isFull = isFull;
             this.isCropped = isCropped;
+            this.isShaded = isShaded;
             this.isMultiplayer = isMultiplayer;
         }
 
@@ -31,6 +32,7 @@ namespace SanaraV2.Games
         public string gameName; // Used to store the score in the db
         public bool isFull; // Some game have a full mode containing a bigger dictionnary (not filtered)
         public bool isCropped; // Difficulty level cutting images in half
+        public bool isShaded; // Difficulty level only displaying shadow
         public APreload.Multiplayer isMultiplayer; // Some game have a multiplayer mode
     }
 

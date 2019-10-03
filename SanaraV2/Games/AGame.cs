@@ -33,7 +33,7 @@ namespace SanaraV2.Games
                 throw new NoDictionnaryException();
             _dictionnary = dictionnary != null ? new List<string>(dictionnary) : null; // We create a new one to be sure to not modify the common one
             _contributors = new List<ulong>();
-            _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "") + (config.isCropped ? "-cropped" : "");
+            _saveName = config.gameName + (config.difficulty == Difficulty.Easy ? "-easy" : "") + (config.isFull ? "-full" : "") + (config.isCropped ? "-cropped" : "") + (config.isShaded ? "-shaded" : "");
             _gameName = new CultureInfo("en-US").TextInfo.ToTitleCase(config.gameName);
             _score = 0;
             _postImage = false;
@@ -44,6 +44,7 @@ namespace SanaraV2.Games
             _lobby = (config.isMultiplayer == APreload.Multiplayer.MultiOnly ? new MultiplayerLobby(playerId) : null);
             _isFound = false;
             _isCropped = config.isCropped;
+            _isShaded = config.isShaded;
             Init();
         }
 
@@ -358,7 +359,7 @@ namespace SanaraV2.Games
         {
             using (HttpClient hc = new HttpClient())
             {
-                if (_isCropped) // If image need to be crop we can't just upload it with the stream, we need to download it and modify it before
+                if (_isCropped || _isShaded) // If image need to be crop we can't just upload it with the stream, we need to download it and modify it before
                 {
                     string fileExtension;
                     if (url.Contains(".png")) fileExtension = ".png";
@@ -367,11 +368,29 @@ namespace SanaraV2.Games
                     else if (url.Contains(".gif")) fileExtension = ".gif";
                     else throw new InvalidOperationException("Invalid extension for " + url);
                     string path = _gameName + DateTime.Now.ToString("HHmmss") + Program.p.rand.Next() + fileExtension;
+
                     System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(await (await hc.GetAsync(url)).Content.ReadAsStreamAsync());
-                    System.Drawing.Bitmap finalBmp = new System.Drawing.Bitmap(bmp.Width / 2, bmp.Height);
-                    System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(finalBmp);
-                    g.DrawImage(bmp, 0, 0, new System.Drawing.Rectangle(Program.p.rand.Next(0, 2) == 0 ? 0 : bmp.Width / 2, 0, bmp.Width / 2, bmp.Height), System.Drawing.GraphicsUnit.Pixel);
-                    finalBmp.Save(path);
+                    if (_isCropped)
+                    {
+                        System.Drawing.Bitmap finalBmp = new System.Drawing.Bitmap(bmp.Width / 2, bmp.Height);
+                        System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(finalBmp);
+                        g.DrawImage(bmp, 0, 0, new System.Drawing.Rectangle(Program.p.rand.Next(0, 2) == 0 ? 0 : bmp.Width / 2, 0, bmp.Width / 2, bmp.Height), System.Drawing.GraphicsUnit.Pixel);
+                        bmp = finalBmp;
+                    }
+                    if (_isShaded)
+                    {
+                        for (int x = 0; x < bmp.Width; x++)
+                        {
+                            for (int y = 0; y < bmp.Height; y++)
+                            {
+                                if (bmp.GetPixel(x, y).A > 0)
+                                    bmp.SetPixel(x, y, System.Drawing.Color.White);
+                                else
+                                    bmp.SetPixel(x, y, System.Drawing.Color.Black);
+                            }
+                        }
+                    }
+                    bmp.Save(path);
                     await _chan.SendFileAsync(path);
                     File.Delete(path);
                 }
@@ -432,5 +451,6 @@ namespace SanaraV2.Games
         private MultiplayerLobby _lobby; // Null if game session is solo
         private bool            _isFound; // Fix a bug where 2 users could answer at the same time
         private bool            _isCropped; // Difficulty level, image is cut in half
+        private bool            _isShaded; // Difficulty level, only display shadow
     }
 }

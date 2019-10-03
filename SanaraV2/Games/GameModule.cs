@@ -68,8 +68,11 @@ namespace SanaraV2.Games
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleStart"));
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote2"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote3"));
+            str.AppendLine(Environment.NewLine);
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties2"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties3"));
+            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties4"));
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleMultiHelp"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleSoloHelp"));

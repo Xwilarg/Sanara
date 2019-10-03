@@ -112,6 +112,7 @@ namespace SanaraV2.Games
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
             bool isCropped = false;
+            bool isShaded = false;
             APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
             if (args.Length > 1)
             {
@@ -139,6 +140,11 @@ namespace SanaraV2.Games
                         case "crop":
                         case "cropped":
                             isCropped = true;
+                            break;
+
+                        case "shade":
+                        case "shadow":
+                            isShaded = true;
                             break;
 
                         default:
@@ -170,7 +176,7 @@ namespace SanaraV2.Games
                             preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isCropped, isMultiplayer), playerId);
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isCropped, isShaded, isMultiplayer), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });

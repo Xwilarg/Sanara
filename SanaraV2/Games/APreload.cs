@@ -30,6 +30,7 @@ namespace SanaraV2.Games
         public abstract bool IsNsfw();
         public abstract bool DoesAllowFull(); // Allow 'full' attribute
         public abstract bool DoesAllowCropped(); // Allow 'crop" attribute
+        public abstract bool DoesAllowShadow(); // Allow 'shadow" attribute
         public abstract Multiplayer DoesAllowMultiplayer(); // Allow 'multi' attribute
         public enum Multiplayer
         {
