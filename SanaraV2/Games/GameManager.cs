@@ -112,7 +112,7 @@ namespace SanaraV2.Games
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
             bool isCropped = false;
-            bool isShaded = false;
+            APreload.Shadow isShaded = APreload.Shadow.None;
             APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
             if (args.Length > 1)
             {
@@ -144,7 +144,8 @@ namespace SanaraV2.Games
 
                         case "shade":
                         case "shadow":
-                            isShaded = true;
+                        case "shaded":
+                            isShaded = APreload.Shadow.Transparency;
                             break;
 
                         default:
@@ -167,6 +168,10 @@ namespace SanaraV2.Games
                         return Sentences.FullNotAvailable;
                     if (isCropped && !preload.DoesAllowCropped())
                         return Sentences.CropNotAvailable;
+                    if (isCropped && preload.DoesAllowShadow() == APreload.Shadow.None)
+                        return Sentences.ShadowNotAvailable;
+                    if (isShaded != APreload.Shadow.None)
+                        isShaded = preload.DoesAllowShadow();
                     try
                     {
                         await chan.SendMessageAsync(

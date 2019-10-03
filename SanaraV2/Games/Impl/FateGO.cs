@@ -38,8 +38,8 @@ namespace SanaraV2.Games.Impl
         public override bool DoesAllowCropped()
             => true;
 
-        public override bool DoesAllowShadow()
-            => true;
+        public override Shadow DoesAllowShadow()
+            => Shadow.Transparency;
 
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.SoloOnly;
