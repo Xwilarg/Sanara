@@ -82,10 +82,13 @@ namespace SanaraV2.Games.Impl
                             name = m.Groups[1].Value;
                         name = Regex.Replace(name, "<[^>]+>", "");
                         name = Regex.Replace(name, "<\\/[^>]+>", "");
-                        if (!string.IsNullOrWhiteSpace(name))
+                        foreach (string sName in name.Split(','))
                         {
-                            allAnswer.Add(name.Trim());
-                            allAnswer.Add(CleanFateGOName(name.Trim()));
+                            if (!string.IsNullOrWhiteSpace(sName))
+                            {
+                                allAnswer.Add(sName.Trim());
+                                allAnswer.Add(CleanFateGOName(sName.Trim()));
+                            }
                         }
                     }
                 }

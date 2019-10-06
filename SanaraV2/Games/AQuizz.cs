@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV2.Games
 {
@@ -80,7 +81,7 @@ namespace SanaraV2.Games
             => Sentences.GoodAnswerWas(GetGuildId(), FormatAnswer());
 
         private string FormatAnswer()
-            => new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess[0].Replace('_', ' '));
+            => HttpUtility.UrlDecode(new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess[0].Replace('_', ' ')));
 
         protected override string Help()
         {

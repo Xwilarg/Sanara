@@ -21,6 +21,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV2.Games.Impl
 {
@@ -67,7 +68,7 @@ namespace SanaraV2.Games.Impl
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(curr).Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
             }
-            List<string> allNames = new List<string>(){ curr, json[0].ToObject<string>() };
+            List<string> allNames = new List<string>() { HttpUtility.UrlDecode(curr), json[0].ToObject<string>() };
             if (curr == "HMS_Neptune" || curr == "HDN_Neptune")
                 allNames.Add("Neptune"); // Both ship are named "Neptune" ingame
             using (HttpClient hc = new HttpClient())
@@ -75,7 +76,7 @@ namespace SanaraV2.Games.Impl
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 return (new Tuple<string[], string[]>(
                     new[] { "https://azurlane.koumakan.jp" + Regex.Match(hc.GetStringAsync("https://azurlane.koumakan.jp/" + curr).GetAwaiter().GetResult(),
-                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + curr + ".png)").Groups[1].Value },
+                    "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + Uri.EscapeDataString(curr) + ".png)").Groups[1].Value },
                     allNames.ToArray()
                 ));
             }
