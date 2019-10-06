@@ -112,12 +112,16 @@ namespace SanaraV2.Games.Impl
                 {
                     string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + servantClass).GetAwaiter().GetResult();
                     html = string.Join("", html.Split(new[] { "article-thumb tnone show-info-icon" }, StringSplitOptions.None).Skip(1));
-                    foreach (Match match in Regex.Matches(html, "<a href=\"\\/wiki\\/[^\"]+\"[ \\t]+class=\"[^\"]+\"[ \\t]+title=\"([^\"]+)\"").Cast<Match>())
+                    foreach (string s in html.Split(new[] { "<td>" }, StringSplitOptions.None))
                     {
-                        string name = match.Groups[1].Value;
-                        if (!characters.Contains(name))
+                        Match match = Regex.Match(s, "<a href=\"\\/wiki\\/([^\"]+)\"( |\t)*title=\"[^\"]+\">");
+                        if (match.Success && !s.Contains("Unplayable"))
                         {
-                            characters.Add(name);
+                            string name = match.Groups[1].Value;
+                            if (!characters.Contains(name))
+                            {
+                                characters.Add(name);
+                            }
                         }
                     }
 
