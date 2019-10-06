@@ -70,8 +70,7 @@ namespace SanaraV2.Games.Impl
         {
             using (HttpClient hc = new HttpClient())
             {
-                string html = await hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Special:Search?search=" + curr + "&limit=1");
-                html = await hc.GetStringAsync(Regex.Match(html, "<a href=\"(https?:\\/\\/fategrandorder\\.fandom\\.com\\/wiki\\/[^\"]+)\" class=\"result-link").Groups[1].Value);
+                string html = await hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + curr);
 
                 List<string> allAnswer = new List<string>();
                 allAnswer.Add(HttpUtility.UrlDecode(curr).Replace("&amp;", "And").Replace("&#39;", "'"));
