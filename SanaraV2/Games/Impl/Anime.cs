@@ -15,10 +15,14 @@
 
 using BooruSharp.Booru;
 using Discord;
+using MediaToolkit;
+using MediaToolkit.Model;
+using MediaToolkit.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Games.Impl
@@ -32,6 +36,9 @@ namespace SanaraV2.Games.Impl
             => false;
 
         public override bool DoesAllowFull()
+            => true;
+
+        public override bool DoesAllowSendImage()
             => true;
 
         public override bool DoesAllowCropped()
@@ -50,7 +57,11 @@ namespace SanaraV2.Games.Impl
     public class Anime : AQuizz
     {
         public Anime(ITextChannel chan, Config config, ulong playerId) : base(chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config, playerId)
-        { }
+        {
+            _sendImage = config.sendImage;
+            if (_sendImage && Directory.Exists("Saves"))
+                Directory.CreateDirectory("Saves");
+        }
 
         protected override void Init()
         {
@@ -64,13 +75,47 @@ namespace SanaraV2.Games.Impl
         protected override bool DoesDisplayHelp()
             => true;
 
+        protected override PostType GetPostType()
+            => _sendImage ? PostType.LocalPath : PostType.Url;
+
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
             var result = Features.NSFW.Booru.SearchBooru(false, new string[] { curr, "animated" }, _booru, Program.p.rand).GetAwaiter().GetResult();
-            return (new Tuple<string[], string[]>(
-                new[] { result.answer.url },
-                result.answer.tags.Where(x => _booru.GetTag(x).GetAwaiter().GetResult().type == BooruSharp.Search.Tag.TagType.Copyright).ToArray()
-            ));
+            var answers = result.answer.tags.Where(x => _booru.GetTag(x).GetAwaiter().GetResult().type == BooruSharp.Search.Tag.TagType.Copyright).ToArray();
+            if (_sendImage)
+            {
+                if (result.answer.url.EndsWith(".gif"))
+                    return await GetPostInternalAsync(curr); // We only take .mp4 for now
+                string randomPath = GetRandomPath();
+                string path = "Saves/" + randomPath + ".mp4";
+                using (HttpClient hc = new HttpClient())
+                    File.WriteAllBytes(path, await hc.GetByteArrayAsync(result.answer.url));
+                using (var engine = new Engine())
+                {
+                    var mp4 = new MediaFile { Filename = path };
+                    engine.GetMetadata(mp4);
+                    var i = 0;
+                    int middle = (int)mp4.Metadata.Duration.TotalSeconds / 2;
+                    int lowerQuartile = middle / 2;
+                    int upperQuartile = lowerQuartile * 3;
+                    engine.GetThumbnail(mp4, new MediaFile { Filename = "Saves/" + randomPath + "-1.jpeg" },
+                        new ConversionOptions { Seek = TimeSpan.FromSeconds(lowerQuartile) });
+                    engine.GetThumbnail(mp4, new MediaFile { Filename = "Saves/" + randomPath + "-2.jpeg" },
+                        new ConversionOptions { Seek = TimeSpan.FromSeconds(middle) });
+                    engine.GetThumbnail(mp4, new MediaFile { Filename = "Saves/" + randomPath + "-3.jpeg" },
+                        new ConversionOptions { Seek = TimeSpan.FromSeconds(upperQuartile) });
+                }
+                File.Delete(path);
+                return (new Tuple<string[], string[]>(
+                    new[] { "Saves/" + randomPath + "-1.jpeg", "Saves/" + randomPath + "-2.jpeg", "Saves/" + randomPath + "-3.jpeg" }, answers
+                ));
+            }
+            else
+            {
+                return (new Tuple<string[], string[]>(
+                    new[] { result.answer.url }, answers
+                ));
+            }
         }
 
         private Sakugabooru _booru;
@@ -91,5 +136,7 @@ namespace SanaraV2.Games.Impl
             }
             return (new Tuple<List<string>, List<string>>(tags, tagsFull));
         }
+
+        private bool _sendImage; // Send 3 images instead of the video
     }
 }

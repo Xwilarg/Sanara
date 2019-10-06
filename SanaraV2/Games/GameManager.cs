@@ -111,6 +111,7 @@ namespace SanaraV2.Games
             string gameName = args[0].ToLower();
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
+            bool sendImage = false;
             bool isCropped = false;
             APreload.Shadow isShaded = APreload.Shadow.None;
             APreload.Multiplayer isMultiplayer = APreload.Multiplayer.SoloOnly;
@@ -148,6 +149,10 @@ namespace SanaraV2.Games
                             isShaded = APreload.Shadow.Transparency;
                             break;
 
+                        case "image":
+                            sendImage = true;
+                            break;
+
                         default:
                             return Sentences.InvalidGameArgument;
                     }
@@ -166,6 +171,8 @@ namespace SanaraV2.Games
                         return Sentences.SoloNotAvailable;
                     if (isFull && !preload.DoesAllowFull())
                         return Sentences.FullNotAvailable;
+                    if (sendImage && !preload.DoesAllowSendImage())
+                        return Sentences.SendImageNotAvailable;
                     if (isCropped && !preload.DoesAllowCropped())
                         return Sentences.CropNotAvailable;
                     if (isCropped && preload.DoesAllowShadow() == APreload.Shadow.None)
@@ -181,7 +188,7 @@ namespace SanaraV2.Games
                             preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, isCropped, isShaded, isMultiplayer), playerId);
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });

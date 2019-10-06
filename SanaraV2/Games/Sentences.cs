@@ -79,6 +79,7 @@ namespace SanaraV2.Games
         public static string ScoreContributors(ulong guildId) { return (Translation.GetTranslation(guildId, "scoreContributors")); }
         public static string NoScore(ulong guildId) { return (Translation.GetTranslation(guildId, "noScore")); }
         public static string FullNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "fullNotAvailable")); }
+        public static string SendImageNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "sendImageNotAvailable")); }
         public static string CropNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "cropNotAvailable")); }
         public static string ShadowNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "shadowNotAvailable")); }
         public static string SoloNotAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "soloNotAvailable")); }

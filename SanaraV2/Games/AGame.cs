@@ -144,7 +144,8 @@ namespace SanaraV2.Games
                 string finding = ""; // For error handling
                 try
                 {
-                    if (GetPostType() == PostType.Text)
+                    PostType type = GetPostType();
+                    if (type == PostType.Text)
                         foreach (string s in await GetPostAsync())
                         {
                             if (s == null)
@@ -152,7 +153,7 @@ namespace SanaraV2.Games
                             finding = s;
                             await PostText(s);
                         }
-                    else
+                    else if (type == PostType.Url)
                         foreach (string s in await GetPostAsync())
                         {
                             if (s == null)
@@ -161,6 +162,15 @@ namespace SanaraV2.Games
                             using (HttpClient hc = new HttpClient())
                                 await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
                             await PostFromUrl(s);
+                        }
+                    else
+                        foreach (string s in await GetPostAsync())
+                        {
+                            if (s == null)
+                                continue;
+                            finding = s;
+                            await PostFromLocalPath(s);
+                            File.Delete(s);
                         }
                     _startTime = DateTime.Now;
                     _isFound = false;
@@ -417,6 +427,11 @@ namespace SanaraV2.Games
             await _chan.SendMessageAsync(msg);
         }
 
+        protected async Task PostFromLocalPath(string path)
+        {
+            await _chan.SendFileAsync(path);
+        }
+
         protected async Task PostText(Func<ulong, string> fct) // Called by children to display sentences
             => await PostText(fct(_chan.GuildId));
 
@@ -426,10 +441,16 @@ namespace SanaraV2.Games
         protected ulong GetGuildId() // Use GetStringFromSentence instead if possible
             => _chan.GuildId;
 
+        protected string GetRandomPath() // Add this to a local file to make sure it doesn't already exists
+        {
+            return _chan.Id + DateTime.Now.ToString("HHmmss") + Program.p.rand.Next(int.MaxValue);
+        }
+
         protected enum PostType
         {
             Url,
-            Text
+            Text,
+            LocalPath
         }
 
         private enum GameState
