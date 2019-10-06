@@ -21,6 +21,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV2.Games.Impl
 {
@@ -63,17 +64,17 @@ namespace SanaraV2.Games.Impl
             => false;
 
         private string CleanFateGOName(string name)
-            => name.Replace("ō", "ou").Replace("ū", "uu").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("è", "e").Replace("ð", "d").Replace("&Amp;", "And").Replace("&#39;", "'");
+            => HttpUtility.UrlDecode(name).Replace("ō", "ou").Replace("ū", "uu").Replace("á", "a").Replace("ú", "u").Replace("ó", "o").Replace("é", "e").Replace("è", "e").Replace("ð", "d").Replace("&Amp;", "And").Replace("&#39;", "'");
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
             using (HttpClient hc = new HttpClient())
             {
-                string html = await hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Special:Search?search=" + Uri.EscapeDataString(curr) + "&limit=1");
+                string html = await hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/Special:Search?search=" + curr + "&limit=1");
                 html = await hc.GetStringAsync(Regex.Match(html, "<a href=\"(https?:\\/\\/fategrandorder\\.fandom\\.com\\/wiki\\/[^\"]+)\" class=\"result-link").Groups[1].Value);
 
                 List<string> allAnswer = new List<string>();
-                allAnswer.Add(curr.Replace("&amp;", "And").Replace("&#39;", "'"));
+                allAnswer.Add(HttpUtility.UrlDecode(curr).Replace("&amp;", "And").Replace("&#39;", "'"));
                 allAnswer.Add(CleanFateGOName(curr));
                 if (html.Contains("AKA:"))
                 {
