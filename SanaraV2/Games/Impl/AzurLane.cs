@@ -69,7 +69,7 @@ namespace SanaraV2.Games.Impl
             using (HttpClient hc = new HttpClient())
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + Uri.EscapeDataString(curr).Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
+                json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + curr.Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
             }
             List<string> allNames = new List<string>() { HttpUtility.UrlDecode(curr), json[0].ToObject<string>() };
             if (curr == "HMS_Neptune" || curr == "HDN_Neptune")

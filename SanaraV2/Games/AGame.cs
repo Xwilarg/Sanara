@@ -160,7 +160,11 @@ namespace SanaraV2.Games
                                 continue;
                             finding = s;
                             using (HttpClient hc = new HttpClient())
-                                await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s)); // Throw an exception is the link isn't valid
+                            {
+                                var answer = await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s));
+                                if (!answer.IsSuccessStatusCode)
+                                    throw new HttpRequestException("Invalid code " + answer.StatusCode);
+                            }
                             await PostFromUrl(s);
                         }
                     else
