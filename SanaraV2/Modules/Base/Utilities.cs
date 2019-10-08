@@ -53,6 +53,7 @@ namespace SanaraV2.Modules.Base
         public static string CleanWord(string word)
         {
             string finalStr = "";
+            word = Regex.Replace(word, "%[0-9A-Z]{2}", ""); // Remove special characters encoded
             foreach (char c in word)
             {
                 if (char.IsLetterOrDigit(c))

@@ -63,13 +63,13 @@ namespace SanaraV2.Games
                 if (cleanUserAnswer == Utilities.CleanWord(s))
                     return null;
             }
+            if (IsDictionnaryFull())
+            {
+                if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
+                    return GetStringFromSentence(Sentences.guessDontExist);
+            }
             foreach (string s in _toGuess)
             {
-                if (IsDictionnaryFull())
-                {
-                    if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
-                        return GetStringFromSentence(Sentences.guessDontExist);
-                }
                 string cleanGuess = Utilities.CleanWord(s);
                 if (cleanUserAnswer.Contains(cleanGuess) || cleanGuess.Contains(cleanUserAnswer))
                     return Sentences.BooruGuessClose(GetGuildId(), userAnswer.Replace("@everyone", "@ everyone"));
