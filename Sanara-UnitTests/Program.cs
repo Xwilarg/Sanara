@@ -263,7 +263,7 @@ namespace Sanara_UnitTests
         [InlineData("Kisaragi", "https://azurlane.koumakan.jp/w/images/thumb/b/ba/Kisaragi.png/600px-Kisaragi.png")]
         [InlineData("Li%27l_Sandy", "https://azurlane.koumakan.jp/w/images/thumb/1/19/Li%27l_Sandy.png/600px-Li%27l_Sandy.png")]
         [InlineData("33", "https://azurlane.koumakan.jp/w/images/thumb/9/9c/33.png/600px-33.png")]
-        [InlineData("Le_T%C3%A9m%C3%A9raire", "https://azurlane.koumakan.jp/w/images/thumb/9/94/Le_Temeraire.png/600px-Le_Temeraire.png")]
+        [InlineData("Le_Temeraire", "https://azurlane.koumakan.jp/w/images/thumb/9/94/Le_Temeraire.png/600px-Le_Temeraire.png")]
         [InlineData("Ibuki", "https://azurlane.koumakan.jp/w/images/thumb/7/75/Ibuki.png/600px-Ibuki.png")]
         [InlineData("Laffey", "https://azurlane.koumakan.jp/w/images/thumb/2/2a/Laffey.png/595px-Laffey.png")]
         public async Task TestAzurLaneDictionnary(string name, string url)
@@ -274,10 +274,10 @@ namespace Sanara_UnitTests
         }
 
         [Theory]
-        [InlineData("Mashu_Kyrielight", "https://vignette.wikia.nocookie.net/fategrandorder/images/b/b0/Shielder1.png/revision/latest/scale-to-width-down/350?cb=20170206150321")]
-        [InlineData("Tamamo_Cat", "https://vignette.wikia.nocookie.net/fategrandorder/images/f/fd/Tamamo01.png/revision/latest/scale-to-width-down/350?cb=20170208180452")]
-        [InlineData("Miyamoto_Musashi_(Berserker)", "https://vignette.wikia.nocookie.net/fategrandorder/images/8/85/Musashi_Berserker_1.png/revision/latest/scale-to-width-down/350?cb=20190814143846")]
-        [InlineData("Sakamoto_Ry%C5%8Dma", "https://vignette.wikia.nocookie.net/fategrandorder/images/9/97/Ryoma_1.png/revision/latest/scale-to-width-down/350?cb=20180617153050")]
+        [InlineData("Mashu_Kyrielight", "https://vignette.wikia.nocookie.net/fategrandorder/images/b/b0/Shielder1.png")]
+        [InlineData("Tamamo_Cat", "https://vignette.wikia.nocookie.net/fategrandorder/images/f/fd/Tamamo01.png")]
+        [InlineData("Miyamoto_Musashi_(Berserker)", "https://vignette.wikia.nocookie.net/fategrandorder/images/8/85/Musashi_Berserker_1.png")]
+        [InlineData("Sakamoto_Ry%C5%8Dma", "https://vignette.wikia.nocookie.net/fategrandorder/images/9/97/Ryoma_1.png")]
         public async Task TestFateGODictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.fateGODictionnary);
@@ -286,9 +286,9 @@ namespace Sanara_UnitTests
         }
 
         [Theory]
-        [InlineData("Ryuujou", "https://vignette.wikia.nocookie.net/kancolle/images/8/81/Ryuujou_Full.png/revision/latest?cb=20180817193523")]
-        [InlineData("Commandant_Teste", "https://vignette.wikia.nocookie.net/kancolle/images/c/ca/Commandant_Teste_Full.png/revision/latest?cb=20181029140128")]
-        [InlineData("Maruyu", "https://vignette.wikia.nocookie.net/kancolle/images/a/aa/Maruyu_Full.png/revision/latest?cb=20180817192914")]
+        [InlineData("Ryuujou", "https://vignette.wikia.nocookie.net/kancolle/images/8/81/Ryuujou_Full.png")]
+        [InlineData("Commandant_Teste", "https://vignette.wikia.nocookie.net/kancolle/images/c/ca/Commandant_Teste_Full.png")]
+        [InlineData("Maruyu", "https://vignette.wikia.nocookie.net/kancolle/images/a/aa/Maruyu_Full.png")]
         public async Task TestKanColleDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.kanColleDictionnary);
