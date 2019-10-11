@@ -57,7 +57,7 @@ namespace SanaraV2.Games
 
         /// Only for unit tests
         public async Task<string> GetUrlTest(string userAnswer)
-            => await GetCheckCorrectAsync(userAnswer);
+            => (await GetPostInternalAsync(userAnswer)).Item1[0];
 
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
