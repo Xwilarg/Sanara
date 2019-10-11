@@ -260,51 +260,62 @@ namespace Sanara_UnitTests
             => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
 
         [Theory]
-        [InlineData("Kisaragi")]
-        [InlineData("Li%27L_Sandy")]
-        [InlineData("33")]
-        [InlineData("Le_T%C3%A9m%C3%A9raire")]
-        [InlineData("Unicorn")]
-        public async Task TestAzurLaneDictionnary(string name)
+        [InlineData("Kisaragi", "https://azurlane.koumakan.jp/w/images/thumb/b/ba/Kisaragi.png/600px-Kisaragi.png")]
+        [InlineData("Li%27l_Sandy", "https://azurlane.koumakan.jp/w/images/thumb/1/19/Li%27l_Sandy.png/600px-Li%27l_Sandy.png")]
+        [InlineData("33", "https://azurlane.koumakan.jp/w/images/thumb/9/9c/33.png/600px-33.png")]
+        [InlineData("Le_T%C3%A9m%C3%A9raire", "https://azurlane.koumakan.jp/w/images/thumb/9/94/Le_Temeraire.png/600px-Le_Temeraire.png")]
+        [InlineData("Ibuki", "https://azurlane.koumakan.jp/w/images/thumb/7/75/Ibuki.png/600px-Ibuki.png")]
+        [InlineData("Laffey", "https://azurlane.koumakan.jp/w/images/thumb/2/2a/Laffey.png/595px-Laffey.png")]
+        public async Task TestAzurLaneDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.azurLaneDictionnary);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
         }
 
         [Theory]
-        [InlineData("Mashu_Kyrielight")]
-        [InlineData("Tamamo_Cat")]
-        [InlineData("Miyamoto_Musashi_(Berserker)")]
-        [InlineData("Sakamoto_Ry%C5%8Dma")]
-        public async Task TestFateGODictionnary(string name)
+        [InlineData("Mashu_Kyrielight", "https://vignette.wikia.nocookie.net/fategrandorder/images/b/b0/Shielder1.png/revision/latest/scale-to-width-down/350?cb=20170206150321")]
+        [InlineData("Tamamo_Cat", "https://vignette.wikia.nocookie.net/fategrandorder/images/f/fd/Tamamo01.png/revision/latest/scale-to-width-down/350?cb=20170208180452")]
+        [InlineData("Miyamoto_Musashi_(Berserker)", "https://vignette.wikia.nocookie.net/fategrandorder/images/8/85/Musashi_Berserker_1.png/revision/latest/scale-to-width-down/350?cb=20190814143846")]
+        [InlineData("Sakamoto_Ry%C5%8Dma", "https://vignette.wikia.nocookie.net/fategrandorder/images/9/97/Ryoma_1.png/revision/latest/scale-to-width-down/350?cb=20180617153050")]
+        public async Task TestFateGODictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.fateGODictionnary);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "fatego", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
         }
 
         [Theory]
-        [InlineData("Ryuujou")]
-        [InlineData("Commandant Teste")]
-        [InlineData("Maruyu")]
-        public async Task TestKanColleDictionnary(string name)
+        [InlineData("Ryuujou", "https://vignette.wikia.nocookie.net/kancolle/images/8/81/Ryuujou_Full.png/revision/latest?cb=20180817193523")]
+        [InlineData("Commandant_Teste", "https://vignette.wikia.nocookie.net/kancolle/images/c/ca/Commandant_Teste_Full.png/revision/latest?cb=20181029140128")]
+        [InlineData("Maruyu", "https://vignette.wikia.nocookie.net/kancolle/images/a/aa/Maruyu_Full.png/revision/latest?cb=20180817192914")]
+        public async Task TestKanColleDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.kanColleDictionnary);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "kancolle", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
         }
 
         [Theory]
-        [InlineData("Ponyta")]
-        [InlineData("Farfetch'd")]
-        [InlineData("Solgaleo")]
-        public async Task TestPokemonDictionnary(string name)
+        [InlineData("ponyta", "https://img.pokemondb.net/artwork/ponyta.jpg")]
+        [InlineData("farfetchd", "https://img.pokemondb.net/artwork/farfetchd.jpg")]
+        [InlineData("solgaleo", "https://img.pokemondb.net/artwork/solgaleo.jpg")]
+        public async Task TestPokemonDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.pokemonDictionnary);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "pokemon", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
         }
 
         [Theory]
-        [InlineData("FNC")]
-        [InlineData("OTs-14")]
-        [InlineData("ST_AR-15")]
-        public async Task TestGirlsFrontlineDictionnary(string name)
+        [InlineData("FNC", "https://en.gfwiki.com/images/thumb/e/ec/FNC.png/600px-FNC.png")]
+        [InlineData("OTs-14", "https://en.gfwiki.com/images/thumb/9/93/OTs-14.png/600px-OTs-14.png")]
+        [InlineData("ST_AR-15", "https://en.gfwiki.com/images/thumb/2/2e/ST_AR-15.png/600px-ST_AR-15.png")]
+        public async Task TestGirlsFrontlineDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.girlsfrontlineDictionnary);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
         }
 
         // BOORU MODULE
