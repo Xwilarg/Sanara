@@ -15,7 +15,6 @@
 using Xunit;
 using System;
 using SanaraV2.Features.NSFW;
-using System.Net;
 using System.Threading.Tasks;
 using Discord;
 using System.Linq;
@@ -259,6 +258,54 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestGameGirlsFrontline()
             => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+
+        [Theory]
+        [InlineData("Kisaragi")]
+        [InlineData("Li%27L_Sandy")]
+        [InlineData("33")]
+        [InlineData("Le_T%C3%A9m%C3%A9raire")]
+        [InlineData("Unicorn")]
+        public async Task TestAzurLaneDictionnary(string name)
+        {
+            Assert.Contains(name, Constants.azurLaneDictionnary);
+        }
+
+        [Theory]
+        [InlineData("Mashu_Kyrielight")]
+        [InlineData("Tamamo_Cat")]
+        [InlineData("Miyamoto_Musashi_(Berserker)")]
+        [InlineData("Sakamoto_Ry%C5%8Dma")]
+        public async Task TestFateGODictionnary(string name)
+        {
+            Assert.Contains(name, Constants.fateGODictionnary);
+        }
+
+        [Theory]
+        [InlineData("Ryuujou")]
+        [InlineData("Commandant Teste")]
+        [InlineData("Maruyu")]
+        public async Task TestKanColleDictionnary(string name)
+        {
+            Assert.Contains(name, Constants.kanColleDictionnary);
+        }
+
+        [Theory]
+        [InlineData("Ponyta")]
+        [InlineData("Farfetch'd")]
+        [InlineData("Solgaleo")]
+        public async Task TestPokemonDictionnary(string name)
+        {
+            Assert.Contains(name, Constants.pokemonDictionnary);
+        }
+
+        [Theory]
+        [InlineData("FNC")]
+        [InlineData("OTs-14")]
+        [InlineData("ST_AR-15")]
+        public async Task TestGirlsFrontlineDictionnary(string name)
+        {
+            Assert.Contains(name, Constants.girlsfrontlineDictionnary);
+        }
 
         // BOORU MODULE
         [Fact]

@@ -55,6 +55,10 @@ namespace SanaraV2.Games
             return elem.Item1;
         }
 
+        /// Only for unit tests
+        public async Task<string> GetUrlTest(string userAnswer)
+            => await GetCheckCorrectAsync(userAnswer);
+
         protected override async Task<string> GetCheckCorrectAsync(string userAnswer)
         {
             string cleanUserAnswer = Utilities.CleanWord(userAnswer);
