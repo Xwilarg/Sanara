@@ -111,6 +111,7 @@ namespace SanaraV2.Games.Impl
                 foreach (string servantClass in new[] { "Shielder", "Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin", "Berserker", "Ruler", "Avenger", "Moon_Cancer", "Alter_Ego", "Foreigner" })
                 {
                     string html = hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + servantClass).GetAwaiter().GetResult();
+                    html = html.Split(new[] { "navbox mw-collapsible" }, StringSplitOptions.None)[0]; // Remove useless things at ending
                     html = string.Join("", html.Split(new[] { "article-thumb tnone show-info-icon" }, StringSplitOptions.None).Skip(1));
                     foreach (string s in html.Split(new[] { "<td>" }, StringSplitOptions.None))
                     {
