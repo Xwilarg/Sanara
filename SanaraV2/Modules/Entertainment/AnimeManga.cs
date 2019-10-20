@@ -82,9 +82,10 @@ namespace SanaraV2.Modules.Entertainment
 
         private Embed CreateEmbed(bool isAnime, Response.AnimeManga res, ulong guildId)
         {
+            string fullName = res.name + ((res.alternativeTitles == null || res.alternativeTitles.Length == 0) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")"));
             EmbedBuilder embed = new EmbedBuilder()
             {
-                Title = res.name + ((res.alternativeTitles == null || res.alternativeTitles.Length == 0) ? ("") : (" (" + string.Join(", ", res.alternativeTitles) + ")")),
+                Title = fullName.Length > 256 ? res.name : fullName,
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
                 Description = res.synopsis
