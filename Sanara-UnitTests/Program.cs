@@ -67,6 +67,7 @@ namespace Sanara_UnitTests
             Assert.Equal(1, result.answer.episode);
             Assert.Equal("4:51", result.answer.at);
             Assert.Equal("https://trace.moe/thumbnail.php?anilist_id=21034&file=%5BDymy%5D%5BGochuumon%20wa%20Usagi%20Desu%20ka%5D%5BS2%5D%5B01%5D%5BBIG5%5D%5B1280X720%5D.mp4&t=291.08&token=Ffs0TXlswccEj-6Yyg3ALg", result.answer.imageUrl);
+            Assert.InRange(result.answer.compatibility, 0.9f, 1f);
         }
 
         // DOUJINSHI MODULE
