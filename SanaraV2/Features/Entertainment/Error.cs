@@ -16,6 +16,14 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Error
     {
+        public enum Source
+        {
+            None,
+            Help,
+            NotFound,
+            NotNsfw
+        }
+
         public enum Score
         {
             None,

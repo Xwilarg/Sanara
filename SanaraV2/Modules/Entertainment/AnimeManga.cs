@@ -16,6 +16,7 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Features.Entertainment;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment
@@ -23,6 +24,46 @@ namespace SanaraV2.Modules.Entertainment
     public class AnimeManga : ModuleBase
     {
         Program p = Program.p;
+
+        [Command("AnimeSource"), Alias("SourceAnime", "Source", "Sauce")]
+        public async Task Source(params string[] args)
+        {
+            if (Context.Message.Attachments.Count > 0)
+                args = new[] { Context.Message.Attachments.ToArray()[0].Url };
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            var result = await Features.Entertainment.AnimeManga.SearchSource(((ITextChannel)Context.Channel).IsNsfw, args);
+            switch (result.error)
+            {
+                case Error.Source.None:
+                    await ReplyAsync("", false, new EmbedBuilder
+                    {
+                        Color = result.answer.isNsfw ? Color.Red : Color.Green,
+                        Title = result.answer.name,
+                        ImageUrl = result.answer.imageUrl,
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility.ToString("0.00")
+                        }
+                    }.Build());
+                    break;
+
+                case Error.Source.Help:
+                    await ReplyAsync(Sentences.SourceHelp(Context.Guild.Id));
+                    break;
+
+                case Error.Source.NotFound:
+                    await ReplyAsync(Tools.Sentences.NotAnImage(Context.Guild.Id));
+                    break;
+
+                case Error.Source.NotNsfw:
+                    await ReplyAsync(Base.Sentences.AnswerNsfw(Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
         [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
         public async Task Anime(params string[] animeNameArr)

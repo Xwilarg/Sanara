@@ -19,6 +19,14 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Response
     {
+        public class Source
+        {
+            public string name;
+            public string imageUrl;
+            public bool isNsfw;
+            public float compatibility;
+        }
+
         public class Score
         {
             public class ScoreItem

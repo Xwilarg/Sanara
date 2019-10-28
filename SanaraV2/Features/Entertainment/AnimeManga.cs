@@ -31,6 +31,37 @@ namespace SanaraV2.Features.Entertainment
             return s1.Contains(s2);
         }
 
+        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, string[] args)
+        {
+            string url = string.Join("", args);
+            if (url.Length == 0)
+                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.Help);
+            dynamic json;
+            try
+            {
+
+                using (HttpClient hc = new HttpClient())
+                {
+                    string html = await hc.GetStringAsync("https://trace.moe/api/search?url=" + Uri.EscapeDataString(url));
+                    json = JsonConvert.DeserializeObject(html);
+                }
+            }
+            catch (HttpRequestException) // The API return an error 500 on fail
+            {
+                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotFound);
+            }
+            dynamic elem = json.docs[0];
+            if (!isChanNsfw && (bool)elem.is_adult)
+                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotNsfw);
+            return new FeatureRequest<Response.Source, Error.Source>(new Response.Source
+            {
+                compatibility = elem.similarity,
+                imageUrl = "https://trace.moe/thumbnail.php?anilist_id=" + elem.anilist_id + "&file=" + Uri.EscapeDataString((string)elem.filename) + "&t=" + elem.at + "&token=" + elem.tokenthumb,
+                isNsfw = elem.is_adult,
+                name = elem.title_romaji
+            }, Error.Source.None);
+        }
+
         /// <summary>
         /// Search for an anime/manga using kitsu.io API
         /// </summary>

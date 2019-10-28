@@ -21,6 +21,7 @@ namespace SanaraV2.Modules.Entertainment
         /// --------------------------- AnimeManga ---------------------------
         public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }
         public static string AnimeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "animeHelp")); }
+        public static string SourceHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "sourceHelp")); }
         public static string MangaNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaNotFound")); }
         public static string AnimeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotFound")); }
         public static string AnimeEpisodes(ulong guildId) { return (Translation.GetTranslation(guildId, "animeEpisodes")); }
@@ -29,6 +30,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string AnimeAudiance(ulong guildId) { return (Translation.GetTranslation(guildId, "animeAudiance")); }
         public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
         public static string Unknown(ulong guildId) { return (Translation.GetTranslation(guildId, "unknown")); }
+        public static string Certitude(ulong guildId) { return (Translation.GetTranslation(guildId, "certitude")); }
 
         /// --------------------------- Radio ---------------------------
         public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }
