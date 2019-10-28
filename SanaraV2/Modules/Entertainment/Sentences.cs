@@ -31,6 +31,7 @@ namespace SanaraV2.Modules.Entertainment
         public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
         public static string Unknown(ulong guildId) { return (Translation.GetTranslation(guildId, "unknown")); }
         public static string Certitude(ulong guildId) { return (Translation.GetTranslation(guildId, "certitude")); }
+        public static string Episode(ulong guildId) { return (Translation.GetTranslation(guildId, "episode")); }
 
         /// --------------------------- Radio ---------------------------
         public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }

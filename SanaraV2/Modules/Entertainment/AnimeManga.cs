@@ -25,7 +25,7 @@ namespace SanaraV2.Modules.Entertainment
     {
         Program p = Program.p;
 
-        [Command("AnimeSource"), Alias("SourceAnime", "Source", "Sauce")]
+        [Command("AnimeSource", RunMode = RunMode.Async), Alias("SourceAnime", "Source", "Sauce")]
         public async Task Source(params string[] args)
         {
             if (Context.Message.Attachments.Count > 0)
@@ -40,6 +40,7 @@ namespace SanaraV2.Modules.Entertainment
                     {
                         Color = result.answer.isNsfw ? Color.Red : Color.Green,
                         Title = result.answer.name,
+                        Description = Sentences.Episode(Context.Guild.Id) + " " + result.answer.episode + " " + Base.Sentences.AtStr(Context.Guild.Id) + " " + result.answer.at,
                         ImageUrl = result.answer.imageUrl,
                         Footer = new EmbedFooterBuilder
                         {

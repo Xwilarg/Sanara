@@ -53,14 +53,20 @@ namespace SanaraV2.Features.Entertainment
             dynamic elem = json.docs[0];
             if (!isChanNsfw && (bool)elem.is_adult)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotNsfw);
+            int at = elem.at;
             return new FeatureRequest<Response.Source, Error.Source>(new Response.Source
             {
                 compatibility = elem.similarity,
-                imageUrl = "https://trace.moe/thumbnail.php?anilist_id=" + elem.anilist_id + "&file=" + Uri.EscapeDataString((string)elem.filename) + "&t=" + elem.at + "&token=" + elem.tokenthumb,
+                imageUrl = "https://trace.moe/thumbnail.php?anilist_id=" + elem.anilist_id + "&file=" + Uri.EscapeDataString((string)elem.filename) + "&t=" + elem.at.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + "&token=" + elem.tokenthumb,
                 isNsfw = elem.is_adult,
-                name = elem.title_romaji
+                name = elem.title_romaji,
+                episode = elem.episode,
+                at = at / 60 + ":" + AddLeadingZero((at % 60).ToString())
             }, Error.Source.None);
         }
+
+        private static string AddLeadingZero(string str)
+            => str.Length == 1 ? "0" + str : str;
 
         /// <summary>
         /// Search for an anime/manga using kitsu.io API

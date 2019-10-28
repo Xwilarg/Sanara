@@ -56,6 +56,19 @@ namespace Sanara_UnitTests
             Assert.InRange(result.answer.synopsis.Length, 800, 1200);
         }
 
+        [Fact]
+        public async Task TestSource()
+        {
+            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchSource(false, new[] { "https://trace.moe/img/draw2-good.jpg" });
+            Assert.Equal(SanaraV2.Features.Entertainment.Error.Source.None, result.error);
+            Assert.NotNull(result.answer);
+            Assert.Equal("Gochuumon wa Usagi Desu ka??", result.answer.name);
+            Assert.False(result.answer.isNsfw);
+            Assert.Equal(1, result.answer.episode);
+            Assert.Equal("4:51", result.answer.at);
+            Assert.Equal("https://trace.moe/thumbnail.php?anilist_id=21034&file=%5BDymy%5D%5BGochuumon%20wa%20Usagi%20Desu%20ka%5D%5BS2%5D%5B01%5D%5BBIG5%5D%5B1280X720%5D.mp4&t=291.08&token=Ffs0TXlswccEj-6Yyg3ALg", result.answer.imageUrl);
+        }
+
         // DOUJINSHI MODULE
         [Fact]
         public async Task TestDoujinshi()
