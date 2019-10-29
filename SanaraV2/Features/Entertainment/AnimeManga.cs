@@ -50,7 +50,7 @@ namespace SanaraV2.Features.Entertainment
             dynamic json = null;
             if (!skipBeginning)
             {
-                json = ContactSource(url);
+                json = await ContactSource(url);
             }
             if (json == null && website != null && token != null)
             {
@@ -63,7 +63,7 @@ namespace SanaraV2.Features.Entertainment
                 HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, token);
                 msg.Content = new FormUrlEncodedContent(values);
                 string newUrl = ((dynamic)JsonConvert.DeserializeObject(await (await httpClient.SendAsync(msg)).Content.ReadAsStringAsync())).url;
-                json = ContactSource(newUrl);
+                json = await ContactSource(newUrl);
                 values = new Dictionary<string, string> {
                            { "token", website },
                            { "action", "delete" },
