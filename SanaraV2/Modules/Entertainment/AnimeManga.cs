@@ -36,7 +36,7 @@ namespace SanaraV2.Modules.Entertainment
                 args = new[] { Context.Message.Attachments.ToArray()[0].Url };
                 skipBeginning = true;
             }
-            var result = await Features.Entertainment.AnimeManga.SearchSource(((ITextChannel)Context.Channel).IsNsfw, skipBeginning, args);
+            var result = await Features.Entertainment.AnimeManga.SearchSource(((ITextChannel)Context.Channel).IsNsfw, skipBeginning, Program.p.websiteUpload, Program.p.websiteUploadToken, args);
             switch (result.error)
             {
                 case Error.Source.None:

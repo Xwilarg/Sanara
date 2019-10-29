@@ -86,6 +86,8 @@ namespace SanaraV2
         private string websiteStats, websiteStatsToken;
         public bool sendStats { private set; get; }
 
+        public string websiteUpload, websiteUploadToken; // For "Source" command
+
         // Discord Bot List
         private AuthDiscordBotListApi dblApi;
         private DateTime lastDiscordBotsSent; // We make sure to wait at least 10 mins before sending stats to DiscordBots.org so we don't spam the API
@@ -163,6 +165,8 @@ namespace SanaraV2
                 GitHubKey = json.githubKey;
                 websiteStats = json.websiteStats;
                 websiteStatsToken = json.websiteStatsToken;
+                websiteUpload = json.websiteUpload;
+                websiteUploadToken = json.websiteUploadToken;
                 if (json.kitsuEmail != null && json.kitsuPassword != null)
                 {
                     kitsuAuth = new Dictionary<string, string> {

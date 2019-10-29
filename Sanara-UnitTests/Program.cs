@@ -59,7 +59,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestSource()
         {
-            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchSource(false, false, new[] { "https://trace.moe/img/draw2-good.jpg" });
+            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchSource(false, false, null, null, new[] { "https://trace.moe/img/draw2-good.jpg" });
             Assert.Equal(SanaraV2.Features.Entertainment.Error.Source.None, result.error);
             Assert.NotNull(result.answer);
             Assert.Equal("Gochuumon wa Usagi Desu ka??", result.answer.name);

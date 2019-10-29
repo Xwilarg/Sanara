@@ -38,7 +38,7 @@ namespace SanaraV2.Features.Entertainment
         /// <param name="isChanNsfw">Is the channel from where the user asking NSFW</param>
         /// <param name="skipBeginning">If is Discord upload, we can skip the verification part</param>
         /// <param name="args">URL</param>
-        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, bool skipBeginning, string[] args)
+        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, bool skipBeginning, string website, string token, string[] args)
         {
             string url = string.Join("", args);
             if (url.Length == 0)
@@ -52,7 +52,27 @@ namespace SanaraV2.Features.Entertainment
             {
                 json = ContactSource(url);
             }
-            // TODO: Contact API to upload image
+            if (json == null && website != null && token != null)
+            {
+                HttpClient httpClient = new HttpClient();
+                var values = new Dictionary<string, string> {
+                           { "token", website },
+                           { "action", "upload" },
+                           { "url", url }
+                        };
+                HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, token);
+                msg.Content = new FormUrlEncodedContent(values);
+                string newUrl = ((dynamic)JsonConvert.DeserializeObject(await (await httpClient.SendAsync(msg)).Content.ReadAsStringAsync())).url;
+                json = ContactSource(newUrl);
+                values = new Dictionary<string, string> {
+                           { "token", website },
+                           { "action", "delete" },
+                           { "url", url }
+                        };
+                msg = new HttpRequestMessage(HttpMethod.Post, token);
+                msg.Content = new FormUrlEncodedContent(values);
+                await httpClient.SendAsync(msg);
+            }
             if (json == null)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotFound);
             dynamic elem = json.docs[0];
