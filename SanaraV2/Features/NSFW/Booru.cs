@@ -16,6 +16,8 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Features.NSFW
@@ -34,6 +36,29 @@ namespace SanaraV2.Features.NSFW
         }
 
         private static Dictionary<string, Tuple<Type, BooruSharp.Search.Post.SearchResult>> tagInfos = new Dictionary<string, Tuple<Type, BooruSharp.Search.Post.SearchResult>>();
+
+        public static async Task<FeatureRequest<Response.BooruSource, Error.SourceBooru>> SearchSourceBooru(string[] args)
+        {
+            string url = string.Join("", args);
+            if (url.Length == 0)
+                return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.Help);
+            if (url.Contains("?"))
+                url = url.Split('?')[0];
+            if (!Modules.Base.Utilities.IsImage(url.Split('.').Last()) || !Utilities.IsLinkValid(url))
+                return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.NotAnUrl);
+            string html;
+            using (HttpClient hc = new HttpClient())
+                html = await hc.GetStringAsync("https://saucenao.com/search.php?db=999&url=" + Uri.EscapeDataString(url));
+            if (!html.Contains("<div id=\"middle\">"))
+                return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.NotFound);
+            html = html.Split(new[] { "<td class=\"resulttablecontent\">" }, StringSplitOptions.None)[1];
+            return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(new Response.BooruSource
+            {
+                compatibility = Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value,
+                content = Utilities.RemoveHTML(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
+                url = Regex.Match(html, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
+            }, Error.SourceBooru.None);
+        }
 
         public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, BooruSharp.Booru.Booru booru, Random r)
         {

@@ -25,7 +25,7 @@ namespace SanaraV2.Modules.Entertainment
     {
         Program p = Program.p;
 
-        [Command("AnimeSource", RunMode = RunMode.Async), Alias("SourceAnime", "Source", "Sauce")]
+        [Command("AnimeSource", RunMode = RunMode.Async), Alias("SourceAnime")]
         public async Task Source(params string[] args)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
@@ -48,7 +48,7 @@ namespace SanaraV2.Modules.Entertainment
                         ImageUrl = result.answer.imageUrl,
                         Footer = new EmbedFooterBuilder
                         {
-                            Text = Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility.ToString("0.00")
+                            Text = Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility.ToString("0.00") + "%"
                         }
                     }.Build());
                     break;

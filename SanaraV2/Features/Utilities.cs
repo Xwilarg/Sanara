@@ -17,11 +17,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SanaraV2.Features
 {
     public static class Utilities
     {
+        public static string RemoveHTML(string html)
+        {
+            html = Regex.Replace(html, "<br ?\\/>", "\n");
+            html = Regex.Replace(html, "<strong>([^<]+)<\\/strong>", "**$1**");
+            html = Regex.Replace(html, "<[^>]+>([^<]+)<\\/[^>]+>", "$1");
+            html = Regex.Replace(html, "<[^<]+>", "");
+            return html;
+        }
+
         /// <summary>
         /// Discord messages must be less than 2048 characters
         /// This function allow to "properly cut" them to remove the excess of characters

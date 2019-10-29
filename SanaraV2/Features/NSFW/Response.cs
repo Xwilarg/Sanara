@@ -19,6 +19,13 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Response
     {
+        public class BooruSource
+        {
+            public string compatibility;
+            public string content;
+            public string url;
+        }
+
         public class Booru
         {
             public string url;

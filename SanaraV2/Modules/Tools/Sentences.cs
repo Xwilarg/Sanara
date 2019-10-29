@@ -119,7 +119,7 @@ namespace SanaraV2.Modules.Tools
         public static string BooruHelp(ulong guildId, bool isChanNsfw)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
-                return Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
+                return Translation.GetTranslation(guildId, "booruModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
                 + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : (""))
                 + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleTags")

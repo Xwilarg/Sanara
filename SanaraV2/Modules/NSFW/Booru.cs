@@ -26,6 +26,46 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
+        [Command("Source", RunMode = RunMode.Async), Alias("Sauce")]
+        public async Task Source(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            if (Context.Message.Attachments.Count > 0)
+                args = new[] { Context.Message.Attachments.ToArray()[0].Url };
+            var result = await Features.NSFW.Booru.SearchSourceBooru(args);
+            switch (result.error)
+            {
+                case Features.NSFW.Error.SourceBooru.None:
+                    await ReplyAsync("", false, new EmbedBuilder
+                    {
+                        Description = result.answer.content,
+                        ImageUrl = result.answer.url,
+                        Color = Color.Green,
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%"
+                        }
+                    }.Build());
+                    break;
+
+                case Features.NSFW.Error.SourceBooru.Help:
+                    await ReplyAsync(Entertainment.Sentences.SourceHelp(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.SourceBooru.NotFound:
+                    await ReplyAsync(Tools.Sentences.NotAnImage(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.SourceBooru.NotAnUrl:
+                    await ReplyAsync(Entertainment.Sentences.NotAnUrl(Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
