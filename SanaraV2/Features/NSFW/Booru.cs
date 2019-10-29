@@ -51,12 +51,13 @@ namespace SanaraV2.Features.NSFW
                 html = await hc.GetStringAsync("https://saucenao.com/search.php?db=999&url=" + Uri.EscapeDataString(url));
             if (!html.Contains("<div id=\"middle\">"))
                 return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.NotFound);
+            string fullHtml = html;
             html = html.Split(new[] { "<td class=\"resulttablecontent\">" }, StringSplitOptions.None)[1];
             return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(new Response.BooruSource
             {
                 compatibility = Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value,
                 content = Utilities.RemoveHTML(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
-                url = Regex.Match(html, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
+                url = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
             }, Error.SourceBooru.None);
         }
 
