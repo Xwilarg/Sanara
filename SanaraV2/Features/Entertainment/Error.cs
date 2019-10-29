@@ -21,7 +21,8 @@ namespace SanaraV2.Features.Entertainment
             None,
             Help,
             NotFound,
-            NotNsfw
+            NotNsfw,
+            NotAnUrl
         }
 
         public enum Score

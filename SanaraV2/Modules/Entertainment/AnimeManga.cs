@@ -28,11 +28,15 @@ namespace SanaraV2.Modules.Entertainment
         [Command("AnimeSource", RunMode = RunMode.Async), Alias("SourceAnime", "Source", "Sauce")]
         public async Task Source(params string[] args)
         {
-            if (Context.Message.Attachments.Count > 0)
-                args = new[] { Context.Message.Attachments.ToArray()[0].Url };
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.SearchSource(((ITextChannel)Context.Channel).IsNsfw, args);
+            bool skipBeginning = false;
+            if (Context.Message.Attachments.Count > 0)
+            {
+                args = new[] { Context.Message.Attachments.ToArray()[0].Url };
+                skipBeginning = true;
+            }
+            var result = await Features.Entertainment.AnimeManga.SearchSource(((ITextChannel)Context.Channel).IsNsfw, skipBeginning, args);
             switch (result.error)
             {
                 case Error.Source.None:
@@ -59,6 +63,10 @@ namespace SanaraV2.Modules.Entertainment
 
                 case Error.Source.NotNsfw:
                     await ReplyAsync(Base.Sentences.AnswerNsfw(Context.Guild.Id));
+                    break;
+
+                case Error.Source.NotAnUrl:
+                    await ReplyAsync(Sentences.NotAnUrl(Context.Guild.Id));
                     break;
 
                 default:

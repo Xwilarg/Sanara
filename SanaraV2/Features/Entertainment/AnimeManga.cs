@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -31,25 +32,29 @@ namespace SanaraV2.Features.Entertainment
             return s1.Contains(s2);
         }
 
-        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, string[] args)
+        /// <summary>
+        /// Find the source of an anime extract
+        /// </summary>
+        /// <param name="isChanNsfw">Is the channel from where the user asking NSFW</param>
+        /// <param name="skipBeginning">If is Discord upload, we can skip the verification part</param>
+        /// <param name="args">URL</param>
+        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, bool skipBeginning, string[] args)
         {
             string url = string.Join("", args);
             if (url.Length == 0)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.Help);
-            dynamic json;
-            try
+            if (url.Contains("?"))
+                url = url.Split('?')[0];
+            if (!Modules.Base.Utilities.IsImage(url.Split('.').Last()) || !Utilities.IsLinkValid(url))
+                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotAnUrl);
+            dynamic json = null;
+            if (!skipBeginning)
             {
-
-                using (HttpClient hc = new HttpClient())
-                {
-                    string html = await hc.GetStringAsync("https://trace.moe/api/search?url=" + Uri.EscapeDataString(url));
-                    json = JsonConvert.DeserializeObject(html);
-                }
+                json = ContactSource(url);
             }
-            catch (HttpRequestException) // The API return an error 500 on fail
-            {
+            // TODO: Contact API to upload image
+            if (json == null)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotFound);
-            }
             dynamic elem = json.docs[0];
             if (!isChanNsfw && (bool)elem.is_adult)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotNsfw);
@@ -63,6 +68,24 @@ namespace SanaraV2.Features.Entertainment
                 episode = elem.episode,
                 at = at / 60 + ":" + AddLeadingZero((at % 60).ToString())
             }, Error.Source.None);
+        }
+
+        private static async Task<dynamic> ContactSource(string url)
+        {
+            dynamic json;
+            try
+            {
+                using (HttpClient hc = new HttpClient())
+                {
+                    string html = await hc.GetStringAsync("https://trace.moe/api/search?url=" + Uri.EscapeDataString(url));
+                    json = JsonConvert.DeserializeObject(html);
+                }
+            }
+            catch (HttpRequestException) // The API return an error 500 on fail
+            {
+                return null;
+            }
+            return json;
         }
 
         private static string AddLeadingZero(string str)
