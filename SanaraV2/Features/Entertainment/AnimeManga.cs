@@ -56,20 +56,21 @@ namespace SanaraV2.Features.Entertainment
             {
                 HttpClient httpClient = new HttpClient();
                 var values = new Dictionary<string, string> {
-                           { "token", website },
+                           { "token", token },
                            { "action", "upload" },
                            { "url", url }
                         };
-                HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, token);
+                HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, website);
                 msg.Content = new FormUrlEncodedContent(values);
-                string newUrl = ((dynamic)JsonConvert.DeserializeObject(await (await httpClient.SendAsync(msg)).Content.ReadAsStringAsync())).url;
+                string answer = await (await httpClient.SendAsync(msg)).Content.ReadAsStringAsync();
+                string newUrl = ((dynamic)JsonConvert.DeserializeObject(answer)).url;
                 json = await ContactSource(newUrl);
                 values = new Dictionary<string, string> {
-                           { "token", website },
+                           { "token", token },
                            { "action", "delete" },
                            { "url", url }
                         };
-                msg = new HttpRequestMessage(HttpMethod.Post, token);
+                msg = new HttpRequestMessage(HttpMethod.Post, website);
                 msg.Content = new FormUrlEncodedContent(values);
                 await httpClient.SendAsync(msg);
             }
