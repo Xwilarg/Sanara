@@ -57,7 +57,7 @@ namespace Sanara_UnitTests
         }
 
         [Fact]
-        public async Task TestSource()
+        public async Task TestSourceAnime()
         {
             var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchSource(false, false, null, null, new[] { "https://trace.moe/img/draw2-good.jpg" });
             Assert.Equal(SanaraV2.Features.Entertainment.Error.Source.None, result.error);
@@ -68,6 +68,19 @@ namespace Sanara_UnitTests
             Assert.Equal("4:51", result.answer.at);
             Assert.Equal("https://trace.moe/thumbnail.php?anilist_id=21034&file=%5BDymy%5D%5BGochuumon%20wa%20Usagi%20Desu%20ka%5D%5BS2%5D%5B01%5D%5BBIG5%5D%5B1280X720%5D.mp4&t=291.08&token=Ffs0TXlswccEj-6Yyg3ALg", result.answer.imageUrl);
             Assert.InRange(result.answer.compatibility, 0.9f, 1f);
+        }
+
+        [Fact]
+        public async Task TestSourceBooru()
+        {
+            var result = await Booru.SearchSourceBooru(new[] { "https://konachan.net/sample/8e62b8cf03665480cfe40e71a9cc8797/Konachan.com%20-%20273621%20sample.jpg" });
+            Assert.Equal(Error.SourceBooru.None, result.error);
+            Assert.NotNull(result.answer);
+            Assert.Equal("https://img3.saucenao.com/booru/8/7/87b29dd1740518f2d0394b8d76e31509_1.jpg", result.answer.url);
+            float comp = float.Parse(result.answer.compatibility);
+            Assert.InRange(comp, 90f, 99f);
+            Assert.Contains("Twitter @Calico_Malyu", result.answer.content);
+            Assert.Contains("kantai collection", result.answer.content);
         }
 
         // DOUJINSHI MODULE
