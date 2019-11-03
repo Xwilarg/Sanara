@@ -239,7 +239,7 @@ namespace Sanara_UnitTests
 
         // GAMES MODULE
         [Fact]
-        public async Task TestGames()
+        public void TestGames()
         {
             foreach (var game in Constants.allDictionnaries)
             {

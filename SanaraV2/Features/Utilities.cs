@@ -12,12 +12,14 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SanaraV2.Features
 {
@@ -145,6 +147,29 @@ namespace SanaraV2.Features
                 }
             }
             return false;
+        }
+
+        public static async Task<ITextChannel> GetTextChannelAsync(string name, IGuild guild)
+        {
+            Match match = Regex.Match(name, "<#([0-9]{18})>");
+            if (match.Success)
+            {
+                ITextChannel chan = await guild.GetTextChannelAsync(ulong.Parse(match.Groups[1].Value));
+                if (chan != null)
+                    return (chan);
+            }
+            if (ulong.TryParse(name, out ulong id2))
+            {
+                ITextChannel chan = await guild.GetTextChannelAsync(id2);
+                if (chan != null)
+                    return (chan);
+            }
+            foreach (ITextChannel chan in await guild.GetTextChannelsAsync())
+            {
+                if (chan.Name == name)
+                    return (chan);
+            }
+            return (null);
         }
     }
 }

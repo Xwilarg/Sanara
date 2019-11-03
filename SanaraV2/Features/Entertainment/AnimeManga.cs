@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,25 @@ namespace SanaraV2.Features.Entertainment
             if (s1 == null)
                 return false;
             return s1.Contains(s2);
+        }
+
+        public static async Task<FeatureRequest<Response.Subscribe, Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args)
+        {
+            string channel = string.Join(" ", args);
+            if (channel.Length == 0)
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.Help);
+            ITextChannel chan = await Utilities.GetTextChannelAsync(channel, guild);
+            if (chan == null)
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
+            await db.AddAnimeSubscription(guild.Id, chan.Id);
+            return new FeatureRequest<Response.Subscribe, Error.Subscribe>(new Response.Subscribe(), Error.Subscribe.None);
+        }
+
+        public static async Task<FeatureRequest<Response.Subscribe, Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
+        {
+            if (!await db.RemoveAnimeSubscription(guild.Id))
+                return new FeatureRequest<Response.Subscribe, Error.Unsubscribe>(null, Error.Unsubscribe.NoSubscription);
+            return new FeatureRequest<Response.Subscribe, Error.Unsubscribe>(null, Error.Unsubscribe.None);
         }
 
         /// <summary>

@@ -25,6 +25,52 @@ namespace SanaraV2.Modules.Entertainment
     {
         Program p = Program.p;
 
+        [Command("Subscribe Anime")]
+        public async Task Subscribe(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            var result = await Features.Entertainment.AnimeManga.Subscribe(Context.Guild, Program.p.db, args);
+            switch (result.error)
+            {
+                case Error.Subscribe.Help:
+                    await ReplyAsync("Help");
+                    break;
+
+                case Error.Subscribe.InvalidChannel:
+                    await ReplyAsync("Invalid Channel");
+                    break;
+
+                case Error.Subscribe.None:
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        [Command("Unsubscribe Anime")]
+        public async Task Unsubcribe(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            var result = await Features.Entertainment.AnimeManga.Unsubscribe(Context.Guild, Program.p.db);
+            switch (result.error)
+            {
+                case Error.Unsubscribe.NoSubscription:
+                    await ReplyAsync("No Subscription");
+                    break;
+
+                case Error.Unsubscribe.None:
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("AnimeSource", RunMode = RunMode.Async), Alias("SourceAnime")]
         public async Task Source(params string[] args)
         {

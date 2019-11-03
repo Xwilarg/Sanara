@@ -19,6 +19,9 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Response
     {
+        public class Subscribe
+        { }
+
         public class Source
         {
             public string name;

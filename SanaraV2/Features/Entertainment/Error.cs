@@ -16,6 +16,19 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Error
     {
+        public enum Subscribe
+        {
+            None,
+            Help,
+            InvalidChannel
+        }
+
+        public enum Unsubscribe
+        {
+            None,
+            NoSubscription
+        }
+
         public enum Source
         {
             None,
