@@ -136,6 +136,18 @@ namespace SanaraV2.Db
             return chans.ToArray();
         }
 
+        public async Task<string> GetMyChannelNameAsync(IGuild guild)
+        {
+            if (AnimeSubscription.ContainsKey(guild.Id))
+            {
+                var chan = await guild.GetTextChannelAsync(AnimeSubscription[guild.Id]);
+                if (chan == null)
+                    return "Deleted channel";
+                return chan.Mention;
+            }
+            return "None";
+        } // TODO: Manage deleted guilds
+
         public async Task SetPrefix(ulong guildId, string prefix)
         {
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())

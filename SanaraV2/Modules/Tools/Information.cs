@@ -238,6 +238,7 @@ namespace SanaraV2.Modules.Tools
             else
                 no++;
             embed.AddField("Anime/Manga Module - NSFW", "**Kitsu logins:** " + (p.kitsuAuth != null ? "Yes" : "No"));
+            embed.AddField("Anime/Manga Module - Subscription", "**Subscription channel:** " + await p.db.GetMyChannelNameAsync(Context.Guild));
             if (p.kitsuAuth != null)
                 yes++;
             else

@@ -20,13 +20,17 @@ namespace SanaraV2.Subscription
     {
         public SubscriptionManager()
         {
+            anime = new AnimeSubscription();
             _ = Task.Run(async () =>
             {
                 for (;;)
                 {
                     await Task.Delay(120000); // 2 minutes
+                    await anime.UpdateChannelAsync(await Program.p.db.GetAllAnimeSubscriptionChannelsAsync(Program.p.client));
                 }
             });
         }
+
+        AnimeSubscription anime;
     }
 }

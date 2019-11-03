@@ -338,6 +338,7 @@
     <Compile Include="Modules\Entertainment\Vn.cs" />
     <Compile Include="Modules\Entertainment\Xkcd.cs" />
     <Compile Include="Modules\Entertainment\YouTube.cs" />
+    <Compile Include="Subscription\AnimeSubscription.cs" />
     <Compile Include="Subscription\SubscriptionManager.cs" />
   </ItemGroup>
   <ItemGroup>
