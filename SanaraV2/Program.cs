@@ -28,6 +28,7 @@ using SanaraV2.Modules.Entertainment;
 using SanaraV2.Modules.GamesInfo;
 using SanaraV2.Modules.NSFW;
 using SanaraV2.Modules.Tools;
+using SanaraV2.Subscription;
 using SharpRaven;
 using SharpRaven.Data;
 using System;
@@ -112,6 +113,9 @@ namespace SanaraV2
         // Anime/Manga module
         public Dictionary<string, string> kitsuAuth;
 
+        // Subscriptions
+        SubscriptionManager subManager;
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -147,6 +151,8 @@ namespace SanaraV2
             p = this;
 
             rand = new Random();
+
+            subManager = new SubscriptionManager();
 
             UpdateLanguageFiles();
 
@@ -221,13 +227,12 @@ namespace SanaraV2
                 {
                     for (;;)
                     {
-                        await Task.Delay(60000);
+                        await Task.Delay(60000); // 1 minute
                         if (client.ConnectionState == ConnectionState.Connected)
                             UpdateStatus();
                     }
                 });
             }
-
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
         }
