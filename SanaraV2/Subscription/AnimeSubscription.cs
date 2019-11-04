@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -48,15 +49,22 @@ namespace SanaraV2.Subscription
                 currName = data[0].name;
                 foreach (var chan in channels)
                 {
-                    foreach (var elem in data)
+                    try
                     {
-                        await chan.SendMessageAsync("", false, new EmbedBuilder
+                        foreach (var elem in data)
                         {
-                            Color = Color.Blue,
-                            Title = elem.name,
-                            Url = elem.pageUrl,
-                            ImageUrl = elem.previewUrl
-                        }.Build());
+                            await chan.SendMessageAsync("", false, new EmbedBuilder
+                            {
+                                Color = Color.Blue,
+                                Title = elem.name,
+                                Url = elem.pageUrl,
+                                ImageUrl = elem.previewUrl
+                            }.Build());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     }
                 }
             }
