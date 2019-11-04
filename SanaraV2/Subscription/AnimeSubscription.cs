@@ -16,6 +16,7 @@ using Discord;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -37,11 +38,20 @@ namespace SanaraV2.Subscription
                 string title = GetAttribute(node, "title");
                 if (title == currName)
                     break;
+                string animeName = Regex.Match(title, "(^.+) #[1-9]+$").Groups[1].Value;
+                string description = "";
+                var result = await Features.Entertainment.AnimeManga.SearchAnime(true, new[] { animeName }, null);
+                if (result.error == Features.Entertainment.Error.AnimeManga.None
+                    && result.answer.name == animeName)
+                {
+                    description = result.answer.synopsis;
+                }
                 data.Add(new AnimeData
                 {
                     name = title,
                     pageUrl = GetAttribute(node, "guid"),
-                    previewUrl = GetAttribute(node, "media:thumbnail", "url")
+                    previewUrl = GetAttribute(node, "media:thumbnail", "url"),
+                    description = description
                 });
             }
             if (data.Count > 0)
@@ -57,6 +67,7 @@ namespace SanaraV2.Subscription
                             {
                                 Color = Color.Blue,
                                 Title = elem.name,
+                                Description = elem.description,
                                 Url = elem.pageUrl,
                                 ImageUrl = elem.previewUrl
                             }.Build());
@@ -103,6 +114,7 @@ namespace SanaraV2.Subscription
         private struct AnimeData
         {
             public string name;
+            public string description;
             public string previewUrl;
             public string pageUrl;
         }
