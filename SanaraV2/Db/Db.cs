@@ -131,7 +131,17 @@ namespace SanaraV2.Db
             List<ITextChannel> chans = new List<ITextChannel>();
             foreach (var elem in AnimeSubscription)
             {
-                chans.Add(await ((IGuild)client.GetGuild(elem.Key)).GetTextChannelAsync(elem.Value));
+                IGuild guild = client.GetGuild(elem.Key);
+                if (guild != null)
+                {
+                    ITextChannel chan = await guild.GetTextChannelAsync(elem.Value);
+                    if (chan != null)
+                        chans.Add(chan);
+                    else
+                        await RemoveAnimeSubscription(elem.Key);
+                }
+                else
+                    await RemoveAnimeSubscription(elem.Key);
             }
             return chans.ToArray();
         }
@@ -146,7 +156,7 @@ namespace SanaraV2.Db
                 return chan.Mention;
             }
             return "None";
-        } // TODO: Manage deleted guilds
+        }
 
         public async Task SetPrefix(ulong guildId, string prefix)
         {
