@@ -59,12 +59,16 @@ namespace SanaraV2.Features.Tools
                     else
                         parts.Add(name, Regex.Match(await hc.GetStringAsync("https:" + match.Groups[1].Value), "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim());
                 }
-                foreach (var match in Regex.Matches(html.Split(new string[] { "kanji-details__main-readings-list" }, StringSplitOptions.None)[1],
+                if (html.Contains("<dt>On:"))
+                    foreach (var match in Regex.Matches(html.Split(new[] { "<dt>On:" }, StringSplitOptions.None)[1]
+                        .Split(new[] { "</dd>" }, StringSplitOptions.None)[0],
+                        "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                        onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+                if (html.Contains("<dt>Kun:"))
+                    foreach (var match in Regex.Matches(html.Split(new[] { "<dt>Kun:" }, StringSplitOptions.None)[1]
+                        .Split(new string[] { "</dd>" }, StringSplitOptions.None)[0],
                     "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
-                    onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
-                foreach (var match in Regex.Matches(html.Split(new string[] { "class=\"inline-list\"" }, StringSplitOptions.None)[0].Split(new string[] { "kanji-details__main-readings-list" }, StringSplitOptions.None)[2],
-                    "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
-                    kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+                        kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
             }
             return new FeatureRequest<Response.Kanji, Error.Kanji>(new Response.Kanji
             {

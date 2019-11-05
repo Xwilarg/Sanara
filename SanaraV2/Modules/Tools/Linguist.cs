@@ -47,6 +47,7 @@ namespace SanaraV2.Modules.Tools
                         Title = result.answer.kanji.ToString(),
                         Description = result.answer.meaning,
                         ImageUrl = result.answer.strokeOrder,
+                        Color = Color.Blue,
                         Fields = new List<EmbedFieldBuilder>
                         {
                             new EmbedFieldBuilder()
