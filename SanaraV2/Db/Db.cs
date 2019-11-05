@@ -52,6 +52,10 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Anime").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Anime").Run(conn);
+            foreach (dynamic elem in await R.Db(dbName).Table("Anime").RunAsync(conn))
+            {
+                AnimeSubscription.Add(ulong.Parse((string)elem.id), ulong.Parse((string)elem.channel));
+            }
         }
 
         private static readonly string defaultAvailability = "11111111111111";
@@ -90,10 +94,6 @@ namespace SanaraV2.Db
                 while (newAvailability.Length < defaultAvailability.Length)
                     newAvailability += "1";
                 Availability.Add(guildId, newAvailability);
-            }
-            foreach (dynamic elem in await R.Db(dbName).Table("Anime").RunAsync(conn))
-            {
-                AnimeSubscription.Add(ulong.Parse((string)elem.id), ulong.Parse((string)elem.channel));
             }
         }
 
