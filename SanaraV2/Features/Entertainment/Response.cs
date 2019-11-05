@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using System;
 using VndbSharp.Models.VisualNovel;
 
@@ -19,8 +20,13 @@ namespace SanaraV2.Features.Entertainment
 {
     public static class Response
     {
-        public class Subscribe
+        public class Unsubscribe
         { }
+
+        public class Subscribe
+        {
+            public ITextChannel chan;
+        }
 
         public class Source
         {

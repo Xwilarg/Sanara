@@ -113,7 +113,9 @@ namespace SanaraV2.Modules.Tools
         public static string AnimeMangaHelp(ulong guildId)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
-                return Translation.GetTranslation(guildId, "animeMangaModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga");
+                return Translation.GetTranslation(guildId, "animeMangaModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleAnime")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga")
+                     + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string BooruHelp(ulong guildId, bool isChanNsfw)

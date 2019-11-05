@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using SanaraV2.Modules.Base;
 
 namespace SanaraV2.Modules.Entertainment
@@ -33,6 +34,11 @@ namespace SanaraV2.Modules.Entertainment
         public static string Certitude(ulong guildId) { return (Translation.GetTranslation(guildId, "certitude")); }
         public static string Episode(ulong guildId) { return (Translation.GetTranslation(guildId, "episode")); }
         public static string NotAnUrl(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnUrl")); }
+        public static string SubscribeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "subscribeHelp")); }
+        public static string InvalidChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidChannel")); }
+        public static string NoSubscription(ulong guildId) { return (Translation.GetTranslation(guildId, "noSubscription")); }
+        public static string SubscribeDone(ulong guildId, string name, ITextChannel channel) { return (Translation.GetTranslation(guildId, "subscribeDone", name, channel.Mention)); }
+        public static string UnsubscribeDone(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "unsubscribeDone", name)); }
 
         /// --------------------------- Radio ---------------------------
         public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }

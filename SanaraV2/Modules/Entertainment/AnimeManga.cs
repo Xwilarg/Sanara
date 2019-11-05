@@ -34,15 +34,15 @@ namespace SanaraV2.Modules.Entertainment
             switch (result.error)
             {
                 case Error.Subscribe.Help:
-                    await ReplyAsync("Help");
+                    await ReplyAsync(Sentences.SubscribeHelp(Context.Guild.Id));
                     break;
 
                 case Error.Subscribe.InvalidChannel:
-                    await ReplyAsync("Invalid Channel");
+                    await ReplyAsync(Sentences.InvalidChannel(Context.Guild.Id));
                     break;
 
                 case Error.Subscribe.None:
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Sentences.SubscribeDone(Context.Guild.Id, "anime", result.answer.chan));
                     break;
 
                 default:
@@ -59,11 +59,11 @@ namespace SanaraV2.Modules.Entertainment
             switch (result.error)
             {
                 case Error.Unsubscribe.NoSubscription:
-                    await ReplyAsync("No Subscription");
+                    await ReplyAsync(Sentences.NoSubscription(Context.Guild.Id));
                     break;
 
                 case Error.Unsubscribe.None:
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Sentences.UnsubscribeDone(Context.Guild.Id, "anime"));
                     break;
 
                 default:

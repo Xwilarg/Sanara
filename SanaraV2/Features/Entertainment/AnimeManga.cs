@@ -42,14 +42,17 @@ namespace SanaraV2.Features.Entertainment
             if (chan == null)
                 return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
             await db.AddAnimeSubscription(guild.Id, chan.Id);
-            return new FeatureRequest<Response.Subscribe, Error.Subscribe>(new Response.Subscribe(), Error.Subscribe.None);
+            return new FeatureRequest<Response.Subscribe, Error.Subscribe>(new Response.Subscribe
+            {
+                chan = chan
+            }, Error.Subscribe.None);
         }
 
-        public static async Task<FeatureRequest<Response.Subscribe, Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
+        public static async Task<FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
         {
             if (!await db.RemoveAnimeSubscription(guild.Id))
-                return new FeatureRequest<Response.Subscribe, Error.Unsubscribe>(null, Error.Unsubscribe.NoSubscription);
-            return new FeatureRequest<Response.Subscribe, Error.Unsubscribe>(null, Error.Unsubscribe.None);
+                return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(null, Error.Unsubscribe.NoSubscription);
+            return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(new Response.Unsubscribe(), Error.Unsubscribe.None);
         }
 
         /// <summary>
