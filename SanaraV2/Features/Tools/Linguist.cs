@@ -36,7 +36,7 @@ namespace SanaraV2.Features.Tools
             string argsEscape = Uri.EscapeDataString(string.Join(" ", args));
             string html;
             dynamic json;
-            char kanji;
+            char? kanji = null;
             string meaning;
             Match radicalMatch;
             Dictionary<string, string> parts = new Dictionary<string, string>();
@@ -47,7 +47,20 @@ namespace SanaraV2.Features.Tools
                 json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + argsEscape));
                 if (json.data.Count == 0 || json.data[0].japanese[0].word == null)
                     return new FeatureRequest<Response.Kanji, Error.Kanji>(null, Error.Kanji.NotFound);
-                kanji = ((string)json.data[0].japanese[0].word)[0];
+
+                // Looking if player input is actually a kanji
+                char playerChar = args[0][0];
+                foreach (var elem in json.data)
+                {
+                    foreach (var elem2 in elem.japanese)
+                    {
+                        if (elem2.word == playerChar)
+                            kanji = playerChar;
+                    }
+                }
+
+                if (kanji == null)
+                    kanji = ((string)json.data[0].japanese[0].word)[0];
                 html = await hc.GetStringAsync("https://jisho.org/search/" + kanji + "%20%23kanji");
                 radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
                 meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
@@ -72,7 +85,7 @@ namespace SanaraV2.Features.Tools
             }
             return new FeatureRequest<Response.Kanji, Error.Kanji>(new Response.Kanji
             {
-                kanji = kanji,
+                kanji = kanji.Value,
                 meaning = meaning,
                 strokeOrder = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)kanji + "_frames.png",
                 parts = parts,
