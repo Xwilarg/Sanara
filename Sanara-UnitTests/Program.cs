@@ -164,20 +164,20 @@ namespace Sanara_UnitTests
             Assert.Single(result.answer.parts);
             Assert.True(result.answer.parts.ContainsKey("食"));
             Assert.True(result.answer.parts.ContainsValue("eat, food"));
-            Assert.Equal(4, result.answer.onyomi.Count);
-            Assert.True(result.answer.onyomi.ContainsKey("く.う"));
-            Assert.True(result.answer.onyomi.ContainsValue("ku.u"));
-            Assert.True(result.answer.onyomi.ContainsKey("く.らう"));
-            Assert.True(result.answer.onyomi.ContainsValue("ku.rau"));
-            Assert.True(result.answer.onyomi.ContainsKey("た.べる"));
-            Assert.True(result.answer.onyomi.ContainsValue("ta.beru"));
-            Assert.True(result.answer.onyomi.ContainsKey("は.む"));
-            Assert.True(result.answer.onyomi.ContainsValue("ha.mu"));
-            Assert.Equal(2, result.answer.kunyomi.Count);
-            Assert.True(result.answer.kunyomi.ContainsKey("ショク"));
-            Assert.True(result.answer.kunyomi.ContainsValue("shoku"));
-            Assert.True(result.answer.kunyomi.ContainsKey("ジキ"));
-            Assert.True(result.answer.kunyomi.ContainsValue("jiki"));
+            Assert.Equal(4, result.answer.kunyomi.Count);
+            Assert.True(result.answer.kunyomi.ContainsKey("く.う"));
+            Assert.True(result.answer.kunyomi.ContainsValue("ku.u"));
+            Assert.True(result.answer.kunyomi.ContainsKey("く.らう"));
+            Assert.True(result.answer.kunyomi.ContainsValue("ku.rau"));
+            Assert.True(result.answer.kunyomi.ContainsKey("た.べる"));
+            Assert.True(result.answer.kunyomi.ContainsValue("ta.beru"));
+            Assert.True(result.answer.kunyomi.ContainsKey("は.む"));
+            Assert.True(result.answer.kunyomi.ContainsValue("ha.mu"));
+            Assert.Equal(2, result.answer.onyomi.Count);
+            Assert.True(result.answer.onyomi.ContainsKey("ショク"));
+            Assert.True(result.answer.onyomi.ContainsValue("shoku"));
+            Assert.True(result.answer.onyomi.ContainsKey("ジキ"));
+            Assert.True(result.answer.onyomi.ContainsValue("jiki"));
             Assert.Equal("http://classic.jisho.org/static/images/stroke_diagrams/39135_frames.png", result.answer.strokeOrder);
         }
 
