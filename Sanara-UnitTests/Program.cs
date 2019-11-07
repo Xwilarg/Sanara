@@ -196,12 +196,12 @@ namespace Sanara_UnitTests
             Assert.True(result.answer.parts.ContainsValue("person"));
             Assert.True(result.answer.parts.ContainsKey("冂"));
             Assert.True(result.answer.parts.ContainsValue("upside-down box radical (no. 13)"));
-            Assert.Single(result.answer.onyomi);
-            Assert.True(result.answer.onyomi.ContainsKey("しし"));
-            Assert.True(result.answer.onyomi.ContainsValue("shishi"));
             Assert.Single(result.answer.kunyomi);
-            Assert.True(result.answer.kunyomi.ContainsKey("ニク"));
-            Assert.True(result.answer.kunyomi.ContainsValue("niku"));
+            Assert.True(result.answer.kunyomi.ContainsKey("しし"));
+            Assert.True(result.answer.kunyomi.ContainsValue("shishi"));
+            Assert.Single(result.answer.onyomi);
+            Assert.True(result.answer.onyomi.ContainsKey("ニク"));
+            Assert.True(result.answer.onyomi.ContainsValue("niku"));
             Assert.Equal("http://classic.jisho.org/static/images/stroke_diagrams/32905_frames.png", result.answer.strokeOrder);
         }
 
