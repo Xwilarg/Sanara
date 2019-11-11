@@ -72,9 +72,9 @@ namespace SanaraV2.Features.Entertainment
                 isAvailableEnglish = vn.Languages.Contains("en"),
                 isAvailableWindows = vn.Platforms.Contains("win"),
                 rating = vn.Rating,
-                releaseYear = vn.Released.Year,
-                releaseMonth = vn.Released.Month,
-                releaseDay = vn.Released.Day,
+                releaseYear = vn.Released?.Year,
+                releaseMonth = vn.Released?.Month,
+                releaseDay = vn.Released?.Day,
                 length = vn.Length
             }, Error.Vn.None);
         }
