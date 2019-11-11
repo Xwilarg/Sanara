@@ -47,8 +47,11 @@ namespace SanaraV2.Features.Entertainment
             MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
             foreach (Match match in matches)
             {
-                if (Utilities.CleanWord(match.Groups[3].Value).Contains(cleanVnName)
-                    || match.Groups[2].Value.Contains(vnName))
+                string titleName = Utilities.CleanWord(match.Groups[3].Value);
+                string titleNameBase = match.Groups[2].Value;
+                if (id == 0 && (titleName.Contains(cleanVnName) || titleNameBase.Contains(vnName)))
+                    id = uint.Parse(match.Groups[1].Value);
+                if (titleName == cleanVnName || titleNameBase == cleanVnName)
                 {
                     id = uint.Parse(match.Groups[1].Value);
                     break;
