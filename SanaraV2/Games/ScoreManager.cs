@@ -88,7 +88,11 @@ namespace SanaraV2.Games
                     alreadySaid.Add(bestServer);
                     IGuild guild = Program.p.client.GetGuild(ulong.Parse(bestServer));
                     if (guild != null)
-                        best.Add(new Tuple<string, int>(Program.p.GetName(Program.p.client.GetGuild(ulong.Parse(bestServer)).Name), bestScore));
+                    {
+                        var name = Program.p.client.GetGuild(ulong.Parse(bestServer)).Name;
+                        if (name != null)
+                            best.Add(new Tuple<string, int>(Program.p.GetName(name), bestScore));
+                    }
                 }
                 finalStr.Append(string.Join("|", best.Select(x => x.Item1 + "|" + x.Item2)) + "$");
             }
