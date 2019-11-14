@@ -45,7 +45,7 @@ namespace SanaraV2.Games
             {
                 var elem = globalRanking.First(x => x.Value.Equals(globalRanking.Values.Max()));
                 IGuild guild = Program.p.client.GetGuild(ulong.Parse(elem.Key));
-                if (guild != null)
+                if (guild != null && guild.Name != null)
                 {
                     if (globalRankingStr != "")
                         globalRankingStr += "|";
