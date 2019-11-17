@@ -1,7 +1,8 @@
 [<img src="https://discordbots.org/api/widget/owner/329664361016721408.svg"/>](https://discordbots.org/bot/329664361016721408)
 [![Build status](https://ci.appveyor.com/api/projects/status/o67101qtad8drfit/branch/master?svg=true)](https://ci.appveyor.com/project/Xwilarg/sanara/branch/master)
 [![Tests](https://img.shields.io/appveyor/tests/xwilarg/sanara.svg)](https://ci.appveyor.com/project/Xwilarg/sanara/branch/master/tests)
-[![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)<br/>
+[![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)
+[![Server Count](https://img.shields.io/endpoint?color=deepgreen&url=https%3A%2F%2Fapi.zirk.eu%2Fbots.php%3Fname%3DSanara%26shield%3Dtrue)](https://sanara.zirk.eu/stats.html)<br/>
 # Sanara
 
 ## What is Sanara
