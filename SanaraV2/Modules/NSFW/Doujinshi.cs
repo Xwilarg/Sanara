@@ -28,7 +28,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand);
+            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand, Program.p.categories);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:

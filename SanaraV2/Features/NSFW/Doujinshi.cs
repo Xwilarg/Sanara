@@ -28,11 +28,47 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
-        public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchAdultVideo(bool isChanSafe, string[] tags, Random r)
+        public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchAdultVideo(bool isChanSafe, string[] tags, Random r, List<string> categories)
         {
             if (isChanSafe)
                 return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
-            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.None);
+            string tag = tags.Length > 0 ? string.Join(" ", tags).ToLower() : "";
+            if (tags.Length > 0)
+            {
+                if (!categories.Contains(tag))
+                    return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound);
+            }
+            if (tag == "")
+                tag = "all";
+            int perPage;
+            int total;
+            string url ="https://www5.javmost.com/category/" + tag;
+            string html;
+            using (HttpClient hc = new HttpClient())
+            {
+                html = await hc.GetStringAsync(url);
+                perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
+                total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
+            }
+            int video = r.Next(0, total);
+            int pageNumber = video / perPage; // Which page the video is in
+            int pageIndex = video % perPage; // Number of the video in the page
+            if (pageNumber > 0) // If it's the first page, we already got the HTML
+            {
+                using (HttpClient hc = new HttpClient())
+                    html = await hc.GetStringAsync(url + "/page/" + (pageNumber + 1));
+            }
+            string videoHtml = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None)[pageIndex];
+            var videoMatch = Regex.Match(videoHtml, "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
+            string previewUrl = "https:" + Regex.Match(videoHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
+            string[] videoTags = Regex.Matches(videoHtml, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi
+            {
+                imageUrl = previewUrl,
+                url = videoMatch.Groups[1].Value,
+                title = videoMatch.Groups[2].Value,
+                tags = videoTags
+            }, Error.Doujinshi.None);
         }
 
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchCosplay(bool isChanSafe, string[] tags, Random r)

@@ -115,10 +115,10 @@ namespace SanaraV2
         public Dictionary<string, string> kitsuAuth;
 
         // Subscriptions
-        SubscriptionManager subManager;
+        private SubscriptionManager subManager;
 
         // AV
-        private List<string> categories;
+        public List<string> categories;
 
         public Program()
         {
@@ -299,6 +299,7 @@ namespace SanaraV2
                 await Log(new LogMessage(LogSeverity.Info, "Setup", await process.StandardOutput.ReadToEndAsync()));
             }
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising services"));
             // Categories for AdultVideo command
             categories = new List<string>();
             categories.Add("censor");
