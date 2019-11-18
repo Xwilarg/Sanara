@@ -28,6 +28,13 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
+        public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchAdultVideo(bool isChanSafe, string[] tags, Random r)
+        {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
+            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.None);
+        }
+
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchCosplay(bool isChanSafe, string[] tags, Random r)
         {
             if (isChanSafe)

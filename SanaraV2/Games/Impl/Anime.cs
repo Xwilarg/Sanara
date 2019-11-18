@@ -94,7 +94,6 @@ namespace SanaraV2.Games.Impl
                 {
                     var mp4 = new MediaFile { Filename = path };
                     engine.GetMetadata(mp4);
-                    var i = 0;
                     int middle = (int)mp4.Metadata.Duration.TotalSeconds / 2;
                     int lowerQuartile = middle / 2;
                     int upperQuartile = lowerQuartile * 3;

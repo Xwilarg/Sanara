@@ -23,6 +23,31 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
+        [Command("AdultVideo", RunMode = RunMode.Async), Alias("AV")]
+        public async Task GetAdultVideo(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand);
+            switch (result.error)
+            {
+                case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Doujinshi.NotFound:
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild.Id, args));
+                    break;
+
+                case Features.NSFW.Error.Doujinshi.None:
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("Cosplay", RunMode = RunMode.Async)]
         public async Task GetCosplay(params string[] args)
         {
