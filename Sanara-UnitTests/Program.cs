@@ -77,8 +77,7 @@ namespace Sanara_UnitTests
             Assert.Equal(Error.SourceBooru.None, result.error);
             Assert.NotNull(result.answer);
             Assert.Equal("https://img3.saucenao.com/booru/8/7/87b29dd1740518f2d0394b8d76e31509_1.jpg", result.answer.url);
-            float comp = float.Parse(result.answer.compatibility);
-            Assert.InRange(comp, 90f, 99f);
+            Assert.InRange(result.answer.compatibility, 90f, 99f);
             Assert.Contains("Twitter @Calico_Malyu", result.answer.content);
             Assert.Contains("kantai collection", result.answer.content);
         }
