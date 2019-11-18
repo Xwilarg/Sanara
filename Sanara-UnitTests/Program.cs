@@ -120,7 +120,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestAdultVideo()
         {
-            var result = await Doujinshi.SearchCosplay(false, new string[] { "lesbian" }, new Random());
+            var result = await Doujinshi.SearchAdultVideo(false, new string[] { "lesbian" }, new Random());
             Assert.Equal(Error.Doujinshi.None, result.error);
             Assert.True(await IsLinkValid(result.answer.url));
             Assert.True(await IsLinkValid(result.answer.imageUrl));
