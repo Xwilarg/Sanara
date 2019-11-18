@@ -37,11 +37,19 @@ namespace SanaraV2.Modules.NSFW
             switch (result.error)
             {
                 case Features.NSFW.Error.SourceBooru.None:
+                    Color color;
+                    float certitude = result.answer.compatibility;
+                    if (certitude > 80f)
+                        color = Color.Green;
+                    else if (certitude > 50)
+                        color = Color.Orange;
+                    else
+                        color = Color.Red;
                     await ReplyAsync("", false, new EmbedBuilder
                     {
                         Description = result.answer.content,
                         ImageUrl = result.answer.url,
-                        Color = Color.Green,
+                        Color = color,
                         Footer = new EmbedFooterBuilder
                         {
                             Text = Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%"

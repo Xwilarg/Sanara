@@ -103,13 +103,14 @@ namespace SanaraV2.Features.Entertainment
             if (!isChanNsfw && (bool)elem.is_adult)
                 return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotNsfw);
             int at = elem.at;
+            string episode = elem.episode;
             return new FeatureRequest<Response.Source, Error.Source>(new Response.Source
             {
                 compatibility = elem.similarity,
                 imageUrl = "https://trace.moe/thumbnail.php?anilist_id=" + elem.anilist_id + "&file=" + Uri.EscapeDataString((string)elem.filename) + "&t=" + elem.at.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + "&token=" + elem.tokenthumb,
                 isNsfw = elem.is_adult,
                 name = elem.title_romaji,
-                episode = elem.episode,
+                episode = episode == "" ? -1 : int.Parse(episode),
                 at = at / 60 + ":" + AddLeadingZero((at % 60).ToString())
             }, Error.Source.None);
         }

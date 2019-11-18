@@ -15,6 +15,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -55,7 +56,7 @@ namespace SanaraV2.Features.NSFW
             html = html.Split(new[] { "<td class=\"resulttablecontent\">" }, StringSplitOptions.None)[1];
             return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(new Response.BooruSource
             {
-                compatibility = Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value,
+                compatibility = float.Parse(Regex.Match(html, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value, CultureInfo.InvariantCulture),
                 content = Utilities.RemoveHTML(html.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]),
                 url = Regex.Match(fullHtml, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value
             }, Error.SourceBooru.None);

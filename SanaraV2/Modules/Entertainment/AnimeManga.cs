@@ -86,11 +86,19 @@ namespace SanaraV2.Modules.Entertainment
             switch (result.error)
             {
                 case Error.Source.None:
+                    Color color;
+                    float certitude = result.answer.compatibility;
+                    if (certitude > 80f)
+                        color = Color.Green;
+                    else if (certitude > 50)
+                        color = Color.Orange;
+                    else
+                        color = Color.Red;
                     await ReplyAsync("", false, new EmbedBuilder
                     {
-                        Color = result.answer.isNsfw ? Color.Red : Color.Green,
+                        Color = color,
                         Title = result.answer.name,
-                        Description = Sentences.Episode(Context.Guild.Id) + " " + result.answer.episode + " " + Base.Sentences.AtStr(Context.Guild.Id) + " " + result.answer.at,
+                        Description = Sentences.Episode(Context.Guild.Id) + " " + (result.answer.episode == -1 ? Sentences.Unknown(Context.Guild.Id) : result.answer.episode.ToString()) + " " + Base.Sentences.AtStr(Context.Guild.Id) + " " + result.answer.at,
                         ImageUrl = result.answer.imageUrl,
                         Footer = new EmbedFooterBuilder
                         {

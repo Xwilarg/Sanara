@@ -21,7 +21,7 @@ namespace SanaraV2.Features.NSFW
     {
         public class BooruSource
         {
-            public string compatibility;
+            public float compatibility;
             public string content;
             public string url;
         }
