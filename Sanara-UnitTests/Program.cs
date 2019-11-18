@@ -117,6 +117,16 @@ namespace Sanara_UnitTests
             Assert.Contains("kantai collection", result.answer.tags);
         }
 
+        [Fact]
+        public async Task TestAdultVideo()
+        {
+            var result = await Doujinshi.SearchCosplay(false, new string[] { "lesbian" }, new Random());
+            Assert.Equal(Error.Doujinshi.None, result.error);
+            Assert.True(await IsLinkValid(result.answer.url));
+            Assert.True(await IsLinkValid(result.answer.imageUrl));
+            Assert.Contains("Lesbian", result.answer.tags);
+        }
+
         // GAMES INFO
         [Fact]
         public async Task TestKancolleCharac()
