@@ -37,6 +37,19 @@ namespace Sanara_UnitTests
             return false;
         }
 
+        // SUBSCRIPTION
+        [Fact]
+        public async Task TestAnimeSubscription()
+        {
+            var sub = new SanaraV2.Subscription.AnimeSubscription();
+            var datas = await sub.GetAnimes();
+            Assert.NotEmpty(datas);
+            var anime = datas[0];
+            Assert.True(await IsLinkValid(anime.previewUrl));
+            Assert.True(await IsLinkValid(anime.pageUrl));
+            Assert.NotEmpty(anime.name);
+        }
+
         // ANIME/MANGA MODULE
         [Fact]
         public async Task TestAnime()

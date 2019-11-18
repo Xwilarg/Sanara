@@ -30,7 +30,7 @@ namespace SanaraV2.Subscription
             currName = GetAttribute(feed[0], "title");
         }
 
-        public async Task UpdateChannelAsync(ITextChannel[] channels)
+        public async Task<List<AnimeData>> GetAnimes()
         {
             List<AnimeData> data = new List<AnimeData>();
             foreach (var node in await GetAnimeFeedAsync())
@@ -54,6 +54,12 @@ namespace SanaraV2.Subscription
                     description = description
                 });
             }
+            return data;
+        }
+
+        public async Task UpdateChannelAsync(ITextChannel[] channels)
+        {
+            var data = await GetAnimes();
             if (data.Count > 0)
             {
                 currName = data[0].name;
@@ -111,7 +117,7 @@ namespace SanaraV2.Subscription
 
         string currName;
 
-        private struct AnimeData
+        public struct AnimeData
         {
             public string name;
             public string description;
