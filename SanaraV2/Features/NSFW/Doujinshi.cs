@@ -50,18 +50,37 @@ namespace SanaraV2.Features.NSFW
                 perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
                 total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
             }
-            int video = r.Next(0, total);
-            int pageNumber = video / perPage; // Which page the video is in
-            int pageIndex = video % perPage; // Number of the video in the page
-            if (pageNumber > 0) // If it's the first page, we already got the HTML
+            Match videoMatch;
+            string[] videoTags = null;
+            string previewUrl = "";
+            int nbTry = 0;
+            do
             {
-                using (HttpClient hc = new HttpClient())
-                    html = await hc.GetStringAsync(url + "/page/" + (pageNumber + 1));
-            }
-            string videoHtml = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None)[pageIndex];
-            var videoMatch = Regex.Match(videoHtml, "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
-            string previewUrl = "https:" + Regex.Match(videoHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
-            string[] videoTags = Regex.Matches(videoHtml, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                int video = r.Next(0, total);
+                int pageNumber = video / perPage; // Which page the video is in
+                int pageIndex = video % perPage; // Number of the video in the page
+                if (pageNumber > 0) // If it's the first page, we already got the HTML
+                {
+                    using (HttpClient hc = new HttpClient())
+                        html = await hc.GetStringAsync(url + "/page/" + (pageNumber + 1));
+                }
+                int index = pageIndex + 1;
+                var arr = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None);
+                if (index >= arr.Length) // Sometimes happen, I don't really know why
+                {
+                    videoMatch = Regex.Match("", "a");
+                    continue;
+                }
+                string videoHtml = arr[index];
+                videoMatch = Regex.Match(videoHtml, "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
+                previewUrl = Regex.Match(videoHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
+                if (previewUrl.StartsWith("//"))
+                    previewUrl = "https:" + previewUrl;
+                videoTags = Regex.Matches(videoHtml, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                nbTry++;
+                if (nbTry > 10)
+                    return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound);
+            } while (!videoMatch.Success);
             return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi
             {
                 imageUrl = previewUrl,
