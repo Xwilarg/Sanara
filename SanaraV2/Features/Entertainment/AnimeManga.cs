@@ -193,7 +193,8 @@ namespace SanaraV2.Features.Entertainment
                 endDate = finalData.endDate ?? DateTime.ParseExact((string)finalData.endDate, "yyyy-MM-dd", CultureInfo.CurrentCulture),
                 ageRating = finalData.ageRatingGuide,
                 synopsis = finalData.synopsis,
-                nsfw = finalData.nsfw ?? false
+                nsfw = finalData.nsfw ?? false,
+                animeUrl = "https://kitsu.io/" + ((isAnime) ? ("anime") : ("manga")) + "/" + finalData.slug
             }, Error.AnimeManga.None);
         }
     }

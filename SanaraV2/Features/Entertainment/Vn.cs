@@ -78,7 +78,8 @@ namespace SanaraV2.Features.Entertainment
                 releaseYear = vn.Released?.Year,
                 releaseMonth = vn.Released?.Month,
                 releaseDay = vn.Released?.Day,
-                length = vn.Length
+                length = vn.Length,
+                vnUrl = "https://vndb.org/v" + vn.Id
             }, Error.Vn.None);
         }
     }

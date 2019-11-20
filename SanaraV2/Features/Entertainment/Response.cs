@@ -63,6 +63,7 @@ namespace SanaraV2.Features.Entertainment
             public string ageRating;
             public string synopsis;
             public bool nsfw;
+            public string animeUrl;
         }
 
         public class Xkcd
@@ -100,6 +101,7 @@ namespace SanaraV2.Features.Entertainment
             public uint? releaseMonth;
             public uint? releaseDay;
             public VisualNovelLength? length;
+            public string vnUrl;
         }
 
         public enum GameName

@@ -46,6 +46,7 @@ namespace SanaraV2.Modules.Entertainment
                     EmbedBuilder embed = new EmbedBuilder()
                     {
                         Title = result.answer.originalTitle == null ? result.answer.title : result.answer.originalTitle + " (" + result.answer.title + ")",
+                        Url = result.answer.vnUrl,
                         ImageUrl = result.answer.imageUrl,
                         Description = result.answer.description,
                         Color = Color.Blue

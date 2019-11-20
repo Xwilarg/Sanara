@@ -190,6 +190,7 @@ namespace SanaraV2.Modules.Entertainment
             EmbedBuilder embed = new EmbedBuilder()
             {
                 Title = fullName.Length > 256 ? res.name : fullName,
+                Url = res.animeUrl,
                 Color = Color.Green,
                 ImageUrl = res.imageUrl,
                 Description = res.synopsis
