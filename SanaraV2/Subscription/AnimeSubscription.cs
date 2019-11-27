@@ -115,7 +115,13 @@ namespace SanaraV2.Subscription
             return nodes.ToArray();
         }
 
-        string currName;
+        public string GetCurrName()
+            => currName;
+
+        public void SetCurrName(string value) // For unit tests only
+            => currName = value;
+
+        private string currName;
 
         public struct AnimeData
         {

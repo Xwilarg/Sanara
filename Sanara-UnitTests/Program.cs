@@ -43,6 +43,8 @@ namespace Sanara_UnitTests
         public async Task TestAnimeSubscription()
         {
             var sub = new SanaraV2.Subscription.AnimeSubscription();
+            Assert.NotEmpty(sub.GetCurrName());
+            sub.SetCurrName("value");
             var datas = await sub.GetAnimes();
             Assert.NotEmpty(datas);
             var anime = datas[0];
