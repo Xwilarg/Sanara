@@ -285,31 +285,31 @@ namespace Sanara_UnitTests
 
         [Fact]
         public async Task TestGameAnime()
-            => await CheckGame(new SanaraV2.Games.Impl.Anime(null, new Config(0, Difficulty.Normal, "anime", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.Anime(null, new Config(0, Difficulty.Normal, "anime", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGameAzurLane()
-            => await CheckGame(new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGameBooru()
-            => await CheckGame(new SanaraV2.Games.Impl.Booru(null, new Config(0, Difficulty.Normal, "booru", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.Booru(null, new Config(0, Difficulty.Normal, "booru", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGameFateGO()
-            => await CheckGame(new SanaraV2.Games.Impl.FateGO(null, new Config(0, Difficulty.Normal, "fatego", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.FateGO(null, new Config(0, Difficulty.Normal, "fatego", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGameKanColle()
-            => await CheckGame(new SanaraV2.Games.Impl.KanColle(null, new Config(0, Difficulty.Normal, "kancolle", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.KanColle(null, new Config(0, Difficulty.Normal, "kancolle", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGamePokemon()
-            => await CheckGame(new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Fact]
         public async Task TestGameGirlsFrontline()
-            => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0));
+            => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
         [Theory]
         [InlineData("Kisaragi", "https://azurlane.koumakan.jp/w/images/thumb/b/ba/Kisaragi.png/600px-Kisaragi.png")]
@@ -321,7 +321,7 @@ namespace Sanara_UnitTests
         public async Task TestAzurLaneDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.azurLaneDictionnary);
-            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            var game = new SanaraV2.Games.Impl.AzurLane(null, new Config(0, Difficulty.Normal, "azurlane", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
@@ -333,7 +333,7 @@ namespace Sanara_UnitTests
         public async Task TestFateGODictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.fateGODictionnary);
-            var game = new SanaraV2.Games.Impl.FateGO(null, new Config(0, Difficulty.Normal, "fatego", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            var game = new SanaraV2.Games.Impl.FateGO(null, new Config(0, Difficulty.Normal, "fatego", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
@@ -344,7 +344,7 @@ namespace Sanara_UnitTests
         public async Task TestKanColleDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.kanColleDictionnary);
-            var game = new SanaraV2.Games.Impl.KanColle(null, new Config(0, Difficulty.Normal, "kancolle", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            var game = new SanaraV2.Games.Impl.KanColle(null, new Config(0, Difficulty.Normal, "kancolle", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
@@ -355,7 +355,7 @@ namespace Sanara_UnitTests
         public async Task TestPokemonDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.pokemonDictionnary);
-            var game = new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            var game = new SanaraV2.Games.Impl.Pokemon(null, new Config(0, Difficulty.Normal, "pokemon", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
@@ -366,7 +366,7 @@ namespace Sanara_UnitTests
         public async Task TestGirlsFrontlineDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.girlsfrontlineDictionnary);
-            var game = new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly), 0);
+            var game = new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 

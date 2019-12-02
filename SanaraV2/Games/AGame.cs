@@ -45,6 +45,7 @@ namespace SanaraV2.Games
             _isFound = false;
             _isCropped = config.isCropped;
             _isShaded = config.isShaded;
+            _multiType = config.multiplayerType;
             Init();
         }
 
@@ -338,16 +339,25 @@ namespace SanaraV2.Games
             _gameState = GameState.Lost;
             if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
             {
-                _lobby.RemoveCurrentPlayer();
-                if (_lobby.HaveEnoughPlayer())
+                if (_multiType == APreload.MultiplayerType.Elimination)
                 {
-                    _gameState = GameState.Running;
-                    _startTime = DateTime.Now;
-                    await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
-                    _postImage = false;
-                    return;
+                    _lobby.RemoveCurrentPlayer();
+                    if (_lobby.HaveEnoughPlayer())
+                    {
+                        _gameState = GameState.Running;
+                        _startTime = DateTime.Now;
+                        await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+                        _postImage = false;
+                        return;
+                    }
+                    await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
                 }
-                await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
+                else if (_multiType == APreload.MultiplayerType.BestOf)
+                {
+
+                }
+                else
+                    throw new ArgumentException("Unhandled multiplayer gamemode.");
             }
             else
             {
@@ -450,6 +460,9 @@ namespace SanaraV2.Games
             return _chan.Id + DateTime.Now.ToString("HHmmss") + Program.p.rand.Next(int.MaxValue);
         }
 
+        /// <summary>
+        /// How files are send
+        /// </summary>
         protected enum PostType
         {
             Url,
@@ -457,6 +470,9 @@ namespace SanaraV2.Games
             LocalPath
         }
 
+        /// <summary>
+        /// Current game state
+        /// </summary>
         private enum GameState
         {
             WaitingForPlayers,
@@ -479,5 +495,6 @@ namespace SanaraV2.Games
         private bool            _isFound; // Fix a bug where 2 users could answer at the same time
         private bool            _isCropped; // Difficulty level, image is cut in half
         private APreload.Shadow _isShaded; // Difficulty level, only display shadow
+        private APreload.MultiplayerType _multiType;
     }
 }

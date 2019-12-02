@@ -16,7 +16,8 @@ namespace SanaraV2.Games
 {
     public struct Config
     {
-        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, bool sendImage, bool isCropped, APreload.Shadow isShaded, APreload.Multiplayer isMultiplayer)
+        public Config(int refTime, Difficulty difficulty, string gameName, bool isFull, bool sendImage, bool isCropped,
+            APreload.Shadow isShaded, APreload.Multiplayer isMultiplayer, APreload.MultiplayerType multiplayerType)
         {
             this.refTime = refTime;
             this.difficulty = difficulty;
@@ -26,6 +27,7 @@ namespace SanaraV2.Games
             this.isCropped = isCropped;
             this.isShaded = isShaded;
             this.isMultiplayer = isMultiplayer;
+            this.multiplayerType = multiplayerType;
         }
 
         public int refTime; // Time before the counter end and the player loose
@@ -36,6 +38,7 @@ namespace SanaraV2.Games
         public bool isCropped; // Difficulty level cutting images in half
         public APreload.Shadow isShaded; // Difficulty level only displaying shadow
         public APreload.Multiplayer isMultiplayer; // Some game have a multiplayer mode
+        public APreload.MultiplayerType multiplayerType; // How multiplayer is handled
     }
 
     public enum Difficulty // Easy mode give twice more time

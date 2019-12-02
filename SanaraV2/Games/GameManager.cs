@@ -188,7 +188,7 @@ namespace SanaraV2.Games
                             preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
                             Sentences.RulesReset(chan.GuildId));
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer), playerId);
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });

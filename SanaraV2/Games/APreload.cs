@@ -33,17 +33,33 @@ namespace SanaraV2.Games
         public abstract bool DoesAllowCropped(); // Allow 'crop" attribute
         public abstract Shadow DoesAllowShadow(); // Allow 'shadow" attribute
         public abstract Multiplayer DoesAllowMultiplayer(); // Allow 'multi' attribute
+        public abstract MultiplayerType GetMultiplayerType();
+        /// <summary>
+        /// If game allow multiplayer or not
+        /// </summary>
         public enum Multiplayer
         {
             SoloOnly,
             MultiOnly,
             Both
         }
+        /// <summary>
+        /// Settings for shadow option: identify background
+        /// </summary>
         public enum Shadow
         {
-            Transparency,
-            White,
-            None
+            Transparency, // Background is transparency
+            White, // Background is white
+            None // Shadow mode disabled
+        }
+        /// <summary>
+        /// How multiplayer is handled
+        /// </summary>
+        public enum MultiplayerType
+        {
+            None, // No multiplayer available
+            Elimination, // If player loose, he is eliminated
+            BestOf // Player have X chances to find the solution, after Y question best score win
         }
         public abstract string GetRules(ulong guildId, bool isMultiplayer);
 

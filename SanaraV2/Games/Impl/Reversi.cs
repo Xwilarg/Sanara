@@ -43,6 +43,9 @@ namespace SanaraV2.Games.Impl
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.MultiOnly;
 
+        public override MultiplayerType GetMultiplayerType()
+            => MultiplayerType.Elimination;
+
         public override string GetRules(ulong guildId, bool _)
             => Sentences.RulesReversi(guildId);
     }
