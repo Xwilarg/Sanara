@@ -306,21 +306,30 @@ namespace SanaraV2
             categories.Add("uncensor");
             List<string> newTags;
             int page = 1;
-            using (HttpClient hc = new HttpClient())
+            try
             {
-                do
+                using (HttpClient hc = new HttpClient())
                 {
-                    newTags = new List<string>();
-                    string html = await hc.GetStringAsync("https://www5.javmost.com/allcategory/" + page);
-                    foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
+                    do
                     {
-                        string content = m.Groups[1].Value.Trim().ToLower();
-                        if (!categories.Contains(content))
-                            newTags.Add(content);
-                    }
-                    categories.AddRange(newTags);
-                    page++;
-                } while (newTags.Count > 0);
+                        newTags = new List<string>();
+                        string html = await hc.GetStringAsync("https://www5.javmost.com/allcategory/" + page);
+                        foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
+                        {
+                            string content = m.Groups[1].Value.Trim().ToLower();
+                            if (!categories.Contains(content))
+                                newTags.Add(content);
+                        }
+                        categories.AddRange(newTags);
+                        page++;
+                    } while (newTags.Count > 0);
+                }
+            }
+            catch (HttpRequestException)
+            {
+                // javmost isn't available in Korea so if we are in the debug version of the bot we ignore this
+                if (!Debugger.IsAttached)
+                    throw;
             }
 
             // Then we update all others modules
