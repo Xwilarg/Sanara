@@ -16,6 +16,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +32,7 @@ namespace SanaraV2.Games
             _players = new List<ulong>();
             _players.Add(owner);
             _names = new List<string>();
+            _fullNames = new List<string>();
             _startTime = DateTime.Now;
         }
 
@@ -93,6 +95,7 @@ namespace SanaraV2.Games
                 if (user == null)
                     return false;
                 _names.Add(user.Nickname ?? user.Username);
+                _fullNames.Add(user.ToString());
             }
             _allNames = new List<string>(_names).ToArray();
             return true;
@@ -107,8 +110,12 @@ namespace SanaraV2.Games
         public string GetName(int index)
             => _allNames[index];
 
+        public ReadOnlyCollection<string> GetFullNames()
+            => _fullNames.AsReadOnly();
+
         private List<ulong>     _players; // Players in the lobby
         private List<string>    _names;
+        private List<string>    _fullNames; // Names in format xxxxx#1234
         private string[]        _allNames; // Isn't modified when a player loose
         private DateTime        _startTime; // Time when the game was created (the lobby stay open X seconds so^players can join it)
         private int             _currTurn; // Keep track of which turn is it

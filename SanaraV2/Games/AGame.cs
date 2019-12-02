@@ -46,8 +46,8 @@ namespace SanaraV2.Games
             _isCropped = config.isCropped;
             _isShaded = config.isShaded;
             _multiType = config.multiplayerType;
-            _bestOfScore = new Dictionary<IUser, int>();
-            _bestOfTries = new Dictionary<IUser, int>();
+            _bestOfScore = new Dictionary<string, int>();
+            _bestOfTries = new Dictionary<string, int>();
             _bestOfRemainingRounds = 5;
             Init();
         }
@@ -285,8 +285,8 @@ namespace SanaraV2.Games
                 _checkingAnswer = false;
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
-                    if (_bestOfTries.ContainsKey(user)) _bestOfTries[user]++;
-                    else _bestOfTries.Add(user, 1);
+                    if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
+                    else _bestOfTries.Add(user.ToString(), 1);
                 }
                 return;
             }
@@ -306,13 +306,16 @@ namespace SanaraV2.Games
                 }
                 else if (_multiType == APreload.MultiplayerType.BestOf)
                 {
-                    if (_bestOfScore.ContainsKey(user)) _bestOfScore[user]++;
-                    else _bestOfScore.Add(user, 1);
-                    _bestOfTries = new Dictionary<IUser, int>();
+                    if (_bestOfScore.ContainsKey(user.ToString())) _bestOfScore[user.ToString()]++;
+                    else _bestOfScore.Add(user.ToString(), 1);
+                    _bestOfTries = new Dictionary<string, int>();
                     finalStr += "Current Score:" + Environment.NewLine;
-                    foreach (var u in _bestOfScore)
+                    foreach (var name in _lobby.GetFullNames())
                     {
-                        finalStr += u.Key.ToString() + ": " + u.Value + Environment.NewLine;
+                        if (_bestOfScore.ContainsKey(name))
+                            finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
+                        else
+                            finalStr += name + ": 0" + Environment.NewLine;
                     }
                 }
             }
@@ -357,14 +360,17 @@ namespace SanaraV2.Games
                     {
                         _gameState = GameState.Lost;
                         string finalStr = "Current Score:" + Environment.NewLine;
-                        foreach (var u in _bestOfScore)
+                        foreach (var name in _lobby.GetFullNames())
                         {
-                            finalStr += u.Key.ToString() + ": " + u.Value + Environment.NewLine;
+                            if (_bestOfScore.ContainsKey(name))
+                                finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
+                            else
+                                finalStr += name + ": 0" + Environment.NewLine;
                         }
                         await PostText(finalStr);
                     }
                     else
-                        _bestOfTries = new Dictionary<IUser, int>();
+                        _bestOfTries = new Dictionary<string, int>();
                 }
                 else
                 {
@@ -539,8 +545,8 @@ namespace SanaraV2.Games
         private APreload.MultiplayerType _multiType; // How multiplayer is played
 
         // Multiplayer "BestOf" Game Mode
-        private Dictionary<IUser, int> _bestOfScore;
-        private Dictionary<IUser, int> _bestOfTries;
+        private Dictionary<string, int> _bestOfScore;
+        private Dictionary<string, int> _bestOfTries;
         private int _bestOfRemainingRounds;
     }
 }
