@@ -130,7 +130,8 @@ namespace SanaraV2.Games
                     _gameState = GameState.Lost;
                     await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
                 }
-                await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+                if (_multiType == APreload.MultiplayerType.Elimination)
+                    await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
             }
             await PostAsync();
         }
