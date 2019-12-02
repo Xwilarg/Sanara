@@ -309,7 +309,7 @@ namespace SanaraV2.Games
                     if (_bestOfScore.ContainsKey(user.ToString())) _bestOfScore[user.ToString()]++;
                     else _bestOfScore.Add(user.ToString(), 1);
                     _bestOfTries = new Dictionary<string, int>();
-                    finalStr += "Current Score:" + Environment.NewLine;
+                    finalStr += Environment.NewLine + "Current Score:" + Environment.NewLine;
                     foreach (var name in _lobby.GetFullNames())
                     {
                         if (_bestOfScore.ContainsKey(name))
@@ -366,7 +366,23 @@ namespace SanaraV2.Games
                     }
                     await PostText(finalStr);
                     if (_bestOfRemainingRounds == 0)
+                    {
+                        List<string> bestName = new List<string>();
+                        int bestScore = 0;
+                        foreach (var name in _lobby.GetFullNames())
+                        {
+                            int currScore = _bestOfScore.ContainsKey(name) ? _bestOfScore[name] : 0;
+                            if (currScore == bestScore)
+                                bestName.Add(name);
+                            else if (currScore > bestScore)
+                            {
+                                bestName = new List<string>();
+                                bestName.Add(name);
+                            }
+                        }
+                        await PostText(string.Join(", ", bestName) + " won.");
                         _gameState = GameState.Lost;
+                    }
                     else
                     {
                         _bestOfTries = new Dictionary<string, int>();
