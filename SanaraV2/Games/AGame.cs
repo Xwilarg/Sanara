@@ -368,7 +368,10 @@ namespace SanaraV2.Games
                     if (_bestOfRemainingRounds == 0)
                         _gameState = GameState.Lost;
                     else
+                    {
                         _bestOfTries = new Dictionary<string, int>();
+                        await PostAsync();
+                    }
                 }
                 else
                 {
