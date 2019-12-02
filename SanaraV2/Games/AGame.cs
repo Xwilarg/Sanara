@@ -46,6 +46,9 @@ namespace SanaraV2.Games
             _isCropped = config.isCropped;
             _isShaded = config.isShaded;
             _multiType = config.multiplayerType;
+            _bestOfScore = new Dictionary<IUser, int>();
+            _bestOfTries = new Dictionary<IUser, int>();
+            _bestOfRemainingRounds = 5;
             Init();
         }
 
@@ -235,18 +238,19 @@ namespace SanaraV2.Games
             if (_gameState != GameState.Running)
                 return;
             _checkingAnswer = true;
-            if (HaveMultiplayerLobby())
+            if (HaveMultiplayerLobby()) // If is in multiplayer
             {
-                if (!_lobby.IsPlayerIn(user.Id))
+                if (!_lobby.IsPlayerIn(user.Id)) // Player isn't in the multiplayer lobby
                     return;
-                else if (!_lobby.IsMyTurn(user.Id))
+                // Check if it's the player's turn (elimination mode only)
+                else if (!_lobby.IsMyTurn(user.Id) && _multiType == APreload.MultiplayerType.Elimination)
                 {
                     await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
                     _checkingAnswer = false;
                     return;
                 }
             }
-            if (_postImage)
+            if (_postImage) // Image is being posted
             {
                 await PostText(Sentences.WaitImage(_chan.GuildId));
                 _checkingAnswer = false;
@@ -278,6 +282,11 @@ namespace SanaraV2.Games
                 if (error != "")
                     await PostText(error);
                 _checkingAnswer = false;
+                if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
+                {
+                    if (_bestOfTries.ContainsKey(user)) _bestOfTries[user]++;
+                    else _bestOfTries.Add(user, 1);
+                }
                 return;
             }
             if (!_contributors.Contains(user.Id))
@@ -287,10 +296,24 @@ namespace SanaraV2.Games
                 finalStr += Sentences.GuessGood(_chan.GuildId);
             if (HaveMultiplayerLobby())
             {
-                await NextTurn();
-                if (finalStr != "")
-                    finalStr += Environment.NewLine;
-                finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
+                if (_multiType == APreload.MultiplayerType.Elimination)
+                {
+                    await NextTurn();
+                    if (finalStr != "")
+                        finalStr += Environment.NewLine;
+                    finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
+                }
+                else if (_multiType == APreload.MultiplayerType.BestOf)
+                {
+                    if (_bestOfScore.ContainsKey(user)) _bestOfScore[user]++;
+                    else _bestOfScore.Add(user, 1);
+                    _bestOfTries = new Dictionary<IUser, int>();
+                    finalStr += "Current Score:" + Environment.NewLine;
+                    foreach (var u in _bestOfScore)
+                    {
+                        finalStr += u.Key.ToString() + ": " + u.Value + Environment.NewLine;
+                    }
+                }
             }
             if (_gameState != GameState.Running || _isFound)
                 return;
@@ -325,7 +348,28 @@ namespace SanaraV2.Games
             if (_postImage || _checkingAnswer) // If we are already doing something (posting image or checking answer) we wait for it
                 return;
             if (_startTime.AddSeconds(_timer).CompareTo(DateTime.Now) < 0)
-                await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
+            {
+                if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
+                {
+                    _bestOfRemainingRounds--;
+                    if (_bestOfRemainingRounds == 0)
+                    {
+                        _gameState = GameState.Lost;
+                        string finalStr = "Current Score:" + Environment.NewLine;
+                        foreach (var u in _bestOfScore)
+                        {
+                            finalStr += u.Key.ToString() + ": " + u.Value + Environment.NewLine;
+                        }
+                        await PostText(finalStr);
+                    }
+                    else
+                        _bestOfTries = new Dictionary<IUser, int>();
+                }
+                else
+                {
+                    await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
+                }
+            }
         }
 
         public bool DidLost()
@@ -352,12 +396,8 @@ namespace SanaraV2.Games
                     }
                     await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
                 }
-                else if (_multiType == APreload.MultiplayerType.BestOf)
-                {
-
-                }
                 else
-                    throw new ArgumentException("Unhandled multiplayer gamemode.");
+                    await PostText("Game ended: " + reason);
             }
             else
             {
@@ -495,6 +535,11 @@ namespace SanaraV2.Games
         private bool            _isFound; // Fix a bug where 2 users could answer at the same time
         private bool            _isCropped; // Difficulty level, image is cut in half
         private APreload.Shadow _isShaded; // Difficulty level, only display shadow
-        private APreload.MultiplayerType _multiType;
+        private APreload.MultiplayerType _multiType; // How multiplayer is played
+
+        // Multiplayer "BestOf" Game Mode
+        private Dictionary<IUser, int> _bestOfScore;
+        private Dictionary<IUser, int> _bestOfTries;
+        private int _bestOfRemainingRounds;
     }
 }
