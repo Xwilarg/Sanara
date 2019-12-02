@@ -356,19 +356,17 @@ namespace SanaraV2.Games
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     _bestOfRemainingRounds--;
-                    if (_bestOfRemainingRounds == 0)
+                    string finalStr = "Current Score:" + Environment.NewLine;
+                    foreach (var name in _lobby.GetFullNames())
                     {
-                        _gameState = GameState.Lost;
-                        string finalStr = "Current Score:" + Environment.NewLine;
-                        foreach (var name in _lobby.GetFullNames())
-                        {
-                            if (_bestOfScore.ContainsKey(name))
-                                finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
-                            else
-                                finalStr += name + ": 0" + Environment.NewLine;
-                        }
-                        await PostText(finalStr);
+                        if (_bestOfScore.ContainsKey(name))
+                            finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
+                        else
+                            finalStr += name + ": 0" + Environment.NewLine;
                     }
+                    await PostText(finalStr);
+                    if (_bestOfRemainingRounds == 0)
+                        _gameState = GameState.Lost;
                     else
                         _bestOfTries = new Dictionary<string, int>();
                 }
