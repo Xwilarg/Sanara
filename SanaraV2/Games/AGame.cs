@@ -253,7 +253,7 @@ namespace SanaraV2.Games
                 // Check if the player is out of tries
                 else if (_multiType == APreload.MultiplayerType.BestOf && (!_bestOfTries.ContainsKey(user.ToString()) || _bestOfTries[user.ToString()] == nbMaxTry))
                 {
-                    await PostText("You are out of tried");
+                    await PostText(Sentences.OutOfTries(_chan.GuildId));
                     _checkingAnswer = false;
                     return;
                 }
@@ -291,7 +291,7 @@ namespace SanaraV2.Games
                 {
                     if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
                     else _bestOfTries.Add(user.ToString(), 1);
-                    error += Environment.NewLine + _bestOfTries[user.ToString()] + " remaining for " + user.ToString();
+                    error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, _bestOfTries[user.ToString()], user.ToString());
                 }
                 if (error != "")
                     await PostText(error);
@@ -317,7 +317,7 @@ namespace SanaraV2.Games
                     if (_bestOfScore.ContainsKey(user.ToString())) _bestOfScore[user.ToString()]++;
                     else _bestOfScore.Add(user.ToString(), 1);
                     _bestOfTries = new Dictionary<string, int>();
-                    finalStr += Environment.NewLine + "Current Score:" + Environment.NewLine;
+                    finalStr += Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
                     foreach (var name in _lobby.GetFullNames())
                     {
                         if (_bestOfScore.ContainsKey(name))
@@ -364,7 +364,7 @@ namespace SanaraV2.Games
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     _bestOfRemainingRounds--;
-                    string finalStr = "Time Out, Current Score:" + Environment.NewLine;
+                    string finalStr = Sentences.TimeOut(_chan.GuildId) + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
                     foreach (var name in _lobby.GetFullNames())
                     {
                         if (_bestOfScore.ContainsKey(name))
@@ -389,9 +389,9 @@ namespace SanaraV2.Games
                             }
                         }
                         if (bestName.Count == _lobby.GetFullNames().Count)
-                            await PostText("It's a draw.");
+                            await PostText(Sentences.Draw(_chan.GuildId));
                         else
-                            await PostText(string.Join(", ", bestName) + " won.");
+                            await PostText(Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
                         _gameState = GameState.Lost;
                     }
                     else
@@ -432,7 +432,7 @@ namespace SanaraV2.Games
                     await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
                 }
                 else
-                    await PostText("Game ended: " + reason);
+                    throw new ArgumentException("Multiplayer game " + _gameName + " ended in an unexpected way: " + reason);
             }
             else
             {

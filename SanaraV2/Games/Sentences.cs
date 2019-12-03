@@ -32,6 +32,8 @@ namespace SanaraV2.Games
         public static string RulesCharacter(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesCharacter")); }
         public static string RulesTimer(ulong guildId, int timerRef) { return (Translation.GetTranslation(guildId, "rulesTimer", timerRef.ToString())); }
         public static string RulesReset(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesReset")); }
+        public static string RulesMultiElimination(ulong guildId) { return (Translation.GetTranslation(guildId, "rulesMultiElimination")); }
+        public static string RulesMultiBestOf(ulong guildId, int nbTries, int nbQuestions) { return (Translation.GetTranslation(guildId, "rulesMultiBestOf", nbTries.ToString(), nbQuestions.ToString())); }
         public static string ResetNone(ulong guildId) { return (Translation.GetTranslation(guildId, "resetNone")); }
         public static string ResetDone(ulong guildId) { return (Translation.GetTranslation(guildId, "resetDone")); }
         public static string InvalidGameName(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidGameName")); }
@@ -115,5 +117,10 @@ namespace SanaraV2.Games
         public static string YouLost(ulong guildId) { return (Translation.GetTranslation(guildId, "youLost")); }
         public static string WonMulti(ulong guildId, string lastName) { return (Translation.GetTranslation(guildId, "wonMulti", lastName)); }
         public static string DictionnaryEmpty(ulong guildId) { return (Translation.GetTranslation(guildId, "dictionnaryEmpty")); }
+        public static string TurnsRemaining(ulong guildId, int nb, string name) { return (Translation.GetTranslation(guildId, "turnsRemaning", nb.ToString(), name)); }
+        public static string CurrentScore(ulong guildId) { return (Translation.GetTranslation(guildId, "currentScore")); }
+        public static string TimeOut(ulong guildId) { return (Translation.GetTranslation(guildId, "timeOut")); }
+        public static string Draw(ulong guildId) { return (Translation.GetTranslation(guildId, "draw")); }
+        public static string OutOfTries(ulong guildId) { return (Translation.GetTranslation(guildId, "outOfTries")); }
     }
 }
