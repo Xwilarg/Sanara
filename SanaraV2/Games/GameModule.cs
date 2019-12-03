@@ -55,12 +55,21 @@ namespace SanaraV2.Games
             }
             // Display help
             StringBuilder str = new StringBuilder();
-            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleSoloOnly") + "**");
-            AppendHelp(soloOnly, str, isChanNsfw, guildId);
-            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleMultiOnly") + "**");
-            AppendHelp(multiOnly, str, isChanNsfw, guildId);
-            str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleBoth") + "**");
-            AppendHelp(both, str, isChanNsfw, guildId);
+            if (soloOnly.Count > 0)
+            {
+                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleSoloOnly") + "**");
+                AppendHelp(soloOnly, str, isChanNsfw, guildId);
+            }
+            if (multiOnly.Count > 0)
+            {
+                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleMultiOnly") + "**");
+                AppendHelp(multiOnly, str, isChanNsfw, guildId);
+            }
+            if (both.Count > 0)
+            {
+                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleBoth") + "**");
+                AppendHelp(both, str, isChanNsfw, guildId);
+            }
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleReset"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleScore"));
             str.AppendLine(Translation.GetTranslation(guildId, "gameModuleJoin"));
