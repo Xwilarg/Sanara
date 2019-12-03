@@ -244,9 +244,16 @@ namespace SanaraV2.Games
                 if (!_lobby.IsPlayerIn(user.Id)) // Player isn't in the multiplayer lobby
                     return;
                 // Check if it's the player's turn (elimination mode only)
-                else if (!_lobby.IsMyTurn(user.Id) && _multiType == APreload.MultiplayerType.Elimination)
+                else if (_multiType == APreload.MultiplayerType.Elimination && !_lobby.IsMyTurn(user.Id))
                 {
                     await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
+                    _checkingAnswer = false;
+                    return;
+                }
+                // Check if the player is out of tries
+                else if (_multiType == APreload.MultiplayerType.BestOf && (!_bestOfTries.ContainsKey(user.ToString()) || _bestOfTries[user.ToString()] == nbMaxTry))
+                {
+                    await PostText("You are out of tried");
                     _checkingAnswer = false;
                     return;
                 }
@@ -280,14 +287,15 @@ namespace SanaraV2.Games
             }
             if (error != null)
             {
-                if (error != "")
-                    await PostText(error);
-                _checkingAnswer = false;
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
                     else _bestOfTries.Add(user.ToString(), 1);
+                    error += Environment.NewLine + _bestOfTries[user.ToString()] + " remaining for " + user.ToString();
                 }
+                if (error != "")
+                    await PostText(error);
+                _checkingAnswer = false;
                 return;
             }
             if (!_contributors.Contains(user.Id))
@@ -356,7 +364,7 @@ namespace SanaraV2.Games
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     _bestOfRemainingRounds--;
-                    string finalStr = "Current Score:" + Environment.NewLine;
+                    string finalStr = "Time Out, Current Score:" + Environment.NewLine;
                     foreach (var name in _lobby.GetFullNames())
                     {
                         if (_bestOfScore.ContainsKey(name))
@@ -380,7 +388,10 @@ namespace SanaraV2.Games
                                 bestName.Add(name);
                             }
                         }
-                        await PostText(string.Join(", ", bestName) + " won.");
+                        if (bestName.Count == _lobby.GetFullNames().Count)
+                            await PostText("It's a draw.");
+                        else
+                            await PostText(string.Join(", ", bestName) + " won.");
                         _gameState = GameState.Lost;
                     }
                     else
@@ -565,5 +576,6 @@ namespace SanaraV2.Games
         private Dictionary<string, int> _bestOfScore;
         private Dictionary<string, int> _bestOfTries;
         private int _bestOfRemainingRounds;
+        private const int nbMaxTry = 3;
     }
 }
