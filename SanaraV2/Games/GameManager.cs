@@ -181,13 +181,23 @@ namespace SanaraV2.Games
                         isShaded = preload.DoesAllowShadow();
                     try
                     {
-                        await chan.SendMessageAsync(
-                            (isMultiplayer == APreload.Multiplayer.MultiOnly
-                                ? Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine : "") +
-                            "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
+                        string introMsg = "";
+                        if (isMultiplayer == APreload.Multiplayer.MultiOnly)
+                        {
+                            introMsg += Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine;
+                        }
+                        introMsg += "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
                             preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
                             Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
-                            Sentences.RulesReset(chan.GuildId));
+                            Sentences.RulesReset(chan.GuildId);
+                        if (isMultiplayer == APreload.Multiplayer.MultiOnly)
+                        {
+                            if (preload.GetMultiplayerType() == APreload.MultiplayerType.Elimination)
+                                introMsg += Sentences.RulesMultiElimination(chan.GuildId);
+                            else
+                                introMsg += Sentences.RulesMultiBestOf(chan.GuildId, AGame.nbMaxTry, AGame.nbQuestions);
+                        }
+                        await chan.SendMessageAsync(introMsg);
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)

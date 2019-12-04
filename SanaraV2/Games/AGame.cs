@@ -48,7 +48,7 @@ namespace SanaraV2.Games
             _multiType = config.multiplayerType;
             _bestOfScore = new Dictionary<string, int>();
             _bestOfTries = new Dictionary<string, int>();
-            _bestOfRemainingRounds = 5;
+            _bestOfRemainingRounds = nbQuestions;
             Init();
         }
 
@@ -251,7 +251,7 @@ namespace SanaraV2.Games
                     return;
                 }
                 // Check if the player is out of tries
-                else if (_multiType == APreload.MultiplayerType.BestOf && (!_bestOfTries.ContainsKey(user.ToString()) || _bestOfTries[user.ToString()] == nbMaxTry))
+                else if (_multiType == APreload.MultiplayerType.BestOf && _bestOfTries.ContainsKey(user.ToString()) && _bestOfTries[user.ToString()] == nbMaxTry)
                 {
                     await PostText(Sentences.OutOfTries(_chan.GuildId));
                     _checkingAnswer = false;
@@ -291,7 +291,7 @@ namespace SanaraV2.Games
                 {
                     if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
                     else _bestOfTries.Add(user.ToString(), 1);
-                    error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, _bestOfTries[user.ToString()], user.ToString());
+                    error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, nbMaxTry - _bestOfTries[user.ToString()], user.ToString());
                 }
                 if (error != "")
                     await PostText(error);
@@ -316,6 +316,12 @@ namespace SanaraV2.Games
                 {
                     if (_bestOfScore.ContainsKey(user.ToString())) _bestOfScore[user.ToString()]++;
                     else _bestOfScore.Add(user.ToString(), 1);
+                    _bestOfRemainingRounds--;
+                    if (_bestOfRemainingRounds == 0)
+                    {
+                        await BestOfOutOfRound();
+                        return;
+                    }
                     _bestOfTries = new Dictionary<string, int>();
                     finalStr += Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
                     foreach (var name in _lobby.GetFullNames())
@@ -375,24 +381,7 @@ namespace SanaraV2.Games
                     await PostText(finalStr);
                     if (_bestOfRemainingRounds == 0)
                     {
-                        List<string> bestName = new List<string>();
-                        int bestScore = 0;
-                        foreach (var name in _lobby.GetFullNames())
-                        {
-                            int currScore = _bestOfScore.ContainsKey(name) ? _bestOfScore[name] : 0;
-                            if (currScore == bestScore)
-                                bestName.Add(name);
-                            else if (currScore > bestScore)
-                            {
-                                bestName = new List<string>();
-                                bestName.Add(name);
-                            }
-                        }
-                        if (bestName.Count == _lobby.GetFullNames().Count)
-                            await PostText(Sentences.Draw(_chan.GuildId));
-                        else
-                            await PostText(Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
-                        _gameState = GameState.Lost;
+                        await BestOfOutOfRound();
                     }
                     else
                     {
@@ -405,6 +394,28 @@ namespace SanaraV2.Games
                     await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
                 }
             }
+        }
+
+        private async Task BestOfOutOfRound()
+        {
+            List<string> bestName = new List<string>();
+            int bestScore = 0;
+            foreach (var name in _lobby.GetFullNames())
+            {
+                int currScore = _bestOfScore.ContainsKey(name) ? _bestOfScore[name] : 0;
+                if (currScore == bestScore)
+                    bestName.Add(name);
+                else if (currScore > bestScore)
+                {
+                    bestName = new List<string>();
+                    bestName.Add(name);
+                }
+            }
+            if (bestName.Count == _lobby.GetFullNames().Count)
+                await PostText(Sentences.Draw(_chan.GuildId));
+            else
+                await PostText(Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
+            _gameState = GameState.Lost;
         }
 
         public bool DidLost()
@@ -576,6 +587,7 @@ namespace SanaraV2.Games
         private Dictionary<string, int> _bestOfScore;
         private Dictionary<string, int> _bestOfTries;
         private int _bestOfRemainingRounds;
-        private const int nbMaxTry = 3;
+        public static readonly int nbMaxTry = 3;
+        public static readonly int nbQuestions = 5;
     }
 }
