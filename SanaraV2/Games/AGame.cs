@@ -431,6 +431,7 @@ namespace SanaraV2.Games
                     }
                 }
                 finalStr += currName + ": " + bestScore + Environment.NewLine;
+                allNames.Remove(currName);
             }
             return finalStr;
         }
