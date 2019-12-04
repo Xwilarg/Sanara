@@ -187,16 +187,16 @@ namespace SanaraV2.Games
                             introMsg += Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine;
                         }
                         introMsg += "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
-                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
-                            Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
-                            Sentences.RulesReset(chan.GuildId);
+                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine;
                         if (isMultiplayer == APreload.Multiplayer.MultiOnly)
                         {
                             if (preload.GetMultiplayerType() == APreload.MultiplayerType.Elimination)
-                                introMsg += Sentences.RulesMultiElimination(chan.GuildId);
+                                introMsg += Sentences.RulesMultiElimination(chan.GuildId) + Environment.NewLine;
                             else
-                                introMsg += Sentences.RulesMultiBestOf(chan.GuildId, AGame.nbMaxTry, AGame.nbQuestions);
+                                introMsg += Sentences.RulesMultiBestOf(chan.GuildId, AGame.nbMaxTry, AGame.nbQuestions) + Environment.NewLine;
                         }
+                        introMsg += Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
+                            Sentences.RulesReset(chan.GuildId);
                         await chan.SendMessageAsync(introMsg);
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);

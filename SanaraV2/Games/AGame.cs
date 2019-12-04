@@ -236,7 +236,7 @@ namespace SanaraV2.Games
 
         public async Task CheckCorrectAsync(IUser user, string userAnswer)
         {
-            if (_gameState != GameState.Running)
+            if (_gameState != GameState.Running || userAnswer.StartsWith("//") || userAnswer.StartsWith("#"))
                 return;
             _checkingAnswer = true;
             if (HaveMultiplayerLobby()) // If is in multiplayer
@@ -324,13 +324,7 @@ namespace SanaraV2.Games
                     }
                     _bestOfTries = new Dictionary<string, int>();
                     finalStr += Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
-                    foreach (var name in _lobby.GetFullNames())
-                    {
-                        if (_bestOfScore.ContainsKey(name))
-                            finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
-                        else
-                            finalStr += name + ": 0" + Environment.NewLine;
-                    }
+                    finalStr += GetBestOfScore();
                 }
             }
             if (_gameState != GameState.Running || _isFound)
@@ -370,14 +364,8 @@ namespace SanaraV2.Games
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     _bestOfRemainingRounds--;
-                    string finalStr = Sentences.TimeOut(_chan.GuildId) + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
-                    foreach (var name in _lobby.GetFullNames())
-                    {
-                        if (_bestOfScore.ContainsKey(name))
-                            finalStr += name + ": " + _bestOfScore[name] + Environment.NewLine;
-                        else
-                            finalStr += name + ": 0" + Environment.NewLine;
-                    }
+                    string finalStr = Sentences.TimeOut(_chan.GuildId) + await GetLoose() + Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
+                    finalStr += GetBestOfScore();
                     await PostText(finalStr);
                     if (_bestOfRemainingRounds == 0)
                     {
@@ -411,11 +399,40 @@ namespace SanaraV2.Games
                     bestName.Add(name);
                 }
             }
+            string finalStr = Environment.NewLine + Environment.NewLine + Sentences.ReversiGameEnded(_chan.GuildId) + Environment.NewLine;
             if (bestName.Count == _lobby.GetFullNames().Count)
-                await PostText(Sentences.Draw(_chan.GuildId));
+                await PostText(finalStr + Sentences.Draw(_chan.GuildId));
             else
-                await PostText(Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
+                await PostText(finalStr + Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
             _gameState = GameState.Lost;
+        }
+
+        private string GetBestOfScore()
+        {
+            string finalStr = "";
+            List<string> allNames = new List<string>(_lobby.GetFullNames());
+            string currName;
+            int bestScore;
+            while (allNames.Count > 0)
+            {
+                currName = null;
+                bestScore = -1;
+                foreach (string name in allNames)
+                {
+                    int score;
+                    if (_bestOfScore.ContainsKey(name))
+                        score = _bestOfScore[name];
+                    else
+                        score = 0;
+                    if (currName == null || score > bestScore)
+                    {
+                        currName = name;
+                        bestScore = score;
+                    }
+                }
+                finalStr += currName + ": " + bestScore + Environment.NewLine;
+            }
+            return finalStr;
         }
 
         public bool DidLost()
