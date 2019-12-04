@@ -319,7 +319,7 @@ namespace SanaraV2.Games
                     _bestOfRemainingRounds--;
                     if (_bestOfRemainingRounds == 0)
                     {
-                        await BestOfOutOfRound();
+                        await BestOfOutOfRound(true);
                         return;
                     }
                     _bestOfTries = new Dictionary<string, int>();
@@ -369,7 +369,7 @@ namespace SanaraV2.Games
                     await PostText(finalStr);
                     if (_bestOfRemainingRounds == 0)
                     {
-                        await BestOfOutOfRound();
+                        await BestOfOutOfRound(false);
                     }
                     else
                     {
@@ -384,7 +384,7 @@ namespace SanaraV2.Games
             }
         }
 
-        private async Task BestOfOutOfRound()
+        private async Task BestOfOutOfRound(bool didFindGuess)
         {
             List<string> bestName = new List<string>();
             int bestScore = 0;
@@ -397,9 +397,13 @@ namespace SanaraV2.Games
                 {
                     bestName = new List<string>();
                     bestName.Add(name);
+                    bestScore = currScore;
                 }
             }
-            string finalStr = Environment.NewLine + Environment.NewLine + Sentences.ReversiGameEnded(_chan.GuildId) + Environment.NewLine;
+            string finalStr = "";
+            if (didFindGuess)
+                finalStr += Sentences.GuessGood(_chan.GuildId) + Environment.NewLine;
+            finalStr += Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine + GetBestOfScore() + Environment.NewLine + Environment.NewLine + Sentences.ReversiGameEnded(_chan.GuildId) + Environment.NewLine;
             if (bestName.Count == _lobby.GetFullNames().Count)
                 await PostText(finalStr + Sentences.Draw(_chan.GuildId));
             else
