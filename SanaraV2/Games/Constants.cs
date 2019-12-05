@@ -33,7 +33,8 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(AzurLanePreload), typeof(AzurLane), "gameModuleAzurLane"),
             new Tuple<Type, Type, string>(typeof(FateGOPreload), typeof(FateGO), "gameModuleFateGO"),
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon"),
-            new Tuple<Type, Type, string>(typeof(GirlsFrontlinePreload), typeof(GirlsFrontline), "gameModuleGirlsFrontline")
+            new Tuple<Type, Type, string>(typeof(GirlsFrontlinePreload), typeof(GirlsFrontline), "gameModuleGirlsFrontline"),
+            new Tuple<Type, Type, string>(typeof(DestinyChildPreload), typeof(DestinyChild), "gameModuleDestinyChild")
         };
 
         public static readonly Tuple<Type, Type, string>[] allGames = InitAllGames();
@@ -53,6 +54,7 @@ namespace SanaraV2.Games
         public static readonly List<string> fateGODictionnary = FateGO.LoadDictionnary();
         public static readonly List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
         public static readonly List<string> girlsfrontlineDictionnary = GirlsFrontline.LoadDictionnary();
+        public static readonly List<string> destinyChildDictionnary = DestinyChild.LoadDictionnary();
 
         // Used by information module to display stats
         public static readonly Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
@@ -65,7 +67,8 @@ namespace SanaraV2.Games
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary)
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary),
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.DestinyChildGame, destinyChildDictionnary)
         };
     }
 }
