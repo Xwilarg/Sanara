@@ -14,15 +14,12 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace SanaraV2.Games.Impl
 {
