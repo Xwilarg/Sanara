@@ -46,8 +46,6 @@ namespace SanaraV2.Db
             conn = await R.Connection().ConnectAsync();
             if (!await R.DbList().Contains(dbName).RunAsync<bool>(conn))
                 R.DbCreate(dbName).Run(conn);
-            if (!await R.Db(dbName).TableList().Contains("Users").RunAsync<bool>(conn))
-                R.Db(dbName).TableCreate("Users").Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Guilds").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Anime").RunAsync<bool>(conn))
