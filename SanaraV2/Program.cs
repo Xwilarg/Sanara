@@ -299,6 +299,10 @@ namespace SanaraV2
                 await Log(new LogMessage(LogSeverity.Info, "Setup", await process.StandardOutput.ReadToEndAsync()));
             }
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Preloading games dictionnaries"));
+            foreach (var elem in Constants.allGames)
+            { }
+
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising services"));
             // Categories for AdultVideo command
             categories = new List<string>();

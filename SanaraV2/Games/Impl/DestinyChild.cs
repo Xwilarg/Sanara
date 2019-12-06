@@ -88,8 +88,11 @@ namespace SanaraV2.Games.Impl
             List<string> children = new List<string>();
             string[] urls = new string[]
             {
-                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Story_Character",
-                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Event_Child"
+                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Attacker_Type",
+                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Debuffer_Type",
+                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Defender_Type",
+                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Healer_Type",
+                "https://destiny-child-for-kakao.fandom.com/wiki/Category:Supporter_Type"
             };
             using (HttpClient hc = new HttpClient())
             {
@@ -98,9 +101,8 @@ namespace SanaraV2.Games.Impl
                     string html = hc.GetStringAsync(url).GetAwaiter().GetResult();
                     foreach (string s in Regex.Matches(html, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"[^\"]+\">\\n\\t+<img").Cast<Match>().Select(x => x.Groups[1].Value))
                     {
-                        if (s == "Gift_Bag") // Ignoring "Gift Bag" character
-                            continue;
-                        children.Add(s);
+                        if (hc.GetStringAsync("https://destiny-child-for-kakao.fandom.com/wiki/" + s).GetAwaiter().GetResult().Contains("<a href=\"/wiki/Awakening\"")) // Keep characters that have "Awakening" property
+                            children.Add(s);
                     }
                 }
             }
