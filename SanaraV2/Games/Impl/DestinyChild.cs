@@ -101,7 +101,7 @@ namespace SanaraV2.Games.Impl
                     string html = hc.GetStringAsync(url).GetAwaiter().GetResult();
                     foreach (string s in Regex.Matches(html, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"[^\"]+\">\\n\\t+<img").Cast<Match>().Select(x => x.Groups[1].Value))
                     {
-                        if (hc.GetStringAsync("https://destiny-child-for-kakao.fandom.com/wiki/" + s).GetAwaiter().GetResult().Contains("<a href=\"/wiki/Awakening\"")) // Keep characters that have "Awakening" property
+                        if (hc.GetStringAsync("https://destiny-child-for-kakao.fandom.com/wiki/" + s).GetAwaiter().GetResult().Contains("<span class=\"mw-headline\" id=\"Awakening\">")) // Keep characters that have "Awakening" property
                             children.Add(s);
                     }
                 }
