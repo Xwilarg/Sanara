@@ -29,7 +29,7 @@ namespace SanaraV2.Games
         protected AGame(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId, bool ignoreDictionnarycheck = false)
         {
             _chan = chan;
-            if (!ignoreDictionnarycheck && (dictionnary == null || dictionnary.Count < 200)) // Dictionnary failed to load
+            if (!ignoreDictionnarycheck && (dictionnary == null || dictionnary.Count < 50)) // Dictionnary failed to load
                 throw new NoDictionnaryException();
             _dictionnary = dictionnary != null ? new List<string>(dictionnary) : null; // We create a new one to be sure to not modify the common one
             _contributors = new List<ulong>();

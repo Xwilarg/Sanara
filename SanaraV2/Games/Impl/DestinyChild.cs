@@ -50,7 +50,7 @@ namespace SanaraV2.Games.Impl
             => MultiplayerType.BestOf;
 
         public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesKancolle(guildId);
+            => Sentences.RulesDestinyChild(guildId);
     }
 
     public class DestinyChild : AQuizz
@@ -74,10 +74,10 @@ namespace SanaraV2.Games.Impl
             using (HttpClient hc = new HttpClient())
             {
                 return (new Tuple<string[], string[]>(
-                    new[] { Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)\"").Groups[1].Value },
+                    new[] { Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)\"").Groups[1].Value.Split(new[] { ".png" }, StringSplitOptions.None)[0] + ".png" },
                     new[]
                     {
-                        Regex.Match(html, "<meta property=\"og:title\" content=(\"[^\"]+\")").Groups[1].Value
+                        Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)\"").Groups[1].Value
                     }
                 ));
             }
