@@ -377,7 +377,7 @@ namespace Sanara_UnitTests
         [Theory]
         [InlineData("Freyja", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/b/b0/Innocent_Freyja.png")]
         [InlineData("Shamash", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/b/be/Lawful_Shamash.png")]
-        [InlineData("Jeanne_d'Arc", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/7/7b/Martyr_Jeanne_d%27Arc.png")]
+        [InlineData("Jeanne_d%27Arc", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/7/7b/Martyr_Jeanne_d%27Arc.png")]
         public async Task TestDestinyChildDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.destinyChildDictionnary);
