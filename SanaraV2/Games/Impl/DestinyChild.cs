@@ -104,7 +104,7 @@ namespace SanaraV2.Games.Impl
                     string html = hc.GetStringAsync(url).GetAwaiter().GetResult();
                     foreach (Match m in Regex.Matches(html, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"([^\"]+)\">\\n\\t+<img").Cast<Match>())
                     {
-                        if (Regex.Match(htmlRef, "c\\d+:{([a-zA-Z]+:[^,]+,)*name:\"" + m.Groups[2].Value, RegexOptions.IgnoreCase).Success)
+                        if (Regex.Match(htmlRef, "c\\d+:{([a-zA-Z]+:[^,]+,)*name:\"" + m.Groups[2].Value.Replace("&#039;", "'"), RegexOptions.IgnoreCase).Success)
                             children.Add(m.Groups[1].Value);
                     }
                 }
