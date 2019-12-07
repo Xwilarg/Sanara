@@ -94,15 +94,18 @@ namespace SanaraV2.Games.Impl
                 "https://destiny-child-for-kakao.fandom.com/wiki/Category:Healer_Type",
                 "https://destiny-child-for-kakao.fandom.com/wiki/Category:Supporter_Type"
             };
+            string htmlRef; // Contains a way to know if characters are childs or monsters
             using (HttpClient hc = new HttpClient())
             {
+                htmlRef = hc.GetStringAsync("https://lokicoder.github.io/destiny-child-tools/bundle.js").GetAwaiter().GetResult()
+                            .Split(new[] { "@license MIT" }, StringSplitOptions.None)[1].Split(new[] { "@license React v16.11.0" }, StringSplitOptions.None)[0];
                 foreach (string url in urls)
                 {
                     string html = hc.GetStringAsync(url).GetAwaiter().GetResult();
-                    foreach (string s in Regex.Matches(html, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"[^\"]+\">\\n\\t+<img").Cast<Match>().Select(x => x.Groups[1].Value))
+                    foreach (Match m in Regex.Matches(html, "<a href=\"\\/wiki\\/([^\"]+)\" title=\"([^\"]+)\">\\n\\t+<img").Cast<Match>())
                     {
-                        if (hc.GetStringAsync("https://destiny-child-for-kakao.fandom.com/wiki/" + s).GetAwaiter().GetResult().Contains("<span class=\"mw-headline\" id=\"Awakening\">")) // Keep characters that have "Awakening" property
-                            children.Add(s);
+                        if (Regex.Match(htmlRef, "c\\d+:{([a-zA-Z]+:[^,]+,)*name:\"" + m.Groups[2].Value, RegexOptions.IgnoreCase).Success)
+                            children.Add(m.Groups[1].Value);
                     }
                 }
             }
