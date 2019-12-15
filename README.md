@@ -6,7 +6,7 @@
 # Sanara
 
 ## What is Sanara
-Sanara is a multipurpose bot that is now in more than 200 servers (05/2019).<br/>
+Sanara is a multipurpose bot that is now in more than 300 servers (12/2019).<br/>
 Her most used features are games, doujinshi and images but there are a lot more.
 
 ## Commands
