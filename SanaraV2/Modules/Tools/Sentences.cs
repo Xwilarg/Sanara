@@ -204,7 +204,7 @@ namespace SanaraV2.Modules.Tools
                 {
                     if (finalStr != "")
                         finalStr += Environment.NewLine;
-                    finalStr += Translation.GetTranslation(guildId, "settingsModuleReload") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleLeave")
+                    finalStr += Translation.GetTranslation(guildId, "settingsModuleReload")
                         + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleResetDb")
                         + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEval");
                 }
