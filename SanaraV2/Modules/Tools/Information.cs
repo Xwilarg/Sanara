@@ -85,7 +85,7 @@ namespace SanaraV2.Modules.Tools
             if (page != "" && (page == "1" || animeMangaModule.ToLower().Contains(page)))
             {
                 embed.Title += " (" + animeMangaModule + ")";
-                embed.Description = Sentences.AnimeMangaHelp(Context.Guild.Id);
+                embed.Description = Sentences.AnimeMangaHelp(Context.Guild.Id, Settings.CanModify(Context.User, Base.Sentences.ownerId));
             }
             else if (page != "" && (page == "2" || booruModule.ToLower().Contains(page)))
             {

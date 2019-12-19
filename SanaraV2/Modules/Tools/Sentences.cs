@@ -110,12 +110,18 @@ namespace SanaraV2.Modules.Tools
         public static string XkcdModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdModuleName")); }
         public static string YoutubeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeModuleName")); }
         /// --------------------------- Help Module Content ---------------------------
-        public static string AnimeMangaHelp(ulong guildId)
+        public static string AnimeMangaHelp(ulong guildId, bool isServerOwner)
         {
+            string res;
             if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
-                return Translation.GetTranslation(guildId, "animeMangaModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleAnime")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga")
-                     + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
+            {
+                res = Translation.GetTranslation(guildId, "animeMangaModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleAnime")
+                   + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga");
+                if (isServerOwner)
+                    res += Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
+                else
+                    res += Environment.NewLine + "*" + Translation.GetTranslation(guildId, "ownerForFull") + "*";
+            }
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string BooruHelp(ulong guildId, bool isChanNsfw)
@@ -146,7 +152,7 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
-                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo");
+                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay");// + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo");
                 else
                     return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*";
             }
@@ -203,7 +209,7 @@ namespace SanaraV2.Modules.Tools
                         + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEval");
                 }
                 if (finalStr == "")
-                    return NoCommandAvailable(guildId);
+                    return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "ownerForFull") + "*"; ;
                 return finalStr;
             }
             return Base.Sentences.NotAvailable(guildId);

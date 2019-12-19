@@ -305,7 +305,7 @@ namespace SanaraV2
 
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising services"));
             // Categories for AdultVideo command
-            categories = new List<string>();
+            /*categories = new List<string>();
             categories.Add("censor");
             categories.Add("uncensor");
             List<string> newTags;
@@ -334,7 +334,7 @@ namespace SanaraV2
                 // javmost isn't available in Korea so if we are in the debug version of the bot we ignore this
                 if (!Debugger.IsAttached)
                     throw;
-            }
+            }*/
 
             // Then we update all others modules
             // It's basically just checking if the credential file is here

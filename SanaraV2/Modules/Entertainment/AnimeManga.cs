@@ -30,23 +30,30 @@ namespace SanaraV2.Modules.Entertainment
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.Subscribe(Context.Guild, Program.p.db, args);
-            switch (result.error)
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
             {
-                case Error.Subscribe.Help:
-                    await ReplyAsync(Sentences.SubscribeHelp(Context.Guild.Id));
-                    break;
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            else
+            {
+                var result = await Features.Entertainment.AnimeManga.Subscribe(Context.Guild, Program.p.db, args);
+                switch (result.error)
+                {
+                    case Error.Subscribe.Help:
+                        await ReplyAsync(Sentences.SubscribeHelp(Context.Guild.Id));
+                        break;
 
-                case Error.Subscribe.InvalidChannel:
-                    await ReplyAsync(Sentences.InvalidChannel(Context.Guild.Id));
-                    break;
+                    case Error.Subscribe.InvalidChannel:
+                        await ReplyAsync(Sentences.InvalidChannel(Context.Guild.Id));
+                        break;
 
-                case Error.Subscribe.None:
-                    await ReplyAsync(Sentences.SubscribeDone(Context.Guild.Id, "anime", result.answer.chan));
-                    break;
+                    case Error.Subscribe.None:
+                        await ReplyAsync(Sentences.SubscribeDone(Context.Guild.Id, "anime", result.answer.chan));
+                        break;
 
-                default:
-                    throw new NotImplementedException();
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
@@ -55,19 +62,27 @@ namespace SanaraV2.Modules.Entertainment
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.Unsubscribe(Context.Guild, Program.p.db);
-            switch (result.error)
+
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
             {
-                case Error.Unsubscribe.NoSubscription:
-                    await ReplyAsync(Sentences.NoSubscription(Context.Guild.Id));
-                    break;
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            else
+            {
+                var result = await Features.Entertainment.AnimeManga.Unsubscribe(Context.Guild, Program.p.db);
+                switch (result.error)
+                {
+                    case Error.Unsubscribe.NoSubscription:
+                        await ReplyAsync(Sentences.NoSubscription(Context.Guild.Id));
+                        break;
 
-                case Error.Unsubscribe.None:
-                    await ReplyAsync(Sentences.UnsubscribeDone(Context.Guild.Id, "anime"));
-                    break;
+                    case Error.Unsubscribe.None:
+                        await ReplyAsync(Sentences.UnsubscribeDone(Context.Guild.Id, "anime"));
+                        break;
 
-                default:
-                    throw new NotImplementedException();
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
