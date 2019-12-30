@@ -27,8 +27,10 @@ namespace SanaraV2.Modules.NSFW
         public async Task GetAdultVideo(params string[] args)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await ReplyAsync("Javmost blocked the access of bots to their website, this service is therefore temporarily unavailable.");
-            return;
+            if (Program.p.categories.Count == 2) // Tags not loaded
+            {
+                throw new NullReferenceException("An error occurred while loading tags, the command is therefore temporarily unavailable.");
+            }
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand, Program.p.categories);
             switch (result.error)
