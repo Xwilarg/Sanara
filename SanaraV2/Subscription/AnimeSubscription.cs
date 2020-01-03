@@ -27,7 +27,10 @@ namespace SanaraV2.Subscription
         public AnimeSubscription()
         {
             var feed = GetAnimeFeedAsync().GetAwaiter().GetResult();
-            currName = GetAttribute(feed[0], "title");
+            if (feed.Length > 0)
+                currName = GetAttribute(feed[0], "title");
+            else
+                currName = null;
         }
 
         public async Task<List<AnimeData>> GetAnimes()

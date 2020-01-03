@@ -67,8 +67,7 @@ namespace SanaraV2.Games
             new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
             new Tuple<Func<ulong, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.DestinyChildGame, destinyChildDictionnary)
+            new Tuple<Func<ulong, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary)
         };
     }
 }

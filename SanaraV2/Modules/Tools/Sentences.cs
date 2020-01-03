@@ -173,7 +173,7 @@ namespace SanaraV2.Modules.Tools
         public static string KantaiCollectionHelp(ulong guildId)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
-                return Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac") + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop");
+                return Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac");// + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string LinguisticHelp(ulong guildId, bool isChanNsfw)
