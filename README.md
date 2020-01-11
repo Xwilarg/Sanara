@@ -28,4 +28,4 @@ If you have any wonder about what the bot collect on you and how you can get/del
 
 You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
 
-![Preview](https://zirk.eu/img/Slideshow-Sanara.gif)
+![Preview](https://files.zirk.eu/Sanara/Preview.gif)
