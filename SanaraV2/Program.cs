@@ -336,6 +336,8 @@ namespace SanaraV2
                 if (!Debugger.IsAttached)
                     throw;
             }
+            catch (TaskCanceledException)
+            { } // Not available
 
             // Then we update all others modules
             // It's basically just checking if the credential file is here
