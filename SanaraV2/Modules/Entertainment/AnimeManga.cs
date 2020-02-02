@@ -109,17 +109,27 @@ namespace SanaraV2.Modules.Entertainment
                         color = Color.Orange;
                     else
                         color = Color.Red;
-                    await ReplyAsync("", false, new EmbedBuilder
+                    if (result.answer.imageUrl.Contains(".jpg") || result.answer.imageUrl.Contains(".png")
+                        || result.answer.imageUrl.Contains(".jpeg") || result.answer.imageUrl.Contains(".gif"))
                     {
-                        Color = color,
-                        Title = result.answer.name,
-                        Description = Sentences.Episode(Context.Guild.Id) + " " + (result.answer.episode == -1 ? Sentences.Unknown(Context.Guild.Id) : result.answer.episode.ToString()) + " " + Base.Sentences.AtStr(Context.Guild.Id) + " " + result.answer.at,
-                        ImageUrl = result.answer.imageUrl,
-                        Footer = new EmbedFooterBuilder
+                        await ReplyAsync("", false, new EmbedBuilder
                         {
-                            Text = Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility.ToString("0.00") + "%"
-                        }
-                    }.Build());
+                            Color = color,
+                            Title = result.answer.name,
+                            Description = Sentences.Episode(Context.Guild.Id) + " " + (result.answer.episode == "" ? Sentences.Unknown(Context.Guild.Id) : result.answer.episode.ToString()) + " " + Base.Sentences.AtStr(Context.Guild.Id) + " " + result.answer.at,
+                            ImageUrl = result.answer.imageUrl,
+                            Footer = new EmbedFooterBuilder
+                            {
+                                Text = Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility.ToString("0.00") + "%"
+                            }
+                        }.Build());
+                    }
+                    else
+                    {
+                        await ReplyAsync("Image found with " + result.answer.compatibility.ToString("0.00") + "%" + "of certitude" + Environment.NewLine +
+                            "Source: " + result.answer.name + (result.answer.episode != "" ? " episode " + result.answer.episode.ToString() + " at " + result.answer.at : "") + Environment.NewLine +
+                            result.answer.imageUrl);
+                    }
                     break;
 
                 case Error.Source.Help:

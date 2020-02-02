@@ -34,7 +34,7 @@ namespace SanaraV2.Features.Entertainment
             public string imageUrl;
             public bool isNsfw;
             public float compatibility;
-            public int episode;
+            public string episode;
             public string at;
         }
 
