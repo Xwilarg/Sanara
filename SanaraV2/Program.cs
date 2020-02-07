@@ -156,8 +156,6 @@ namespace SanaraV2
 
             rand = new Random();
 
-            subManager = new SubscriptionManager();
-
             UpdateLanguageFiles();
 
             // Setting up various credentials
@@ -219,6 +217,7 @@ namespace SanaraV2
             client.Disconnected += Disconnected;
             client.UserVoiceStateUpdated += VoiceUpdate;
             client.Connected += Connected;
+            client.Ready += Ready;
 
             await client.LoginAsync(TokenType.Bot, botToken);
             startTime = DateTime.Now;
@@ -239,6 +238,15 @@ namespace SanaraV2
             }
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
+        }
+
+        /// <summary>
+        /// When client is ready, we start the SubscriptionManager (we wait for it to be ready so it can access the guilds and channels)
+        /// </summary>
+        private Task Ready()
+        {
+            subManager = new SubscriptionManager();
+            return Task.CompletedTask;
         }
 
         /// <summary>
