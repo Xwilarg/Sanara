@@ -115,8 +115,7 @@ namespace SanaraV2.Modules.Tools
             string res;
             if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
             {
-                res = Translation.GetTranslation(guildId, "animeMangaModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleAnime")
-                   + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga");
+                res = Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga");
                 if (isServerOwner)
                     res += Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
                 else

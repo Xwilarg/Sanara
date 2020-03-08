@@ -55,65 +55,6 @@ namespace SanaraV2.Features.Entertainment
             return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(new Response.Unsubscribe(), Error.Unsubscribe.None);
         }
 
-        /// <summary>
-        /// Find the source of an anime extract
-        /// </summary>
-        /// <param name="isChanNsfw">Is the channel from where the user asking NSFW</param>
-        /// <param name="skipBeginning">If is Discord upload, we can skip the verification part</param>
-        /// <param name="args">URL</param>
-        public static async Task<FeatureRequest<Response.Source, Error.Source>> SearchSource(bool isChanNsfw, bool skipBeginning, string website, string token, string[] args)
-        {
-            string url = string.Join("", args);
-            if (url.Length == 0)
-                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.Help);
-            if (url.Contains("?"))
-                url = url.Split('?')[0];
-            if (!Modules.Base.Utilities.IsImage(url.Split('.').Last()) || !Utilities.IsLinkValid(url))
-                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotAnUrl);
-            dynamic json = null;
-            if (!skipBeginning)
-            {
-                json = await ContactSource(url);
-            }
-            if (json == null && website != null && token != null)
-            {
-                HttpClient httpClient = new HttpClient();
-                var values = new Dictionary<string, string> {
-                           { "token", token },
-                           { "action", "upload" },
-                           { "url", url }
-                        };
-                HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, website);
-                msg.Content = new FormUrlEncodedContent(values);
-                string answer = await (await httpClient.SendAsync(msg)).Content.ReadAsStringAsync();
-                string newUrl = ((dynamic)JsonConvert.DeserializeObject(answer)).url;
-                json = await ContactSource(newUrl);
-                values = new Dictionary<string, string> {
-                           { "token", token },
-                           { "action", "delete" },
-                           { "url", url }
-                        };
-                msg = new HttpRequestMessage(HttpMethod.Post, website);
-                msg.Content = new FormUrlEncodedContent(values);
-                await httpClient.SendAsync(msg);
-            }
-            if (json == null)
-                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotFound);
-            dynamic elem = json.docs[0];
-            if (!isChanNsfw && (bool)elem.is_adult)
-                return new FeatureRequest<Response.Source, Error.Source>(null, Error.Source.NotNsfw);
-            int at = elem.at;
-            return new FeatureRequest<Response.Source, Error.Source>(new Response.Source
-            {
-                compatibility = elem.similarity,
-                imageUrl = "https://trace.moe/thumbnail.php?anilist_id=" + elem.anilist_id + "&file=" + Uri.EscapeDataString((string)elem.filename) + "&t=" + elem.at.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + "&token=" + elem.tokenthumb,
-                isNsfw = elem.is_adult,
-                name = elem.title_romaji,
-                episode = elem.episode,
-                at = at / 60 + ":" + AddLeadingZero((at % 60).ToString())
-            }, Error.Source.None);
-        }
-
         private static async Task<dynamic> ContactSource(string url)
         {
             dynamic json;

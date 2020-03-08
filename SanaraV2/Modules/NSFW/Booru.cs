@@ -26,7 +26,7 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
-        [Command("Source", RunMode = RunMode.Async), Alias("Sauce")]
+        [Command("Source", RunMode = RunMode.Async), Alias("Sauce", "AnimeSource", "SourceAnime")]
         public async Task Source(params string[] args)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
