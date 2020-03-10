@@ -75,15 +75,12 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestSourceAnime()
         {
-            var result = await SanaraV2.Features.Entertainment.AnimeManga.SearchSource(false, false, null, null, new[] { "https://trace.moe/img/draw2-good.jpg" });
-            Assert.Equal(SanaraV2.Features.Entertainment.Error.Source.None, result.error);
+            var result = await Booru.SearchSourceBooru(new[] { "https://trace.moe/img/draw2-good.jpg" });
+            Assert.Equal(Error.SourceBooru.None, result.error);
             Assert.NotNull(result.answer);
-            Assert.Equal("Gochuumon wa Usagi Desu ka??", result.answer.name);
-            Assert.False(result.answer.isNsfw);
-            Assert.Equal("1", result.answer.episode);
-            Assert.Equal("4:51", result.answer.at);
-            Assert.Equal("https://trace.moe/thumbnail.php?anilist_id=21034&file=%5BDymy%5D%5BGochuumon%20wa%20Usagi%20Desu%20ka%5D%5BS2%5D%5B01%5D%5BBIG5%5D%5B1280X720%5D.mp4&t=291.08&token=Ffs0TXlswccEj-6Yyg3ALg", result.answer.imageUrl);
-            Assert.InRange(result.answer.compatibility, 0.9f, 1f);
+            Assert.Equal("https://i.ytimg.com/vi/6-zlwCuu64U/maxresdefault.jpg", result.answer.url);
+            Assert.InRange(result.answer.compatibility, 90f, 99f);
+            Assert.Contains("はたらく細胞", result.answer.content);
         }
 
         [Fact]
