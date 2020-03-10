@@ -140,7 +140,7 @@ namespace SanaraV2.Modules.Base
         /// <summary>
         /// Check if file extension is the one of an image
         /// </summary>
-        public static bool IsImage(string extension)
-            => extension == "gif" || extension == "png" || extension == "jpg" || extension == "jpeg";
+        public static bool IsImage(string link)
+            => link.Contains(".gif") || link.Contains(".png") || link.Contains(".jpg") || link.Contains(".jpeg");
     }
 }

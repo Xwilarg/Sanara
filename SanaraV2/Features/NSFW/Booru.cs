@@ -43,9 +43,7 @@ namespace SanaraV2.Features.NSFW
             string url = string.Join("", args);
             if (url.Length == 0)
                 return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.Help);
-            if (url.Contains("?"))
-                url = url.Split('?')[0];
-            if (!Modules.Base.Utilities.IsImage(url.Split('.').Last()) || !Utilities.IsLinkValid(url))
+            if (!Modules.Base.Utilities.IsImage(url) || !Utilities.IsLinkValid(url))
                 return new FeatureRequest<Response.BooruSource, Error.SourceBooru>(null, Error.SourceBooru.NotAnUrl);
             string html;
             using (HttpClient hc = new HttpClient())

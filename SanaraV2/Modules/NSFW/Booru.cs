@@ -172,7 +172,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Booru.None:
-                    if (!Utilities.IsImage(result.answer.url.Split('.').Last()))
+                    if (!Utilities.IsImage(result.answer.url))
                     {
                         await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guildId, result.answer.saveId) + "*");
                     }
