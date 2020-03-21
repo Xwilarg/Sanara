@@ -158,7 +158,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        private static async Task PostImage(BooruSharp.Booru.Booru booru, ITextChannel chan, string[] tags, ulong guildId)
+        private static async Task PostImage(ABooru booru, ITextChannel chan, string[] tags, ulong guildId)
         {
             var result = await Features.NSFW.Booru.SearchBooru(!chan.IsNsfw, tags, booru, Program.p.rand);
             switch (result.error)

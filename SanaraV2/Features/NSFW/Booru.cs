@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using BooruSharp.Booru;
 using Discord;
 using System;
 using System.Collections.Generic;
@@ -60,14 +61,14 @@ namespace SanaraV2.Features.NSFW
             }, Error.SourceBooru.None);
         }
 
-        public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, BooruSharp.Booru.Booru booru, Random r)
+        public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, ABooru booru, Random r)
         {
             if (isChanSafe && !booru.IsSafe())
                 return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW);
             BooruSharp.Search.Post.SearchResult res;
             try
             {
-                res = await booru.GetRandomImage(tags);
+                res = await booru.GetRandomImageAsync(tags);
             }
             catch (BooruSharp.Search.InvalidTags)
             {
@@ -75,12 +76,12 @@ namespace SanaraV2.Features.NSFW
                 foreach (string s in tags)
                 {
                     string tag = s;
-                    if ((await booru.GetNbImage(s)) == 0)
+                    if (!(await booru.GetTagsAsync(s)).Any(x => x.name == s)) // Invalid tag
                     {
-                        var related = await new BooruSharp.Booru.Konachan().GetTags(s);
+                        var related = await new Konachan().GetTagsAsync(s);
                         tag = null;
                         foreach (var rTag in related)
-                            if ((await booru.GetNbImage(rTag.name)) > 0)
+                            if ((await booru.GetTagsAsync(rTag.name)).Any(x => x.name == rTag.name)) // rTag is a valid alternative
                             {
                                 tag = rTag.name;
                                 break;
@@ -92,7 +93,7 @@ namespace SanaraV2.Features.NSFW
                 }
                 try
                 {
-                    res = await booru.GetRandomImage(newTags.ToArray());
+                    res = await booru.GetRandomImageAsync(newTags.ToArray());
                 }
                 catch (BooruSharp.Search.InvalidTags)
                 {
@@ -120,7 +121,7 @@ namespace SanaraV2.Features.NSFW
             if (!tagInfos.ContainsKey(id))
                 return new FeatureRequest<Response.BooruTags, Error.BooruTags>(null, Error.BooruTags.NotFound);
             var elem = tagInfos[id];
-            BooruSharp.Booru.Booru b = (BooruSharp.Booru.Booru)Activator.CreateInstance(elem.Item1, (BooruSharp.Booru.BooruAuth)null);
+            ABooru b = (ABooru)Activator.CreateInstance(elem.Item1, (BooruAuth)null);
             List<string> artists = new List<string>();
             List<string> sources = new List<string>();
             List<string> characs = new List<string>();
@@ -130,7 +131,7 @@ namespace SanaraV2.Features.NSFW
                 i++;
                 try
                 {
-                    switch ((await b.GetTag(s)).type)
+                    switch ((await b.GetTagAsync(s)).type)
                     {
                         case BooruSharp.Search.Tag.TagType.Artist:
                             if (artists.Count == 10)

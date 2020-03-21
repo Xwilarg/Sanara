@@ -84,7 +84,7 @@ namespace SanaraV2.Games.Impl
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
             var result = Features.NSFW.Booru.SearchBooru(false, new string[] { curr, "animated" }, _booru, Program.p.rand).GetAwaiter().GetResult();
-            var answers = result.answer.tags.Where(x => _booru.GetTag(x).GetAwaiter().GetResult().type == BooruSharp.Search.Tag.TagType.Copyright).ToArray();
+            var answers = result.answer.tags.Where(x => _booru.GetTagAsync(x).GetAwaiter().GetResult().type == BooruSharp.Search.Tag.TagType.Copyright).ToArray();
             if (_sendImage)
             {
                 if (result.answer.url.EndsWith(".gif"))
