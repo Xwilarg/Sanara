@@ -49,7 +49,11 @@ namespace SanaraV2.Games
                 {
                     if (globalRankingStr != "")
                         globalRankingStr += "|";
-                    globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allRankedGames.Length);
+                    try
+                    {
+                        globalRankingStr += Program.p.GetName(guild.Name) + "|" + (elem.Value / Constants.allRankedGames.Length);
+                    } catch (NullReferenceException)
+                    { } // No idea why this goes here
                     i++;
                 }
                 globalRanking.Remove(elem.Key);
