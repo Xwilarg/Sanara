@@ -61,35 +61,60 @@ namespace SanaraV2.Features.NSFW
             }, Error.SourceBooru.None);
         }
 
+        // From: https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560
+        private static int GetStringDistance(string a, string b)
+        {
+            var source1Length = a.Length;
+            var source2Length = b.Length;
+
+            var matrix = new int[source1Length + 1, source2Length + 1];
+
+            // First calculation, if one entry is empty return full length
+            if (source1Length == 0)
+                return source2Length;
+
+            if (source2Length == 0)
+                return source1Length;
+
+            // Initialization of matrix with row size source1Length and columns size source2Length
+            for (var i = 0; i <= source1Length; matrix[i, 0] = i++) { }
+            for (var j = 0; j <= source2Length; matrix[0, j] = j++) { }
+
+            // Calculate rows and collumns distances
+            for (var i = 1; i <= source1Length; i++)
+            {
+                for (var j = 1; j <= source2Length; j++)
+                {
+                    var cost = (b[j - 1] == a[i - 1]) ? 0 : 1;
+
+                    matrix[i, j] = Math.Min(
+                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
+                        matrix[i - 1, j - 1] + cost);
+                }
+            }
+            return matrix[source1Length, source2Length];
+        }
+
         public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, ABooru booru, Random r)
         {
             if (isChanSafe && !booru.IsSafe())
                 return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW);
             BooruSharp.Search.Post.SearchResult res;
+            List<string> newTags = null;
             try
             {
                 res = await booru.GetRandomImageAsync(tags);
             }
             catch (BooruSharp.Search.InvalidTags)
             {
-                List<string> newTags = new List<string>();
+                newTags = new List<string>();
                 foreach (string s in tags)
                 {
                     string tag = s;
-                    if (!(await booru.GetTagsAsync(s)).Any(x => x.name == s)) // Invalid tag
-                    {
-                        var related = await new Konachan().GetTagsAsync(s);
-                        tag = null;
-                        foreach (var rTag in related)
-                            if ((await booru.GetTagsAsync(rTag.name)).Any(x => x.name == rTag.name)) // rTag is a valid alternative
-                            {
-                                tag = rTag.name;
-                                break;
-                            }
-                        if (tag == null)
-                            return (new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound));
-                    }
-                    newTags.Add(tag);
+                    var related = await new Konachan().GetTagsAsync(s);
+                    if (related.Length == 0)
+                        return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound);
+                    newTags.Add(tag = related.OrderBy(x => GetStringDistance(x.name, s)).First().name);
                 }
                 try
                 {
@@ -109,7 +134,8 @@ namespace SanaraV2.Features.NSFW
                 url = url,
                 colorRating = color,
                 saveId = saveId,
-                tags = res.tags
+                tags = res.tags,
+                newTags = newTags?.ToArray()
             }, error);
         }
 

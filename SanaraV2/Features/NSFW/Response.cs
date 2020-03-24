@@ -32,6 +32,7 @@ namespace SanaraV2.Features.NSFW
             public Color colorRating;
             public string saveId;
             public string[] tags;
+            public string[] newTags;
         }
 
         public class BooruTags

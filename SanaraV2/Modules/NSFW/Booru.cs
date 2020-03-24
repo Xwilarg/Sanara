@@ -184,7 +184,8 @@ namespace SanaraV2.Modules.NSFW
                             ImageUrl = result.answer.url,
                             Footer = new EmbedFooterBuilder()
                             {
-                                Text = Sentences.ImageInfo(guildId, result.answer.saveId)
+                                Text = (result.answer.newTags != null ? "Some of your tags were invalid. The current search tags are: " + string.Join(", ", result.answer.newTags) + "\n\n" :
+                                "") + Sentences.ImageInfo(guildId, result.answer.saveId)
                             }
                         }.Build());
                     }
