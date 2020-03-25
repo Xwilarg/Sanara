@@ -308,10 +308,6 @@ namespace Sanara_UnitTests
         public async Task TestGameGirlsFrontline()
             => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
-        [Fact]
-        public async Task TestGameDestinyChild()
-            => await CheckGame(new SanaraV2.Games.Impl.DestinyChild(null, new Config(0, Difficulty.Normal, "destinychild", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
-
         [Theory]
         [InlineData("Kisaragi", "https://azurlane.koumakan.jp/w/images/thumb/b/ba/Kisaragi.png/[0-9]{3}px-Kisaragi.png")]
         [InlineData("Li%27l_Sandy", "https://azurlane.koumakan.jp/w/images/thumb/1/19/Li%27l_Sandy.png/[0-9]{3}px-Li%27l_Sandy.png")]
@@ -368,17 +364,6 @@ namespace Sanara_UnitTests
         {
             Assert.Contains(name, Constants.girlsfrontlineDictionnary);
             var game = new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
-            Assert.Equal(url, await game.GetUrlTest(name));
-        }
-
-        [Theory]
-        [InlineData("Freyja", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/b/b0/Innocent_Freyja.png")]
-        [InlineData("Shamash", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/b/be/Lawful_Shamash.png")]
-        [InlineData("Jeanne_d%27Arc", "https://vignette.wikia.nocookie.net/destiny-child-for-kakao/images/7/7b/Martyr_Jeanne_d%27Arc.png")]
-        public async Task TestDestinyChildDictionnary(string name, string url)
-        {
-            Assert.Contains(name, Constants.destinyChildDictionnary);
-            var game = new SanaraV2.Games.Impl.DestinyChild(null, new Config(0, Difficulty.Normal, "destinychild", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 

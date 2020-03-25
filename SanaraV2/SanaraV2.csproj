@@ -283,7 +283,6 @@
     <Compile Include="Games\Impl\Anime.cs" />
     <Compile Include="Games\Impl\AzurLane.cs" />
     <Compile Include="Games\Impl\Booru.cs" />
-    <Compile Include="Games\Impl\DestinyChild.cs" />
     <Compile Include="Games\Impl\FateGO.cs" />
     <Compile Include="Games\Impl\GirlsFrontline.cs" />
     <Compile Include="Games\Impl\KanColle.cs" />
