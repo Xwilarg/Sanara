@@ -288,8 +288,11 @@ namespace SanaraV2
         }
 
         // If the bot is disconnected we exit the program, an external program will relaunch it
-        private Task Disconnected(Exception _)
+        private Task Disconnected(Exception e)
         {
+            if (!File.Exists("Saves/Logs"))
+                Directory.CreateDirectory("Saves/Logs");
+            File.WriteAllText(DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", e.ToString());
             Environment.Exit(1);
             return Task.CompletedTask;
         }
@@ -563,9 +566,10 @@ namespace SanaraV2
             List<Tuple<string, int, int>> guilds = new List<Tuple<string, int, int>>();
             foreach (IGuild g in client.Guilds)
             {
+                await g.DownloadUsersAsync();
                 int users = 0;
                 int bots = 0;
-                foreach (IGuildUser u in await g.GetUsersAsync())
+                foreach (IGuildUser u in await g.GetUsersAsync(CacheMode.AllowDownload))
                 {
                     if (u.IsBot) bots++;
                     else users++;

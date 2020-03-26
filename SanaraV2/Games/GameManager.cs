@@ -175,7 +175,7 @@ namespace SanaraV2.Games
                         return Sentences.SendImageNotAvailable;
                     if (isCropped && !preload.DoesAllowCropped())
                         return Sentences.CropNotAvailable;
-                    if (isCropped && preload.DoesAllowShadow() == APreload.Shadow.None)
+                    if (isShaded != APreload.Shadow.None && preload.DoesAllowShadow() == APreload.Shadow.None)
                         return Sentences.ShadowNotAvailable;
                     if (isShaded != APreload.Shadow.None)
                         isShaded = preload.DoesAllowShadow();

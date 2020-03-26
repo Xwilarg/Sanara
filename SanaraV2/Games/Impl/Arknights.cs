@@ -40,7 +40,7 @@ namespace SanaraV2.Games.Impl
             => true;
 
         public override Shadow DoesAllowShadow()
-            => Shadow.None;
+            => Shadow.Transparency;
 
         public override Multiplayer DoesAllowMultiplayer()
             => Multiplayer.Both;
