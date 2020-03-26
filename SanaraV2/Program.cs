@@ -562,22 +562,14 @@ namespace SanaraV2
         private async void UpdateStatus()
         {
             // Server count
-            List<Tuple<string, int, int>> guilds = new List<Tuple<string, int, int>>();
+            List<Tuple<string, int>> guilds = new List<Tuple<string, int>>();
             foreach (IGuild g in client.Guilds)
             {
-                await g.DownloadUsersAsync();
-                int users = 0;
-                int bots = 0;
-                foreach (IGuildUser u in await g.GetUsersAsync(CacheMode.AllowDownload))
-                {
-                    if (u.IsBot) bots++;
-                    else users++;
-                }
-                guilds.Add(new Tuple<string, int, int>(g.Name, users, bots));
+                guilds.Add(new Tuple<string, int>(g.Name, ((SocketGuild)g).MemberCount));
             }
 
             // Server biggest
-            Tuple<string, int, int> biggest = null;
+            Tuple<string, int> biggest = null;
             string finalStr = "";
             for (int i = 0; i < 10; i++)
             {
@@ -588,7 +580,7 @@ namespace SanaraV2
                 }
                 if (biggest == null)
                     break;
-                finalStr += GetName(biggest.Item1) + "|" + biggest.Item2 + "|" + biggest.Item3 + "$";
+                finalStr += GetName(biggest.Item1) + "|" + biggest.Item2 + "$";
                 guilds.Remove(biggest);
                 biggest = null;
             }
