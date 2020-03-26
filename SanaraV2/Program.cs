@@ -292,8 +292,7 @@ namespace SanaraV2
         {
             if (!File.Exists("Saves/Logs"))
                 Directory.CreateDirectory("Saves/Logs");
-            File.WriteAllText(DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", "Bot disconnected. Exception:\n" + e.ToString());
-            Environment.Exit(1);
+            File.WriteAllText("Saves/Logs/" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", "Bot disconnected. Exception:\n" + e.ToString());
             return Task.CompletedTask;
         }
 
