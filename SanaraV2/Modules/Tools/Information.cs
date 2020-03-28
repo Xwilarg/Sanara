@@ -168,7 +168,8 @@ namespace SanaraV2.Modules.Tools
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Settings) ? "**11**: " + settingsModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Vn) ? "**12**: " + visualNovelModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Xkcd) ? "**13**: " + xkcdModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube) ? "**14**: " + youtubeModule + Environment.NewLine: "");
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube) ? "**14**: " + youtubeModule + Environment.NewLine: "") + Environment.NewLine + Environment.NewLine +
+                    "We are doing a survey to understand how people are using Sanara and hopefully improve her in a good way. You can fill it here: https://forms.gle/DWz2aMeMrDbtVfzM6";
             }
             await ReplyAsync("", false, embed.Build());
         }
