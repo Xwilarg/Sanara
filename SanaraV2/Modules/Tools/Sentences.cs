@@ -189,7 +189,7 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Radio))
                 return Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop");
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleRemove") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string SettingsHelp(ulong guildId, bool isServerOwner, bool isBotOwner)
