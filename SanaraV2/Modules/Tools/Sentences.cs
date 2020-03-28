@@ -120,6 +120,7 @@ namespace SanaraV2.Modules.Tools
                     res += Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
                 else
                     res += Environment.NewLine + "*" + Translation.GetTranslation(guildId, "ownerForFull") + "*";
+                return res;
             }
             return Base.Sentences.NotAvailable(guildId);
         }
