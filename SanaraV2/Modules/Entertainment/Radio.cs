@@ -88,6 +88,40 @@ namespace SanaraV2.Modules.Entertainment
                 m_musics.Add(new Song(path, title, url, imageUrl, requester));
             }
 
+            public async Task<bool> RemoveSong(IMessageChannel chan, string name)
+            {
+                if (m_musics.Any(x => x.title == name))
+                {
+                    int index = m_musics.IndexOf(m_musics.Where(x => x.title == name).First());
+                    if (index == 0)
+                        return await Skip(chan);
+                    else
+                        m_musics.RemoveAt(index);
+                    return true;
+                }
+                return false;
+            }
+
+            public async Task<bool> RemoveSong(IMessageChannel chan, List<int> indexs)
+            {
+                bool didRemove = false;
+                indexs = indexs.OrderByDescending(x => x).ToList();
+                foreach (int i in indexs)
+                {
+                    if (i == 0)
+                    {
+                        await Skip(chan);
+                        didRemove = true;
+                    }
+                    if (i > 0 && i < m_musics.Count)
+                    {
+                        m_musics.RemoveAt(i);
+                        didRemove = true;
+                    }
+                }
+                return didRemove;
+            }
+
             public async Task<bool> Skip(IMessageChannel chan)
             {
                 if (m_process == null)
@@ -185,7 +219,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Radio"), Priority(-1)]
-        public async Task Help(params string[] args)
+        public async Task Help(params string[] _)
         {
             await ReplyAsync("", false, new EmbedBuilder()
             {
@@ -243,7 +277,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Launch radio", RunMode = RunMode.Async), Summary("Launch radio"), Alias("Radio launch", "Radio start", "Start radio")]
-        public async Task LaunchRadio(params string[] words)
+        public async Task LaunchRadio(params string[] _)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
@@ -254,7 +288,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Playlist radio", RunMode = RunMode.Async), Summary("Display the current playlist"), Alias("Radio playlist", "Radio list", "List radio")]
-        public async Task ListRadio(params string[] words)
+        public async Task ListRadio(params string[] _)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
@@ -265,7 +299,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Skip radio", RunMode = RunMode.Async), Summary("Skip the current song"), Alias("Radio skip")]
-        public async Task SkipRadio(params string[] words)
+        public async Task SkipRadio(params string[] _)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
@@ -274,9 +308,52 @@ namespace SanaraV2.Modules.Entertainment
                 await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
             else
             {
-                bool suceed = await radio.Skip(Context.Channel);
-                if (!suceed)
+                bool succeed = await radio.Skip(Context.Channel);
+                if (!succeed)
                     await ReplyAsync(Sentences.RadioNoSong(Context.Guild.Id));
+            }
+        }
+
+        [Command("Remove radio", RunMode = RunMode.Async), Summary("Remove a song of the playlist"), Alias("Radio remove")]
+        public async Task RemoveRadio(params string[] args)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
+            RadioChannel radio = p.radios.Find(x => x.m_guildId == Context.Guild.Id);
+            if (radio == null)
+                await ReplyAsync(Sentences.RadioNotStarted(Context.Guild.Id));
+            else
+            {
+                string title = string.Join(" ", args);
+                if (await radio.RemoveSong(Context.Channel, title))
+                {
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                }
+                else
+                {
+                    List<int> indexs = new List<int>();
+                    foreach (var str in args)
+                    {
+                        if (int.TryParse(str, out int res))
+                        {
+                            if (!indexs.Contains(res))
+                                indexs.Add(res);
+                        }
+                        else
+                        {
+                            indexs = null;
+                            break;
+                        }
+                    }
+                    if (indexs == null || !await radio.RemoveSong(Context.Channel, indexs))
+                    {
+                        await ReplyAsync("There is no song with this name.");
+                    }
+                    else
+                    {
+                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    }
+                }
             }
         }
 
@@ -299,7 +376,7 @@ namespace SanaraV2.Modules.Entertainment
         }
 
         [Command("Stop radio", RunMode = RunMode.Async), Summary("Stop radio"), Alias("Radio stop", "Radio quit", "Quit radio")]
-        public async Task StopRadio(params string[] words)
+        public async Task StopRadio(params string[] _)
         {
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Radio);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Radio);
