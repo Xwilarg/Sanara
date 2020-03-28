@@ -95,7 +95,7 @@ namespace SanaraV2.Features.NSFW
             return matrix[source1Length, source2Length];
         }
 
-        public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, ABooru booru, Random r)
+        public static async Task<FeatureRequest<Response.Booru, Error.Booru>> SearchBooru(bool isChanSafe, string[] tags, ABooru booru, Random r, int remainingTries = 5)
         {
             if (isChanSafe && !booru.IsSafe())
                 return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.ChanNotNSFW);
@@ -126,6 +126,13 @@ namespace SanaraV2.Features.NSFW
                 }
             }
             Error.Booru error = Error.Booru.None;
+            if (res.fileUrl == null)
+            {
+                if (remainingTries == 0)
+                    return new FeatureRequest<Response.Booru, Error.Booru>(null, Error.Booru.NotFound);
+                else
+                    return await SearchBooru(isChanSafe, tags, booru, r, remainingTries - 1);
+            }
             string url = res.fileUrl.AbsoluteUri;
             Color color = GetColorFromRating(res.rating);
             string saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
