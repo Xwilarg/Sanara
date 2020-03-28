@@ -96,7 +96,11 @@ namespace SanaraV2.Modules.Entertainment
                     if (index == 0)
                         return await Skip(chan);
                     else
+                    {
+                        string musicTitle = m_musics[index].title;
                         m_musics.RemoveAt(index);
+                        await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, musicTitle));
+                    }
                     return true;
                 }
                 return false;
@@ -104,29 +108,37 @@ namespace SanaraV2.Modules.Entertainment
 
             public async Task<bool> RemoveSong(IMessageChannel chan, List<int> indexs)
             {
-                bool didRemove = false;
+                int didRemove = 0;
                 indexs = indexs.OrderByDescending(x => x).ToList();
+                string songName = null;
                 foreach (int i in indexs)
                 {
                     if (i == 0)
                     {
-                        await Skip(chan);
-                        didRemove = true;
+                        songName = m_musics[0].title;
+                        await Skip(null);
+                        didRemove++;
                     }
                     if (i > 0 && i < m_musics.Count)
                     {
+                        songName = m_musics[i].title;
                         m_musics.RemoveAt(i);
-                        didRemove = true;
+                        didRemove++;
                     }
                 }
-                return didRemove;
+                if (didRemove == 1)
+                    await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, songName));
+                else if (didRemove > 1)
+                    await chan.SendMessageAsync(didRemove + " songs were skipped.");
+                return didRemove > 0;
             }
 
             public async Task<bool> Skip(IMessageChannel chan)
             {
                 if (m_process == null)
                     return false;
-                await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, m_musics[0].title));
+                if (chan != null)
+                    await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, m_musics[0].title));
                 m_process.Kill();
                 return true;
             }
