@@ -129,7 +129,7 @@ namespace SanaraV2.Modules.Entertainment
                 if (didRemove == 1)
                     await chan.SendMessageAsync(Sentences.SongSkipped((chan as ITextChannel).GuildId, songName));
                 else if (didRemove > 1)
-                    await chan.SendMessageAsync(didRemove + " songs were skipped.");
+                    await chan.SendMessageAsync(Sentences.SongsSkipped((chan as ITextChannel).GuildId, didRemove));
                 return didRemove > 0;
             }
 
@@ -359,7 +359,7 @@ namespace SanaraV2.Modules.Entertainment
                     }
                     if (indexs == null || !await radio.RemoveSong(Context.Channel, indexs))
                     {
-                        await ReplyAsync("There is no song with this name.");
+                        await ReplyAsync(Sentences.InvalidSong(Context.Guild.Id));
                     }
                     else
                     {

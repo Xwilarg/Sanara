@@ -251,7 +251,7 @@ namespace SanaraV2.Games
                     return;
                 }
                 // Check if the player is out of tries
-                else if (_multiType == APreload.MultiplayerType.BestOf && _bestOfTries.ContainsKey(user.ToString()) && _bestOfTries[user.ToString()] == nbMaxTry)
+                else if (_multiType == APreload.MultiplayerType.BestOf && _bestOfTries.ContainsKey(user.ToString()) && _bestOfTries[user.ToString()] == nbMaxTry - 1)
                 {
                     await PostText(Sentences.OutOfTries(_chan.GuildId));
                     _checkingAnswer = false;

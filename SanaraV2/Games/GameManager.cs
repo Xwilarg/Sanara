@@ -187,16 +187,18 @@ namespace SanaraV2.Games
                             introMsg += Sentences.LobbyCreation(chan.GuildId, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine;
                         }
                         introMsg += "**" + Sentences.Rules(chan.GuildId) + ":**" + Environment.NewLine +
-                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine;
+                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
+                            Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine;
                         if (isMultiplayer == APreload.Multiplayer.MultiOnly)
                         {
+                            introMsg += "**" + Sentences.MultiplayerRules(chan.GuildId) + ":**" + Environment.NewLine;
                             if (preload.GetMultiplayerType() == APreload.MultiplayerType.Elimination)
-                                introMsg += Sentences.RulesMultiElimination(chan.GuildId) + Environment.NewLine;
+                                introMsg += Sentences.RulesMultiElimination(chan.GuildId);
                             else
-                                introMsg += Sentences.RulesMultiBestOf(chan.GuildId, AGame.nbMaxTry, AGame.nbQuestions) + Environment.NewLine;
+                                introMsg += Sentences.RulesMultiBestOf(chan.GuildId, AGame.nbMaxTry, AGame.nbQuestions);
+                            introMsg += Environment.NewLine + Environment.NewLine;
                         }
-                        introMsg += Sentences.RulesTimer(chan.GuildId, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine +
-                            Sentences.RulesReset(chan.GuildId);
+                        introMsg += Sentences.RulesReset(chan.GuildId);
                         await chan.SendMessageAsync(introMsg);
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);

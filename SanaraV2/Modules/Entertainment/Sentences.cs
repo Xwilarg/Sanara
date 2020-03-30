@@ -48,6 +48,8 @@ namespace SanaraV2.Modules.Entertainment
         public static string RadioTooMany(ulong guildId) { return (Translation.GetTranslation(guildId, "radioTooMany")); }
         public static string RadioNoSong(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNoSong")); }
         public static string SongSkipped(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songSkipped", songName)); }
+        public static string SongsSkipped(ulong guildId, int nb) { return (Translation.GetTranslation(guildId, "songSkipped", nb.ToString())); }
+        public static string InvalidSong(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidSong")); }
         public static string Current(ulong guildId) { return (Translation.GetTranslation(guildId, "current")); }
         public static string Downloading(ulong guildId) { return (Translation.GetTranslation(guildId, "downloading")); }
         public static string SongAdded(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songAdded", songName)); }
