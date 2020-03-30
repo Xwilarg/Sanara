@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
 using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -234,7 +235,7 @@ namespace SanaraV2.Games
             _postImage = false;
         }
 
-        public async Task CheckCorrectAsync(IUser user, string userAnswer)
+        public async Task CheckCorrectAsync(IUser user, string userAnswer, SocketUserMessage msg)
         {
             if (_gameState != GameState.Running || userAnswer.StartsWith("//") || userAnswer.StartsWith("#"))
                 return;
@@ -246,21 +247,21 @@ namespace SanaraV2.Games
                 // Check if it's the player's turn (elimination mode only)
                 else if (_multiType == APreload.MultiplayerType.Elimination && !_lobby.IsMyTurn(user.Id))
                 {
-                    await PostText(Sentences.AnnounceTurnError(_chan.GuildId, _lobby.GetTurnName()));
+                    await msg.AddReactionAsync(new Emoji("🚫"));
                     _checkingAnswer = false;
                     return;
                 }
                 // Check if the player is out of tries
                 else if (_multiType == APreload.MultiplayerType.BestOf && _bestOfTries.ContainsKey(user.ToString()) && _bestOfTries[user.ToString()] == nbMaxTry - 1)
                 {
-                    await PostText(Sentences.OutOfTries(_chan.GuildId));
+                    await msg.AddReactionAsync(new Emoji("🚫"));
                     _checkingAnswer = false;
                     return;
                 }
             }
             if (_postImage) // Image is being posted
             {
-                await PostText(Sentences.WaitImage(_chan.GuildId));
+                await msg.AddReactionAsync(new Emoji("❌"));
                 _checkingAnswer = false;
                 return;
             }
@@ -294,7 +295,12 @@ namespace SanaraV2.Games
                     error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, nbMaxTry - _bestOfTries[user.ToString()], user.ToString());
                 }
                 if (error != "")
-                    await PostText(error);
+                {
+                    if (error.Length < 5)
+                        await msg.AddReactionAsync(new Emoji(error));
+                    else
+                        await PostText(error);
+                }
                 _checkingAnswer = false;
                 return;
             }

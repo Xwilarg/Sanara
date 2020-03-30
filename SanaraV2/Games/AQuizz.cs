@@ -70,7 +70,7 @@ namespace SanaraV2.Games
             if (IsDictionnaryFull())
             {
                 if (!_dictionnary.Any(x => Utilities.CleanWord(x) == cleanUserAnswer))
-                    return GetStringFromSentence(Sentences.guessDontExist);
+                    return "❌";
             }
             foreach (string s in _toGuess)
             {

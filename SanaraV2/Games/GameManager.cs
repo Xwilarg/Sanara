@@ -215,11 +215,11 @@ namespace SanaraV2.Games
             return Sentences.InvalidGameName;
         }
 
-        public async Task ReceiveMessageAsync(string message, SocketUser user, ulong chanId) // Called everytimes a message is sent somewhere
+        public async Task ReceiveMessageAsync(string message, SocketUser user, ulong chanId, SocketUserMessage msg) // Called everytimes a message is sent somewhere
         {
             AGame game = _games.Find(x => x.IsSelf(chanId));
             if (game != null)
-                await game.CheckCorrectAsync(user, message);
+                await game.CheckCorrectAsync(user, message, msg);
         }
 
         private void GameLoop()

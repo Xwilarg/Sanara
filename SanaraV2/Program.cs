@@ -598,7 +598,7 @@ namespace SanaraV2
             if (msg == null) return;
 
             /// When playing games
-            Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id); });
+            Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id, msg); });
 
             int pos = 0;
             if (arg.Channel as ITextChannel == null) // The bot doesn't handle private messages
