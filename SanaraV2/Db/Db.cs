@@ -230,23 +230,40 @@ namespace SanaraV2.Db
             return (new Tuple<Comparaison, int>(cmp, currScore.Value));
         }
 
-        public async Task<Dictionary<string, Dictionary<string, string>>> GetAllScores()
+        /// <returns>
+        /// Dictionary<string, Dictionary<string, string>>
+        /// Key: Guild id
+        /// Value: Dictionnary of Key: game name, Value: score
+        /// </returns>
+        public async Task<Dictionary<string, Dictionary<string, GuildScore>>> GetAllScores()
         {
-            Dictionary<string, Dictionary<string, string>> allScores = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<string, Dictionary<string, GuildScore>> allScores = new Dictionary<string, Dictionary<string, GuildScore>>();
             var json = await R.Db(dbName).Table("Guilds").RunAsync(conn);
             foreach (var elem in json)
             {
-                Dictionary<string, string> currDict = new Dictionary<string, string>();
+                Dictionary<string, GuildScore> currDict = new Dictionary<string, GuildScore>();
                 foreach (var game in Constants.allRankedGames)
                 {
                     APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                     string gameName = preload.GetGameName();
-                    if (elem[gameName] != null) currDict.Add(gameName, elem[gameName].ToString());
+                    if (elem[gameName] != null) currDict.Add(gameName, new GuildScore(elem[gameName].ToString(), false));
                 }
                 if (currDict.Count > 0)
                     allScores.Add(elem.id.ToString(), currDict);
             }
-            return (allScores);
+            return allScores;
+        }
+
+        public struct GuildScore
+        {
+            public GuildScore(string score, bool anonymous)
+            {
+                this.score = score;
+                this.anonymous = anonymous;
+            }
+
+            public string score;
+            public bool anonymous;
         }
 
         private RethinkDB R;

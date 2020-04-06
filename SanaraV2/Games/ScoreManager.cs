@@ -34,8 +34,8 @@ namespace SanaraV2.Games
                 int sScore = 0;
                 foreach (var elem in s.Value)
                 {
-                    int best = scores.Where(x => x.Value.ContainsKey(elem.Key)).Max(x => int.Parse(x.Value[elem.Key].Split('|')[0]));
-                    sScore += int.Parse(elem.Value.Split('|')[0]) * 100 / best;
+                    int best = scores.Where(x => x.Value.ContainsKey(elem.Key)).Max(x => int.Parse(x.Value[elem.Key].score.Split('|')[0]));
+                    sScore += int.Parse(elem.Value.score.Split('|')[0]) * 100 / best;
                 }
                 if (sScore > 0)
                     globalRanking.Add(s.Key, sScore);
@@ -70,7 +70,7 @@ namespace SanaraV2.Games
                 foreach (var elem in scores)
                 {
                     if (elem.Value.ContainsKey(gameName))
-                        allScores.Add(new Tuple<string, string>(elem.Key, elem.Value[gameName].Split('|')[0]));
+                        allScores.Add(new Tuple<string, string>(elem.Key, elem.Value[gameName].score.Split('|')[0]));
                 }
                 List<Tuple<string, int>> best = new List<Tuple<string, int>>();
                 string bestServer;
