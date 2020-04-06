@@ -94,7 +94,7 @@ namespace SanaraV2.Db
                     newAvailability += "1";
                 Availability.Add(guildId, newAvailability);
             }
-            string anonymize = (string)json.anonymize;
+            string anonymize = (string)json.Anonymize;
             if (anonymize != null)
                 Anonymize.Add(guildId, bool.Parse(anonymize));
             else

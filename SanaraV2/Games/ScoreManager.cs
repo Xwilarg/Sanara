@@ -93,7 +93,7 @@ namespace SanaraV2.Games
                     IGuild guild = Program.p.client.GetGuild(ulong.Parse(bestServer));
                     if (guild != null)
                     {
-                        var name = Program.p.client.GetGuild(ulong.Parse(bestServer)).Name;
+                        var name = (Program.p.db.IsAnonymized(guild.Id) ? "Anonymous" : Program.p.client.GetGuild(ulong.Parse(bestServer)).Name);
                         if (name != null)
                             best.Add(new Tuple<string, int>(Program.p.GetName(name), bestScore));
                     }
