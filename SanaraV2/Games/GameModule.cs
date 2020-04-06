@@ -98,6 +98,11 @@ namespace SanaraV2.Games
             str.AppendLine(Environment.NewLine);
         }
 
+        public static async Task Anonymize(ulong guildId, bool value)
+        {
+            await Program.p.db.SetAnonymize(guildId, value);
+        }
+
         [Command("Join")]
         public async Task Join(params string[] _)
         {

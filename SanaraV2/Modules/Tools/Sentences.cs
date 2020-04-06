@@ -87,6 +87,9 @@ namespace SanaraV2.Modules.Tools
         public static string AllModulesDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesDisabled")); }
         public static string AllModulesAlreadyEnabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyEnabled")); }
         public static string AllModulesAlreadyDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyDisabled")); }
+        public static string AnonymizeCurrentTrue(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeCurrentTrue")); }
+        public static string AnonymizeCurrentFalse(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeCurrentFalse")); }
+        public static string AnonymizeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeHelp")); }
 
         /// --------------------------- Help ---------------------------
         public static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
@@ -199,7 +202,8 @@ namespace SanaraV2.Modules.Tools
                 string finalStr = "";
                 if (isServerOwner)
                     finalStr = Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable");
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable")
+                         + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleAnonymize");
                 if (isBotOwner)
                 {
                     if (finalStr != "")

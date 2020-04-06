@@ -181,6 +181,35 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
+        [Command("Anonymize")]
+        public async Task Anonymize(params string[] args)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            if (!CanModify(Context.User, Context.Guild.OwnerId))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            if (args.Length == 0)
+            {
+                if (Program.p.db.IsAnonymized(Context.Guild.Id))
+                    await ReplyAsync(Sentences.AnonymizeCurrentTrue(Context.Guild.Id));
+                else
+                    await ReplyAsync(Sentences.AnonymizeCurrentFalse(Context.Guild.Id));
+            }
+            else
+            {
+                if (bool.TryParse(string.Join(" ", args), out bool value))
+                {
+                    await Games.GameModule.Anonymize(Context.Guild.Id, value);
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                }
+                else
+                {
+                    await ReplyAsync(Sentences.AnonymizeHelp(Context.Guild.Id));
+                }
+            }
+        }
+
         [Command("Enable"), Summary("Enable a module")]
         public async Task Enable(params string[] args)
             => await ManageModule(Context.Channel, args, 1);

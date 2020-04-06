@@ -35,6 +35,7 @@ namespace SanaraV2.Db
             Prefixs = new Dictionary<ulong, string>();
             Availability = new Dictionary<ulong, string>();
             AnimeSubscription = new Dictionary<ulong, ulong>();
+            Anonymize = new Dictionary<ulong, bool>();
         }
 
         public async Task InitAsync()
@@ -93,6 +94,11 @@ namespace SanaraV2.Db
                     newAvailability += "1";
                 Availability.Add(guildId, newAvailability);
             }
+            string anonymize = (string)json.anonymize;
+            if (anonymize != null)
+                Anonymize.Add(guildId, bool.Parse(anonymize));
+            else
+                Anonymize.Add(guildId, false);
         }
 
         public async Task AddAnimeSubscription(ulong guildId, ulong channelId)
@@ -183,16 +189,29 @@ namespace SanaraV2.Db
             Availability[guildId] = res;
         }
 
-        public bool IsAvailable(ulong guildId, Program.Module module)
+        public async Task SetAnonymize(ulong guildId, bool value)
         {
-            return (Availability[guildId][(int)module] == '1');
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+                .With("Anonymize", value)
+                ).RunAsync(conn);
+            Anonymize[guildId] = value;
         }
+
+        public bool IsAvailable(ulong guildId, Program.Module module)
+            => Availability[guildId][(int)module] == '1';
 
         public bool AreAllAvailable(ulong guildId)
             => Availability[guildId].All(x => x == '1');
 
         public bool AreNoneAvailable(ulong guildId)
             => Availability[guildId].Count(x => x == '0') == 2;
+
+        public bool IsAnonymized(ulong guildId)
+        {
+            if (!Anonymize.ContainsKey(guildId))
+                return false;
+            return Anonymize[guildId];
+        }
 
         public async Task<string> GetGuild(ulong guildId)
         {
@@ -246,10 +265,10 @@ namespace SanaraV2.Db
                 {
                     APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                     string gameName = preload.GetGameName();
-                    if (elem[gameName] != null) currDict.Add(gameName, new GuildScore(elem[gameName].ToString(), false));
+                    if (elem[gameName] != null) currDict.Add(gameName, new GuildScore(elem[gameName].ToString(), IsAnonymized(ulong.Parse((string)elem.id))));
                 }
                 if (currDict.Count > 0)
-                    allScores.Add(elem.id.ToString(), currDict);
+                    allScores.Add((string)elem.id, currDict);
             }
             return allScores;
         }
@@ -272,6 +291,7 @@ namespace SanaraV2.Db
 
         public Dictionary<ulong, string> Languages { private set; get; }
         public Dictionary<ulong, string> Prefixs { private set; get; }
+        public Dictionary<ulong, bool> Anonymize { private set; get; }
         public Dictionary<ulong, string> Availability { private set; get; }
         public Dictionary<ulong, ulong> AnimeSubscription { private set; get; } // For each guild, their subscription channel
     }
