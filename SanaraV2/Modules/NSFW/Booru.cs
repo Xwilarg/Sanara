@@ -45,16 +45,23 @@ namespace SanaraV2.Modules.NSFW
                         color = Color.Orange;
                     else
                         color = Color.Red;
-                    await ReplyAsync("", false, new EmbedBuilder
+                    if (Uri.IsWellFormedUriString(result.answer.url, UriKind.Absolute))
                     {
-                        Description = result.answer.content,
-                        ImageUrl = result.answer.url,
-                        Color = color,
-                        Footer = new EmbedFooterBuilder
+                        await ReplyAsync("", false, new EmbedBuilder
                         {
-                            Text = Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%"
-                        }
-                    }.Build());
+                            Description = result.answer.content,
+                            ImageUrl = result.answer.url,
+                            Color = color,
+                            Footer = new EmbedFooterBuilder
+                            {
+                                Text = Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%"
+                            }
+                        }.Build());
+                    }
+                    else
+                    {
+                        await ReplyAsync(result.answer.content + Environment.NewLine + result.answer.url + Environment.NewLine + Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%");
+                    }
                     break;
 
                 case Features.NSFW.Error.SourceBooru.Help:
