@@ -173,8 +173,6 @@ namespace SanaraV2
                 GitHubKey = json.githubKey;
                 websiteStats = json.websiteStats;
                 websiteStatsToken = json.websiteStatsToken;
-                websiteUpload = json.websiteUpload;
-                websiteUploadToken = json.websiteUploadToken;
                 if (json.kitsuEmail != null && json.kitsuPassword != null)
                 {
                     kitsuAuth = new Dictionary<string, string> {
