@@ -13,7 +13,6 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
@@ -34,7 +33,7 @@ namespace SanaraV2.Db
             Languages = new Dictionary<ulong, string>();
             Prefixs = new Dictionary<ulong, string>();
             Availability = new Dictionary<ulong, string>();
-            AnimeSubscription = new Dictionary<ulong, ulong>();
+            AnimeSubscription = new List<ITextChannel>();
             Anonymize = new Dictionary<ulong, bool>();
         }
 
@@ -51,10 +50,6 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Anime").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Anime").Run(conn);
-            foreach (dynamic elem in await R.Db(dbName).Table("Anime").RunAsync(conn))
-            {
-                AnimeSubscription.Add(ulong.Parse((string)elem.id), ulong.Parse((string)elem.channel));
-            }
         }
 
         private static readonly string defaultAvailability = "11111111111111";
@@ -68,11 +63,11 @@ namespace SanaraV2.Db
                    ).RunAsync(conn);
         }
 
-        public async Task InitGuild(ulong guildId)
+        public async Task InitGuild(IGuild guild)
         {
-            if (Languages.ContainsKey(guildId)) // If somehow InitGuild is called 2 times for the same guild we ignore it
+            if (Languages.ContainsKey(guild.Id)) // If somehow InitGuild is called 2 times for the same guild we ignore it
                 return;
-            string guildIdStr = guildId.ToString();
+            string guildIdStr = guild.Id.ToString();
             if (await R.Db(dbName).Table("Guilds").GetAll(guildIdStr).Count().Eq(0).RunAsync<bool>(conn))
             {
                 await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildIdStr)
@@ -82,43 +77,36 @@ namespace SanaraV2.Db
                     ).RunAsync(conn);
             }
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
-            Languages.Add(guildId, (string)json.Language);
-            Prefixs.Add(guildId, (string)json.Prefix);
+            Languages.Add(guild.Id, (string)json.Language);
+            Prefixs.Add(guild.Id, (string)json.Prefix);
             string availability = (string)json.Availability;
             if (availability == null)
-                Availability.Add(guildId, defaultAvailability);
+                Availability.Add(guild.Id, defaultAvailability);
             else
             {
                 string newAvailability = availability;
                 while (newAvailability.Length < defaultAvailability.Length)
                     newAvailability += "1";
-                Availability.Add(guildId, newAvailability);
+                Availability.Add(guild.Id, newAvailability);
             }
             string anonymize = (string)json.Anonymize;
             if (anonymize != null)
-                Anonymize.Add(guildId, bool.Parse(anonymize));
+                Anonymize.Add(guild.Id, bool.Parse(anonymize));
             else
-                Anonymize.Add(guildId, false);
+                Anonymize.Add(guild.Id, false);
+            string anime = (string)json.animeSubscription;
+            if (anime != null)
+                AnimeSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
         }
 
-        public async Task AddAnimeSubscription(ulong guildId, ulong channelId)
+        public async Task AddAnimeSubscription(ITextChannel chan)
         {
-            string guildIdStr = guildId.ToString();
-            string channelIdStr = channelId.ToString();
-            if (await R.Db(dbName).Table("Anime").GetAll(guildIdStr).Count().Eq(0).RunAsync<bool>(conn))
-            {
-                await R.Db(dbName).Table("Anime").Insert(R.HashMap("id", guildIdStr)
-                    .With("channel", channelIdStr)
-                    ).RunAsync(conn);
-                AnimeSubscription.Add(guildId, channelId);
-            }
-            else
-            {
-                await R.Db(dbName).Table("Anime").Update(R.HashMap("id", guildIdStr)
-                    .With("channel", channelIdStr)
-                    ).RunAsync(conn);
-                AnimeSubscription[guildId] = channelId;
-            }
+            string guildIdStr = chan.GuildId.ToString();
+            string channelIdStr = chan.Id.ToString();
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
+                .With("animeSubscription", channelIdStr)
+                ).RunAsync(conn);
+            AnimeSubscription.Add(chan);
         }
 
         public async Task<bool> RemoveAnimeSubscription(ulong guildId)
@@ -130,34 +118,17 @@ namespace SanaraV2.Db
             return true;
         }
 
-        public async Task<ITextChannel[]> GetAllAnimeSubscriptionChannelsAsync(DiscordSocketClient client)
-        {
-            List<ITextChannel> chans = new List<ITextChannel>();
-            foreach (var elem in AnimeSubscription)
-            {
-                IGuild guild = client.GetGuild(elem.Key);
-                if (guild != null)
-                {
-                    ITextChannel chan = await guild.GetTextChannelAsync(elem.Value);
-                    if (chan != null)
-                        chans.Add(chan);
-                    else
-                        await RemoveAnimeSubscription(elem.Key);
-                }
-                else
-                    await RemoveAnimeSubscription(elem.Key);
-            }
-            return chans.ToArray();
-        }
-
         public async Task<string> GetMyChannelNameAsync(IGuild guild)
         {
-            if (AnimeSubscription.ContainsKey(guild.Id))
+            dynamic json = await R.Db(dbName).Table("Guilds").Get(guild.Id).RunAsync(conn);
+            string anime = (string)json.animeSubscription;
+            if (anime != null)
             {
-                var chan = await guild.GetTextChannelAsync(AnimeSubscription[guild.Id]);
-                if (chan == null)
-                    return "Deleted channel";
-                return chan.Mention;
+                ITextChannel chan = await guild.GetTextChannelAsync(ulong.Parse(anime));
+                if (chan != null)
+                {
+                    return chan.Mention;
+                }
             }
             return "None";
         }
@@ -281,6 +252,6 @@ namespace SanaraV2.Db
         public Dictionary<ulong, string> Prefixs { private set; get; }
         public Dictionary<ulong, bool> Anonymize { private set; get; }
         public Dictionary<ulong, string> Availability { private set; get; }
-        public Dictionary<ulong, ulong> AnimeSubscription { private set; get; } // For each guild, their subscription channel
+        public List<ITextChannel> AnimeSubscription { private set; get; } // For each guild, their subscription channel
     }
 }

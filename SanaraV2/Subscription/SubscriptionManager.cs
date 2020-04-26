@@ -26,7 +26,7 @@ namespace SanaraV2.Subscription
                 for (;;)
                 {
                     await Task.Delay(120000); // 2 minutes
-                    await anime.UpdateChannelAsync(await Program.p.db.GetAllAnimeSubscriptionChannelsAsync(Program.p.client));
+                    await anime.UpdateChannelAsync();
                 }
             });
         }

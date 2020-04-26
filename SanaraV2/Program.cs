@@ -491,7 +491,7 @@ namespace SanaraV2
         /// </summary>
         private async Task GuildJoin(SocketGuild arg)
         {
-            await db.InitGuild(arg.Id);
+            await db.InitGuild(arg);
         }
 
         public enum Module

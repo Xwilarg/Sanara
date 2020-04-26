@@ -41,7 +41,7 @@ namespace SanaraV2.Features.Entertainment
             ITextChannel chan = await Utilities.GetTextChannelAsync(channel, guild);
             if (chan == null)
                 return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
-            await db.AddAnimeSubscription(guild.Id, chan.Id);
+            await db.AddAnimeSubscription(chan);
             return new FeatureRequest<Response.Subscribe, Error.Subscribe>(new Response.Subscribe
             {
                 chan = chan

@@ -60,19 +60,19 @@ namespace SanaraV2.Subscription
             return data;
         }
 
-        public async Task UpdateChannelAsync(ITextChannel[] channels)
+        public async Task UpdateChannelAsync()
         {
             var data = await GetAnimes();
             if (data.Count > 0)
             {
                 currName = data[0].name;
-                foreach (var chan in channels)
+                for (int i = Program.p.db.AnimeSubscription.Count - 1; i >= 0; i--)
                 {
                     try
                     {
                         foreach (var elem in data)
                         {
-                            await chan.SendMessageAsync("", false, new EmbedBuilder
+                            await Program.p.db.AnimeSubscription[i].SendMessageAsync("", false, new EmbedBuilder
                             {
                                 Color = Color.Blue,
                                 Title = elem.name,
