@@ -78,7 +78,7 @@ namespace Sanara_UnitTests
             var result = await Booru.SearchSourceBooru(new[] { "https://trace.moe/img/draw2-good.jpg" });
             Assert.Equal(Error.SourceBooru.None, result.error);
             Assert.NotNull(result.answer);
-            Assert.Equal("https://i.ytimg.com/vi/6-zlwCuu64U/maxresdefault.jpg", result.answer.url);
+            Assert.Equal("https://img3.saucenao.com/frames/?expires=1587952066&init=53878b079e61c5b3&data=957d5567c02ab1df7c2bdcfd0b20ac0da5a3bcc8798575878ff84e195d3a60d0ee88b1d21717593e6f5da4a455d992ce2c80a581868a481ff889755f19dee1226b362a3983636096c56396639b3be0c3ea22aaf3fc5b8f87cc23b3d6f4dc213905fc5fd27a10a24a2a76bc0a3b460124f352c54898ce52a0777fa7521ed76ff8&auth=5c321b7ca454f61bc4a2c4d682e5f0716cc3e4dd", result.answer.url);
             Assert.InRange(result.answer.compatibility, 90f, 99f);
             Assert.Contains("はたらく細胞", result.answer.content);
         }

@@ -95,7 +95,7 @@ namespace SanaraV2.Db
             else
                 Anonymize.Add(guild.Id, false);
             string anime = (string)json.animeSubscription;
-            if (anime != null)
+            if (anime != null && anime != "0")
                 AnimeSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
         }
 
@@ -112,15 +112,19 @@ namespace SanaraV2.Db
         public async Task<bool> RemoveAnimeSubscription(ulong guildId)
         {
             string guildIdStr = guildId.ToString();
-            if (await R.Db(dbName).Table("Anime").GetAll(guildIdStr).Count().Eq(0).RunAsync<bool>(conn))
+            dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
+            string anime = (string)json.animeSubscription;
+            if (anime == null || anime == "0")
                 return false;
-            await R.Db(dbName).Table("Anime").Filter(R.HashMap("id", guildIdStr)).Delete().RunAsync(conn);
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
+                .With("animeSubscription", "0")
+                ).RunAsync(conn);
             return true;
         }
 
         public async Task<string> GetMyChannelNameAsync(IGuild guild)
         {
-            dynamic json = await R.Db(dbName).Table("Guilds").Get(guild.Id).RunAsync(conn);
+            dynamic json = await R.Db(dbName).Table("Guilds").Get(guild.Id.ToString()).RunAsync(conn);
             string anime = (string)json.animeSubscription;
             if (anime != null)
             {
