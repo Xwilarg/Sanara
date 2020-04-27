@@ -15,6 +15,10 @@ You can see the full list on [Sanara's command page](https://sanara.zirk.eu/comm
 ## How to invite her on my server
 Just click [here](https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot).
 
+## Translate her in my own language
+If you are familiar with GitHub you can do a Pull Request to the [translation repository](https://github.com/Xwilarg/Sanara-Website)<br/>
+You can also [go to Crowdin](https://crowdin.com/project/sanara) if you want to do the translations online.
+
 ## More information
 
 The bot is in constant developpement, I'm always improving her by adding features and fixing bugs.<br/>
