@@ -243,7 +243,7 @@ namespace SanaraV2
         /// </summary>
         private Task Ready()
         {
-            subManager = new SubscriptionManager();
+            subManager = SubscriptionManager.GetCurrentSubscription();
             return Task.CompletedTask;
         }
 

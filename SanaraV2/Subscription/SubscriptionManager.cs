@@ -18,7 +18,13 @@ namespace SanaraV2.Subscription
 {
     public class SubscriptionManager
     {
-        public SubscriptionManager()
+        public static SubscriptionManager GetCurrentSubscription()
+        {
+            if (me == null) return new SubscriptionManager();
+            else return me;
+        }
+
+        private SubscriptionManager()
         {
             anime = new AnimeSubscription();
             _ = Task.Run(async () =>
@@ -31,6 +37,7 @@ namespace SanaraV2.Subscription
             });
         }
 
-        AnimeSubscription anime;
+        private AnimeSubscription anime;
+        private static SubscriptionManager me = null;
     }
 }
