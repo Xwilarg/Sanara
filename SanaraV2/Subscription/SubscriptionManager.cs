@@ -20,7 +20,11 @@ namespace SanaraV2.Subscription
     {
         public static SubscriptionManager GetCurrentSubscription()
         {
-            if (me == null) return new SubscriptionManager();
+            if (me == null)
+            {
+                me = new SubscriptionManager();
+                return me;
+            }
             else return me;
         }
 
