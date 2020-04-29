@@ -81,6 +81,16 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
+        [Command("Booru", RunMode = RunMode.Async)]
+        public async Task BooruSearch(params string[] tags)
+        {
+            ITextChannel chan = (ITextChannel)Context.Channel;
+            if (chan.IsNsfw)
+                await GelbooruSearch(tags);
+            else
+                await SafebooruSearch(tags);
+        }
+
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
