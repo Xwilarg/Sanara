@@ -87,6 +87,7 @@ namespace SanaraV2
         // Send stats to website
         private string websiteStats, websiteStatsToken;
         public string websiteUpload { private set; get; }
+        public string websiteUrl { private set; get; }
         public bool sendStats { private set; get; }
 
         // Discord Bot List
@@ -178,6 +179,7 @@ namespace SanaraV2
                 websiteStats = json.websiteStats;
                 websiteStatsToken = json.websiteStatsToken;
                 websiteUpload = json.websiteUpload;
+                websiteUrl = json.websiteUrl;
                 if (json.kitsuEmail != null && json.kitsuPassword != null)
                 {
                     kitsuAuth = new Dictionary<string, string> {
