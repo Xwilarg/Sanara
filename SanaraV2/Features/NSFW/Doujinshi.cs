@@ -192,6 +192,23 @@ namespace SanaraV2.Features.NSFW
         {
             if (isChanSafe)
                 return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
+            if (tags.Length == 1 && int.TryParse(tags[0], out int id))
+            {
+                try
+                {
+                    var elem = await SearchClient.SearchByIdAsync(id);
+                    return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
+                    {
+                        url = elem.url.AbsoluteUri,
+                        imageUrl = elem.pages[0].imageUrl.AbsoluteUri,
+                        title = elem.prettyTitle,
+                        tags = elem.tags.Select(x => x.name).ToArray(),
+                        id = elem.id
+                    }, Error.Doujinshi.None);
+                }
+                catch (InvalidArgumentException)
+                { }
+            }
             SearchResult result;
             try
             {
