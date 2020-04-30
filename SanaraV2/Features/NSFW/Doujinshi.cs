@@ -74,7 +74,8 @@ namespace SanaraV2.Features.NSFW
             return new FeatureRequest<Response.Download, Error.Download>(new Response.Download
             {
                 directoryPath = "Saves/Download/" + path,
-                filePath = "Saves/Download/" + path + "/" + idStr + ".zip"
+                filePath = "Saves/Download/" + path + "/" + idStr + ".zip",
+                id = elem.id
             }, Error.Download.None);
         }
 

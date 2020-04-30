@@ -23,6 +23,7 @@ namespace SanaraV2.Features.NSFW
         {
             public string directoryPath;
             public string filePath;
+            public long id;
         }
 
         public class BooruSource

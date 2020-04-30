@@ -35,5 +35,6 @@ namespace SanaraV2.Modules.NSFW
         public static string PreparingDownload(ulong guildId) { return (Translation.GetTranslation(guildId, "preparingDownload")); }
         public static string DownloadHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadHelp")); }
         public static string DownloadNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadNotFound")); }
+        public static string DeleteTime(ulong guildId, string time) { return (Translation.GetTranslation(guildId, "deleteTime", time)); }
     }
 }

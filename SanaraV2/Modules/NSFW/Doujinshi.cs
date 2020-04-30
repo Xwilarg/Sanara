@@ -52,6 +52,24 @@ namespace SanaraV2.Modules.NSFW
                     FileInfo fi = new FileInfo(result.answer.filePath);
                     if (fi.Length < 8000000)
                         await Context.Channel.SendFileAsync(result.answer.filePath);
+                    else
+                    {
+                        if (Program.p.websiteUpload == null)
+                            throw new NullReferenceException("File bigger than 8GB and websiteUpload key null");
+                        else
+                        {
+                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+                            Directory.CreateDirectory(Program.p.websiteUpload + "/" + now);
+                            File.Copy(result.answer.filePath, Program.p.websiteUpload + "/" + now + "/" + result.answer.id + ".zip");
+                            await Context.Channel.SendFileAsync(Program.p.websiteUpload + "/" + now + "/" + result.answer.id + ".zip", Sentences.DeleteTime(Context.Guild.Id, "10"));
+                            _ = Task.Run(async () =>
+                            {
+                                await Task.Delay(600000); // 10 minutes
+                                File.Delete(Program.p.websiteUpload + "/" + now + "/" + result.answer.id + ".zip");
+                                Directory.Delete(Program.p.websiteUpload + "/" + now);
+                            });
+                        }
+                    }
                     await msg.DeleteAsync();
                     File.Delete(result.answer.filePath);
                     Directory.Delete(result.answer.directoryPath);

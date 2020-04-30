@@ -86,9 +86,8 @@ namespace SanaraV2
 
         // Send stats to website
         private string websiteStats, websiteStatsToken;
+        public string websiteUpload { private set; get; }
         public bool sendStats { private set; get; }
-
-        public string websiteUpload, websiteUploadToken; // For "Source" command
 
         // Discord Bot List
         private AuthDiscordBotListApi dblApi;
@@ -178,6 +177,7 @@ namespace SanaraV2
                 GitHubKey = json.githubKey;
                 websiteStats = json.websiteStats;
                 websiteStatsToken = json.websiteStatsToken;
+                websiteUpload = json.websiteUpload;
                 if (json.kitsuEmail != null && json.kitsuPassword != null)
                 {
                     kitsuAuth = new Dictionary<string, string> {
