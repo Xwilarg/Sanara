@@ -17,6 +17,14 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Error
     {
+        public enum Download
+        {
+            None,
+            Help,
+            ChanNotSafe,
+            NotFound
+        }
+
         public enum SourceBooru
         {
             None,

@@ -19,6 +19,12 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Response
     {
+        public class Download
+        {
+            public string directoryPath;
+            public string filePath;
+        }
+
         public class BooruSource
         {
             public float compatibility;
@@ -50,6 +56,7 @@ namespace SanaraV2.Features.NSFW
 
         public class Doujinshi
         {
+            public long id;
             public string url;
             public string title;
             public string[] tags;

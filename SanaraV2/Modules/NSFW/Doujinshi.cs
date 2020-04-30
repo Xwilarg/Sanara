@@ -15,6 +15,7 @@
 using Discord;
 using Discord.Commands;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.NSFW
@@ -22,6 +23,44 @@ namespace SanaraV2.Modules.NSFW
     public class Doujinshi : ModuleBase
     {
         Program p = Program.p;
+
+        [Command("Download", RunMode = RunMode.Async)]
+        public async Task GetDownload(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            IMessage msg = null;
+            var result = await Features.NSFW.Doujinshi.SearchDownload(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
+            {
+                msg = await ReplyAsync("Preparing download, this might take some time...");
+            });
+            switch (result.error)
+            {
+                case Features.NSFW.Error.Download.ChanNotSafe:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.Help:
+                    await ReplyAsync(Sentences.DownloadHelp(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.NotFound:
+                    await ReplyAsync(Sentences.DownloadNotFound(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.None:
+                    FileInfo fi = new FileInfo(result.answer.filePath);
+                    if (fi.Length < 8000000)
+                        await Context.Channel.SendFileAsync(result.answer.filePath);
+                    await msg.DeleteAsync();
+                    File.Delete(result.answer.filePath);
+                    Directory.Delete(result.answer.directoryPath);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
         [Command("AdultVideo", RunMode = RunMode.Async), Alias("AV")]
         public async Task GetAdultVideo(params string[] args)
@@ -113,7 +152,7 @@ namespace SanaraV2.Modules.NSFW
                 ImageUrl = result.imageUrl,
                 Footer = new EmbedFooterBuilder()
                 {
-                    Text = Sentences.ClickFull(guildId)
+                    Text = Sentences.ClickFull(guildId) + (result.id == 0 ? "" : "\n\n" + Sentences.DownloadInfo(guildId, result.id.ToString()))
                 }
             }.Build();
         }

@@ -12,12 +12,13 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-using Newtonsoft.Json;
 using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -28,6 +29,64 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
+        public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownload(bool isChanSafe, string[] id, Func<Task> onReadyCallback)
+        {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.ChanNotSafe);
+            if (id.Length == 0)
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
+            string idStr = string.Join("", id);
+            GalleryElement elem;
+            if (int.TryParse(idStr, out int idInt))
+            {
+                if (idInt <= 0)
+                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+                try
+                {
+                    elem = await SearchClient.SearchByIdAsync(idInt);
+                }
+                catch (InvalidArgumentException)
+                {
+                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+                }
+            }
+            else
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
+            await onReadyCallback();
+            string path = idStr + "_" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Directory.CreateDirectory("Saves/Download/" + path);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + idStr);
+            int i = 1;
+            using (HttpClient hc = new HttpClient())
+            {
+                foreach (var page in elem.pages)
+                {
+                    string extension = "." + page.format.ToString().ToLower();
+                    File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + Get3DigitNumber(i.ToString()) + extension,
+                        await hc.GetByteArrayAsync("https://i.nhentai.net/galleries/" + elem.mediaId + "/" + i + extension));
+                    i++;
+                }
+            }
+            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + idStr, "Saves/Download/" + path + "/" + idStr + ".zip");
+            for (i = Directory.GetFiles("Saves/Download/" + path + "/" + idStr).Length - 1; i >= 0; i--)
+                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + idStr)[i]);
+            Directory.Delete("Saves/Download/" + path + "/" + idStr);
+            return new FeatureRequest<Response.Download, Error.Download>(new Response.Download
+            {
+                directoryPath = "Saves/Download/" + path,
+                filePath = "Saves/Download/" + path + "/" + idStr + ".zip"
+            }, Error.Download.None);
+        }
+
+        private static string Get3DigitNumber(string nb)
+        {
+            if (nb.Length == 3)
+                return nb;
+            if (nb.Length == 2)
+                return "0" + nb;
+            return "00" + nb;
+        }
+
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchAdultVideo(bool isChanSafe, string[] tags, Random r, List<string> categories)
         {
             if (isChanSafe)
@@ -148,7 +207,8 @@ namespace SanaraV2.Features.NSFW
                 url = doujinshi.url.AbsoluteUri,
                 imageUrl = doujinshi.pages[0].imageUrl.AbsoluteUri,
                 title = doujinshi.prettyTitle,
-                tags = doujinshi.tags.Select(x => x.name).ToArray()
+                tags = doujinshi.tags.Select(x => x.name).ToArray(),
+                id = doujinshi.id
             }, Error.Doujinshi.None);
         }
     }

@@ -158,6 +158,11 @@ namespace SanaraV2
 
             UpdateLanguageFiles();
 
+            if (!Directory.Exists("Saves"))
+                Directory.CreateDirectory("Saves");
+            if (!Directory.Exists("Saves/Download"))
+                Directory.CreateDirectory("Saves/Download");
+
             // Setting up various credentials
             if (botToken == null)
             {
