@@ -93,16 +93,15 @@ namespace SanaraV2.Features.NSFW
             if (!idFirst.All(x => char.IsLetterOrDigit(x)) || !idSecond.All(x => char.IsLetterOrDigit(x)))
                 return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
             string html;
-            string imageId;
             int nbPages;
+            int limitPages;
             try
             {
                 using (HttpClient hc = new HttpClient())
                     html = await hc.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond);
-                Match m = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/[a-z0-9]+-1\">");
-                imageId = m.Groups[1].Value;
-                m = Regex.Match(html, "([0-9]+) pages");
-                nbPages = int.Parse(m.Groups[1].Value);
+                var m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of ([0-9]+) images");
+                limitPages = int.Parse(m.Groups[1].Value);
+                nbPages = int.Parse(m.Groups[2].Value);
             }
             catch (HttpException)
             {
@@ -112,16 +111,25 @@ namespace SanaraV2.Features.NSFW
             string path = idStr + "_" + DateTime.Now.ToString("yyyyMMddHHmmss");
             Directory.CreateDirectory("Saves/Download/" + path);
             Directory.CreateDirectory("Saves/Download/" + path + "/" + idStr);
+            int nextPage = 1;
             using (HttpClient hc = new HttpClient())
             {
                 for (int i = 1; i < nbPages; i++)
                 {
-                    html = await hc.GetStringAsync("https://e-hentai.org/s/" + imageId + "/" + idFirst + "-" + i); // TODO: Fix that
-                    Match m = Regex.Match(html, "<img id=\"img\" src=\"([^\"]+)\"");
+                    var imageMatch = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/" + idFirst + "-" + i + "\">");
+                    string html2 = await hc.GetStringAsync("https://e-hentai.org/s/" + imageMatch.Groups[1].Value + "/" + idFirst + "-" + i);
+                    Match m = Regex.Match(html2, "<img id=\"img\" src=\"([^\"]+)\"");
                     string url = m.Groups[1].Value;
                     string extension = "." + url.Split('.').Last();
                     File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + Get3DigitNumber(i.ToString()) + extension,
                         await hc.GetByteArrayAsync(url));
+                    if (i == limitPages)
+                    {
+                        html = await hc.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond + "/?p=" + nextPage);
+                        m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of [0-9]+ images");
+                        limitPages = int.Parse(m.Groups[1].Value);
+                        nextPage++;
+                    }
                 }
             }
             ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + idStr, "Saves/Download/" + path + "/" + idStr + ".zip");
