@@ -29,7 +29,7 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
-        public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownload(bool isChanSafe, string[] id, Func<Task> onReadyCallback)
+        public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownloadDoujinshi(bool isChanSafe, string[] id, Func<Task> onReadyCallback)
         {
             if (isChanSafe)
                 return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.ChanNotSafe);
@@ -75,7 +75,64 @@ namespace SanaraV2.Features.NSFW
             {
                 directoryPath = "Saves/Download/" + path,
                 filePath = "Saves/Download/" + path + "/" + idStr + ".zip",
-                id = elem.id
+                id = elem.id.ToString()
+            }, Error.Download.None);
+        }
+
+        public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownloadCosplay(bool isChanSafe, string[] id, Func<Task> onReadyCallback)
+        {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.ChanNotSafe);
+            if (id.Length == 0)
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
+            string[] idStr = string.Join("", id).Split('/');
+            if (idStr.Length != 2)
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
+            string idFirst = idStr[0];
+            string idSecond = idStr[1];
+            if (!idFirst.All(x => char.IsLetterOrDigit(x)) || !idSecond.All(x => char.IsLetterOrDigit(x)))
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.Help);
+            string html;
+            string imageId;
+            int nbPages;
+            try
+            {
+                using (HttpClient hc = new HttpClient())
+                    html = await hc.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond);
+                Match m = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/[a-z0-9]+-1\">");
+                imageId = m.Groups[1].Value;
+                m = Regex.Match(html, "([0-9]+) pages");
+                nbPages = int.Parse(m.Groups[1].Value);
+            }
+            catch (HttpException)
+            {
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+            }
+            await onReadyCallback();
+            string path = idStr + "_" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Directory.CreateDirectory("Saves/Download/" + path);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + idStr);
+            using (HttpClient hc = new HttpClient())
+            {
+                for (int i = 1; i < nbPages; i++)
+                {
+                    html = await hc.GetStringAsync("https://e-hentai.org/s/" + imageId + "/" + idFirst + "-" + i); // TODO: Fix that
+                    Match m = Regex.Match(html, "<img id=\"img\" src=\"([^\"]+)\"");
+                    string url = m.Groups[1].Value;
+                    string extension = "." + url.Split('.').Last();
+                    File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + Get3DigitNumber(i.ToString()) + extension,
+                        await hc.GetByteArrayAsync(url));
+                }
+            }
+            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + idStr, "Saves/Download/" + path + "/" + idStr + ".zip");
+            for (int i = Directory.GetFiles("Saves/Download/" + path + "/" + idStr).Length - 1; i >= 0; i--)
+                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + idStr)[i]);
+            Directory.Delete("Saves/Download/" + path + "/" + idStr);
+            return new FeatureRequest<Response.Download, Error.Download>(new Response.Download
+            {
+                directoryPath = "Saves/Download/" + path,
+                filePath = "Saves/Download/" + path + "/" + idStr + ".zip",
+                id = idFirst
             }, Error.Download.None);
         }
 
@@ -146,7 +203,8 @@ namespace SanaraV2.Features.NSFW
                 imageUrl = previewUrl,
                 url = videoMatch.Groups[1].Value,
                 title = videoMatch.Groups[2].Value,
-                tags = videoTags
+                tags = videoTags,
+                id = null
             }, Error.Doujinshi.None);
         }
 
@@ -168,7 +226,8 @@ namespace SanaraV2.Features.NSFW
                     return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.NotFound);
                 randomDoujinshi = r.Next(0, int.Parse(m.Groups[1].Value.Replace(",", "")));
                 html = await hc.GetStringAsync(url + "&page=" + randomDoujinshi / 25);
-                finalUrl = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/[^\"]+)\"")[randomDoujinshi % 25].Groups[1].Value;
+                var sM = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/([a-z0-9]+)\\/([a-z0-9]+)\\/)\"")[randomDoujinshi % 25];
+                finalUrl = sM.Groups[1].Value;
                 html = await hc.GetStringAsync(finalUrl);
 
                 string htmlTags = html.Split(new[] { "taglist" }, StringSplitOptions.None)[1].Split(new[] { "Showing" }, StringSplitOptions.None)[0];
@@ -178,14 +237,15 @@ namespace SanaraV2.Features.NSFW
                 // To get the cover image, we first must go the first image of the gallery then we get it
                 string htmlCover = await hc.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
                 imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
+                return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
+                {
+                    url = finalUrl,
+                    imageUrl = imageUrl,
+                    title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
+                    tags = allTags.ToArray(),
+                    id = sM.Groups[2].Value + "/" + sM.Groups[3].Value
+                }, Error.Doujinshi.None);
             }
-            return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(new Response.Doujinshi()
-            {
-                url = finalUrl,
-                imageUrl = imageUrl,
-                title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
-                tags = allTags.ToArray()
-            }, Error.Doujinshi.None);
         }
 
         public static async Task<FeatureRequest<Response.Doujinshi, Error.Doujinshi>> SearchDoujinshi(bool isChanSafe, string[] tags, Random r)
@@ -203,7 +263,7 @@ namespace SanaraV2.Features.NSFW
                         imageUrl = elem.pages[0].imageUrl.AbsoluteUri,
                         title = elem.prettyTitle,
                         tags = elem.tags.Select(x => x.name).ToArray(),
-                        id = elem.id
+                        id = elem.id.ToString()
                     }, Error.Doujinshi.None);
                 }
                 catch (InvalidArgumentException)
@@ -226,7 +286,7 @@ namespace SanaraV2.Features.NSFW
                 imageUrl = doujinshi.pages[0].imageUrl.AbsoluteUri,
                 title = doujinshi.prettyTitle,
                 tags = doujinshi.tags.Select(x => x.name).ToArray(),
-                id = doujinshi.id
+                id = doujinshi.id.ToString()
             }, Error.Doujinshi.None);
         }
     }

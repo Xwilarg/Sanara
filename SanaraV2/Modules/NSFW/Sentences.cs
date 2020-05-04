@@ -28,13 +28,17 @@ namespace SanaraV2.Modules.NSFW
         public static string Artist(ulong guildId) { return (Translation.GetTranslation(guildId, "artist")); }
         public static string Artists(ulong guildId) { return (Translation.GetTranslation(guildId, "artists")); }
         public static string ImageInfo(ulong guildId, string id) { return (Translation.GetTranslation(guildId, "imageInfo", id)); }
-        public static string DownloadInfo(ulong guildId, string id) { return (Translation.GetTranslation(guildId, "downloadInfo", id)); }
+        public static string DownloadDoujinshiInfo(ulong guildId, string id) { return (Translation.GetTranslation(guildId, "downloadDoujinshiInfo", id)); }
+        public static string DownloadCosplayInfo(ulong guildId, string id) { return (Translation.GetTranslation(guildId, "downloadCosplayInfo", id)); }
+        public static string DownloadHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadHelp")); }
 
         /// --------------------------- Doujinshi ---------------------------
         public static string ClickFull(ulong guildId) { return (Translation.GetTranslation(guildId, "clickFull")); }
         public static string PreparingDownload(ulong guildId) { return (Translation.GetTranslation(guildId, "preparingDownload")); }
-        public static string DownloadHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadHelp")); }
-        public static string DownloadNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadNotFound")); }
+        public static string DownloadDoujinshiHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadDoujinshiHelp")); }
+        public static string DownloadCosplayHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadCosplayHelp")); }
+        public static string DownloadDoujinshiNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadDoujinshiNotFound")); }
+        public static string DownloadCosplayNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadCosplayNotFound")); }
         public static string DeleteTime(ulong guildId, string time) { return (Translation.GetTranslation(guildId, "deleteTime", time)); }
     }
 }

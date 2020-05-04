@@ -23,7 +23,7 @@ namespace SanaraV2.Features.NSFW
         {
             public string directoryPath;
             public string filePath;
-            public long id;
+            public string id;
         }
 
         public class BooruSource
@@ -57,7 +57,7 @@ namespace SanaraV2.Features.NSFW
 
         public class Doujinshi
         {
-            public long id;
+            public string id;
             public string url;
             public string title;
             public string[] tags;

@@ -24,13 +24,13 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
-        [Command("Download", RunMode = RunMode.Async)]
-        public async Task GetDownload(params string[] args)
+        [Command("Download doujinshi", RunMode = RunMode.Async)]
+        public async Task GetDownloadDoujinshi(params string[] args)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             IMessage msg = null;
-            var result = await Features.NSFW.Doujinshi.SearchDownload(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
+            var result = await Features.NSFW.Doujinshi.SearchDownloadDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
             {
                 msg = await ReplyAsync("Preparing download, this might take some time...");
             });
@@ -41,43 +41,87 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Download.Help:
-                    await ReplyAsync(Sentences.DownloadHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadDoujinshiHelp(Context.Guild.Id));
                     break;
 
                 case Features.NSFW.Error.Download.NotFound:
-                    await ReplyAsync(Sentences.DownloadNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadDoujinshiNotFound(Context.Guild.Id));
                     break;
 
                 case Features.NSFW.Error.Download.None:
-                    FileInfo fi = new FileInfo(result.answer.filePath);
-                    if (fi.Length < 8000000)
-                        await Context.Channel.SendFileAsync(result.answer.filePath);
-                    else
-                    {
-                        if (Program.p.websiteUpload == null)
-                            throw new NullReferenceException("File bigger than 8GB and websiteUpload key null");
-                        else
-                        {
-                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-                            Directory.CreateDirectory(Program.p.websiteUpload + "/" + now);
-                            File.Copy(result.answer.filePath, Program.p.websiteUpload + "/" + now + "/" + result.answer.id + ".zip");
-                            await ReplyAsync(Program.p.websiteUrl + "/" + now + "/" + result.answer.id + ".zip" + Environment.NewLine + Sentences.DeleteTime(Context.Guild.Id, "10"));
-                            _ = Task.Run(async () =>
-                            {
-                                await Task.Delay(600000); // 10 minutes
-                                File.Delete(Program.p.websiteUpload + "/" + now + "/" + result.answer.id + ".zip");
-                                Directory.Delete(Program.p.websiteUpload + "/" + now);
-                            });
-                        }
-                    }
-                    await msg.DeleteAsync();
-                    File.Delete(result.answer.filePath);
-                    Directory.Delete(result.answer.directoryPath);
+                    await GetDownloadResult(msg, result.answer);
                     break;
 
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        [Command("Download cosplay", RunMode = RunMode.Async)]
+        public async Task GetDownloadCosplay(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            IMessage msg = null;
+            var result = await Features.NSFW.Doujinshi.SearchDownloadCosplay(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
+            {
+                msg = await ReplyAsync("Preparing download, this might take some time...");
+            });
+            switch (result.error)
+            {
+                case Features.NSFW.Error.Download.ChanNotSafe:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.Help:
+                    await ReplyAsync(Sentences.DownloadCosplayHelp(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.NotFound:
+                    await ReplyAsync(Sentences.DownloadCosplayNotFound(Context.Guild.Id));
+                    break;
+
+                case Features.NSFW.Error.Download.None:
+                    await GetDownloadResult(msg, result.answer);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        [Command("Download"), Priority(-1)]
+        public async Task GetDownloadDefault(params string[] _)
+        {
+            await ReplyAsync(Sentences.DownloadHelp(Context.Guild.Id));
+        }
+
+        public async Task GetDownloadResult(IMessage msg, Features.NSFW.Response.Download answer)
+        {
+            FileInfo fi = new FileInfo(answer.filePath);
+            if (fi.Length < 8000000)
+                await Context.Channel.SendFileAsync(answer.filePath);
+            else
+            {
+                if (Program.p.websiteUpload == null)
+                    throw new NullReferenceException("File bigger than 8MB and websiteUpload key null");
+                else
+                {
+                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    Directory.CreateDirectory(Program.p.websiteUpload + "/" + now);
+                    File.Copy(answer.filePath, Program.p.websiteUpload + "/" + now + "/" + answer.id + ".zip");
+                    await ReplyAsync(Program.p.websiteUrl + "/" + now + "/" + answer.id + ".zip" + Environment.NewLine + Sentences.DeleteTime(Context.Guild.Id, "10"));
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(600000); // 10 minutes
+                        File.Delete(Program.p.websiteUpload + "/" + now + "/" + answer.id + ".zip");
+                        Directory.Delete(Program.p.websiteUpload + "/" + now);
+                    });
+                }
+            }
+            await msg.DeleteAsync();
+            File.Delete(answer.filePath);
+            Directory.Delete(answer.directoryPath);
         }
 
         [Command("AdultVideo", RunMode = RunMode.Async), Alias("AV")]
@@ -101,7 +145,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, null));
                     break;
 
                 default:
@@ -126,7 +170,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, Sentences.DownloadCosplayInfo));
                     break;
 
                 default:
@@ -151,7 +195,7 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, Sentences.DownloadDoujinshiInfo));
                     break;
 
                 default:
@@ -159,7 +203,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        public Embed CreateFinalEmbed(Features.NSFW.Response.Doujinshi result, ulong guildId)
+        public Embed CreateFinalEmbed(Features.NSFW.Response.Doujinshi result, ulong guildId, Func<ulong, string, string> downloadInfo)
         {
             return new EmbedBuilder()
             {
@@ -170,7 +214,7 @@ namespace SanaraV2.Modules.NSFW
                 ImageUrl = result.imageUrl,
                 Footer = new EmbedFooterBuilder()
                 {
-                    Text = Sentences.ClickFull(guildId) + (result.id == 0 ? "" : "\n\n" + Sentences.DownloadInfo(guildId, result.id.ToString()))
+                    Text = Sentences.ClickFull(guildId) + (downloadInfo == null ? "" : "\n\n" + downloadInfo(guildId, result.id.ToString()))
                 }
             }.Build();
         }

@@ -155,7 +155,9 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
-                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay");// + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo");
+                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadCosplay");
+                // + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo");
                 else
                     return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*";
             }
