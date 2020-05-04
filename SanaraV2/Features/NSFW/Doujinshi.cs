@@ -114,7 +114,7 @@ namespace SanaraV2.Features.NSFW
             int nextPage = 1;
             using (HttpClient hc = new HttpClient())
             {
-                for (int i = 1; i < nbPages; i++)
+                for (int i = 1; i <= nbPages; i++)
                 {
                     var imageMatch = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/" + idFirst + "-" + i + "\">");
                     string html2 = await hc.GetStringAsync("https://e-hentai.org/s/" + imageMatch.Groups[1].Value + "/" + idFirst + "-" + i);
