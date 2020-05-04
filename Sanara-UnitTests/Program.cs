@@ -22,6 +22,7 @@ using SanaraV2.Games;
 using System.Reflection;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Sanara_UnitTests
 {
@@ -99,7 +100,7 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestDoujinshi()
         {
-           var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
+            var result = await Doujinshi.SearchDoujinshi(false, new string[] { "color", "english" }, new Random());
             Assert.Equal(Error.Doujinshi.None, result.error);
             Assert.True(await IsLinkValid(result.answer.url));
             Assert.True(await IsLinkValid(result.answer.imageUrl));
@@ -115,6 +116,26 @@ namespace Sanara_UnitTests
             Assert.True(await IsLinkValid(result.answer.url));
             Assert.True(await IsLinkValid(result.answer.imageUrl));
             Assert.Contains("kantai collection", result.answer.tags);
+        }
+
+        [Fact]
+        public async Task TestDownloadDoujinshi()
+        {
+            var result = await Doujinshi.SearchDownloadDoujinshi(false, new[] { "112731" }, () => { return Task.CompletedTask; });
+            Assert.Equal(Error.Download.None, result.error);
+            Assert.True(Directory.Exists(result.answer.directoryPath));
+            Assert.True(File.Exists(result.answer.filePath));
+            Assert.Equal("112731", result.answer.id);
+        }
+
+        [Fact]
+        public async Task TestDownloadCosplay()
+        {
+            var result = await Doujinshi.SearchDownloadCosplay(false, new[] { "656554/5329651869" }, () => { return Task.CompletedTask; });
+            Assert.Equal(Error.Download.None, result.error);
+            Assert.True(Directory.Exists(result.answer.directoryPath));
+            Assert.True(File.Exists(result.answer.filePath));
+            Assert.Equal("656554", result.answer.id);
         }
 
         [Fact]
