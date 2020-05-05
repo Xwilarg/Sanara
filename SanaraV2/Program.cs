@@ -120,6 +120,8 @@ namespace SanaraV2
         // AV
         public List<string> categories;
 
+        public Dictionary<string, ErrorData> exceptions = new Dictionary<string, ErrorData>();
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -683,16 +685,15 @@ namespace SanaraV2
             if (ce != null)
             {
                 if (ravenClient != null)
-                    ravenClient.Capture(new SentryEvent(new Exception(msg.Message + Environment.NewLine + ce.Context.Message, msg.Exception)));
+                    ravenClient.Capture(new SentryEvent(new Exception(ce.Context.Message.ToString(), msg.Exception)));
+                var now = DateTime.Now;
+                string id = now.ToString("ddHHmmssfff") + ce.Context.Guild.Id.ToString().Substring(0, 4);
+                exceptions.Add(id, new ErrorData() { date = now, exception = ce });
                 ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                 {
                     Color = Color.Red,
-                    Title = msg.Exception.InnerException.GetType().ToString(),
-                    Description = Modules.Base.Sentences.ExceptionThrown(ce.Context.Guild.Id, msg.Exception.InnerException.Message),
-                    Footer = new EmbedFooterBuilder()
-                    {
-                        Text = Modules.Base.Sentences.ExceptionReported(ce.Context.Guild.Id)
-                    }
+                    Title = Modules.Base.Sentences.ErrorIntro(ce.Context.Guild.Id),
+                    Description = Modules.Base.Sentences.ErrorBody(ce.Context.Guild.Id, id)
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());

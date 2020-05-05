@@ -30,6 +30,47 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        [Command("Error")]
+        public async Task Error(params string[] args)
+        {
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
+            if (args.Length == 0)
+            {
+                await ReplyAsync(Sentences.ErrorHelp(Context.Guild.Id));
+                return;
+            }
+            string id = string.Join("", args);
+            if (!Program.p.exceptions.ContainsKey(id))
+            {
+                await ReplyAsync(Sentences.ErrorNotFound(Context.Guild.Id));
+                return;
+            }
+            var elem = Program.p.exceptions[id];
+            await ReplyAsync("", false, new EmbedBuilder
+            {
+                Color = Color.Purple,
+                Title = elem.exception.InnerException.GetType().ToString(),
+                Description = "```" + Environment.NewLine + elem.exception.InnerException.Message + Environment.NewLine + "```",
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = Sentences.Command(Context.Guild.Id),
+                        Value = elem.exception.Context.Message.ToString().Replace("@", "@\u200b")
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = Sentences.Date(Context.Guild.Id),
+                        Value = elem.date.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id))
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = Sentences.ErrorGdpr(Context.Guild.Id, "https://sanara.zirk.eu/gdpr.html#collectedError")
+                }
+            }.Build());
+        }
+
         [Command("Logs"), Alias("Log", "Changes", "Change")]
         public async Task Logs(params string[] args)
         {
