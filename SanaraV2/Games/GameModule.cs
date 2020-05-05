@@ -28,7 +28,6 @@ namespace SanaraV2.Games
     {
         public static string DisplayHelp(ulong guildId, bool isChanNsfw)
         {
-
             if (!Program.p.db.IsAvailable(guildId, Program.Module.Game))
                 return Modules.Base.Sentences.NotAvailable(guildId);
             List<Tuple<APreload, string>> soloOnly = new List<Tuple<APreload, string>>();

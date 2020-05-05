@@ -22,6 +22,7 @@ using Google.Apis.YouTube.v3;
 using Google.Cloud.Translation.V2;
 using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
+using SanaraV2.Community;
 using SanaraV2.Games;
 using SanaraV2.Modules.Base;
 using SanaraV2.Modules.Entertainment;
@@ -122,6 +123,8 @@ namespace SanaraV2
 
         public Dictionary<string, ErrorData> exceptions = new Dictionary<string, ErrorData>();
 
+        public CommunityManager cm = new CommunityManager();
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -215,6 +218,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<Xkcd>(null);
             await commands.AddModuleAsync<Communication>(null);
             await commands.AddModuleAsync<Code>(null);
+            await commands.AddModuleAsync<CommunityModule>(null);
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -518,7 +522,8 @@ namespace SanaraV2
             Settings,
             Vn,
             Xkcd,
-            Youtube
+            Youtube,
+            Community
         }
 
         /// <summary>
