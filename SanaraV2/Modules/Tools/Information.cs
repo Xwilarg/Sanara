@@ -238,7 +238,7 @@ namespace SanaraV2.Modules.Tools
                 Title = Sentences.ServicesAvailability(Context.Guild.Id)
             };
             string description = "";
-            for (Program.Module i = 0; i < Program.Module.Youtube; i++)
+            for (Program.Module i = 0; i <= Program.Module.Community; i++)
                 description += "**" + i.ToString() + "**: " + ((Program.p.db.IsAvailable(Context.Guild.Id, i)) ? (Sentences.Enabled(Context.Guild.Id)) : (Sentences.Disabled(Context.Guild.Id))) + Environment.NewLine;
             embed.Description = description;
             if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio))
