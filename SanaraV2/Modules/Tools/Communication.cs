@@ -17,6 +17,7 @@ using Discord.Commands;
 using Discord.Net;
 using SanaraV2.Modules.Base;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,6 +29,38 @@ namespace SanaraV2.Modules.Tools
     public class Communication : ModuleBase
     {
         Program p = Program.p;
+
+        [Command("Poll")]
+        public async Task Poll(params string[] args)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            if (args.Length < 2)
+            {
+                await ReplyAsync(Sentences.PollHelp(Context.Guild.Id));
+                return;
+            }
+            if (args.Length > 10)
+            {
+                await ReplyAsync(Sentences.PollTooManyChoices(Context.Guild.Id));
+                return;
+            }
+            var emotes = new[] { new Emoji("1️⃣"), new Emoji("2️⃣"), new Emoji("3️⃣"), new Emoji("4️⃣"), new Emoji("5️⃣"), new Emoji("6️⃣"), new Emoji("7️⃣"), new Emoji("8️⃣"), new Emoji("9️⃣") };
+            string str = "";
+            int i = 0;
+            foreach (string s in args.Skip(1))
+            {
+                str += emotes[i] + ": " + s + Environment.NewLine;
+                i++;
+            }
+            var msg = await ReplyAsync("", false, new EmbedBuilder
+            {
+                Title = args[0],
+                Description = str,
+                Color = Color.Blue
+            }.Build());
+            await msg.AddReactionsAsync(emotes.Take(i).ToArray());
+        }
 
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)

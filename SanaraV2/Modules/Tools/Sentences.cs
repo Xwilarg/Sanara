@@ -41,6 +41,8 @@ namespace SanaraV2.Modules.Tools
         public static string EvalError(ulong guildId, string msg) { return (Translation.GetTranslation(guildId, "evalError", msg)); }
         public static string InvitationLink(ulong guildId) { return (Translation.GetTranslation(guildId, "invitationLink")); }
         public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
+        public static string PollHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "pollHelp")); }
+        public static string PollTooManyChoices(ulong guildId) { return (Translation.GetTranslation(guildId, "pollTooManyChoices")); }
 
         /// --------------------------- Information ---------------------------
         public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }
@@ -153,7 +155,7 @@ namespace SanaraV2.Modules.Tools
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
                 return Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote");
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string DoujinshiHelp(ulong guildId, bool isChanNsfw)
