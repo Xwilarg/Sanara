@@ -22,9 +22,11 @@ namespace SanaraV2.Modules.Entertainment
         /// --------------------------- AnimeManga ---------------------------
         public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }
         public static string AnimeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "animeHelp")); }
+        public static string LNHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "LNHelp")); }
         public static string SourceHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "sourceHelp")); }
         public static string MangaNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaNotFound")); }
         public static string AnimeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotFound")); }
+        public static string LNNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "LNNotFound")); }
         public static string AnimeEpisodes(ulong guildId) { return (Translation.GetTranslation(guildId, "animeEpisodes")); }
         public static string AnimeLength(ulong guildId, int length) { return (Translation.GetTranslation(guildId, "animeLength", length.ToString())); }
         public static string AnimeRating(ulong guildId) { return (Translation.GetTranslation(guildId, "animeRating")); }
