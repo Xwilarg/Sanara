@@ -38,8 +38,8 @@ namespace SanaraV2.Community
             _achievements = token["Achievements"].Value<string>().Split('|').Select((x) =>
             {
                 var split = x.Split(',');
-                int id = int.Parse(split[0]);
-                return new KeyValuePair<int, UserAchievement>(id, new UserAchievement(AchievementList.GetAchievement(id), int.Parse(split[1])));
+                int a_id = int.Parse(split[0]);
+                return new KeyValuePair<int, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1])));
             }).ToDictionary(x => x.Key, x => x.Value);
         }
 
