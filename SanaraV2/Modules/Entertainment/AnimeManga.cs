@@ -86,12 +86,12 @@ namespace SanaraV2.Modules.Entertainment
             }
         }
 
-        [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using MyAnimeList API")]
+        [Command("Anime", RunMode = RunMode.Async), Summary("Give informations about an anime using Kitsu API")]
         public async Task Anime(params string[] animeNameArr)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.SearchAnime(true, animeNameArr, Program.p.kitsuAuth);
+            var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, animeNameArr, Program.p.kitsuAuth);
             switch (result.error)
             {
                 case Error.AnimeManga.Help:
@@ -114,12 +114,12 @@ namespace SanaraV2.Modules.Entertainment
             }
         }
 
-        [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using MyAnimeList API")]
+        [Command("Manga", RunMode = RunMode.Async), Summary("Give informations about a manga using Kitsu API")]
         public async Task Manga(params string[] mangaNameArr)
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
-            var result = await Features.Entertainment.AnimeManga.SearchAnime(false, mangaNameArr, Program.p.kitsuAuth);
+            var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Manga, mangaNameArr, Program.p.kitsuAuth);
             switch (result.error)
             {
                 case Error.AnimeManga.Help:
@@ -128,6 +128,34 @@ namespace SanaraV2.Modules.Entertainment
 
                 case Error.AnimeManga.NotFound:
                     await ReplyAsync(Sentences.MangaNotFound(Context.Guild.Id));
+                    break;
+
+                case Error.AnimeManga.None:
+                    if (result.answer.nsfw && !((ITextChannel)Context.Channel).IsNsfw)
+                        await ReplyAsync(Base.Sentences.AnswerNsfw(Context.Guild.Id));
+                    else
+                        await ReplyAsync("", false, CreateEmbed(false, result.answer, Context.Guild.Id));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        [Command("LN", RunMode = RunMode.Async), Alias("LightNovel", "Novel"), Summary("Give informations about a light novel using Kitsu API")]
+        public async Task LN(params string[] mangaNameArr)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.LightNovel, mangaNameArr, Program.p.kitsuAuth);
+            switch (result.error)
+            {
+                case Error.AnimeManga.Help:
+                    await ReplyAsync(Sentences.LNHelp(Context.Guild.Id));
+                    break;
+
+                case Error.AnimeManga.NotFound:
+                    await ReplyAsync(Sentences.LNNotFound(Context.Guild.Id));
                     break;
 
                 case Error.AnimeManga.None:

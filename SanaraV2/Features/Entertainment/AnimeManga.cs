@@ -14,6 +14,7 @@
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -76,13 +77,20 @@ namespace SanaraV2.Features.Entertainment
         private static string AddLeadingZero(string str)
             => str.Length == 1 ? "0" + str : str;
 
+        public enum SearchType
+        {
+            Manga,
+            Anime,
+            LightNovel
+        }
+
         /// <summary>
         /// Search for an anime/manga using kitsu.io API
         /// </summary>
         /// <param name="isAnime">Is the search an anime (true) or a manga (false)</param>
         /// <param name="args">Name</param>
         /// <returns>Embed containing anime/manga informations (if found)</returns>
-        public static async Task<FeatureRequest<Response.AnimeManga, Error.AnimeManga>> SearchAnime(bool isAnime, string[] args, Dictionary<string, string> auth)
+        public static async Task<FeatureRequest<Response.AnimeManga, Error.AnimeManga>> SearchAnime(SearchType searchType, string[] args, Dictionary<string, string> auth)
         {
             string searchName = Utilities.AddArgs(args);
             if (searchName.Length == 0)
@@ -102,25 +110,37 @@ namespace SanaraV2.Features.Entertainment
             using (HttpClient hc = new HttpClient())
             {
                 hc.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                json = JsonConvert.DeserializeObject(await (await hc.GetAsync("https://kitsu.io/api/edge/" + ((isAnime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
+                json = JsonConvert.DeserializeObject(await (await hc.GetAsync("https://kitsu.io/api/edge/" + ((searchType == SearchType.Anime) ? ("anime") : ("manga")) + "?page[limit]=5&filter[text]=" + searchName)).Content.ReadAsStringAsync());
             }
             if (json.data.Count == 0)
                 return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound);
             dynamic finalData = null;
             string cleanUserInput = Utilities.CleanWord(searchName);
-            foreach (dynamic data in json.data)
+            // Since manga and light novel have the same endpoint we remove the invalid search with their subtypes
+            // In case there are others subtypes than "manga" and "novel", we just exclude the ones that contains "novel" for manga search
+            JArray allDatas;
+            if (searchType == SearchType.Anime)
+                allDatas = (JArray)json.data;
+            else if (searchType == SearchType.Manga)
+                allDatas = new JArray(((JArray)json.data).Where(x => x["attributes"]["subtype"].Value<string>() != "novel"));
+            else
+                allDatas = new JArray(((JArray)json.data).Where(x => x["attributes"]["subtype"].Value<string>() == "novel"));
+            if (allDatas.Count == 0)
+                return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(null, Error.AnimeManga.NotFound);
+            foreach (dynamic data in allDatas)
             {
-                if (data.attributes.subtype == "TV" &&
-                    (ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en), cleanUserInput)
+                if ((ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en), cleanUserInput)
                     || ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en_jp), cleanUserInput)
                     || ContainsCheckNull(Utilities.CleanWord((string)data.attributes.titles.en_us), cleanUserInput)))
                 {
+                    if (searchType == SearchType.Anime && data.attributes.subtype != "TV")
+                        continue;
                     finalData = data.attributes;
                     break;
                 }
             }
             if (finalData == null)
-                finalData = json.data[0].attributes;
+                finalData = allDatas[0]["attributes"];
             return new FeatureRequest<Response.AnimeManga, Error.AnimeManga>(new Response.AnimeManga()
             {
                 name = finalData.canonicalTitle,
@@ -134,7 +154,7 @@ namespace SanaraV2.Features.Entertainment
                 ageRating = finalData.ageRatingGuide,
                 synopsis = finalData.synopsis,
                 nsfw = finalData.nsfw ?? false,
-                animeUrl = "https://kitsu.io/" + ((isAnime) ? ("anime") : ("manga")) + "/" + finalData.slug
+                animeUrl = "https://kitsu.io/" + ((searchType == SearchType.Anime) ? ("anime") : ("manga")) + "/" + finalData.slug
             }, Error.AnimeManga.None);
         }
     }

@@ -43,7 +43,7 @@ namespace SanaraV2.Subscription
                     break;
                 string animeName = Regex.Match(title, "(^.+) #[1-9]+$").Groups[1].Value;
                 string description = "";
-                var result = await Features.Entertainment.AnimeManga.SearchAnime(true, new[] { animeName }, null);
+                var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, new[] { animeName }, null);
                 if (result.error == Features.Entertainment.Error.AnimeManga.None
                     && result.answer.name == animeName)
                 {
