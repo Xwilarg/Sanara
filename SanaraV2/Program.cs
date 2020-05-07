@@ -258,10 +258,10 @@ namespace SanaraV2
         /// <summary>
         /// When client is ready, we start the SubscriptionManager (we wait for it to be ready so it can access the guilds and channels)
         /// </summary>
-        private Task Ready()
+        private async Task Ready()
         {
             subManager = SubscriptionManager.GetCurrentSubscription();
-            return Task.CompletedTask;
+            await cm.CreateMyProfile();
         }
 
         /// <summary>

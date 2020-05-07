@@ -86,12 +86,19 @@ namespace SanaraV2.Community
                 return false;
             description = description.Replace("\\n", "\n");
             string tmp = "";
-            while (description.Length > 40)
+            int i = 0;
+            foreach (char c in description)
             {
-                tmp += description.Substring(0, 40) + "\n";
-                description = description.Substring(40);
+                if (c == '\n' || i == 47)
+                {
+                    if (c != '\n') tmp += c;
+                    tmp += "\n";
+                    i = 0;
+                }
+                else
+                    tmp += c;
+                i++;
             }
-            tmp += description;
             if (tmp.Count(x => x == '\n') > 9) // More than 10 lines
                 return false;
             _description = tmp;
@@ -110,6 +117,12 @@ namespace SanaraV2.Community
                 return true;
             }
             return false;
+        }
+
+        public void UpdateVisibility(Visibility v)
+        {
+            _visibility = v;
+            Program.p.db.UpdateProfile(this);
         }
 
         public string GetUsername()
