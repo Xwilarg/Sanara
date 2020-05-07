@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SanaraV2.Community
 {
@@ -26,6 +27,7 @@ namespace SanaraV2.Community
             _description = "";
             _achievements = new Dictionary<int, UserAchievement>();
             _creationDate = DateTime.UtcNow;
+            _backgroundColor = System.Drawing.Color.White;
         }
 
         /// <summary>
@@ -47,6 +49,8 @@ namespace SanaraV2.Community
                 return new KeyValuePair<int, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1])));
             }).ToDictionary(x => x.Key, x => x.Value) : new Dictionary<int, UserAchievement>();
             _creationDate = DateTime.ParseExact(token["CreationDate"].Value<string>(), "yyMMddHHmmss", CultureInfo.InvariantCulture);
+            var colorString = token["BackgroundColor"].Value<string>().Split(',');
+            _backgroundColor = System.Drawing.Color.FromArgb(int.Parse(colorString[0]), int.Parse(colorString[1]), int.Parse(colorString[2]));
         }
 
         public MapObject GetProfileToDb(RethinkDB r)
@@ -57,7 +61,8 @@ namespace SanaraV2.Community
                     .With("Friends", string.Join(",", _friends))
                     .With("Description", _description)
                     .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString())))
-                    .With("CreationDate", _creationDate.ToString("yyMMddHHmmss"));
+                    .With("CreationDate", _creationDate.ToString("yyMMddHHmmss"))
+                    .With("BackgroundColor", _backgroundColor.R + "," + _backgroundColor.G + "," + _backgroundColor.B);
         }
 
         public System.Drawing.Image GetProfilePicture(IUser user)
@@ -91,11 +96,30 @@ namespace SanaraV2.Community
             return true;
         }
 
+        public async Task<bool> UpdateColor(string[] color)
+        {
+            var result = await Features.Tools.Code.SearchColor(color, Program.p.rand);
+            if (result.error == Features.Tools.Error.Image.None)
+            {
+                var c = result.answer.discordColor;
+                _backgroundColor = System.Drawing.Color.FromArgb(c.R, c.G, c.B);
+                Program.p.db.UpdateProfile(this);
+                return true;
+            }
+            return false;
+        }
+
         public string GetUsername()
             => _username;
 
         public string GetDescription()
             => _description;
+
+        public int GetFriendsCount()
+            => _friends.Count;
+
+        public System.Drawing.Color GetBackgroundColor()
+            => _backgroundColor;
 
         private Visibility _visibility;
         private string _username;
@@ -103,6 +127,7 @@ namespace SanaraV2.Community
         private string _description;
         private Dictionary<int, UserAchievement> _achievements;
         private DateTime _creationDate;
+        private System.Drawing.Color _backgroundColor;
         
         private string _id;
     }

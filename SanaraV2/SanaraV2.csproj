@@ -155,6 +155,7 @@
     <Reference Include="NHentaiSharp, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NHentaiSharp.1.0.7\lib\netstandard2.0\NHentaiSharp.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="RethinkDb.Driver, Version=2.3.100.0, Culture=neutral, PublicKeyToken=289e75d5145ae4e6, processorArchitecture=MSIL">
       <HintPath>..\packages\RethinkDb.Driver.2.3.100\lib\net45\RethinkDb.Driver.dll</HintPath>
     </Reference>
