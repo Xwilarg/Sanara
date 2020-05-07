@@ -2,6 +2,7 @@
 using SanaraV2.Modules.Base;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Community
@@ -21,7 +22,8 @@ namespace SanaraV2.Community
             Profile profile;
             if (args.Length == 0)
             {
-                profile = Program.p.cm.GenerateProfile(Context.User);
+                profile = Program.p.cm.GetOrCreateProfile(Context.User);
+                Program.p.cm.GenerateProfile(profile, Context.User);
             }
             else
             {
@@ -60,6 +62,8 @@ namespace SanaraV2.Community
                         return;
                     }
                 }
+                if (File.Exists("Saves/Profiles/" + profile.GetId() + ".png")) // If somehow the profile card is no longer available
+                    Program.p.cm.GenerateProfile(profile, null);
             }
             await Context.Channel.SendFileAsync("Saves/Profiles/" + profile.GetId() + ".png");
         }
