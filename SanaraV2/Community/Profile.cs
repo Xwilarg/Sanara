@@ -19,9 +19,9 @@ namespace SanaraV2.Community
         public Profile(IUser user)
         {
             _id = user.Id.ToString();
+
             using (HttpClient hc = new HttpClient())
                 File.WriteAllBytes("Saves/Profiles/Pictures/" + user.Id + ".png", hc.GetByteArrayAsync(user.GetAvatarUrl(ImageFormat.Png, 64)).GetAwaiter().GetResult());
-
             _visibility = Visibility.FriendsOnly;
             _username = user.ToString();
             _friends = new List<ulong>();
@@ -64,6 +64,14 @@ namespace SanaraV2.Community
 
         public System.Drawing.Image GetProfilePicture()
             => System.Drawing.Image.FromFile("Saves/Profiles/Pictures/" + _id + ".png");
+
+        public void UpdateProfile(IUser user)
+        {
+            _username = user.ToString();
+            using (HttpClient hc = new HttpClient())
+                File.WriteAllBytes("Saves/Profiles/Pictures/" + user.Id + ".png", hc.GetByteArrayAsync(user.GetAvatarUrl(ImageFormat.Png, 64)).GetAwaiter().GetResult());
+            Program.p.db.UpdateProfile(this);
+        }
 
         private Visibility _visibility;
         private string _username;

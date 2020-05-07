@@ -13,6 +13,7 @@ namespace SanaraV2.Community
             Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
             await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetOrCreateProfile(Context.User);
+            me.UpdateProfile(Context.User);
             using (var model = new Bitmap("Saves/Assets/Background.png"))
             {
                 using (var bp = new Bitmap(model.Width, model.Height))

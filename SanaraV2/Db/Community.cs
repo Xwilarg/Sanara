@@ -20,5 +20,10 @@ namespace SanaraV2.Db
         {
             R.Db(dbName).Table("Profiles").Insert(p.GetProfileToDb(R)).Run(conn);
         }
+
+        public void UpdateProfile(Profile p)
+        {
+            R.Db(dbName).Table("Profiles").Update(p.GetProfileToDb(R)).Run(conn);
+        }
     }
 }
