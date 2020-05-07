@@ -123,7 +123,7 @@ namespace SanaraV2
 
         public Dictionary<string, ErrorData> exceptions = new Dictionary<string, ErrorData>();
 
-        public CommunityManager cm = new CommunityManager();
+        public CommunityManager cm;
 
         public Program()
         {
@@ -148,16 +148,18 @@ namespace SanaraV2
                     Environment.Exit(1);
             });
 
+            p = this;
+
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot"));
             inamiToken = inamiId;
+
+            cm = new CommunityManager();
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
             await db.InitAsync();
 
             gm = new GameManager();
-
-            p = this;
 
             rand = new Random();
 

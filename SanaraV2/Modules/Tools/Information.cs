@@ -232,7 +232,7 @@ namespace SanaraV2.Modules.Tools
                 {
                     Color = Color.Blue,
                     Title = "Data saved about you",
-                    Description = me.GetProfileToDb(Program.p.db.GetR()).ToString()
+                    Description = string.Join(Environment.NewLine, me.GetProfileToDb(Program.p.db.GetR()).Select(x => x.Key + ": " + x.Value))
                 }.Build());
             }
         }

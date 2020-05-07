@@ -9,10 +9,16 @@ namespace SanaraV2.Db
         private async Task PreloadProfiles()
         {
             var json = await R.Db(dbName).Table("Profiles").RunAsync(conn);
-            foreach (JProperty elem in json)
+            foreach (JObject elem in json)
             {
-                Program.p.cm.AddProfile(ulong.Parse(elem.Name), new Profile(elem.Name, elem.Value));
+                string id = elem["id"].Value<string>();
+                Program.p.cm.AddProfile(ulong.Parse(id), new Profile(id, elem));
             }
+        }
+
+        public void AddProfile(Profile p)
+        {
+            R.Db(dbName).Table("Profiles").Insert(p.GetProfileToDb(R)).Run(conn);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Discord;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SanaraV2.Community
@@ -20,6 +21,14 @@ namespace SanaraV2.Community
 
 
         public void AddProfile(ulong id, Profile p) => _profiles.Add(id, p);
+        public Profile GetOrCreateProfile(IUser user)
+        {
+            if (_profiles.ContainsKey(user.Id)) return _profiles[user.Id];
+            Profile p = new Profile(user);
+            _profiles.Add(user.Id, p);
+            Program.p.db.AddProfile(p);
+            return p;
+        }
         public Profile GetProfile(ulong id)
         {
             if (_profiles.ContainsKey(id)) return _profiles[id];
