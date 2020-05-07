@@ -127,6 +127,15 @@ namespace SanaraV2.Community
         public System.Drawing.Color GetBackgroundColor()
             => _backgroundColor;
 
+        public string GetId()
+            => _id;
+
+        public Visibility GetVisibility()
+            => _visibility;
+
+        public bool IsIdFriend(string id)
+            => _friends.Any(x => x.ToString() == id);
+
         private Visibility _visibility;
         private string _username;
         private string _discriminator;

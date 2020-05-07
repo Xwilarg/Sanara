@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SanaraV2.Community
 {
@@ -33,6 +34,10 @@ namespace SanaraV2.Community
         {
             if (_profiles.ContainsKey(id)) return _profiles[id];
             return null;
+        }
+        public Profile GetProfile(string user)
+        {
+            return _profiles.Select(x => x.Value).Where(x => user == x.GetUsername() || user == x.GetUsername() + "#" + x.GetDiscriminator()).FirstOrDefault();
         }
         private Dictionary<ulong, Profile> _profiles;
     }
