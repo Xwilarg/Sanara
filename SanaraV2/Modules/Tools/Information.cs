@@ -225,6 +225,16 @@ namespace SanaraV2.Modules.Tools
                 Title = Sentences.DataSaved(Context.Guild.Id, Context.Guild.Name),
                 Description = await Program.p.db.GetGuild(Context.Guild.Id)
             }.Build());
+            var me = Program.p.cm.GetProfile(Context.User.Id);
+            if (me != null)
+            {
+                await Context.User.SendMessageAsync("", false, new EmbedBuilder()
+                {
+                    Color = Color.Blue,
+                    Title = "Data saved about you",
+                    Description = me.GetProfileToDb(Program.p.db.GetR()).ToString()
+                }.Build());
+            }
         }
 
         [Command("Status"), Summary("Display which commands aren't available because of missing files")]

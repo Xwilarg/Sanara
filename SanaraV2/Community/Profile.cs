@@ -3,7 +3,9 @@ using Newtonsoft.Json.Linq;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Model;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 
 namespace SanaraV2.Community
 {
@@ -15,6 +17,8 @@ namespace SanaraV2.Community
         public Profile(IUser user)
         {
             _id = user.Id.ToString();
+            using (HttpClient hc = new HttpClient())
+                File.WriteAllBytes("Saves/Profiles/Pictures/" + user.Id + ".png", hc.GetByteArrayAsync(user.GetAvatarUrl(ImageFormat.Png, 64)).GetAwaiter().GetResult());
 
             _visibility = Visibility.FriendsOnly;
             _username = user.ToString();
@@ -52,6 +56,9 @@ namespace SanaraV2.Community
                     .With("Description", _description)
                     .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString())));
         }
+
+        public System.Drawing.Image GetProfilePicture()
+            => System.Drawing.Image.FromFile("Saves/Profiles/Pictures/" + _id + ".png");
 
         private Visibility _visibility;
         private string _username;

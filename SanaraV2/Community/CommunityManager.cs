@@ -20,6 +20,11 @@ namespace SanaraV2.Community
 
 
         public void AddProfile(ulong id, Profile p) => _profiles.Add(id, p);
+        public Profile GetProfile(ulong id)
+        {
+            if (_profiles.ContainsKey(id)) return _profiles[id];
+            return null;
+        }
         private Dictionary<ulong, Profile> _profiles;
     }
 }

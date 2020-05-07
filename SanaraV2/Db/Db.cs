@@ -249,7 +249,7 @@ namespace SanaraV2.Db
             return allScores;
         }
 
-        private RethinkDB R;
+        private RethinkDB R; public RethinkDB GetR() => R;
         private Connection conn;
         private string dbName;
 
