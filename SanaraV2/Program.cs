@@ -171,8 +171,6 @@ namespace SanaraV2
                 Directory.CreateDirectory("Saves/Download");
             if (!Directory.Exists("Saves/Profiles"))
                 Directory.CreateDirectory("Saves/Profiles");
-            if (!Directory.Exists("Saves/Profiles/Pictures"))
-                Directory.CreateDirectory("Saves/Profiles/Pictures");
 
             // Setting up various credentials
             if (botToken == null)

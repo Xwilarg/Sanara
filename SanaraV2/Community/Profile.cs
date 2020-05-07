@@ -20,8 +20,6 @@ namespace SanaraV2.Community
         {
             _id = user.Id.ToString();
 
-            using (HttpClient hc = new HttpClient())
-                File.WriteAllBytes("Saves/Profiles/Pictures/" + user.Id + ".png", hc.GetByteArrayAsync(user.GetAvatarUrl(ImageFormat.Png, 64)).GetAwaiter().GetResult());
             _visibility = Visibility.FriendsOnly;
             _username = user.ToString();
             _friends = new List<ulong>();
@@ -62,16 +60,42 @@ namespace SanaraV2.Community
                     .With("CreationDate", _creationDate.ToString("yyMMddHHmmss"));
         }
 
-        public System.Drawing.Image GetProfilePicture()
-            => System.Drawing.Image.FromFile("Saves/Profiles/Pictures/" + _id + ".png");
+        public System.Drawing.Image GetProfilePicture(IUser user)
+        {
+            using (HttpClient hc = new HttpClient())
+                return System.Drawing.Image.FromStream(hc.GetStreamAsync(user.GetAvatarUrl(ImageFormat.Png)).GetAwaiter().GetResult());
+        }
 
         public void UpdateProfile(IUser user)
         {
             _username = user.ToString();
-            using (HttpClient hc = new HttpClient())
-                File.WriteAllBytes("Saves/Profiles/Pictures/" + user.Id + ".png", hc.GetByteArrayAsync(user.GetAvatarUrl(ImageFormat.Png, 64)).GetAwaiter().GetResult());
             Program.p.db.UpdateProfile(this);
         }
+
+        public bool UpdateDescription(string description)
+        {
+            if (description.Length > 400)
+                return false;
+            description = description.Replace("\\n", "\n");
+            string tmp = "";
+            while (description.Length > 40)
+            {
+                tmp += description.Substring(0, 40) + "\n";
+                description = description.Substring(40);
+            }
+            tmp += description;
+            if (tmp.Count(x => x == '\n') > 9) // More than 10 lines
+                return false;
+            _description = tmp;
+            Program.p.db.UpdateProfile(this);
+            return true;
+        }
+
+        public string GetUsername()
+            => _username;
+
+        public string GetDescription()
+            => _description;
 
         private Visibility _visibility;
         private string _username;
