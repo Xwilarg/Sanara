@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Community
@@ -31,11 +32,29 @@ namespace SanaraV2.Community
                         Color color = me.GetBackgroundColor();
                         Brush backgroundBrush = new SolidBrush(Color.FromArgb(50, color.R, color.G, color.B));
                         g.FillRectangle(backgroundBrush, 0, 0, model.Width, model.Height);
-                        g.DrawImage(me.GetProfilePicture(Context.User), 20, 20);
+                        var pfpImage = me.GetProfilePicture(Context.User);
+                        // Round the image, from: https://stackoverflow.com/questions/1758762/how-to-create-image-with-rounded-corners-in-c
+                        int radius = 20;
+                        using (var pfp = new Bitmap(pfpImage.Width, pfpImage.Height))
+                        {
+                            using (Graphics gPfp = Graphics.FromImage(pfp))
+                            {
+                                Brush brush = new TextureBrush(pfpImage);
+                                GraphicsPath gp = new GraphicsPath();
+                                gp.AddArc(0, 0, radius, radius, 180, 90);
+                                gp.AddArc(0 + pfpImage.Width - radius, 0, radius, radius, 270, 90);
+                                gp.AddArc(0 + pfp.Width - radius, 0 + pfp.Height - radius, radius, radius, 0, 90);
+                                gp.AddArc(0, 0 + pfp.Height - radius, radius, radius, 90, 90);
+                                gPfp.FillPath(brush, gp);
+                            }
+                            g.DrawImage(pfp, 20, 20);
+                        }
+
+                        SizeF usernameSize = g.MeasureString(me.GetUsername(), new Font("Arial", 23));
                         g.DrawString(me.GetUsername(), new Font("Arial", 23), Brushes.Black, 170f, 70f, StringFormat.GenericDefault);
+                        g.DrawString("#" + me.GetDiscriminator(), new Font("Arial", 17), Brushes.Black, 170f + usernameSize.Width - 8f, 78f, StringFormat.GenericDefault);
                         g.DrawString(me.GetDescription(), new Font("Arial", 15), Brushes.Black, 20f, 200f, StringFormat.GenericDefault);
                         g.DrawString("Friends: " + me.GetFriendsCount(), new Font("Arial", 20), Brushes.Black, 460f, 15f, StringFormat.GenericDefault);
-                        g.Flush();
                     }
                     bp.Save("Saves/Profiles/" + Context.User.Id + ".png");
                 }

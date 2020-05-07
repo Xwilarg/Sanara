@@ -5,7 +5,6 @@ using RethinkDb.Driver.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,7 +21,8 @@ namespace SanaraV2.Community
             _id = user.Id.ToString();
 
             _visibility = Visibility.FriendsOnly;
-            _username = user.ToString();
+            _username = user.Username;
+            _discriminator = user.Discriminator;
             _friends = new List<ulong>();
             _description = "";
             _achievements = new Dictionary<int, UserAchievement>();
@@ -40,6 +40,7 @@ namespace SanaraV2.Community
 
             _visibility = (Visibility)token["Visibility"].Value<int>();
             _username = token["Username"].Value<string>();
+            _discriminator = token["Discriminator"].Value<string>();
             _friends = token["Friends"].Value<string>().Contains(',') ? token["Friends"].Value<string>().Split(',').Select(x => ulong.Parse(x)).ToList() : new List<ulong>();
             _description = token["Description"].Value<string>();
             _achievements = token["Achievements"].Value<string>().Contains('|') ? token["Achievements"].Value<string>().Split('|').Select((x) =>
@@ -58,6 +59,7 @@ namespace SanaraV2.Community
             return r.HashMap("id", _id)
                     .With("Visibility", (int)_visibility)
                     .With("Username", _username)
+                    .With("Discriminator", _discriminator)
                     .With("Friends", string.Join(",", _friends))
                     .With("Description", _description)
                     .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString())))
@@ -73,7 +75,8 @@ namespace SanaraV2.Community
 
         public void UpdateProfile(IUser user)
         {
-            _username = user.ToString();
+            _username = user.Username;
+            _discriminator = user.Discriminator;
             Program.p.db.UpdateProfile(this);
         }
 
@@ -112,6 +115,9 @@ namespace SanaraV2.Community
         public string GetUsername()
             => _username;
 
+        public string GetDiscriminator()
+            => _discriminator;
+
         public string GetDescription()
             => _description;
 
@@ -123,6 +129,7 @@ namespace SanaraV2.Community
 
         private Visibility _visibility;
         private string _username;
+        private string _discriminator;
         private List<ulong> _friends;
         private string _description;
         private Dictionary<int, UserAchievement> _achievements;
