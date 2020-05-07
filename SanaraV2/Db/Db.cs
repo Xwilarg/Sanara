@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace SanaraV2.Db
 {
-    public class Db
+    public partial class Db
     {
         public Db()
         {
@@ -48,8 +48,9 @@ namespace SanaraV2.Db
                 R.DbCreate(dbName).Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Guilds").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Guilds").Run(conn);
-            if (!await R.Db(dbName).TableList().Contains("Anime").RunAsync<bool>(conn))
-                R.Db(dbName).TableCreate("Anime").Run(conn);
+            if (!await R.Db(dbName).TableList().Contains("Profiles").RunAsync<bool>(conn))
+                R.Db(dbName).TableCreate("Profiles").Run(conn);
+            await PreloadProfiles();
         }
 
         private static readonly string defaultAvailability = "111111111111111";

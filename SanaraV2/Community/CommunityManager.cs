@@ -18,6 +18,8 @@ namespace SanaraV2.Community
             _profiles = new Dictionary<ulong, Profile>();
         }
 
-        Dictionary<ulong, Profile> _profiles;
+
+        public void AddProfile(ulong id, Profile p) => _profiles.Add(id, p);
+        private Dictionary<ulong, Profile> _profiles;
     }
 }

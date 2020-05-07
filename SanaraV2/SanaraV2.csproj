@@ -250,9 +250,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Community\Achievement.cs" />
+    <Compile Include="Community\AchievementList.cs" />
     <Compile Include="Community\CommunityManager.cs" />
     <Compile Include="Community\CommunityModule.cs" />
+    <Compile Include="Community\UserAchievement.cs" />
     <Compile Include="Community\Visibility.cs" />
+    <Compile Include="Db\Community.cs" />
     <Compile Include="Db\Db.cs" />
     <Compile Include="Community\Profile.cs" />
     <Compile Include="ErrorData.cs" />
