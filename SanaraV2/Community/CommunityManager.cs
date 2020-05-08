@@ -96,15 +96,15 @@ namespace SanaraV2.Community
         {
             if (_friendRequests.Any(x => x.Value.author == author && x.Value.destinator == target))
                 return false;
+            var textChan = (Discord.ITextChannel)chan;
             if (target.GetId() == Program.p.client.CurrentUser.Id)
             {
                 target.AddFriend(author);
-                var sMsg = await chan.SendMessageAsync(target.GetUsername() + "#" + target.GetDiscriminator() + " accepted " + author.GetUsername() + "#" + author.GetDiscriminator() + " friend request.");
+                var sMsg = await chan.SendMessageAsync(Sentences.FriendAccepted(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
                 await sMsg.AddReactionAsync(new Discord.Emoji("✅"));
                 return true;
             }
-            var msg = await chan.SendMessageAsync(target.GetUsername() + "#" + target.GetDiscriminator() + ", " + author.GetUsername() + "#" + author.GetDiscriminator() + " wants to add you as a friend." + Environment.NewLine +
-                "Add a reaction on this message to accept or refuse.");
+            var msg = await chan.SendMessageAsync(Sentences.FriendRequest(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
             _friendRequests.Add(msg.Id, new FriendRequest { author = author, destinator = target });
             await msg.AddReactionAsync(new Discord.Emoji("✅"));
             await msg.AddReactionAsync(new Discord.Emoji("❌"));
@@ -138,7 +138,8 @@ namespace SanaraV2.Community
                 {
                     var elem = _friendRequests[msg.Id];
                     elem.destinator.AddFriend(elem.author);
-                    await msg.ModifyAsync(x => x.Content = elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator() + " accepted " + elem.author.GetUsername() + "#" + elem.author.GetDiscriminator() + " friend request.");
+                    var textChan = (Discord.ITextChannel)msg.Channel;
+                    await msg.ModifyAsync(x => x.Content = Sentences.FriendAccepted(textChan.GuildId, elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator(), elem.author.GetUsername() + "#" + elem.author.GetDiscriminator()));
                     await msg.RemoveReactionAsync(new Discord.Emoji("✅"), Program.p.client.CurrentUser);
                     await msg.RemoveReactionAsync(new Discord.Emoji("❌"), Program.p.client.CurrentUser);
                     _friendRequests.Remove(msg.Id);

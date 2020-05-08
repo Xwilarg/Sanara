@@ -109,6 +109,7 @@ namespace SanaraV2.Modules.Tools
         public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }
         public static string CodeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "codeModuleName")); }
         public static string CommunicationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communicationModuleName")); }
+        public static string CommunityModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communityModuleName")); }
         public static string DoujinshiModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "doujinshiModuleName")); }
         public static string GameModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "gameModuleName")); }
         public static string ImageModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "imageModuleName")); }
@@ -156,6 +157,14 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
                 return Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll");
+            return Base.Sentences.NotAvailable(guildId);
+        }
+        public static string CommunityHelp(ulong guildId)
+        {
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Community))
+                return Translation.GetTranslation(guildId, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleDescription")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleVisibility")
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleUnfriend");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string DoujinshiHelp(ulong guildId, bool isChanNsfw)

@@ -35,12 +35,12 @@ namespace SanaraV2.Community
                     var me = Program.p.cm.GetProfile(Context.User.Id);
                     if (v == Visibility.Private)
                     {
-                        await ReplyAsync("This profile is private.");
+                        await ReplyAsync(Sentences.ErrorPrivate(Context.Guild.Id));
                         return;
                     }
                     if (v == Visibility.FriendsOnly && (me == null || !me.IsIdFriend(profile.GetId())))
                     {
-                        await ReplyAsync("You must be friend with this user to see his/her profile.");
+                        await ReplyAsync(Sentences.ErrorFriendsOnly(Context.Guild.Id));
                         return;
                     }
                 }
@@ -56,16 +56,16 @@ namespace SanaraV2.Community
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync("You don't have a profile. You must at first generate it with the 'Profile' command.");
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
                 return;
             }
             if (me.UpdateDescription(string.Join(" ", args)))
             {
-                await ReplyAsync("Your description was updated.");
+                await ReplyAsync(Sentences.DescriptionUpdated(Context.Guild.Id));
             }
             else
             {
-                await ReplyAsync("Your description is too long.");
+                await ReplyAsync(Sentences.DescriptionTooLong(Context.Guild.Id));
             }
         }
 
@@ -75,21 +75,21 @@ namespace SanaraV2.Community
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync("You don't have a profile. You must at first generate it with the 'Profile' command.");
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync("You must give the color you want.");
+                await ReplyAsync(Modules.Tools.Sentences.HelpColor(Context.Guild.Id));
                 return;
             }
             if (await me.UpdateColor(args))
             {
-                await ReplyAsync("Your profile background color was updated.");
+                await ReplyAsync(Sentences.ColorUpdated(Context.Guild.Id));
             }
             else
             {
-                await ReplyAsync("This color does not exist.");
+                await ReplyAsync(Modules.Tools.Sentences.InvalidColor(Context.Guild.Id));
             }
         }
 
@@ -99,7 +99,7 @@ namespace SanaraV2.Community
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync("You don't have a profile. You must at first generate it with the 'Profile' command.");
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
                 return;
             }
             string visibility = string.Join("", args).ToLower().Replace(" ", "");
@@ -111,9 +111,9 @@ namespace SanaraV2.Community
                 me.UpdateVisibility(Visibility.Private);
             else
             {
-                await ReplyAsync("Your profile visibility must be 'Public', 'Friends Only' or 'Private'.");
+                await ReplyAsync(Sentences.VisibilityHelp(Context.Guild.Id));
             }
-            await ReplyAsync("Your visibility preference were updated.");
+            await ReplyAsync(Sentences.VisibilityUpdated(Context.Guild.Id));
         }
 
         [Command("Unfriend"), Alias("Remove friend")]
@@ -122,12 +122,12 @@ namespace SanaraV2.Community
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync("You don't have a profile. You must at first generate it with the 'Profile' command.");
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync("You must give the user you want to unfriend.");
+                await ReplyAsync(Sentences.UnfriendHelp(Context.Guild.Id));
                 return;
             }
             var profile = await GetProfileAsync(args);
@@ -135,16 +135,16 @@ namespace SanaraV2.Community
                 return;
             if (profile.GetId() == Context.User.Id)
             {
-                await ReplyAsync("You can't unfriend yourself.");
+                await ReplyAsync(Sentences.UnfriendYourself(Context.Guild.Id));
                 return;
             }
             if (me.RemoveFriend(profile))
             {
-                await ReplyAsync("You are no longer friend with " + profile.GetUsername());
+                await ReplyAsync(Sentences.UnfriendDone(Context.Guild.Id, profile.GetUsername()));
             }
             else
             {
-                await ReplyAsync(profile.GetUsername() + " is not your friend.");
+                await ReplyAsync(Sentences.UnfriendError(Context.Guild.Id, profile.GetUsername()));
             }
         }
 
@@ -155,12 +155,12 @@ namespace SanaraV2.Community
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync("You don't have a profile. You must at first generate it with the 'Profile' command.");
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync("You must give the user you want to be friend with.");
+                await ReplyAsync(Sentences.FriendHelp(Context.Guild.Id));
                 return;
             }
             var profile = await GetProfileAsync(args);
@@ -168,17 +168,17 @@ namespace SanaraV2.Community
                 return;
             if (profile.GetId() == Context.User.Id)
             {
-                await ReplyAsync("You can't add yourself as a friend.");
+                await ReplyAsync(Sentences.FriendYourself(Context.Guild.Id));
                 return;
             }
             if (me.IsIdFriend(profile.GetId()))
             {
-                await ReplyAsync(profile.GetUsername() + " is already your friend.");
+                await ReplyAsync(Sentences.FriendError(Context.Guild.Id, profile.GetUsername()));
                 return;
             }
             if (!await Program.p.cm.AddFriendRequestAsync(Context.Channel, me, profile))
             {
-                await ReplyAsync("You already have an active friend request with " + profile.GetUsername() + ".");
+                await ReplyAsync(Sentences.FriendAlreadyActive(Context.Guild.Id, profile.GetUsername()));
             }
         }
 
