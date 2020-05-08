@@ -233,6 +233,7 @@ namespace SanaraV2
             client.UserVoiceStateUpdated += VoiceUpdate;
             client.Connected += Connected;
             client.Ready += Ready;
+            client.ReactionAdded += cm.ReactionAdded;
 
             await client.LoginAsync(TokenType.Bot, botToken);
             startTime = DateTime.Now;

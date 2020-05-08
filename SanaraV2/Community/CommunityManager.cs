@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -21,11 +23,13 @@ namespace SanaraV2.Community
                     File.Copy(file, "Saves/Assets/" + fi.Name, true);
                 }
             _profiles = new Dictionary<ulong, Profile>();
+            _friendRequests = new Dictionary<ulong, FriendRequest>();
         }
 
         public void GenerateProfile(Profile profile, Discord.IUser user, Image pfpImage = null)
         {
-            profile.UpdateProfile(user);
+            if (user != null)
+                profile.UpdateProfile(user);
             using (var model = new Bitmap("Saves/Assets/Background.png"))
             {
                 using (var bp = new Bitmap(model.Width, model.Height))
@@ -63,7 +67,7 @@ namespace SanaraV2.Community
                         g.DrawString(profile.GetDescription(), new Font("Arial", 15), Brushes.Black, 20f, 200f, StringFormat.GenericDefault);
                         g.DrawString("Friends: " + profile.GetFriendsCount(), new Font("Arial", 20), Brushes.Black, 460f, 15f, StringFormat.GenericDefault);
                     }
-                    bp.Save("Saves/Profiles/" + user.Id + ".png");
+                    bp.Save("Saves/Profiles/" + profile.GetId() + ".png");
                 }
             }
         }
@@ -87,6 +91,53 @@ namespace SanaraV2.Community
             return _profiles.Select(x => x.Value).Where(x => user == x.GetUsername() || user == x.GetUsername() + "#" + x.GetDiscriminator()).FirstOrDefault();
         }
         private Dictionary<ulong, Profile> _profiles;
+        private Dictionary<ulong, FriendRequest> _friendRequests;
+        public async Task<bool> AddFriendRequestAsync(Discord.IMessageChannel chan, Profile author, Profile target)
+        {
+            if (_friendRequests.Any(x => x.Value.author == author && x.Value.destinator == target))
+                return false;
+            var msg = await chan.SendMessageAsync(target.GetUsername() + "#" + target.GetDiscriminator() + ", " + author.GetUsername() + "#" + author.GetDiscriminator() + " wants to add you as a friend." + Environment.NewLine +
+                "Add a reaction on this message to accept or refuse.");
+            _friendRequests.Add(msg.Id, new FriendRequest { author = author, destinator = target });
+            await msg.AddReactionAsync(new Discord.Emoji("✅"));
+            await msg.AddReactionAsync(new Discord.Emoji("❌"));
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(600000); // 10 minutes
+                if (_friendRequests.ContainsKey(msg.Id))
+                {
+                    _friendRequests.Remove(msg.Id);
+                    await msg.DeleteAsync();
+                }
+            });
+            return true;
+        }
+        public async Task DeleteFriendRequestAsync(Discord.IUserMessage msg, ulong user)
+        {
+            if (_friendRequests.ContainsKey(msg.Id))
+            {
+                if (_friendRequests[msg.Id].author.GetId() == user || _friendRequests[msg.Id].destinator.GetId() == user)
+                {
+                    _friendRequests.Remove(msg.Id);
+                    await msg.DeleteAsync();
+                }
+            }
+        }
+        public async Task AcceptFriendRequestAsync(Discord.IUserMessage msg, ulong user)
+        {
+            if (_friendRequests.ContainsKey(msg.Id))
+            {
+                if (_friendRequests[msg.Id].destinator.GetId() == user)
+                {
+                    var elem = _friendRequests[msg.Id];
+                    elem.destinator.AddFriend(elem.author);
+                    await msg.ModifyAsync(x => x.Content = elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator() + " accepted " + elem.author.GetUsername() + "#" + elem.author.GetDiscriminator() + " friend request.");
+                    await msg.RemoveReactionAsync(new Discord.Emoji("✅"), Program.p.client.CurrentUser);
+                    await msg.RemoveReactionAsync(new Discord.Emoji("❌"), Program.p.client.CurrentUser);
+                    _friendRequests.Remove(msg.Id);
+                }
+            }
+        }
 
         public async Task CreateMyProfile()
         {
@@ -96,6 +147,22 @@ namespace SanaraV2.Community
             p.UpdateVisibility(Visibility.Public);
             using (HttpClient hc = new HttpClient()) // We can't get the bot profile picture from CurrentUser so we need to hardcode it
                 GenerateProfile(p, Program.p.client.CurrentUser, Image.FromStream(await hc.GetStreamAsync("https://cdn.discordapp.com/avatars/329664361016721408/620b71193a2769a44f06eee302ddf0bf.png?size=128")));
+        }
+
+        public async Task ReactionAdded(Discord.Cacheable<Discord.IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        {
+            string emote = react.Emote.ToString();
+            if (react.UserId != Program.p.client.CurrentUser.Id && (emote == "✅" || emote == "❌"))
+            {
+                var downloadedMsg = await msg.GetOrDownloadAsync();
+                if (downloadedMsg.Author.Id == Program.p.client.CurrentUser.Id)
+                {
+                    if (emote == "✅")
+                        await AcceptFriendRequestAsync(downloadedMsg, react.UserId);
+                    else if (emote == "❌")
+                        await DeleteFriendRequestAsync(downloadedMsg, react.UserId);
+                }
+            }
         }
     }
 }

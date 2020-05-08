@@ -18,7 +18,7 @@ namespace SanaraV2.Community
         /// </summary>
         public Profile(IUser user)
         {
-            _id = user.Id.ToString();
+            _id = user.Id;
 
             _visibility = Visibility.FriendsOnly;
             _username = user.Username;
@@ -34,7 +34,7 @@ namespace SanaraV2.Community
         /// Create profile from db
         /// </summary>
         /// <param name="json"></param>
-        public Profile(string id, JObject token)
+        public Profile(ulong id, JObject token)
         {
             _id = id;
 
@@ -125,6 +125,25 @@ namespace SanaraV2.Community
             Program.p.db.UpdateProfile(this);
         }
 
+        public void AddFriend(Profile p)
+        {
+            if (_friends.Contains(p._id))
+                return;
+            p._friends.Add(_id);
+            _friends.Add(p._id);
+            Program.p.db.UpdateProfile(this);
+        }
+
+        public bool RemoveFriend(Profile p)
+        {
+            if (!_friends.Contains(p._id))
+                return false;
+            p._friends.Remove(_id);
+            _friends.Remove(p._id);
+            Program.p.db.UpdateProfile(this);
+            return true;
+        }
+
         public string GetUsername()
             => _username;
 
@@ -140,14 +159,14 @@ namespace SanaraV2.Community
         public System.Drawing.Color GetBackgroundColor()
             => _backgroundColor;
 
-        public string GetId()
+        public ulong GetId()
             => _id;
 
         public Visibility GetVisibility()
             => _visibility;
 
-        public bool IsIdFriend(string id)
-            => _friends.Any(x => x.ToString() == id);
+        public bool IsIdFriend(ulong id)
+            => _friends.Contains(id);
 
         private Visibility _visibility;
         private string _username;
@@ -158,6 +177,6 @@ namespace SanaraV2.Community
         private DateTime _creationDate;
         private System.Drawing.Color _backgroundColor;
         
-        private string _id;
+        private ulong _id;
     }
 }

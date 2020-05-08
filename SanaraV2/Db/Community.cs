@@ -11,8 +11,8 @@ namespace SanaraV2.Db
             var json = await R.Db(dbName).Table("Profiles").RunAsync(conn);
             foreach (JObject elem in json)
             {
-                string id = elem["id"].Value<string>();
-                Program.p.cm.AddProfile(ulong.Parse(id), new Profile(id, elem));
+                ulong id = ulong.Parse(elem["id"].Value<string>());
+                Program.p.cm.AddProfile(id, new Profile(id, elem));
             }
         }
 
