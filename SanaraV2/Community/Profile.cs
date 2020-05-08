@@ -56,7 +56,7 @@ namespace SanaraV2.Community
 
         public MapObject GetProfileToDb(RethinkDB r)
         {
-            return r.HashMap("id", _id)
+            return r.HashMap("id", _id.ToString())
                     .With("Visibility", (int)_visibility)
                     .With("Username", _username)
                     .With("Discriminator", _discriminator)
