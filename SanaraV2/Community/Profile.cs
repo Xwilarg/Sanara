@@ -41,9 +41,9 @@ namespace SanaraV2.Community
             _visibility = (Visibility)token["Visibility"].Value<int>();
             _username = token["Username"].Value<string>();
             _discriminator = token["Discriminator"].Value<string>();
-            _friends = token["Friends"].Value<string>().Contains(',') ? token["Friends"].Value<string>().Split(',').Select(x => ulong.Parse(x)).ToList() : new List<ulong>();
+            _friends = token["Friends"].Value<string>().Length > 0 ? token["Friends"].Value<string>().Split(',').Select(x => ulong.Parse(x)).ToList() : new List<ulong>();
             _description = token["Description"].Value<string>();
-            _achievements = token["Achievements"].Value<string>().Contains('|') ? token["Achievements"].Value<string>().Split('|').Select((x) =>
+            _achievements = token["Achievements"].Value<string>().Length > 0 ? token["Achievements"].Value<string>().Split('|').Select((x) =>
             {
                 var split = x.Split(',');
                 int a_id = int.Parse(split[0]);
