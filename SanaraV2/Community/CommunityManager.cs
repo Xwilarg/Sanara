@@ -96,6 +96,13 @@ namespace SanaraV2.Community
         {
             if (_friendRequests.Any(x => x.Value.author == author && x.Value.destinator == target))
                 return false;
+            if (target.GetId() == Program.p.client.CurrentUser.Id)
+            {
+                target.AddFriend(author);
+                var sMsg = await chan.SendMessageAsync(target.GetUsername() + "#" + target.GetDiscriminator() + " accepted " + author.GetUsername() + "#" + author.GetDiscriminator() + " friend request.");
+                await sMsg.AddReactionAsync(new Discord.Emoji("✅"));
+                return true;
+            }
             var msg = await chan.SendMessageAsync(target.GetUsername() + "#" + target.GetDiscriminator() + ", " + author.GetUsername() + "#" + author.GetDiscriminator() + " wants to add you as a friend." + Environment.NewLine +
                 "Add a reaction on this message to accept or refuse.");
             _friendRequests.Add(msg.Id, new FriendRequest { author = author, destinator = target });

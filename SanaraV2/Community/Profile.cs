@@ -132,6 +132,7 @@ namespace SanaraV2.Community
             p._friends.Add(_id);
             _friends.Add(p._id);
             Program.p.db.UpdateProfile(this);
+            Program.p.db.UpdateProfile(p);
         }
 
         public bool RemoveFriend(Profile p)
@@ -141,6 +142,7 @@ namespace SanaraV2.Community
             p._friends.Remove(_id);
             _friends.Remove(p._id);
             Program.p.db.UpdateProfile(this);
+            Program.p.db.UpdateProfile(p);
             return true;
         }
 
