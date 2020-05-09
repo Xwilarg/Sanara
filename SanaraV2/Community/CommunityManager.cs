@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Community
@@ -24,6 +24,25 @@ namespace SanaraV2.Community
                 }
             _profiles = new Dictionary<ulong, Profile>();
             _friendRequests = new Dictionary<ulong, FriendRequest>();
+            _thread = new Thread(new ThreadStart(Update));
+            _thread.Start();
+        }
+
+        private void Update() // We update all profiles in db every hour
+        {
+            while (Thread.CurrentThread.IsAlive)
+            {
+                Thread.Sleep(1800000);
+                Thread.Sleep(1800000); // Wait one hour
+                UpdateAllProfiles();
+            }
+        }
+
+        public void UpdateAllProfiles()
+        {
+            var profiles = _profiles.Select(x => x.Value);
+            for (int i = profiles.Count() - 1; i >= 0; i--)
+                profiles.ElementAt(i).UpdateProfile();
         }
 
         public void GenerateProfile(Profile profile, Discord.IUser user, Image pfpImage = null)
@@ -90,8 +109,7 @@ namespace SanaraV2.Community
         {
             return _profiles.Select(x => x.Value).Where(x => user == x.GetUsername() || user == x.GetUsername() + "#" + x.GetDiscriminator()).FirstOrDefault();
         }
-        private Dictionary<ulong, Profile> _profiles;
-        private Dictionary<ulong, FriendRequest> _friendRequests;
+
         public async Task<bool> AddFriendRequestAsync(Discord.IMessageChannel chan, Profile author, Profile target)
         {
             if (_friendRequests.Any(x => x.Value.author == author && x.Value.destinator == target))
@@ -172,5 +190,9 @@ namespace SanaraV2.Community
                 }
             }
         }
+
+        private Dictionary<ulong, Profile> _profiles;
+        private Dictionary<ulong, FriendRequest> _friendRequests;
+        private Thread _thread;
     }
 }

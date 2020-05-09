@@ -47,7 +47,7 @@ namespace SanaraV2.Community
             {
                 var split = x.Split(',');
                 int a_id = int.Parse(split[0]);
-                return new KeyValuePair<int, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1])));
+                return new KeyValuePair<int, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1]), split.Skip(2).ToList()));
             }).ToDictionary(x => x.Key, x => x.Value) : new Dictionary<int, UserAchievement>();
             _creationDate = DateTime.ParseExact(token["CreationDate"].Value<string>(), "yyMMddHHmmss", CultureInfo.InvariantCulture);
             var colorString = token["BackgroundColor"].Value<string>().Split(',');
@@ -71,6 +71,11 @@ namespace SanaraV2.Community
         {
             using (HttpClient hc = new HttpClient())
                 return System.Drawing.Image.FromStream(hc.GetStreamAsync(user.GetAvatarUrl(ImageFormat.Png)).GetAwaiter().GetResult());
+        }
+
+        public void UpdateProfile()
+        {
+            Program.p.db.UpdateProfile(this);
         }
 
         public void UpdateProfile(IUser user)

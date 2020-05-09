@@ -56,6 +56,7 @@ namespace SanaraV2.Modules.Tools
         public static string ErrorDetails(ulong guildId, string error) { return (Translation.GetTranslation(guildId, "errorDetails", error)); }
         public static string Command(ulong guildId) { return (Translation.GetTranslation(guildId, "command")); }
         public static string Date(ulong guildId) { return (Translation.GetTranslation(guildId, "date")); }
+        public static string CantPM(ulong guildId) { return (Translation.GetTranslation(guildId, "cantPM")); }
 
         /// --------------------------- Code ---------------------------
         public static string ShellNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "shellNotFound")); }
@@ -152,11 +153,16 @@ namespace SanaraV2.Modules.Tools
                 return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor");
             return Base.Sentences.NotAvailable(guildId);
         }
-        public static string CommunicationHelp(ulong guildId)
+        public static string CommunicationHelp(ulong guildId, bool isServerOwner)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                return Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
+            {
+                string str = Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll");
+                if (isServerOwner)
+                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleSaveAll");
+                return str;
+            }
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string CommunityHelp(ulong guildId)

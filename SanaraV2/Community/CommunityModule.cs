@@ -207,5 +207,17 @@ namespace SanaraV2.Community
             }
             return profile;
         }
+
+        [Command("Save all")]
+        public async Task SaveAll(params string[] _)
+        {
+            if (Context.User.Id != Modules.Base.Sentences.ownerId)
+                await ReplyAsync(Modules.Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+            else
+            {
+                Program.p.cm.UpdateAllProfiles();
+                await ReplyAsync(Modules.Base.Sentences.DoneStr(Context.Guild.Id));
+            }
+        }
     }
 }
