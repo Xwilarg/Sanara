@@ -11,9 +11,9 @@ namespace SanaraV2.Community
             _additionalDatas = additionalDatas;
         }
 
-        public override string ToString()
+        public string ToString(bool censorAchievements)
         {
-            return _progression.ToString() + "," + string.Join(",", _additionalDatas);
+            return (censorAchievements ? "X" : _progression.ToString()) + "," + string.Join(",", _additionalDatas);
         }
 
         public void AddProgression(int value, string addData = null)

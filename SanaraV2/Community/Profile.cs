@@ -54,7 +54,7 @@ namespace SanaraV2.Community
             _backgroundColor = System.Drawing.Color.FromArgb(int.Parse(colorString[0]), int.Parse(colorString[1]), int.Parse(colorString[2]));
         }
 
-        public MapObject GetProfileToDb(RethinkDB r)
+        public MapObject GetProfileToDb(RethinkDB r, bool censorAchievements = false)
         {
             return r.HashMap("id", _id.ToString())
                     .With("Visibility", (int)_visibility)
@@ -62,7 +62,7 @@ namespace SanaraV2.Community
                     .With("Discriminator", _discriminator)
                     .With("Friends", string.Join(",", _friends))
                     .With("Description", _description)
-                    .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString())))
+                    .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString(censorAchievements))))
                     .With("CreationDate", _creationDate.ToString("yyMMddHHmmss"))
                     .With("BackgroundColor", _backgroundColor.R + "," + _backgroundColor.G + "," + _backgroundColor.B);
         }

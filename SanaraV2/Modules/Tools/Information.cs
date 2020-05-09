@@ -142,7 +142,7 @@ namespace SanaraV2.Modules.Tools
             else if (page != "" && (page == "4" || communicationModule.ToLower().Contains(page)))
             {
                 embed.Title += " (" + communicationModule + ")";
-                embed.Description = Sentences.CommunicationHelp(Context.Guild.Id);
+                embed.Description = Sentences.CommunicationHelp(Context.Guild.Id, Context.User.Id == Base.Sentences.ownerId);
             }
             else if (page != "" && (page == "5" || communityModule.ToLower().Contains(page)))
             {
@@ -239,7 +239,11 @@ namespace SanaraV2.Modules.Tools
                 {
                     Color = Color.Blue,
                     Title = "Data saved about you",
-                    Description = string.Join(Environment.NewLine, me.GetProfileToDb(Program.p.db.GetR()).Select(x => x.Key + ": " + x.Value))
+                    Description = string.Join(Environment.NewLine, me.GetProfileToDb(Program.p.db.GetR(), true).Select(x => x.Key + ": " + x.Value)),
+                    Footer = new EmbedFooterBuilder
+                    {
+                        Text = "Achievements progression is kept hidden"
+                    }
                 }.Build());
             }
         }
