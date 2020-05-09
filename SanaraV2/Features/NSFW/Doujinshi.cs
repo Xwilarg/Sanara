@@ -40,7 +40,7 @@ namespace SanaraV2.Features.NSFW
             if (int.TryParse(idStr, out int idInt))
             {
                 if (idInt <= 0)
-                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.NotFound);
                 try
                 {
                     elem = await SearchClient.SearchByIdAsync(idInt);
@@ -260,7 +260,7 @@ namespace SanaraV2.Features.NSFW
         {
             if (isChanSafe)
                 return new FeatureRequest<Response.Doujinshi, Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
-            if (tags.Length == 1 && int.TryParse(tags[0], out int id))
+            if (tags.Length == 1 && int.TryParse(tags[0], out int id) && id > 0)
             {
                 try
                 {
