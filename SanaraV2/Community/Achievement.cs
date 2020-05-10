@@ -5,11 +5,12 @@ namespace SanaraV2.Community
 {
     public class Achievement
     {
-        public Achievement(int lvl1, int lvl2, int lvl3, Func<int, string, int, List<string>, int> specialCallback = null)
+        public Achievement(int lvl1, int lvl2, int lvl3, string fileName, Func<int, string, int, List<string>, int> specialCallback = null)
         {
             _level1 = lvl1;
             _level2 = lvl2;
             _level3 = lvl3;
+            _fileName = fileName;
             _specialCallback = specialCallback;
         }
 
@@ -24,7 +25,11 @@ namespace SanaraV2.Community
         public Func<int, string, int, List<string>, int> GetSpecialCallback()
             => _specialCallback;
 
+        public string GetFilePath()
+            => "Saves/Assets/" + _fileName;
+
         private int _level1, _level2, _level3;
         private Func<int, string, int, List<string>, int> _specialCallback;
+        private string _fileName;
     }
 }

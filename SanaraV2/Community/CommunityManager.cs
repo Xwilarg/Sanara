@@ -94,6 +94,20 @@ namespace SanaraV2.Community
                         g.DrawString("#" + profile.GetDiscriminator(), new Font("Arial", 17), Brushes.Black, 170f + usernameSize.Width - 8f, 78f, StringFormat.GenericDefault);
                         g.DrawString(profile.GetDescription(), new Font("Arial", 15), Brushes.Black, 20f, 200f, StringFormat.GenericDefault);
                         g.DrawString("Friends: " + profile.GetFriendsCount(), new Font("Arial", 20), Brushes.Black, 460f, 15f, StringFormat.GenericDefault);
+                        g.DrawString("Achievements: ", new Font("Arial", 20), Brushes.Black, 460f, 45f, StringFormat.GenericDefault);
+                        int i = 0;
+                        foreach (var a in profile.GetAchievements())
+                        {
+                            Brush medalBrush;
+                            if (a.Item2 == 1) medalBrush = new SolidBrush(Color.FromArgb(184, 115, 51)); // Copper
+                            else if (a.Item2 == 2) medalBrush = new SolidBrush(Color.FromArgb(196, 202, 206)); // Silver
+                            else medalBrush = new SolidBrush(Color.FromArgb(255, 215, 0)); // Gold
+                            int xPos = 460 + (i % 4 == 1 ? 70 : 0);
+                            int yPos = 80 + ((i / 4) * 70);
+                            g.FillPie(medalBrush, new Rectangle(xPos, yPos, 64, 64), 0, 360);
+                            g.DrawImage(a.Item1, xPos, yPos);
+                            i++;
+                        }
                     }
                     bp.Save("Saves/Profiles/" + profile.GetId() + ".png");
                 }

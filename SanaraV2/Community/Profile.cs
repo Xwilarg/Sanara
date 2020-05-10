@@ -170,6 +170,17 @@ namespace SanaraV2.Community
             }
         }
 
+        public List<(System.Drawing.Image, int)> GetAchievements()
+        {
+            List<(System.Drawing.Image, int)> all = new List<(System.Drawing.Image, int)>();
+            foreach (var a in _achievements.OrderBy(x => x.Key))
+            {
+                if (a.Value.GetLevel() > 0)
+                    all.Add((System.Drawing.Image.FromStream(AchievementList.GetAchievementStream(a.Value.GetFilePath())), a.Value.GetLevel()));
+            }
+            return all;
+        }
+
         public string GetUsername()
             => _username;
 

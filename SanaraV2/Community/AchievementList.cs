@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace SanaraV2.Community
 {
@@ -11,14 +12,25 @@ namespace SanaraV2.Community
             return _achievements[id];
         }
 
+        public static Stream GetAchievementStream(string path)
+        {
+            if (!_allAchievementsFiles.ContainsKey(path))
+            {
+                Stream s = new MemoryStream(File.ReadAllBytes(path));
+                _allAchievementsFiles.Add(path, s);
+                return s;
+            }
+            return _allAchievementsFiles[path];
+        }
+
         private static Dictionary<AchievementID, Achievement> _achievements = new Dictionary<AchievementID, Achievement>
         {
-            { AchievementID.SendCommands, new Achievement(100, 1000, 10000) },
-            { AchievementID.ThrowErrors, new Achievement(100, 1000, 10000) },
-            { AchievementID.GoodScores, new Achievement(100, 1000, 10000, ChangeValueIfBetter) },
-            { AchievementID.GoodScoresShadow, new Achievement(100, 1000, 10000, ChangeValueIfBetter) },
-            { AchievementID.PlayWithFriends, new Achievement(100, 1000, 10000, ChangeValueIfBetter) },
-            { AchievementID.CommandsDaysInRow, new Achievement(100, 1000, 10000, (value, addData, progression, list) => {
+            { AchievementID.SendCommands, new Achievement(100, 1000, 10000, "AchievementCommands.png") },
+            { AchievementID.ThrowErrors, new Achievement(1, 10, 50, "AchievementBug.png") },
+            { AchievementID.GoodScores, new Achievement(10, 25, 50, "AchievementGames.png", ChangeValueIfBetter) },
+            { AchievementID.GoodScoresShadow, new Achievement(10, 25, 50, "AchievementShadowGame.png", ChangeValueIfBetter) },
+            { AchievementID.PlayWithFriends, new Achievement(2, 5, 10, "AchievementFriends.png", ChangeValueIfBetter) },
+            { AchievementID.CommandsDaysInRow, new Achievement(7, 14, 30, "AchievementEveryDays.png", (value, addData, progression, list) => {
                 if (list.Count == 0) // First day something is sent to Sanara
                 {
                     list.Add(DateTime.UtcNow.ToString("yyMMddHHmmss"));
@@ -35,6 +47,8 @@ namespace SanaraV2.Community
             })
             }
         };
+
+        private static Dictionary<string, Stream> _allAchievementsFiles = new Dictionary<string, Stream>();
 
         private static int ChangeValueIfBetter(int value, string _, int progression, List<string> __)
             => value > progression ? value : progression;

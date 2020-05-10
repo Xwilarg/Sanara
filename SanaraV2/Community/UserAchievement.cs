@@ -33,7 +33,10 @@ namespace SanaraV2.Community
         }
 
         public int GetLevel()
-            => _progression;
+            => _achievement.GetLevel(_progression);
+
+        public string GetFilePath()
+            => _achievement.GetFilePath();
 
         private Achievement _achievement;
         private int _progression;

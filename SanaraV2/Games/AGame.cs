@@ -293,6 +293,11 @@ namespace SanaraV2.Games
             }
             if (error != null)
             {
+                if (error.Length < 5)
+                {
+                    await msg.AddReactionAsync(new Emoji(error));
+                    error = "";
+                }
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
@@ -300,12 +305,7 @@ namespace SanaraV2.Games
                     error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, nbMaxTry - _bestOfTries[user.ToString()], user.ToString());
                 }
                 if (error != "")
-                {
-                    if (error.Length < 5)
-                        await msg.AddReactionAsync(new Emoji(error));
-                    else
-                        await PostText(error);
-                }
+                    await PostText(error);
                 _checkingAnswer = false;
                 return;
             }

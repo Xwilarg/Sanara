@@ -636,7 +636,7 @@ namespace SanaraV2
                 }
                 DateTime dt = DateTime.UtcNow;
                 IResult result = await commands.ExecuteAsync(context, pos, null);
-                if (result.IsSuccess && sendStats)
+                if (result.IsSuccess)
                 {
                     await cm.ProgressAchievementAsync(AchievementID.SendCommands, 1, null, msg, msg.Author.Id);
                     if (!_lastMsg.ContainsKey(msg.Author.Id))
@@ -649,9 +649,12 @@ namespace SanaraV2
                         await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
                         _lastMsg[msg.Author.Id] = dt.ToString("yyMMddHH");
                     }
-                    await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
-                    await AddError("OK");
-                    await AddCommandServs(context.Guild.Id);
+                    if (sendStats)
+                    {
+                        await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+                        await AddError("OK");
+                        await AddCommandServs(context.Guild.Id);
+                    }
                 }
             }
         }
@@ -720,7 +723,7 @@ namespace SanaraV2
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());
-                cm.ProgressAchievementAsync(AchievementID.ThrowErrors, 1, ce.InnerException.GetHashCode().ToString(), ce.Context.Message, ce.Context.User.Id).GetAwaiter().GetResult();
+                cm.ProgressAchievementAsync(AchievementID.ThrowErrors, 1, ce.InnerException.GetType().GetHashCode().ToString(), ce.Context.Message, ce.Context.User.Id).GetAwaiter().GetResult();
             }
             else
             {
