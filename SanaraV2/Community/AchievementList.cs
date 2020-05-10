@@ -33,14 +33,14 @@ namespace SanaraV2.Community
             { AchievementID.CommandsDaysInRow, new Achievement(7, 14, 30, "AchievementEveryDays.png", (value, addData, progression, list) => {
                 if (list.Count == 0) // First day something is sent to Sanara
                 {
-                    list.Add(DateTime.UtcNow.ToString("yyMMddHHmmss"));
+                    list.Add(DateTime.UtcNow.ToString("yyMMdd"));
                     return 1;
                 }
-                var dt = DateTime.ParseExact(list[0], "yyMMddHHmmss", CultureInfo.InvariantCulture);
+                var dt = DateTime.ParseExact(list[0], "yyMMdd", CultureInfo.InvariantCulture);
                 if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) // Didn't contact Sanara since more than one day
                 {
                     list.Clear();
-                    list.Add(DateTime.UtcNow.ToString("yyMMddHHmmss"));
+                    list.Add(DateTime.UtcNow.ToString("yyMMdd"));
                     return 1;
                 }
                 return progression + 1; // One more day since last contact
