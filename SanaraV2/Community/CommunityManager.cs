@@ -115,10 +115,10 @@ namespace SanaraV2.Community
         }
 
         public void AddProfile(ulong id, Profile p) => _profiles.Add(id, p);
-        public Profile GetOrCreateProfile(Discord.IUser user)
+        public Profile GetOrCreateProfile(Discord.IUserMessage msg, Discord.IUser user)
         {
             if (_profiles.ContainsKey(user.Id)) return _profiles[user.Id];
-            Profile p = new Profile(user);
+            Profile p = new Profile(msg, user);
             _profiles.Add(user.Id, p);
             Program.p.db.AddProfile(p);
             return p;
@@ -190,7 +190,8 @@ namespace SanaraV2.Community
 
         public async Task CreateMyProfile()
         {
-            Profile p = GetOrCreateProfile(Program.p.client.CurrentUser);
+            Discord.IUserMessage msg = null;
+            Profile p = GetOrCreateProfile(msg, Program.p.client.CurrentUser);
             await p.UpdateColor(new[] { "green" });
             p.UpdateDescription("Welcome on my profile!\n\nIf you need any help feel free to check:\n - Website: https://sanara.zirk.eu\n - Official Server: https://discord.gg/H6wMRYV\n - GitHub: https://github.com/Xwilarg/Sanara");
             p.UpdateVisibility(Visibility.Public);

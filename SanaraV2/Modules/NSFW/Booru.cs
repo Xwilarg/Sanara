@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using BooruSharp.Booru;
 using System.Linq;
 using SanaraV2.Modules.Base;
+using SanaraV2.Community;
 
 namespace SanaraV2.Modules.NSFW
 {
@@ -96,7 +97,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -104,7 +105,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -112,7 +113,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
@@ -120,7 +121,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
@@ -128,7 +129,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
@@ -136,7 +137,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild.Id);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
         }
 
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
@@ -175,7 +176,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        private static async Task PostImage(ABooru booru, ITextChannel chan, string[] tags, ulong guildId)
+        private static async Task PostImage(ABooru booru, ITextChannel chan, string[] tags, ulong guildId, ulong userId)
         {
             var result = await Features.NSFW.Booru.SearchBooru(!chan.IsNsfw, tags, booru, Program.p.rand);
             switch (result.error)
@@ -189,13 +190,14 @@ namespace SanaraV2.Modules.NSFW
                     break;
 
                 case Features.NSFW.Error.Booru.None:
+                    IUserMessage msg;
                     if (!Utilities.IsImage(result.answer.url))
                     {
-                        await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guildId, result.answer.saveId) + "*");
+                        msg = await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guildId, result.answer.saveId) + "*");
                     }
                     else
                     {
-                        await chan.SendMessageAsync("", false, new EmbedBuilder()
+                        msg = await chan.SendMessageAsync("", false, new EmbedBuilder()
                         {
                             Color = result.answer.colorRating,
                             ImageUrl = result.answer.url,
@@ -206,6 +208,8 @@ namespace SanaraV2.Modules.NSFW
                             }
                         }.Build());
                     }
+                    foreach (string t in tags)
+                        await Program.p.cm.ProgressAchievementAsync(AchievementID.DoDifferentsBoorus, 1, t.GetHashCode().ToString(), msg, userId);
                     if (Program.p.sendStats)
                         await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", booru.ToString().Split('.').Last().ToLower()) });
                     break;

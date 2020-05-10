@@ -236,6 +236,7 @@ namespace SanaraV2
             client.Connected += Connected;
             client.Ready += Ready;
             client.ReactionAdded += cm.ReactionAdded;
+            commands.CommandExecuted += CommandExecuted;
 
             await client.LoginAsync(TokenType.Bot, botToken);
             startTime = DateTime.Now;
@@ -257,6 +258,7 @@ namespace SanaraV2
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
         }
+
 
         /// <summary>
         /// When client is ready, we start the SubscriptionManager (we wait for it to be ready so it can access the guilds and channels)
@@ -377,7 +379,9 @@ namespace SanaraV2
                 {
                     credential = GoogleCredential.FromFile((string)json.googleTranslateJson);
                     translationClient = TranslationClient.Create(credential);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
@@ -385,12 +389,15 @@ namespace SanaraV2
             youtubeService = null;
             if (json.youtubeKey != null)
             {
-                try {
+                try
+                {
                     youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
                         ApiKey = json.youtubeKey
                     });
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
@@ -400,9 +407,12 @@ namespace SanaraV2
             ravenClient = null;
             if (json.ravenKey != null)
             {
-                try {
+                try
+                {
                     ravenClient = new RavenClient((string)json.ravenKey);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
@@ -410,10 +420,13 @@ namespace SanaraV2
             visionClient = null;
             if (json.googleVisionJson != null)
             {
-                try {
+                try
+                {
                     Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", (string)json.googleVisionJson);
                     visionClient = ImageAnnotatorClient.Create();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
@@ -634,27 +647,34 @@ namespace SanaraV2
                     await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
                     return;
                 }
+                await commands.ExecuteAsync(context, pos, null);
+            }
+        }
+
+        private async Task CommandExecuted(Optional<CommandInfo> cmd, ICommandContext context, IResult result)
+        {
+            if (result.IsSuccess)
+            {
                 DateTime dt = DateTime.UtcNow;
-                IResult result = await commands.ExecuteAsync(context, pos, null);
-                if (result.IsSuccess)
+                var msg = context.Message;
+                if (cmd.IsSpecified)
+                    await cm.ProgressAchievementAsync(AchievementID.DoDifferentsCommands, 1, cmd.Value.Name.GetHashCode().ToString(), msg, msg.Author.Id);
+                await cm.ProgressAchievementAsync(AchievementID.SendCommands, 1, null, msg, msg.Author.Id);
+                if (!_lastMsg.ContainsKey(msg.Author.Id))
                 {
-                    await cm.ProgressAchievementAsync(AchievementID.SendCommands, 1, null, msg, msg.Author.Id);
-                    if (!_lastMsg.ContainsKey(msg.Author.Id))
-                    {
-                        await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
-                        _lastMsg.Add(msg.Author.Id, dt.ToString("yyMMddHH"));
-                    }
-                    else if (_lastMsg[msg.Author.Id] != dt.ToString("yyMMddHH"))
-                    {
-                        await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
-                        _lastMsg[msg.Author.Id] = dt.ToString("yyMMddHH");
-                    }
-                    if (sendStats)
-                    {
-                        await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
-                        await AddError("OK");
-                        await AddCommandServs(context.Guild.Id);
-                    }
+                    await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
+                    _lastMsg.Add(msg.Author.Id, dt.ToString("yyMMddHH"));
+                }
+                else if (_lastMsg[msg.Author.Id] != dt.ToString("yyMMddHH"))
+                {
+                    await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
+                    _lastMsg[msg.Author.Id] = dt.ToString("yyMMddHH");
+                }
+                if (sendStats)
+                {
+                    await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+                    await AddError("OK");
+                    await AddCommandServs(context.Guild.Id);
                 }
             }
         }

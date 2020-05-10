@@ -16,7 +16,7 @@ namespace SanaraV2.Community
         /// <summary>
         /// Create empty profile
         /// </summary>
-        public Profile(IUser user)
+        public Profile(IUserMessage msg, IUser user)
         {
             _id = user.Id;
 
@@ -28,6 +28,8 @@ namespace SanaraV2.Community
             _achievements = new Dictionary<AchievementID, UserAchievement>();
             _creationDate = DateTime.UtcNow;
             _backgroundColor = System.Drawing.Color.White;
+            if (Program.p.rand.Next(0, 10) == 1) // 10% of chance to get this achievement when generating a profile
+                ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "").GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -136,7 +138,18 @@ namespace SanaraV2.Community
                 return;
             p._friends.Add(_id);
             _friends.Add(p._id);
-            await Program.p.cm.ProgressAchievementAsync(AchievementID.AddFriends, _friends.Count, "", msg, _id);
+            await ProgressAchievementAsync(AchievementID.AddFriends, msg, _friends.Count, "");
+            await p.ProgressAchievementAsync(AchievementID.AddFriends, msg, p._friends.Count, "");
+            if (!HaveAchievement(AchievementID.ShareAchievement) && p.HaveAchievement(AchievementID.ShareAchievement))
+            {
+                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "");
+                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, "");
+            }
+            else if (HaveAchievement(AchievementID.ShareAchievement) && !p.HaveAchievement(AchievementID.ShareAchievement))
+            {
+                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, "");
+                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "");
+            }
             Program.p.db.UpdateProfile(this);
             Program.p.db.UpdateProfile(p);
         }
@@ -166,7 +179,7 @@ namespace SanaraV2.Community
                 if (newLevel == 3) emote = new Emoji("🥇"); // Gold
                 else if (newLevel == 2) emote = new Emoji("🥈"); // Silver
                 else emote = new Emoji("🥉"); // Copper
-                await msg.AddReactionAsync(emote);
+                await msg?.AddReactionAsync(emote);
                 Program.p.db.UpdateProfile(this);
             }
         }
@@ -181,6 +194,9 @@ namespace SanaraV2.Community
             }
             return all;
         }
+
+        public bool HaveAchievement(AchievementID id)
+            => _achievements.ContainsKey(id);
 
         public string GetUsername()
             => _username;

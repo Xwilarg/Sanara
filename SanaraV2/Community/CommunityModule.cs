@@ -21,7 +21,7 @@ namespace SanaraV2.Community
             Profile profile;
             if (args.Length == 0)
             {
-                profile = Program.p.cm.GetOrCreateProfile(Context.User);
+                profile = Program.p.cm.GetOrCreateProfile(Context.Message, Context.User);
                 Program.p.cm.GenerateProfile(profile, Context.User);
             }
             else
