@@ -125,7 +125,12 @@ namespace SanaraV2.Games
             {
                 // Setup for multiplayer:
                 if (await _lobby.LoadNames(_chan)) // We try to load the nickname of everyone in the lobby
-                    await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                {
+                    var msg = await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                    var ids = _lobby.GetPlayersId();
+                    foreach (var id in ids)
+                        await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.PlayWithFriends, ids.Count, null, msg, id);
+                }
                 else
                 {
                     _gameState = GameState.Lost;
@@ -455,6 +460,7 @@ namespace SanaraV2.Games
         public async Task LooseAsync(string reason)
         {
             _gameState = GameState.Lost;
+            IUserMessage gameOverMsg;
             if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
             {
                 if (_multiType == APreload.MultiplayerType.Elimination)
@@ -468,7 +474,7 @@ namespace SanaraV2.Games
                         _postImage = false;
                         return;
                     }
-                    await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
+                    gameOverMsg = await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
                 }
                 else
                     throw new ArgumentException("Multiplayer game " + _gameName + " ended in an unexpected way: " + reason);
@@ -476,21 +482,31 @@ namespace SanaraV2.Games
             else
             {
                 if (reason == null)
-                    await SaveScores(Sentences.YouLost(_chan.GuildId) + await GetLoose());
+                    gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + await GetLoose());
                 else
-                    await SaveScores(Sentences.YouLost(_chan.GuildId) + reason + Environment.NewLine + await GetLoose());
+                    gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + reason + Environment.NewLine + await GetLoose());
+            }
+            if (this is AQuizz)
+            {
+                foreach (ulong c in _contributors)
+                    await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScores, _score, null, gameOverMsg, c);
+                if (_isShaded != APreload.Shadow.None)
+                {
+                    foreach (ulong c in _contributors)
+                        await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScoresShadow, _score, null, gameOverMsg, c);
+                }
             }
         }
 
-        private async Task SaveScores(string reason)
+        private async Task<IUserMessage> SaveScores(string reason)
         {
             var newScore = await Program.p.db.SetNewScore(_saveName, _score, _chan.GuildId, string.Join("|", _contributors));
             if (newScore.Item1 == Db.Db.Comparaison.Best)
-                await PostText(reason + Environment.NewLine + Sentences.NewBestScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
+                return await PostText(reason + Environment.NewLine + Sentences.NewBestScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
             else if (newScore.Item1 == Db.Db.Comparaison.Equal)
-                await PostText(reason + Environment.NewLine + Sentences.EqualizedScore(_chan.GuildId, _score.ToString()));
+                return await PostText(reason + Environment.NewLine + Sentences.EqualizedScore(_chan.GuildId, _score.ToString()));
             else
-                await PostText(reason + Environment.NewLine + Sentences.DidntBeatScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
+                return await PostText(reason + Environment.NewLine + Sentences.DidntBeatScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
         }
 
         private async Task PostFromUrl(string url)
@@ -550,9 +566,9 @@ namespace SanaraV2.Games
             }
         }
 
-        protected async Task PostText(string msg)
+        protected async Task<IUserMessage> PostText(string msg)
         {
-            await _chan.SendMessageAsync(msg);
+            return await _chan.SendMessageAsync(msg);
         }
 
         protected async Task PostFromLocalPath(string path)

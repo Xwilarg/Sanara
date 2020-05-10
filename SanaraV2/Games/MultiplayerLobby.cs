@@ -113,6 +113,9 @@ namespace SanaraV2.Games
         public ReadOnlyCollection<string> GetFullNames()
             => _fullNames.AsReadOnly();
 
+        public ReadOnlyCollection<ulong> GetPlayersId()
+            => _players.AsReadOnly();
+
         private List<ulong>     _players; // Players in the lobby
         private List<string>    _names;
         private List<string>    _fullNames; // Names in format xxxxx#1234

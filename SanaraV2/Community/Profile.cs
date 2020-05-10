@@ -25,7 +25,7 @@ namespace SanaraV2.Community
             _discriminator = user.Discriminator;
             _friends = new List<ulong>();
             _description = "";
-            _achievements = new Dictionary<int, UserAchievement>();
+            _achievements = new Dictionary<AchievementID, UserAchievement>();
             _creationDate = DateTime.UtcNow;
             _backgroundColor = System.Drawing.Color.White;
         }
@@ -46,9 +46,9 @@ namespace SanaraV2.Community
             _achievements = token["Achievements"].Value<string>().Length > 0 ? token["Achievements"].Value<string>().Split('|').Select((x) =>
             {
                 var split = x.Split(',');
-                int a_id = int.Parse(split[0]);
-                return new KeyValuePair<int, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1]), split.Skip(2).ToList()));
-            }).ToDictionary(x => x.Key, x => x.Value) : new Dictionary<int, UserAchievement>();
+                var a_id = (AchievementID)int.Parse(split[0]);
+                return new KeyValuePair<AchievementID, UserAchievement>(a_id, new UserAchievement(AchievementList.GetAchievement(a_id), int.Parse(split[1]), split.Skip(2).ToList()));
+            }).ToDictionary(x => x.Key, x => x.Value) : new Dictionary<AchievementID, UserAchievement>();
             _creationDate = DateTime.ParseExact(token["CreationDate"].Value<string>(), "yyMMddHHmmss", CultureInfo.InvariantCulture);
             var colorString = token["BackgroundColor"].Value<string>().Split(',');
             _backgroundColor = System.Drawing.Color.FromArgb(int.Parse(colorString[0]), int.Parse(colorString[1]), int.Parse(colorString[2]));
@@ -62,7 +62,7 @@ namespace SanaraV2.Community
                     .With("Discriminator", _discriminator)
                     .With("Friends", string.Join(",", _friends))
                     .With("Description", _description)
-                    .With("Achievements", string.Join("|", _achievements.Select(x => x.Key + "," + x.Value.ToString(censorAchievements))))
+                    .With("Achievements", string.Join("|", _achievements.Select(x => (int)x.Key + "," + x.Value.ToString(censorAchievements))))
                     .With("CreationDate", _creationDate.ToString("yyMMddHHmmss"))
                     .With("BackgroundColor", _backgroundColor.R + "," + _backgroundColor.G + "," + _backgroundColor.B);
         }
@@ -151,6 +151,25 @@ namespace SanaraV2.Community
             return true;
         }
 
+        public async Task ProgressAchievementAsync(AchievementID id, IUserMessage msg, int progression, string key)
+        {
+            if (!_achievements.ContainsKey(id))
+                _achievements.Add(id, new UserAchievement(AchievementList.GetAchievement(id), 0, new List<string>()));
+            var achievement = _achievements[id];
+            int oldLevel = achievement.GetLevel();
+            achievement.AddProgression(progression, key);
+            int newLevel = achievement.GetLevel();
+            if (newLevel > oldLevel)
+            {
+                IEmote emote;
+                if (newLevel == 3) emote = new Emoji("🥇"); // Gold
+                else if (newLevel == 2) emote = new Emoji("🥈"); // Silver
+                else emote = new Emoji("🥉"); // Copper
+                await msg.AddReactionAsync(emote);
+                Program.p.db.UpdateProfile(this);
+            }
+        }
+
         public string GetUsername()
             => _username;
 
@@ -180,7 +199,7 @@ namespace SanaraV2.Community
         private string _discriminator;
         private List<ulong> _friends;
         private string _description;
-        private Dictionary<int, UserAchievement> _achievements;
+        private Dictionary<AchievementID, UserAchievement> _achievements;
         private DateTime _creationDate;
         private System.Drawing.Color _backgroundColor;
         

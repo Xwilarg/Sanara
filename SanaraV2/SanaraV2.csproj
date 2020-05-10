@@ -253,6 +253,7 @@
   <ItemGroup>
     <Compile Include="Community\Achievement.cs" />
     <Compile Include="Community\AchievementList.cs" />
+    <Compile Include="Community\AchievementID.cs" />
     <Compile Include="Community\CommunityManager.cs" />
     <Compile Include="Community\CommunityModule.cs" />
     <Compile Include="Community\FriendRequest.cs" />

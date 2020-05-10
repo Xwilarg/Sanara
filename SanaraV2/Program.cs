@@ -125,6 +125,8 @@ namespace SanaraV2
 
         public CommunityManager cm;
 
+        public Dictionary<ulong, string> _lastMsg = new Dictionary<ulong, string>(); // Allow to quickly check if already sent a msg this hour
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -636,6 +638,17 @@ namespace SanaraV2
                 IResult result = await commands.ExecuteAsync(context, pos, null);
                 if (result.IsSuccess && sendStats)
                 {
+                    await cm.ProgressAchievementAsync(AchievementID.SendCommands, 1, null, msg, msg.Author.Id);
+                    if (!_lastMsg.ContainsKey(msg.Author.Id))
+                    {
+                        await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
+                        _lastMsg.Add(msg.Author.Id, dt.ToString("yyMMddHH"));
+                    }
+                    else if (_lastMsg[msg.Author.Id] != dt.ToString("yyMMddHH"))
+                    {
+                        await cm.ProgressAchievementAsync(AchievementID.CommandsDaysInRow, 1, null, msg, msg.Author.Id);
+                        _lastMsg[msg.Author.Id] = dt.ToString("yyMMddHH");
+                    }
                     await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
                     await AddError("OK");
                     await AddCommandServs(context.Guild.Id);
@@ -707,6 +720,7 @@ namespace SanaraV2
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());
+                cm.ProgressAchievementAsync(AchievementID.ThrowErrors, 1, ce.InnerException.GetHashCode().ToString(), ce.Context.Message, ce.Context.User.Id).GetAwaiter().GetResult();
             }
             else
             {

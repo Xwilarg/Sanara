@@ -16,15 +16,24 @@ namespace SanaraV2.Community
             return (censorAchievements ? "X" : _progression.ToString()) + "," + string.Join(",", _additionalDatas);
         }
 
-        public void AddProgression(int value, string addData = null)
+        public void AddProgression(int value, string addData)
         {
-            if (addData == null || !_additionalDatas.Contains(addData))
+            var callback = _achievement.GetSpecialCallback();
+            if (callback != null)
+                _progression = callback(value, addData, _progression, _additionalDatas);
+            else // By default achievements just add the given parameter to the progress
             {
-                if (addData != null)
-                    _additionalDatas.Add(addData);
-                _progression += value;
+                if (addData == null || !_additionalDatas.Contains(addData))
+                {
+                    if (addData != null)
+                        _additionalDatas.Add(addData);
+                    _progression += value;
+                }
             }
         }
+
+        public int GetLevel()
+            => _progression;
 
         private Achievement _achievement;
         private int _progression;

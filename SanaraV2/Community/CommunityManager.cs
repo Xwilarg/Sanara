@@ -45,6 +45,15 @@ namespace SanaraV2.Community
                 profiles.ElementAt(i).UpdateProfile();
         }
 
+        public async Task ProgressAchievementAsync(AchievementID achievementID, int progression, string key, Discord.IUserMessage msg, ulong userId)
+        {
+            var profile = GetProfile(userId);
+            if (profile != null) // Achievements don't progress if we don't have a profile
+            {
+                await profile.ProgressAchievementAsync(achievementID, msg, progression, key);
+            }
+        }
+
         public void GenerateProfile(Profile profile, Discord.IUser user, Image pfpImage = null)
         {
             if (user != null)
