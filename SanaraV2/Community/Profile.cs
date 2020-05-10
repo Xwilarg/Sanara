@@ -130,12 +130,13 @@ namespace SanaraV2.Community
             Program.p.db.UpdateProfile(this);
         }
 
-        public void AddFriend(Profile p)
+        public async Task AddFriendAsync(Profile p, IUserMessage msg)
         {
             if (_friends.Contains(p._id))
                 return;
             p._friends.Add(_id);
             _friends.Add(p._id);
+            await Program.p.cm.ProgressAchievementAsync(AchievementID.AddFriends, _friends.Count, "", msg, _id);
             Program.p.db.UpdateProfile(this);
             Program.p.db.UpdateProfile(p);
         }

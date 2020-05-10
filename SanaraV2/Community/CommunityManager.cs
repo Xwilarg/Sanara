@@ -140,9 +140,9 @@ namespace SanaraV2.Community
             var textChan = (Discord.ITextChannel)chan;
             if (target.GetId() == Program.p.client.CurrentUser.Id)
             {
-                target.AddFriend(author);
                 var sMsg = await chan.SendMessageAsync(Sentences.FriendAccepted(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
                 await sMsg.AddReactionAsync(new Discord.Emoji("✅"));
+                await target.AddFriendAsync(author, sMsg);
                 return true;
             }
             var msg = await chan.SendMessageAsync(Sentences.FriendRequest(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
@@ -178,7 +178,7 @@ namespace SanaraV2.Community
                 if (_friendRequests[msg.Id].destinator.GetId() == user)
                 {
                     var elem = _friendRequests[msg.Id];
-                    elem.destinator.AddFriend(elem.author);
+                    await elem.destinator.AddFriendAsync(elem.author, msg);
                     var textChan = (Discord.ITextChannel)msg.Channel;
                     await msg.ModifyAsync(x => x.Content = Sentences.FriendAccepted(textChan.GuildId, elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator(), elem.author.GetUsername() + "#" + elem.author.GetDiscriminator()));
                     await msg.RemoveReactionAsync(new Discord.Emoji("✅"), Program.p.client.CurrentUser);

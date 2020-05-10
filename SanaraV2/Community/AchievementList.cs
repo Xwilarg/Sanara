@@ -48,7 +48,7 @@ namespace SanaraV2.Community
                 return progression;
             })
             },
-            { AchievementID.AddFriends, new Achievement(5, 10, 25, "AchievementProfileFriends.png") },
+            { AchievementID.AddFriends, new Achievement(5, 10, 25, "AchievementProfileFriends.png", ChangeValueIfBetter) },
             { AchievementID.ShareAchievement, new Achievement(0, 5, 20, "AchievementShare.png") },
             { AchievementID.DoDifferentsBoorus, new Achievement(10, 50, 100, "AchievementImage.png") },
             { AchievementID.DoDifferentsCommands, new Achievement(10, 25, 50, "AchievementDifferentsCommands.png") },
