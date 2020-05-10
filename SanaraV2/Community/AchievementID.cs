@@ -7,6 +7,10 @@
         GoodScores,
         GoodScoresShadow,
         PlayWithFriends,
-        CommandsDaysInRow
+        CommandsDaysInRow,
+        AddFriends,
+        ShareAchievement,
+        DoDifferentsBoorus,
+        DoDifferentsCommands
     }
 }

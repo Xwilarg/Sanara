@@ -28,7 +28,7 @@ namespace SanaraV2.Community
             { AchievementID.SendCommands, new Achievement(100, 1000, 10000, "AchievementCommands.png") },
             { AchievementID.ThrowErrors, new Achievement(1, 10, 50, "AchievementBug.png") },
             { AchievementID.GoodScores, new Achievement(10, 25, 50, "AchievementGames.png", ChangeValueIfBetter) },
-            { AchievementID.GoodScoresShadow, new Achievement(10, 25, 50, "AchievementShadowGame.png", ChangeValueIfBetter) },
+            { AchievementID.GoodScoresShadow, new Achievement(5, 20, 40, "AchievementShadowGame.png", ChangeValueIfBetter) },
             { AchievementID.PlayWithFriends, new Achievement(2, 5, 10, "AchievementFriends.png", ChangeValueIfBetter) },
             { AchievementID.CommandsDaysInRow, new Achievement(7, 14, 30, "AchievementEveryDays.png", (value, addData, progression, list) => {
                 if (list.Count == 0) // First day something is sent to Sanara
@@ -47,7 +47,11 @@ namespace SanaraV2.Community
                     return progression + 1; // One more day since last contact
                 return progression;
             })
-            }
+            },
+            { AchievementID.AddFriends, new Achievement(5, 10, 25, "AchievementProfileFriends.png") },
+            { AchievementID.ShareAchievement, new Achievement(0, 5, 20, "AchievementShare.png") },
+            { AchievementID.DoDifferentsBoorus, new Achievement(10, 50, 100, "AchievementImage.png") },
+            { AchievementID.DoDifferentsCommands, new Achievement(10, 25, 50, "AchievementDifferentsCommands.png") },
         };
 
         private static Dictionary<string, Stream> _allAchievementsFiles = new Dictionary<string, Stream>();
