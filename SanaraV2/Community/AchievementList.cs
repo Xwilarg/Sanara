@@ -37,13 +37,15 @@ namespace SanaraV2.Community
                     return 1;
                 }
                 var dt = DateTime.ParseExact(list[0], "yyMMdd", CultureInfo.InvariantCulture);
-                if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) // Didn't contact Sanara since more than one day
+                if (DateTime.UtcNow.Subtract(dt).TotalDays > 2) // Didn't contact Sanara since more than one day
                 {
                     list.Clear();
                     list.Add(DateTime.UtcNow.ToString("yyMMdd"));
                     return 1;
                 }
-                return progression + 1; // One more day since last contact
+                if (DateTime.UtcNow.Subtract(dt).TotalDays > 1)
+                    return progression + 1; // One more day since last contact
+                return progression;
             })
             }
         };
