@@ -29,7 +29,7 @@ namespace SanaraV2.Community
             _creationDate = DateTime.UtcNow;
             _backgroundColor = System.Drawing.Color.White;
             if (Program.p.rand.Next(0, 10) == 1) // 10% of chance to get this achievement when generating a profile
-                ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "").GetAwaiter().GetResult();
+                ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, null).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -138,17 +138,17 @@ namespace SanaraV2.Community
                 return;
             p._friends.Add(_id);
             _friends.Add(p._id);
-            await ProgressAchievementAsync(AchievementID.AddFriends, msg, _friends.Count, "");
-            await p.ProgressAchievementAsync(AchievementID.AddFriends, msg, p._friends.Count, "");
+            await ProgressAchievementAsync(AchievementID.AddFriends, msg, _friends.Count, null);
+            await p.ProgressAchievementAsync(AchievementID.AddFriends, msg, p._friends.Count, null);
             if (!HaveAchievement(AchievementID.ShareAchievement) && p.HaveAchievement(AchievementID.ShareAchievement))
             {
-                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "");
-                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, "");
+                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, null);
+                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, null);
             }
             else if (HaveAchievement(AchievementID.ShareAchievement) && !p.HaveAchievement(AchievementID.ShareAchievement))
             {
-                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, "");
-                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, "");
+                await ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 1, null);
+                await p.ProgressAchievementAsync(AchievementID.ShareAchievement, msg, 0, null);
             }
             Program.p.db.UpdateProfile(this);
             Program.p.db.UpdateProfile(p);
