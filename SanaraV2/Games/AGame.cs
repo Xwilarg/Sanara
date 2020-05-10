@@ -460,7 +460,6 @@ namespace SanaraV2.Games
         public async Task LooseAsync(string reason)
         {
             _gameState = GameState.Lost;
-            IUserMessage gameOverMsg;
             if (HaveMultiplayerLobby()) // Multiplayer scores aren't saved
             {
                 if (_multiType == APreload.MultiplayerType.Elimination)
@@ -474,26 +473,27 @@ namespace SanaraV2.Games
                         _postImage = false;
                         return;
                     }
-                    gameOverMsg = await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
+                    await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
                 }
                 else
                     throw new ArgumentException("Multiplayer game " + _gameName + " ended in an unexpected way: " + reason);
             }
             else
             {
+                IUserMessage gameOverMsg;
                 if (reason == null)
                     gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + await GetLoose());
                 else
                     gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + reason + Environment.NewLine + await GetLoose());
-            }
-            if (this is AQuizz)
-            {
-                foreach (ulong c in _contributors)
-                    await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScores, _score, null, gameOverMsg, c);
-                if (_isShaded != APreload.Shadow.None)
+                if (this is AQuizz)
                 {
                     foreach (ulong c in _contributors)
-                        await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScoresShadow, _score, null, gameOverMsg, c);
+                        await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScores, _score, null, gameOverMsg, c);
+                    if (_isShaded != APreload.Shadow.None)
+                    {
+                        foreach (ulong c in _contributors)
+                            await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScoresShadow, _score, null, gameOverMsg, c);
+                    }
                 }
             }
         }

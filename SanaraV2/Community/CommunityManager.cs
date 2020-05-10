@@ -102,7 +102,7 @@ namespace SanaraV2.Community
                             if (a.Item2 == 1) medalBrush = new SolidBrush(Color.FromArgb(184, 115, 51)); // Copper
                             else if (a.Item2 == 2) medalBrush = new SolidBrush(Color.FromArgb(196, 202, 206)); // Silver
                             else medalBrush = new SolidBrush(Color.FromArgb(255, 215, 0)); // Gold
-                            int xPos = 460 + (i % 4 == 1 ? 70 : 0);
+                            int xPos = 460 + ((i % 4) * 70);
                             int yPos = 80 + ((i / 4) * 70);
                             g.FillPie(medalBrush, new Rectangle(xPos, yPos, 64, 64), 0, 360);
                             g.DrawImage(a.Item1, xPos, yPos);
