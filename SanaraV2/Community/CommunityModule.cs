@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System.IO;
 using System.Threading.Tasks;
@@ -53,6 +52,8 @@ namespace SanaraV2.Community
         [Command("Description")]
         public async Task Description(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
@@ -72,6 +73,8 @@ namespace SanaraV2.Community
         [Command("Color")]
         public async Task ColorCmd(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
@@ -96,6 +99,8 @@ namespace SanaraV2.Community
         [Command("Visibility")]
         public async Task VisibilityCmd(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
@@ -119,6 +124,8 @@ namespace SanaraV2.Community
         [Command("Unfriend"), Alias("Remove friend")]
         public async Task Unfriend(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
@@ -152,6 +159,8 @@ namespace SanaraV2.Community
         [Command("Friend"), Alias("Add friend")]
         public async Task Friend(params string[] args)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
@@ -211,6 +220,8 @@ namespace SanaraV2.Community
         [Command("Save all")]
         public async Task SaveAll(params string[] _)
         {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
             if (Context.User.Id != Modules.Base.Sentences.ownerId)
                 await ReplyAsync(Modules.Base.Sentences.OnlyMasterStr(Context.Guild.Id));
             else
