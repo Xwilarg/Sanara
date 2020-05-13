@@ -53,7 +53,7 @@ namespace SanaraV2.Db
             await PreloadProfiles();
         }
 
-        private static readonly string defaultAvailability = "111111111111111";
+        private static readonly string defaultAvailability = "1111111111111111";
 
         public async Task ResetGuild(ulong guildId)
         {

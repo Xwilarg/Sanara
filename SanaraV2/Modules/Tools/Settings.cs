@@ -256,7 +256,7 @@ namespace SanaraV2.Modules.Tools
                 }
                 return;
             }
-            for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
+            for (Program.Module i = 0; i <= Enum.GetValues(typeof(Program.Module)).Cast<Program.Module>().Max(); i++)
             {
                 if (i == Program.Module.Settings || i == Program.Module.Information)
                     continue;

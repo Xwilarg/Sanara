@@ -225,6 +225,7 @@ namespace SanaraV2
             await commands.AddModuleAsync<Communication>(null);
             await commands.AddModuleAsync<Code>(null);
             await commands.AddModuleAsync<CommunityModule>(null);
+            await commands.AddModuleAsync<Arknights>(null);
 
             client.MessageReceived += HandleCommandAsync;
             client.GuildAvailable += GuildJoin;
@@ -543,7 +544,8 @@ namespace SanaraV2
             Vn,
             Xkcd,
             Youtube,
-            Community
+            Community,
+            Arknights
         }
 
         /// <summary>

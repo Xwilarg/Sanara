@@ -19,6 +19,12 @@ namespace SanaraV2.Features.GamesInfo
 {
     public static class Response
     {
+        public class ArknightsCharac
+        {
+            public string name;
+            public string imgUrl;
+        }
+
         public class DropMap
         {
             public int? rarity;
