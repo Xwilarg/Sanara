@@ -18,6 +18,10 @@ namespace SanaraV2.Modules.GamesInfo
 {
     public static class Sentences
     {
+        ///  --------------------------- Arknights ---------------------------
+        public static string ArknightsHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "arknightsHelp")); }
+        public static string OperatorDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "operatorDontExist")); }
+
         /// --------------------------- KanColle ---------------------------
         public static string KancolleHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kancolleHelp")); }
         public static string ShipgirlDontExist(ulong guildId) { return (Translation.GetTranslation(guildId, "shipgirlDontExist")); }

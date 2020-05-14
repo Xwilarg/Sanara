@@ -107,6 +107,7 @@ namespace SanaraV2.Modules.Tools
 
         /// --------------------------- Help Module Name ---------------------------
         public static string AnimeMangaModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "animeMangaModuleName")); }
+        public static string ArknightsModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "arknightsModuleName")); }
         public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }
         public static string CodeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "codeModuleName")); }
         public static string CommunicationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communicationModuleName")); }
@@ -123,6 +124,12 @@ namespace SanaraV2.Modules.Tools
         public static string XkcdModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdModuleName")); }
         public static string YoutubeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeModuleName")); }
         /// --------------------------- Help Module Content ---------------------------
+        public static string ArknightsHelp(ulong guildId)
+        {
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Arknights))
+                return Translation.GetTranslation(guildId, "arknightsModuleCharac");
+            return Base.Sentences.NotAvailable(guildId);
+        }
         public static string AnimeMangaHelp(ulong guildId, bool isServerOwner)
         {
             string res;

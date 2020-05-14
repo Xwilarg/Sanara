@@ -21,11 +21,11 @@ namespace SanaraV2.Modules.GamesInfo
             switch (result.error)
             {
                 case Features.GamesInfo.Error.Charac.Help:
-                    await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.ArknightsHelp(Context.Guild.Id));
                     break;
 
                 case Features.GamesInfo.Error.Charac.NotFound:
-                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                    await ReplyAsync(Sentences.OperatorDontExist(Context.Guild.Id));
                     break;
 
                 case Features.GamesInfo.Error.Charac.None:
