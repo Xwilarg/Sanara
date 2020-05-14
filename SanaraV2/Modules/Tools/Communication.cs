@@ -17,7 +17,7 @@ using Discord.Commands;
 using Discord.Net;
 using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -29,6 +29,26 @@ namespace SanaraV2.Modules.Tools
     public class Communication : ModuleBase
     {
         Program p = Program.p;
+
+        [Command("Calc")]
+        public async Task Calc(params string[] args)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            DataTable table = new DataTable();
+            try
+            {
+                await ReplyAsync(table.Compute(string.Join("", args), "").ToString());
+            }
+            catch (EvaluateException)
+            {
+                await ReplyAsync(Sentences.InvalidCalc(Context.Guild.Id));
+            }
+            catch (SyntaxErrorException)
+            {
+                await ReplyAsync(Sentences.InvalidCalc(Context.Guild.Id));
+            }
+        }
 
         [Command("Poll")]
         public async Task Poll(params string[] args)

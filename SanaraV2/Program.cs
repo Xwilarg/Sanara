@@ -40,6 +40,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using static SanaraV2.Modules.Entertainment.RadioModule;
 
@@ -167,6 +168,10 @@ namespace SanaraV2
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             db = new Db.Db();
             await db.InitAsync();
+
+            CultureInfo culture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+            culture.NumberFormat.NumberDecimalSeparator = ".";
+            Thread.CurrentThread.CurrentCulture = culture;
 
             gm = new GameManager();
 

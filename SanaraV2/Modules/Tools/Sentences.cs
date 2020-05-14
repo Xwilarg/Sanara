@@ -43,6 +43,7 @@ namespace SanaraV2.Modules.Tools
         public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
         public static string PollHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "pollHelp")); }
         public static string PollTooManyChoices(ulong guildId) { return (Translation.GetTranslation(guildId, "pollTooManyChoices")); }
+        public static string InvalidCalc(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidCalc")); }
 
         /// --------------------------- Information ---------------------------
         public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }
@@ -160,24 +161,28 @@ namespace SanaraV2.Modules.Tools
                 return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor");
             return Base.Sentences.NotAvailable(guildId);
         }
-        public static string CommunicationHelp(ulong guildId, bool isServerOwner)
+        public static string CommunicationHelp(ulong guildId)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
             {
                 string str = Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll");
-                if (isServerOwner)
-                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleSaveAll");
+                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll")
+                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleCalc");
                 return str;
             }
             return Base.Sentences.NotAvailable(guildId);
         }
-        public static string CommunityHelp(ulong guildId)
+        public static string CommunityHelp(ulong guildId, bool isServerOwner)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Community))
-                return Translation.GetTranslation(guildId, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleDescription")
+            {
+                string str = Translation.GetTranslation(guildId, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleDescription")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleVisibility")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleUnfriend");
+                if (isServerOwner)
+                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleSaveAll");
+                return str;
+            }
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string DoujinshiHelp(ulong guildId, bool isChanNsfw)

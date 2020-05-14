@@ -148,12 +148,12 @@ namespace SanaraV2.Modules.Tools
             else if (page != "" && (page == "5" || communicationModule.ToLower().Contains(page)))
             {
                 embed.Title += " (" + communicationModule + ")";
-                embed.Description = Sentences.CommunicationHelp(Context.Guild.Id, Context.User.Id == Base.Sentences.ownerId);
+                embed.Description = Sentences.CommunicationHelp(Context.Guild.Id);
             }
             else if (page != "" && (page == "6" || communityModule.ToLower().Contains(page)))
             {
                 embed.Title += " (" + communityModule + ")";
-                embed.Description = Sentences.CommunityHelp(Context.Guild.Id);
+                embed.Description = Sentences.CommunityHelp(Context.Guild.Id, Context.User.Id == Base.Sentences.ownerId);
             }
             else if (page != "" && (page == "7" || doujinshiModule.ToLower().Contains(page)))
             {
