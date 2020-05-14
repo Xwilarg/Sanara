@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,29 +16,38 @@ namespace SanaraV2.Features.GamesInfo
             string name = Utilities.CleanWord(string.Join(" ", args).ToLower());
             using (HttpClient hc = new HttpClient())
             {
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json"));
-                foreach (dynamic elem in json)
+                if (Program.p.ARKNIGHTS_ALIASES.ContainsKey(name))
                 {
-                    if (name == Utilities.CleanWord((string)elem.name_en))
-                    {
-                        name = Utilities.CleanWord((string)elem.name);
-                        break;
-                    }
+                    name = Program.p.ARKNIGHTS_ALIASES[name];
                 }
-                var fullJson = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json"));
+                var fullJson = Program.p.ARKNIGHTS_GENERAL;
                 foreach (var elem in fullJson)
                 {
                     if (elem.Key.StartsWith("char_") && name == Utilities.CleanWord((string)elem.Value.appellation))
                     {
+                        var skills = new List<Response.ArknightsSkill>();
+                        foreach (dynamic skill in elem.Value.skills)
+                        {
+                            var skillArr = Program.p.ARKNIGHTS_SKILLS[(string)skill.skillId];
+                            skills.Add(new Response.ArknightsSkill { name = skillArr.Item1, description = skillArr.Item2 });
+                        }
                         return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(new Response.ArknightsCharac()
                         {
                             name = elem.Value.appellation,
-                            imgUrl = "https://aceship.github.io/AN-EN-Tags/img/characters/" + elem.Key + "_1.png"
+                            imgUrl = "https://aceship.github.io/AN-EN-Tags/img/characters/" + elem.Key + "_1.png",
+                            type = ToSentenceCase((string)elem.Value.position),
+                            tags = ((JArray)elem.Value.tagList).Select(x => ToSentenceCase(Program.p.ARKNIGHTS_TAGS[x.Value<string>()])).ToArray(),
+                            wikiUrl = "https://aceship.github.io/AN-EN-Tags/akhrchars.html?opname=" + ((string)elem.Value.appellation).Replace(' ', '_'),
+                            skills = skills.ToArray(),
+                            description = Program.p.ARKNIGHTS_DESCRIPTIONS[(string)elem.Value.appellation]
                         }, Error.Charac.None);
                     }
                 }
                 return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.NotFound);
             }
         }
+
+        private static string ToSentenceCase(string str)
+            => str[0] + string.Join("", str.Skip(1)).ToLower();
     }
 }

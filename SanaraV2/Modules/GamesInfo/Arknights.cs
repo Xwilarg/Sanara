@@ -2,6 +2,7 @@
 using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.GamesInfo
@@ -29,11 +30,37 @@ namespace SanaraV2.Modules.GamesInfo
                     break;
 
                 case Features.GamesInfo.Error.Charac.None:
+                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>
+                    {
+                            new EmbedFieldBuilder
+                            {
+                                Name = "Position",
+                                Value = result.answer.type,
+                                IsInline = true
+                            },
+                            new EmbedFieldBuilder
+                            {
+                                Name = "HR Tags",
+                                Value = string.Join(", ", result.answer.tags),
+                                IsInline = true
+                            }
+                    };
+                    foreach (var skill in result.answer.skills)
+                    {
+                        fields.Add(new EmbedFieldBuilder
+                        {
+                            Name = skill.name,
+                            Value = skill.description
+                        });
+                    }
                     await ReplyAsync("", false, new EmbedBuilder
                     {
                         Title = result.answer.name,
+                        Url = result.answer.wikiUrl,
+                        Description = result.answer.description,
                         ImageUrl = result.answer.imgUrl,
-                        Color = Color.Blue
+                        Color = Color.Blue,
+                        Fields = fields
                     }.Build());
                     break;
 

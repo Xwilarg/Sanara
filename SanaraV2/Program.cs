@@ -127,6 +127,13 @@ namespace SanaraV2
 
         public Dictionary<ulong, string> _lastMsg = new Dictionary<ulong, string>(); // Allow to quickly check if already sent a msg this hour
 
+        /// ARKNIGHTS INFOS
+        public Dictionary<string, string> ARKNIGHTS_ALIASES;
+        public Dictionary<string, string> ARKNIGHTS_TAGS;
+        public Dictionary<string, Tuple<string, string>> ARKNIGHTS_SKILLS;
+        public Dictionary<string, dynamic> ARKNIGHTS_GENERAL;
+        public Dictionary<string, string> ARKNIGHTS_DESCRIPTIONS;
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -430,6 +437,49 @@ namespace SanaraV2
                 {
                     await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
+            }
+
+            try
+            {
+                ARKNIGHTS_ALIASES = new Dictionary<string, string>();
+                ARKNIGHTS_TAGS = new Dictionary<string, string>();
+                ARKNIGHTS_SKILLS = new Dictionary<string, Tuple<string, string>>();
+                ARKNIGHTS_DESCRIPTIONS = new Dictionary<string, string>();
+
+                using HttpClient hc = new HttpClient();
+                ARKNIGHTS_GENERAL = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json"));
+                dynamic j = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json"));
+                foreach (dynamic elem in j)
+                {
+                    ARKNIGHTS_ALIASES.Add(Features.Utilities.CleanWord((string)elem.name_en), ((string)elem.name).ToUpper());
+                }
+                j = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-tags.json"));
+                foreach (dynamic elem in j)
+                {
+                    ARKNIGHTS_TAGS.Add((string)elem.tag_cn, Features.Utilities.CleanWord((string)elem.tag_en));
+                }
+                j = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-akhr.json"));
+                foreach (dynamic elem in j)
+                {
+                    ARKNIGHTS_DESCRIPTIONS.Add((string)elem.name_en, (string)elem.characteristic_en);
+                }
+                var tab = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/ace/tl-skills.json"));
+                j = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/skill_table.json"));
+                foreach (var elem in tab)
+                {
+                    string description = elem.Value.desc[0];
+                    foreach (var d in j[elem.Key].levels[0].blackboard)
+                    {
+                        description = description.Replace("{" + d.key + "}", (string)d.value);
+                    }
+                    description = Regex.Replace(description, "{([0-9.-]+):\\.0f}", "$1");
+                    description = Regex.Replace(description, "{([0-9.-]+):\\.0%}", "$1%");
+                    ARKNIGHTS_SKILLS.Add(elem.Key, new Tuple<string, string>((string)elem.Value.name, description));
+                }
+            }
+            catch (Exception e) // If somehow something happens
+            {
+                await LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
             }
         }
 

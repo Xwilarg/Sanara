@@ -79,7 +79,7 @@ namespace Sanara_UnitTests
             var result = await Booru.SearchSourceBooru(new[] { "https://trace.moe/img/draw2-good.jpg" });
             Assert.Equal(Error.SourceBooru.None, result.error);
             Assert.NotNull(result.answer);
-            Assert.Equal("https://img3.saucenao.com/frames/?expires=1587952066&init=53878b079e61c5b3&data=957d5567c02ab1df7c2bdcfd0b20ac0da5a3bcc8798575878ff84e195d3a60d0ee88b1d21717593e6f5da4a455d992ce2c80a581868a481ff889755f19dee1226b362a3983636096c56396639b3be0c3ea22aaf3fc5b8f87cc23b3d6f4dc213905fc5fd27a10a24a2a76bc0a3b460124f352c54898ce52a0777fa7521ed76ff8&auth=5c321b7ca454f61bc4a2c4d682e5f0716cc3e4dd", result.answer.url);
+            Assert.True(await IsLinkValid(result.answer.url));
             Assert.InRange(result.answer.compatibility, 90f, 99f);
             Assert.Contains("はたらく細胞", result.answer.content);
         }
@@ -149,6 +149,46 @@ namespace Sanara_UnitTests
         }
 
         // GAMES INFO
+        [Theory]
+        [InlineData("Ifrit", "Ifrit", "Attacks cause super-distance group spell damage", "https://aceship.github.io/AN-EN-Tags/img/characters/char_134_ifrit_1.png", "Ranged",
+            new[] { "Aoe", "Debuff" }, new[] { "Fanaticism", "Sunburst", "Burning Ground" }, new[] {
+                "Attack +0.1%, Attack speed +45",
+                "The next attack deals 1.3% magical damage. Additionally, inflict -100 Defense and burn the target for 3 seconds. Can hold 2 charges",
+                "Deal 0.75% magical damage to enemies on the ground within attack range every second and inflict -7 Magic resistance. However, Ifrit loses 0.02% Max HP every second"
+            })]
+        [InlineData("Popukar", "Popukar", "", "https://aceship.github.io/AN-EN-Tags/img/characters/char_281_popka_1.png", "Melee",
+            new[] { "Aoe", "Survival" }, new[] { "Attack Strengthening·Type α" }, new[] {
+                "Attack +0.1%"
+            })]
+        [InlineData("Gum", "Гум", "Skills can treat friendly units", "https://aceship.github.io/AN-EN-Tags/img/characters/char_196_sunbr_1.png", "Melee",
+            new[] { "Defense", "Healing" }, new[] { "Reserve Rations", "Food Preparation" }, new[] {
+                "The next attack will heal a nearby ally for 0.95% of ГУМ's Attack. Can hold 1 charges",
+                "Begins cooking and stops attacking enemies for 10 seconds, Defense +0.5%. After finishing cooking, focuses on healing nearby allies (attack interval +1.3%), Attack +0.3%"
+            })]
+        [InlineData("W", "W", "", "https://aceship.github.io/AN-EN-Tags/img/characters/char_113_cqbw_1.png", "Ranged",
+            new[] { "Dps", "Crowdcontrol" }, new[] { "K of Hearts", "Jack-in-the-box", "D12" }, new[] {
+                "Immediately fire a grenade, dealing 2.3% physical damage and stunning the targets for 1.5 seconds",
+                "The next attack changes to burying a landmine on an eligible tile within attack range (lasts for 120 seconds). Landmines trigger when an enemy passes over, dealing 1.9% physical damage to all nearby enemies and stunning them for 1.4 seconds",
+                "Plant bombs on up to 3 targets with the highest HP within attack range. The bombs will explode after a delay, each dealing 2.2% physical damage to all nearby enemies and stunning them for 3 seconds"
+            })]
+        public async Task TestArknights(string title, string name, string description, string imgUrl, string type, string[] tags, string[] skillNames, string[] skillDescription)
+        {
+            var result = await SanaraV2.Features.GamesInfo.Arknights.SearchCharac(new string[] { title });
+            Assert.Equal(SanaraV2.Features.GamesInfo.Error.Charac.None, result.error);
+            Assert.Equal(name, result.answer.name);
+            Assert.Equal(description, result.answer.description);
+            Assert.Equal(imgUrl, result.answer.imgUrl);
+            Assert.Equal(type, result.answer.type);
+            Assert.True(await IsLinkValid(result.answer.wikiUrl));
+            foreach (var elem in result.answer.tags)
+                Assert.Contains(elem, tags);
+            foreach (var elem in result.answer.skills)
+            {
+                Assert.Contains(elem.name, skillNames);
+                Assert.Contains(elem.description, skillDescription);
+            }
+        }
+
         [Fact]
         public async Task TestKancolleCharac()
         {

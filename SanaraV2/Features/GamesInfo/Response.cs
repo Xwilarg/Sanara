@@ -23,6 +23,17 @@ namespace SanaraV2.Features.GamesInfo
         {
             public string name;
             public string imgUrl;
+            public string type;
+            public string[] tags;
+            public string wikiUrl;
+            public ArknightsSkill[] skills;
+            public string description;
+        }
+
+        public struct ArknightsSkill
+        {
+            public string name;
+            public string description;
         }
 
         public class DropMap
