@@ -209,7 +209,7 @@ namespace SanaraV2.Modules.Tools
             {
                 embed.Description = Sentences.HelpHelp(Context.Guild.Id) + Environment.NewLine +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.AnimeManga) ? "**1**: " + animeMangaModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Arknights) ? "**2**: " + animeMangaModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Arknights) ? "**2**: " + arknightsModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Booru) ? "**3**: " + booruModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Code) ? "**4**: " + codeModule + Environment.NewLine : "") +
                     (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Communication) ? "**5**: " + communicationModule + Environment.NewLine : "") +
