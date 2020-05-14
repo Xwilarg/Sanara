@@ -78,7 +78,7 @@ namespace SanaraV2.Games
                 if (cleanUserAnswer.Contains(cleanGuess) || cleanGuess.Contains(cleanUserAnswer))
                     return Sentences.BooruGuessClose(GetGuildId(), userAnswer.Replace("@everyone", "@ everyone"));
             }
-            return (Sentences.GuessBad(GetGuildId(), userAnswer.Replace("@everyone", "@ everyone")));
+            return "❌";
         }
 
         protected override async Task<string> GetLoose()
