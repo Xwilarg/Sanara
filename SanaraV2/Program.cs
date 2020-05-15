@@ -220,6 +220,7 @@ namespace SanaraV2
                     dblApi = null;
                 await InitServices(json);
             }
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising modules"));
             lastDiscordBotsSent = DateTime.MinValue;
 
             await commands.AddModuleAsync<Information>(null);
@@ -346,7 +347,7 @@ namespace SanaraV2
             foreach (var elem in Constants.allGames)
             { }
 
-            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising services"));
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising Javmost"));
             // Categories for AdultVideo command
             categories = new List<string>();
             categories.Add("censor");
@@ -385,6 +386,7 @@ namespace SanaraV2
             // Then we update all others modules
             // It's basically just checking if the credential file is here
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising translation client"));
             translationClient = null;
             if (json.googleTranslateJson != null)
             {
@@ -399,6 +401,7 @@ namespace SanaraV2
                 }
             }
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising YouTube service"));
             youtubeService = null;
             if (json.youtubeKey != null)
             {
@@ -417,6 +420,7 @@ namespace SanaraV2
 
             radios = new List<RadioChannel>();
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising Raven client"));
             ravenClient = null;
             if (json.ravenKey != null)
             {
@@ -430,6 +434,7 @@ namespace SanaraV2
                 }
             }
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising vision client"));
             visionClient = null;
             if (json.googleVisionJson != null)
             {
@@ -444,6 +449,7 @@ namespace SanaraV2
                 }
             }
 
+            await Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising Arknights"));
             try
             {
                 ARKNIGHTS_ALIASES = new Dictionary<string, string>();

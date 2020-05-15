@@ -100,12 +100,14 @@ namespace SanaraV2.Features.NSFW
                 using (HttpClient hc = new HttpClient())
                     html = await hc.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond);
                 var m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of ([0-9]+) images");
+                if (!m.Success)
+                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.NotFound);
                 limitPages = int.Parse(m.Groups[1].Value);
                 nbPages = int.Parse(m.Groups[2].Value);
             }
             catch (HttpException)
             {
-                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+                return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.NotFound);
             }
             await onReadyCallback();
             string path = idStr + "_" + DateTime.Now.ToString("yyyyMMddHHmmss");
