@@ -173,6 +173,7 @@ namespace Sanara_UnitTests
             })]
         public async Task TestArknights(string title, string name, string description, string imgUrl, string type, string[] tags, string[] skillNames, string[] skillDescription)
         {
+            await new SanaraV2.Program().InitArknightsDictionnary();
             var result = await SanaraV2.Features.GamesInfo.Arknights.SearchCharac(new string[] { title });
             Assert.Equal(SanaraV2.Features.GamesInfo.Error.Charac.None, result.error);
             Assert.Equal(name, result.answer.name);
@@ -369,6 +370,10 @@ namespace Sanara_UnitTests
         public async Task TestGameGirlsFrontline()
             => await CheckGame(new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
 
+        [Fact]
+        public async Task TestGameArknights()
+            => await CheckGame(new SanaraV2.Games.Impl.Arknights(null, new Config(0, Difficulty.Normal, "arknights", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0));
+
         [Theory]
         [InlineData("Kisaragi", "https://azurlane.koumakan.jp/w/images/thumb/b/ba/Kisaragi.png/[0-9]{3}px-Kisaragi.png")]
         [InlineData("Li%27l_Sandy", "https://azurlane.koumakan.jp/w/images/thumb/1/19/Li%27l_Sandy.png/[0-9]{3}px-Li%27l_Sandy.png")]
@@ -425,6 +430,17 @@ namespace Sanara_UnitTests
         {
             Assert.Contains(name, Constants.girlsfrontlineDictionnary);
             var game = new SanaraV2.Games.Impl.GirlsFrontline(null, new Config(0, Difficulty.Normal, "girlsfrontline", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
+            Assert.Equal(url, await game.GetUrlTest(name));
+        }
+
+        [Theory]
+        [InlineData("Eyjafjalla", "https://aceship.github.io/AN-EN-Tags/img/characters/char_180_amgoat_1.png")]
+        [InlineData("Ptilopsis", "https://aceship.github.io/AN-EN-Tags/img/characters/char_128_plosis_1.png")]
+        [InlineData("Projekt Red", "https://aceship.github.io/AN-EN-Tags/img/characters/char_144_red_1.png")]
+        public async Task TestArknightsDictionnary(string name, string url)
+        {
+            Assert.Contains(name, Constants.arknightsDictionnary);
+            var game = new SanaraV2.Games.Impl.Arknights(null, new Config(0, Difficulty.Normal, "arknights", false, false, false, APreload.Shadow.None, APreload.Multiplayer.SoloOnly, APreload.MultiplayerType.None), 0);
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
