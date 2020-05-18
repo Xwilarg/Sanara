@@ -434,9 +434,9 @@ namespace Sanara_UnitTests
         }
 
         [Theory]
-        [InlineData("Eyjafjalla", "https://aceship.github.io/AN-EN-Tags/img/characters/char_180_amgoat_1.png")]
-        [InlineData("Ptilopsis", "https://aceship.github.io/AN-EN-Tags/img/characters/char_128_plosis_1.png")]
-        [InlineData("Projekt Red", "https://aceship.github.io/AN-EN-Tags/img/characters/char_144_red_1.png")]
+        [InlineData("char_180_amgoat", "https://aceship.github.io/AN-EN-Tags/img/characters/char_180_amgoat_1.png")]
+        [InlineData("char_128_plosis", "https://aceship.github.io/AN-EN-Tags/img/characters/char_128_plosis_1.png")]
+        [InlineData("char_144_red", "https://aceship.github.io/AN-EN-Tags/img/characters/char_144_red_1.png")]
         public async Task TestArknightsDictionnary(string name, string url)
         {
             Assert.Contains(name, Constants.arknightsDictionnary);
