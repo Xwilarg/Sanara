@@ -258,8 +258,6 @@ namespace SanaraV2.Modules.Tools
         public async Task Status()
         {
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Information);
-            int yes = 0;
-            int no = 0;
             EmbedBuilder embed = new EmbedBuilder()
             {
                 Title = Sentences.ServicesAvailability(Context.Guild.Id)
@@ -283,7 +281,7 @@ namespace SanaraV2.Modules.Tools
             if (p.kitsuAuth == null) missingFiles.Add("Kitsu Logins");
             if (p.youtubeService == null) missingFiles.Add("YouTube API Key");
             embed.AddField("Missing Files", missingFiles.Count == 0 ? "None" : string.Join(", ", missingFiles));
-            embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id, ref yes, ref no));
+            embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id));
             embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAsync(Context.Guild));
             embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
