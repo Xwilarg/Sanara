@@ -39,7 +39,7 @@ namespace SanaraV2.Features.NSFW
             ITextChannel chan = await Utilities.GetTextChannelAsync(channel, guild);
             if (chan == null)
                 return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(null, Entertainment.Error.Subscribe.InvalidChannel);
-            await db.AddAnimeSubscription(chan);
+            await db.AddNHentaiSubscription(chan);
             return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(new Entertainment.Response.Subscribe
             {
                 chan = chan
@@ -48,7 +48,7 @@ namespace SanaraV2.Features.NSFW
 
         public static async Task<FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
         {
-            if (!await db.RemoveAnimeSubscription(guild))
+            if (!await db.RemoveNHentaiSubscription(guild))
                 return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(null, Entertainment.Error.Unsubscribe.NoSubscription);
             return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(new Entertainment.Response.Unsubscribe(), Entertainment.Error.Unsubscribe.None);
         }

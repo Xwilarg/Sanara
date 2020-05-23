@@ -282,9 +282,11 @@ namespace SanaraV2.Modules.Tools
             if (p.youtubeService == null) missingFiles.Add("YouTube API Key");
             embed.AddField("Missing Files", missingFiles.Count == 0 ? "None" : string.Join(", ", missingFiles));
             embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id));
-            embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAsync(Context.Guild));
+            embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAnimeAsync(Context.Guild));
+            embed.AddField("Doujinshi Subscription Channel", await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild));
             embed.AddField("Profile Count", Program.p.cm.GetProfileCount(), true);
             embed.AddField("Anime Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
+            embed.AddField("Doujinshi Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
             embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
             foreach (var elem in Program.p.allLanguages)

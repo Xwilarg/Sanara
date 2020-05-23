@@ -36,7 +36,7 @@ namespace SanaraV2.Modules.NSFW
             }
             else
             {
-                var result = await Features.Entertainment.AnimeManga.Subscribe(Context.Guild, Program.p.db, args);
+                var result = await Features.NSFW.Doujinshi.Subscribe(Context.Guild, Program.p.db, args);
                 switch (result.error)
                 {
                     case Features.Entertainment.Error.Subscribe.Help:
@@ -69,7 +69,7 @@ namespace SanaraV2.Modules.NSFW
             }
             else
             {
-                var result = await Features.Entertainment.AnimeManga.Unsubscribe(Context.Guild, Program.p.db);
+                var result = await Features.NSFW.Doujinshi.Unsubscribe(Context.Guild, Program.p.db);
                 switch (result.error)
                 {
                     case Features.Entertainment.Error.Unsubscribe.NoSubscription:
