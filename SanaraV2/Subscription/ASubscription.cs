@@ -7,7 +7,7 @@ namespace SanaraV2.Subscription
 {
     public abstract class ASubscription
     {
-        protected abstract Task<(int, EmbedBuilder)[]> GetFeed();
+        public abstract Task<(int, EmbedBuilder)[]> GetFeed();
 
         public async Task UpdateChannelAsync(List<ITextChannel> subscriptions)
         {

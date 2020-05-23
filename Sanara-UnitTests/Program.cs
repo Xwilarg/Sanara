@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.IO;
+using SanaraV2.Subscription;
 
 namespace Sanara_UnitTests
 {
@@ -40,18 +41,20 @@ namespace Sanara_UnitTests
         }
 
         // SUBSCRIPTION
-        [Fact]
-        public async Task TestAnimeSubscription()
+        [Theory]
+        [InlineData(typeof(AnimeSubscription))]
+        [InlineData(typeof(NHentaiSubscription))]
+        public async Task TestSubscription(Type t)
         {
-            var sub = new SanaraV2.Subscription.AnimeSubscription();
-            Assert.NotEmpty(sub.GetCurrName());
-            sub.SetCurrName("value");
-            var datas = await sub.GetAnimes();
+            var sub = (ASubscription)Activator.CreateInstance(t);
+            Assert.NotEqual(0, sub.Current);
+            sub.Current = 0;
+            var datas = await sub.GetFeed();
             Assert.NotEmpty(datas);
             var anime = datas[0];
-            Assert.True(await IsLinkValid(anime.previewUrl));
-            Assert.True(await IsLinkValid(anime.pageUrl));
-            Assert.NotEmpty(anime.name);
+            Assert.True(await IsLinkValid(anime.Item2.Url));
+            Assert.True(await IsLinkValid(anime.Item2.ThumbnailUrl));
+            Assert.NotEmpty(anime.Item2.Title);
         }
 
         // ANIME/MANGA MODULE

@@ -17,7 +17,7 @@ namespace SanaraV2.Subscription
                 Current = 0;
         }
 
-        protected override async Task<(int, EmbedBuilder)[]> GetFeed()
+        public override async Task<(int, EmbedBuilder)[]> GetFeed()
         {
             var datas = await SearchClient.SearchAsync();
             return datas.elements.Select(x => ((int)x.id, new EmbedBuilder
@@ -73,7 +73,7 @@ namespace SanaraV2.Subscription
             "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification"
         };
 
-        public string[] yaoi = new[]
+        public string[] yaoi = new[] // I'm just making the baseless assumption that you are an heterosexual male, if that's not the case sorry :( - (You can enable it back anyway)
         {
             "yaoi"
         };

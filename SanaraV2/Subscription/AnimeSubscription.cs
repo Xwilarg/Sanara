@@ -32,7 +32,7 @@ namespace SanaraV2.Subscription
                 Current = 0;
         }
 
-        protected override async Task<(int, EmbedBuilder)[]> GetFeed()
+        public override async Task<(int, EmbedBuilder)[]> GetFeed()
         {
             List<(int, EmbedBuilder)> data = new List<(int, EmbedBuilder)>();
             foreach (var node in await GetAnimeFeedAsync())
