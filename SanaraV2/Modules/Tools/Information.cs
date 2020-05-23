@@ -283,6 +283,8 @@ namespace SanaraV2.Modules.Tools
             embed.AddField("Missing Files", missingFiles.Count == 0 ? "None" : string.Join(", ", missingFiles));
             embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id));
             embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAsync(Context.Guild));
+            embed.AddField("Profile Count", Program.p.cm.GetProfileCount(), true);
+            embed.AddField("Anime Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
             embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
             foreach (var elem in Program.p.allLanguages)

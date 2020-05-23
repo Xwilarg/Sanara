@@ -132,6 +132,8 @@ namespace SanaraV2.Community
         {
             return _profiles.Select(x => x.Value).Where(x => user == x.GetUsername() || user == x.GetUsername() + "#" + x.GetDiscriminator()).FirstOrDefault();
         }
+        public int GetProfileCount()
+            => _profiles.Count;
 
         public async Task<bool> AddFriendRequestAsync(Discord.IMessageChannel chan, Profile author, Profile target)
         {
