@@ -15,7 +15,7 @@ namespace SanaraV2.Subscription
             if (data.Length > 0)
             {
                 Current = data[0].Item1;
-                for (int i = Program.p.db.AnimeSubscription.Count - 1; i >= 0; i--)
+                for (int i = subscriptions.Count - 1; i >= 0; i--)
                 {
                     try
                     {

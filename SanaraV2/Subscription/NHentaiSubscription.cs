@@ -42,5 +42,40 @@ namespace SanaraV2.Subscription
             public Uri urlDoujinshi;
             public Uri urlImage;
         }
+
+        public string[] goreTags = new[] // Visual brutality
+        {
+            "guro", "torture", "necrophilia", "skinsuit", "asphyxiation", "snuff"
+        };
+
+        public string[] badbehaviour = new[] // Disrespect towards some characters involved
+        {
+            "rape", "prostitution", "drugs", "cheating", "humiliation", "slave", "possession", "mind control", "body swap", "netorare"
+        };
+
+        public string[] bodyfluids = new[] // Body fluids (others that semen and blood)
+        {
+            "scat", "vomit", "low scat"
+        };
+
+        public string[] unusualEntrances = new[] // Entering inside the body by holes that aren't meant for that
+        {
+            "vore", "absorption", "brain fuck", "nipple fuck", "urethra insertion"
+        };
+
+        public string[] tos = new[] // Tags that are against Discord's Terms of Service (characters that are too young)
+        {
+            "shota", "lolicon", "oppai loli", "low lolicon", "low shotacon"
+        };
+
+        public string[] othersFetichisms = new[] // Others fetichisms that may seams strange from the outside
+        {
+            "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification"
+        };
+
+        public string[] yaoi = new[]
+        {
+            "yaoi"
+        };
     }
 }
