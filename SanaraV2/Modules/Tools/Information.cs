@@ -264,66 +264,28 @@ namespace SanaraV2.Modules.Tools
             {
                 Title = Sentences.ServicesAvailability(Context.Guild.Id)
             };
-            string description = "";
+            List<string> disabledModules = new List<string>();
             for (Program.Module i = 0; i <= Enum.GetValues(typeof(Program.Module)).Cast<Program.Module>().Max(); i++)
-                description += "**" + i.ToString() + "**: " + ((Program.p.db.IsAvailable(Context.Guild.Id, i)) ? (Sentences.Enabled(Context.Guild.Id)) : (Sentences.Disabled(Context.Guild.Id))) + Environment.NewLine;
-            embed.Description = description;
-            if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio))
+                if (!Program.p.db.IsAvailable(Context.Guild.Id, i))
+                    disabledModules.Add(i.ToString());
+            embed.Description = disabledModules.Count == 0 ? "All modules are enabled" : "Disabled modules:" + string.Join(", ", disabledModules);
+            string[] toCheck = new[]
             {
-                embed.AddField("Radio Module",
-                    "**Opus dll:** " + ((File.Exists("opus.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
-                    "**Lib Sodium dll:** " + ((File.Exists("libsodium.dll") ? ("Yes") : ("No"))) + Environment.NewLine +
-                    "**Ffmpeg:** " + ((File.Exists("ffmpeg.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
-                    "**youtube-dl:** " + ((File.Exists("youtube-dl.exe") ? ("Yes") : ("No"))) + Environment.NewLine +
-                    "**YouTube API key:** " + ((p.youtubeService != null ? ("Yes") : ("No"))));
-                if (File.Exists("opus.dll") && File.Exists("libsodium.dll") && File.Exists("ffmpeg.exe") && p.youtubeService != null)
-                    yes++;
-                else
-                    no++;
-            }
-            if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Game))
-            {
-                embed.AddField("Game Module", ScoreManager.GetInformation(Context.Guild.Id, ref yes, ref no));
-            }
-            if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Linguistic))
-            {
-                embed.AddField("Linguistic Module - Translations",
-                "**Google Translate API key:** " + ((p.translationClient != null ? ("Yes") : ("No"))) + Environment.NewLine +
-                "**Google Vision API key:** " + ((p.visionClient != null ? ("Yes") : ("No"))));
-                if (p.translationClient != null)
-                {
-                    yes++;
-                    if (p.visionClient != null)
-                        yes++;
-                    else
-                        no++;
-                }
-                else
-                    no += 2;
-            }
-            embed.AddField("Information Module - Logs", "**GitHub API key:** " + (p.GitHubKey != null ? "Yes" : "No"));
-            if (p.GitHubKey != null)
-                yes++;
-            else
-                no++;
-            embed.AddField("Anime/Manga Module - NSFW", "**Kitsu logins:** " + (p.kitsuAuth != null ? "Yes" : "No"));
-            embed.AddField("Anime/Manga Module - Subscription", "**Subscription channel:** " + await p.db.GetMyChannelNameAsync(Context.Guild));
-            if (p.kitsuAuth != null)
-                yes++;
-            else
-                no++;
-            if (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube))
-            {
-                embed.AddField("YouTube Module", "**YouTube API key:** " + ((p.youtubeService != null) ? ("Yes") : ("No")));
-                if (p.youtubeService != null)
-                    yes++;
-                else
-                    no++;
-            }
-            if (yes + no == 0)
-                yes++;
-            int max = yes + no;
-            embed.Color = new Color(no * 255 / max, yes * 255 / max, 0);
+                "opus.dll", "libsodium.dll", "ffmpeg.exe", "youtube-dl.exe", 
+            };
+            List<string> missingFiles = new List<string>();
+            foreach (string file in toCheck)
+                if (!File.Exists(file))
+                    missingFiles.Add(file);
+            if (p.translationClient == null) missingFiles.Add("Google Translate API Key");
+            if (p.visionClient == null) missingFiles.Add("Google Vision API Key");
+            if (p.GitHubKey == null) missingFiles.Add("GitHub API Key");
+            if (p.kitsuAuth == null) missingFiles.Add("Kitsu Logins");
+            if (p.youtubeService == null) missingFiles.Add("YouTube API Key");
+            embed.AddField("Missing Files", missingFiles.Count == 0 ? "None" : string.Join(", ", missingFiles));
+            embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id, ref yes, ref no));
+            embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAsync(Context.Guild));
+            embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
             foreach (var elem in Program.p.allLanguages)
                 allTrads.Add(elem.Key, 0);
