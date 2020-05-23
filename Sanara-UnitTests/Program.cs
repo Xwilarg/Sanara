@@ -76,11 +76,11 @@ namespace Sanara_UnitTests
         [Fact]
         public async Task TestSourceAnime()
         {
-            var result = await Booru.SearchSourceBooru(new[] { "https://trace.moe/img/draw2-good.jpg" });
+            var result = await Booru.SearchSourceBooru(new[] { "https://katdon.files.wordpress.com/2015/10/gochuumon.png" });
             Assert.Equal(Error.SourceBooru.None, result.error);
             Assert.NotNull(result.answer);
             Assert.True(await IsLinkValid(result.answer.url));
-            Assert.InRange(result.answer.compatibility, 90f, 99f);
+            Assert.InRange(result.answer.compatibility, 80f, 99f);
             Assert.Contains("はたらく細胞", result.answer.content);
         }
 
