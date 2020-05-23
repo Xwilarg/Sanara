@@ -51,7 +51,7 @@ namespace SanaraV2.Features.Entertainment
 
         public static async Task<FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
         {
-            if (!await db.RemoveAnimeSubscription(guild.Id))
+            if (!await db.RemoveAnimeSubscription(guild))
                 return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(null, Error.Unsubscribe.NoSubscription);
             return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(new Response.Unsubscribe(), Error.Unsubscribe.None);
         }

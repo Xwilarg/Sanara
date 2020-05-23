@@ -31,17 +31,20 @@ namespace SanaraV2.Subscription
         private SubscriptionManager()
         {
             anime = new AnimeSubscription();
+            nhentai = new NHentaiSubscription();
             _ = Task.Run(async () =>
             {
                 for (;;)
                 {
-                    await Task.Delay(120000); // 2 minutes
-                    await anime.UpdateChannelAsync();
+                    await Task.Delay(600000); // 10 minutes
+                    await anime.UpdateChannelAsync(Program.p.db.AnimeSubscription);
+                    await nhentai.UpdateChannelAsync(Program.p.db.NHentaiSubscription);
                 }
             });
         }
 
         private AnimeSubscription anime;
+        private NHentaiSubscription nhentai;
         private static SubscriptionManager me = null;
     }
 }

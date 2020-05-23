@@ -34,6 +34,7 @@ namespace SanaraV2.Db
             Prefixs = new Dictionary<ulong, string>();
             Availability = new Dictionary<ulong, string>();
             AnimeSubscription = new List<ITextChannel>();
+            NHentaiSubscription = new List<ITextChannel>();
             Anonymize = new Dictionary<ulong, bool>();
         }
 
@@ -98,6 +99,9 @@ namespace SanaraV2.Db
             string anime = (string)json.animeSubscription;
             if (anime != null && anime != "0")
                 AnimeSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
+            string nhentai = (string)json.nhentaiSubscription;
+            if (nhentai != null && anime != "0")
+                NHentaiSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
         }
 
         public async Task AddAnimeSubscription(ITextChannel chan)
@@ -110,9 +114,19 @@ namespace SanaraV2.Db
             AnimeSubscription.Add(chan);
         }
 
-        public async Task<bool> RemoveAnimeSubscription(ulong guildId)
+        public async Task AddNHentaiSubscription(ITextChannel chan)
         {
-            string guildIdStr = guildId.ToString();
+            string guildIdStr = chan.GuildId.ToString();
+            string channelIdStr = chan.Id.ToString();
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
+                .With("nhentaiSubscription", channelIdStr)
+                ).RunAsync(conn);
+            NHentaiSubscription.Add(chan);
+        }
+
+        public async Task<bool> RemoveAnimeSubscription(IGuild guild)
+        {
+            string guildIdStr = guild.Id.ToString();
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
             string anime = (string)json.animeSubscription;
             if (anime == null || anime == "0")
@@ -120,6 +134,21 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("animeSubscription", "0")
                 ).RunAsync(conn);
+            AnimeSubscription.Remove(await guild.GetTextChannelAsync(ulong.Parse(anime)));
+            return true;
+        }
+
+        public async Task<bool> RemoveNHentaiSubscription(IGuild guild)
+        {
+            string guildIdStr = guild.Id.ToString();
+            dynamic json = await R.Db(dbName).Table("Guilds").Get(guildIdStr).RunAsync(conn);
+            string hentai = (string)json.nhentaiSubscription;
+            if (hentai == null || hentai == "0")
+                return false;
+            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
+                .With("nhentaiSubscription", "0")
+                ).RunAsync(conn);
+            NHentaiSubscription.Remove(await guild.GetTextChannelAsync(ulong.Parse(hentai)));
             return true;
         }
 
@@ -258,5 +287,6 @@ namespace SanaraV2.Db
         public Dictionary<ulong, bool> Anonymize { private set; get; }
         public Dictionary<ulong, string> Availability { private set; get; }
         public List<ITextChannel> AnimeSubscription { private set; get; } // For each guild, their subscription channel
+        public List<ITextChannel> NHentaiSubscription { private set; get; }
     }
 }

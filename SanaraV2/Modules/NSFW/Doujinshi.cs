@@ -24,6 +24,69 @@ namespace SanaraV2.Modules.NSFW
     {
         Program p = Program.p;
 
+
+        [Command("Subscribe Doujinshi")]
+        public async Task Subscribe(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            else
+            {
+                var result = await Features.Entertainment.AnimeManga.Subscribe(Context.Guild, Program.p.db, args);
+                switch (result.error)
+                {
+                    case Features.Entertainment.Error.Subscribe.Help:
+                        await ReplyAsync(Entertainment.Sentences.SubscribeHelp(Context.Guild.Id));
+                        break;
+
+                    case Features.Entertainment.Error.Subscribe.InvalidChannel:
+                        await ReplyAsync(Entertainment.Sentences.InvalidChannel(Context.Guild.Id));
+                        break;
+
+                    case Features.Entertainment.Error.Subscribe.None:
+                        await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild.Id, "doujinshi", result.answer.chan));
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+        [Command("Unsubscribe Doujinshi")]
+        public async Task Unsubcribe(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+            }
+            else
+            {
+                var result = await Features.Entertainment.AnimeManga.Unsubscribe(Context.Guild, Program.p.db);
+                switch (result.error)
+                {
+                    case Features.Entertainment.Error.Unsubscribe.NoSubscription:
+                        await ReplyAsync(Entertainment.Sentences.NoSubscription(Context.Guild.Id));
+                        break;
+
+                    case Features.Entertainment.Error.Unsubscribe.None:
+                        await ReplyAsync(Entertainment.Sentences.UnsubscribeDone(Context.Guild.Id, "doujinshi"));
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+
         [Command("Download doujinshi", RunMode = RunMode.Async)]
         public async Task GetDownloadDoujinshi(params string[] args)
         {

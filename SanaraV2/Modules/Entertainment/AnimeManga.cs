@@ -16,7 +16,6 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Features.Entertainment;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Entertainment

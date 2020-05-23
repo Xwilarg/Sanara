@@ -13,7 +13,6 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -22,24 +21,24 @@ using System.Xml;
 
 namespace SanaraV2.Subscription
 {
-    public class AnimeSubscription
+    public class AnimeSubscription : ASubscription
     {
         public AnimeSubscription()
         {
             var feed = GetAnimeFeedAsync().GetAwaiter().GetResult();
             if (feed.Length > 0)
-                currName = GetAttribute(feed[0], "title");
+                Current = GetAttribute(feed[0], "title").GetHashCode();
             else
-                currName = null;
+                Current = 0;
         }
 
-        public async Task<List<AnimeData>> GetAnimes()
+        protected override async Task<(int, EmbedBuilder)[]> GetFeed()
         {
-            List<AnimeData> data = new List<AnimeData>();
+            List<(int, EmbedBuilder)> data = new List<(int, EmbedBuilder)>();
             foreach (var node in await GetAnimeFeedAsync())
             {
                 string title = GetAttribute(node, "title");
-                if (title == currName)
+                if (title.GetHashCode() == Current)
                     break;
                 string animeName = Regex.Match(title, "(^.+) #[1-9]+$").Groups[1].Value;
                 string description = "";
@@ -49,45 +48,16 @@ namespace SanaraV2.Subscription
                 {
                     description = result.answer.synopsis;
                 }
-                data.Add(new AnimeData
+                data.Add((title.GetHashCode(), new EmbedBuilder
                 {
-                    name = title,
-                    pageUrl = GetAttribute(node, "guid"),
-                    previewUrl = GetAttribute(node, "media:thumbnail", "url"),
-                    description = description
-                });
+                    Color = Color.Blue,
+                    Title = title,
+                    Description = description,
+                    Url = GetAttribute(node, "guid"),
+                    ImageUrl = GetAttribute(node, "media:thumbnail", "url")
+                }));
             }
-            return data;
-        }
-
-        public async Task UpdateChannelAsync()
-        {
-            var data = await GetAnimes();
-            if (data.Count > 0)
-            {
-                currName = data[0].name;
-                for (int i = Program.p.db.AnimeSubscription.Count - 1; i >= 0; i--)
-                {
-                    try
-                    {
-                        foreach (var elem in data)
-                        {
-                            await Program.p.db.AnimeSubscription[i].SendMessageAsync("", false, new EmbedBuilder
-                            {
-                                Color = Color.Blue,
-                                Title = elem.name,
-                                Description = elem.description,
-                                Url = elem.pageUrl,
-                                ImageUrl = elem.previewUrl
-                            }.Build());
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
-                    }
-                }
-            }
+            return data.ToArray();
         }
 
         private string GetAttribute(XmlNode node, string name, string attribute = null)
@@ -117,14 +87,6 @@ namespace SanaraV2.Subscription
             }
             return nodes.ToArray();
         }
-
-        public string GetCurrName()
-            => currName;
-
-        public void SetCurrName(string value) // For unit tests only
-            => currName = value;
-
-        private string currName;
 
         public struct AnimeData
         {

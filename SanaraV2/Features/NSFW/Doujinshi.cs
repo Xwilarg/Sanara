@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
@@ -29,6 +30,29 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Doujinshi
     {
+
+        public static async Task<FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args)
+        {
+            string channel = string.Join(" ", args);
+            if (channel.Length == 0)
+                return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(null, Entertainment.Error.Subscribe.Help);
+            ITextChannel chan = await Utilities.GetTextChannelAsync(channel, guild);
+            if (chan == null)
+                return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(null, Entertainment.Error.Subscribe.InvalidChannel);
+            await db.AddAnimeSubscription(chan);
+            return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(new Entertainment.Response.Subscribe
+            {
+                chan = chan
+            }, Entertainment.Error.Subscribe.None);
+        }
+
+        public static async Task<FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
+        {
+            if (!await db.RemoveAnimeSubscription(guild))
+                return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(null, Entertainment.Error.Unsubscribe.NoSubscription);
+            return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(new Entertainment.Response.Unsubscribe(), Entertainment.Error.Unsubscribe.None);
+        }
+
         public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownloadDoujinshi(bool isChanSafe, string[] id, Func<Task> onReadyCallback)
         {
             if (isChanSafe)

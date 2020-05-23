@@ -352,7 +352,9 @@
     <Compile Include="Modules\Entertainment\Xkcd.cs" />
     <Compile Include="Modules\Entertainment\YouTube.cs" />
     <Compile Include="Subscription\AnimeSubscription.cs" />
+    <Compile Include="Subscription\ASubscription.cs" />
     <Compile Include="Subscription\SubscriptionManager.cs" />
+    <Compile Include="Subscription\NHentaiSubscription.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
