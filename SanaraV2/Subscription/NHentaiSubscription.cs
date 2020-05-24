@@ -24,14 +24,14 @@ namespace SanaraV2.Subscription
             {
                 Color = new Color(255, 20, 147),
                 Title = x.prettyTitle,
-                Description = string.Join(", ", x.tags),
+                Description = string.Join(", ", x.tags.Select(x => x.name)),
                 Url = x.url.ToString(),
                 ImageUrl = x.pages[0].imageUrl.ToString(),
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = Modules.NSFW.Sentences.ClickFull(0) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(0, x.id.ToString())
                 }
-            })).ToArray();
+            })).Reverse().ToArray();
         }
 
         public struct NHentaiData
