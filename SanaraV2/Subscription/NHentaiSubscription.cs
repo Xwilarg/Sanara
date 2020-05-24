@@ -24,7 +24,7 @@ namespace SanaraV2.Subscription
             {
                 Color = new Color(255, 20, 147),
                 Title = x.prettyTitle,
-                Description = string.Join(", ", x.tags.Select(x => x.name)),
+                Description = string.Join(", ", x.tags.Select(y => y.name)),
                 Url = x.url.ToString(),
                 ImageUrl = x.pages[0].imageUrl.ToString(),
                 Footer = new EmbedFooterBuilder()
