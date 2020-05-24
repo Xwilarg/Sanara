@@ -70,7 +70,7 @@ namespace SanaraV2.Subscription
 
         public string[] othersFetichisms = new[] // Others fetichisms that may seams strange from the outside
         {
-            "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification"
+            "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification", "urination", "piss drinking"
         };
 
         public string[] yaoi = new[] // I'm just making the baseless assumption that you are an heterosexual male, if that's not the case sorry :( - (You can enable it back anyway)
