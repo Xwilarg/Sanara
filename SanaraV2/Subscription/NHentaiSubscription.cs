@@ -1,6 +1,7 @@
 ﻿using Discord;
 using NHentaiSharp.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,18 +21,27 @@ namespace SanaraV2.Subscription
         public override async Task<(int, EmbedBuilder)[]> GetFeed()
         {
             var datas = await SearchClient.SearchAsync();
-            return datas.elements.Select(x => ((int)x.id, new EmbedBuilder
+            List<(int, EmbedBuilder)> allDoujins = new List<(int, EmbedBuilder)>();
+            foreach (var x in datas.elements)
             {
-                Color = new Color(255, 20, 147),
-                Title = x.prettyTitle,
-                Description = string.Join(", ", x.tags.Select(y => y.name)),
-                Url = x.url.ToString(),
-                ImageUrl = x.pages[0].imageUrl.ToString(),
-                Footer = new EmbedFooterBuilder()
+                Console.WriteLine(x.id + " == " + Current);
+                if (x.id == Current)
+                    break;
+                allDoujins.Add(((int)x.id, new EmbedBuilder
                 {
-                    Text = Modules.NSFW.Sentences.ClickFull(0) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(0, x.id.ToString())
-                }
-            })).Reverse().ToArray();
+                    Color = new Color(255, 20, 147),
+                    Title = x.prettyTitle,
+                    Description = string.Join(", ", x.tags.Select(y => y.name)),
+                    Url = x.url.ToString(),
+                    ImageUrl = x.pages[0].imageUrl.ToString(),
+                    Footer = new EmbedFooterBuilder()
+                    {
+                        Text = Modules.NSFW.Sentences.ClickFull(0) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(0, x.id.ToString())
+                    }
+                }));
+            }
+            allDoujins.Reverse();
+            return allDoujins.ToArray();
         }
 
         public struct NHentaiData
@@ -70,7 +80,7 @@ namespace SanaraV2.Subscription
 
         public string[] othersFetichisms = new[] // Others fetichisms that may seams strange from the outside
         {
-            "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification", "urination", "piss drinking"
+            "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification", "urination", "piss drinking", "amputee", "giantess"
         };
 
         public string[] yaoi = new[] // I'm just making the baseless assumption that you are an heterosexual male, if that's not the case sorry :( - (You can enable it back anyway)

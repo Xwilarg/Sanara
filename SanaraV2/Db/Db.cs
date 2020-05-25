@@ -100,8 +100,8 @@ namespace SanaraV2.Db
             if (anime != null && anime != "0")
                 AnimeSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
             string nhentai = (string)json.nhentaiSubscription;
-            if (nhentai != null && anime != "0")
-                NHentaiSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
+            if (nhentai != null && nhentai != "0")
+                NHentaiSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(nhentai)));
         }
 
         public async Task AddAnimeSubscription(ITextChannel chan)
