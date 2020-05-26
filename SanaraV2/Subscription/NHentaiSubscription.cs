@@ -18,10 +18,10 @@ namespace SanaraV2.Subscription
                 Current = 0;
         }
 
-        public override async Task<(int, EmbedBuilder)[]> GetFeed()
+        public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()
         {
             var datas = await SearchClient.SearchAsync();
-            List<(int, EmbedBuilder)> allDoujins = new List<(int, EmbedBuilder)>();
+            List<(int, EmbedBuilder, string[])> allDoujins = new List<(int, EmbedBuilder, string[])>();
             foreach (var x in datas.elements)
             {
                 Console.WriteLine(x.id + " == " + Current);
@@ -38,7 +38,7 @@ namespace SanaraV2.Subscription
                     {
                         Text = Modules.NSFW.Sentences.ClickFull(0) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(0, x.id.ToString())
                     }
-                }));
+                }, x.tags.Select(y => y.name).ToArray()));
             }
             allDoujins.Reverse();
             return allDoujins.ToArray();

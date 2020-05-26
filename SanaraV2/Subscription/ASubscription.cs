@@ -7,7 +7,7 @@ namespace SanaraV2.Subscription
 {
     public abstract class ASubscription
     {
-        public abstract Task<(int, EmbedBuilder)[]> GetFeed();
+        public abstract Task<(int, EmbedBuilder, string[])[]> GetFeed();
 
         public async Task UpdateChannelAsync(List<(ITextChannel, SubscriptionTags)> subscriptions)
         {
@@ -21,7 +21,13 @@ namespace SanaraV2.Subscription
                     {
                         foreach (var elem in data)
                         {
-                            await subscriptions[i].Item1.SendMessageAsync("", false, elem.Item2.Build());
+                            var sub = subscriptions[i];
+                            if (sub.Item2 != null)
+                            {
+                                if (!sub.Item2.IsTagValid(elem.Item3))
+                                    continue;
+                            }
+                            await sub.Item1.SendMessageAsync("", false, elem.Item2.Build());
                         }
                     }
                     catch (Exception e)

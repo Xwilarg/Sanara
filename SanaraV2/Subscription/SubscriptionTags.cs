@@ -68,6 +68,23 @@ namespace SanaraV2.Subscription
             return lists.ToArray();
         }
 
+        /// <summary>
+        /// Tag must be in whitelist and not in blacklist
+        /// </summary>
+        /// <returns></returns>
+        public bool IsTagValid(string[] tags)
+        {
+            bool isWhitelisted = _whitelist.Length == 0;
+            foreach (string tag in tags)
+            {
+                if (_blacklist.Contains(tag))
+                    return false;
+                if (_whitelist.Contains(tag))
+                    isWhitelisted = true;
+            }
+            return isWhitelisted;
+        }
+
         private static Dictionary<string, string[]> _defaultBlacklist = new Dictionary<string, string[]>
         {
             {

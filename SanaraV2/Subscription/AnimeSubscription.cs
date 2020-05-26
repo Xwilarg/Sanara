@@ -32,9 +32,9 @@ namespace SanaraV2.Subscription
                 Current = 0;
         }
 
-        public override async Task<(int, EmbedBuilder)[]> GetFeed()
+        public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()
         {
-            List<(int, EmbedBuilder)> data = new List<(int, EmbedBuilder)>();
+            List<(int, EmbedBuilder, string[])> data = new List<(int, EmbedBuilder, string[])>();
             foreach (var node in await GetAnimeFeedAsync())
             {
                 string title = GetAttribute(node, "title");
@@ -55,7 +55,7 @@ namespace SanaraV2.Subscription
                     Description = description,
                     Url = GetAttribute(node, "guid"),
                     ImageUrl = GetAttribute(node, "media:thumbnail", "url")
-                }));
+                }, new string[0]));
             }
             return data.ToArray();
         }
