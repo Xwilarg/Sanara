@@ -31,19 +31,20 @@ namespace SanaraV2.Features.NSFW
     public static class Doujinshi
     {
 
-        public static async Task<FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args)
+        public static async Task<FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args, bool isChanSafe)
         {
-            string channel = string.Join(" ", args);
-            if (channel.Length == 0)
-                return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(null, Entertainment.Error.Subscribe.Help);
-            ITextChannel chan = await Utilities.GetTextChannelAsync(channel, guild);
+            if (isChanSafe)
+                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.ChanNotSafe);
+            if (args.Length == 0)
+                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.Help);
+            ITextChannel chan = await Utilities.GetTextChannelAsync(args[0], guild);
             if (chan == null)
-                return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(null, Entertainment.Error.Subscribe.InvalidChannel);
-            await db.AddNHentaiSubscription(chan);
-            return new FeatureRequest<Entertainment.Response.Subscribe, Entertainment.Error.Subscribe>(new Entertainment.Response.Subscribe
+                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
+            await db.AddNHentaiSubscription(chan, Subscription.SubscriptionTags.ParseSubscriptionTags(args.Skip(1).ToArray()));
+            return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(new Entertainment.Response.Subscribe
             {
                 chan = chan
-            }, Entertainment.Error.Subscribe.None);
+            }, Error.Subscribe.None);
         }
 
         public static async Task<FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)

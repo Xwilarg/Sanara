@@ -36,18 +36,22 @@ namespace SanaraV2.Modules.NSFW
             }
             else
             {
-                var result = await Features.NSFW.Doujinshi.Subscribe(Context.Guild, Program.p.db, args);
+                var result = await Features.NSFW.Doujinshi.Subscribe(Context.Guild, Program.p.db, args, !((ITextChannel)Context.Channel).IsNsfw);
                 switch (result.error)
                 {
-                    case Features.Entertainment.Error.Subscribe.Help:
+                    case Features.NSFW.Error.Subscribe.ChanNotSafe:
+                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                        break;
+
+                    case Features.NSFW.Error.Subscribe.Help:
                         await ReplyAsync(Entertainment.Sentences.SubscribeHelp(Context.Guild.Id));
                         break;
 
-                    case Features.Entertainment.Error.Subscribe.InvalidChannel:
+                    case Features.NSFW.Error.Subscribe.InvalidChannel:
                         await ReplyAsync(Entertainment.Sentences.InvalidChannel(Context.Guild.Id));
                         break;
 
-                    case Features.Entertainment.Error.Subscribe.None:
+                    case Features.NSFW.Error.Subscribe.None:
                         await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild.Id, "doujinshi", result.answer.chan));
                         break;
 
