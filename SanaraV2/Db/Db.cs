@@ -33,8 +33,8 @@ namespace SanaraV2.Db
             Languages = new Dictionary<ulong, string>();
             Prefixs = new Dictionary<ulong, string>();
             Availability = new Dictionary<ulong, string>();
-            AnimeSubscription = new List<ITextChannel>();
-            NHentaiSubscription = new List<ITextChannel>();
+            AnimeSubscription = new List<(ITextChannel, Subscription.SubscriptionTags)>();
+            NHentaiSubscription = new List<(ITextChannel, Subscription.SubscriptionTags)>();
             Anonymize = new Dictionary<ulong, bool>();
         }
 
@@ -98,10 +98,10 @@ namespace SanaraV2.Db
                 Anonymize.Add(guild.Id, false);
             string anime = (string)json.animeSubscription;
             if (anime != null && anime != "0")
-                AnimeSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(anime)));
+                AnimeSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(anime)), null));
             string nhentai = (string)json.nhentaiSubscription;
             if (nhentai != null && nhentai != "0")
-                NHentaiSubscription.Add(await guild.GetTextChannelAsync(ulong.Parse(nhentai)));
+                NHentaiSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(nhentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(((string)json.nhentaiSubscriptionTags).Split(' '))));
         }
 
         public async Task AddAnimeSubscription(ITextChannel chan)
@@ -111,17 +111,18 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("animeSubscription", channelIdStr)
                 ).RunAsync(conn);
-            AnimeSubscription.Add(chan);
+            AnimeSubscription.Add((chan, null));
         }
 
-        public async Task AddNHentaiSubscription(ITextChannel chan)
+        public async Task AddNHentaiSubscription(ITextChannel chan, Subscription.SubscriptionTags tags)
         {
             string guildIdStr = chan.GuildId.ToString();
             string channelIdStr = chan.Id.ToString();
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("nhentaiSubscription", channelIdStr)
+                .With("nhentaiSubscriptionTags", tags)
                 ).RunAsync(conn);
-            NHentaiSubscription.Add(chan);
+            NHentaiSubscription.Add((chan, tags));
         }
 
         public async Task<bool> RemoveAnimeSubscription(IGuild guild)
@@ -134,7 +135,7 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("animeSubscription", "0")
                 ).RunAsync(conn);
-            AnimeSubscription.Remove(await guild.GetTextChannelAsync(ulong.Parse(anime)));
+            AnimeSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(anime)), null));
             return true;
         }
 
@@ -148,7 +149,7 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("nhentaiSubscription", "0")
                 ).RunAsync(conn);
-            NHentaiSubscription.Remove(await guild.GetTextChannelAsync(ulong.Parse(hentai)));
+            NHentaiSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(hentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(((string)json.nhentaiSubscriptionTags).Split(' '))));
             return true;
         }
 
@@ -301,7 +302,7 @@ namespace SanaraV2.Db
         public Dictionary<ulong, string> Prefixs { private set; get; }
         public Dictionary<ulong, bool> Anonymize { private set; get; }
         public Dictionary<ulong, string> Availability { private set; get; }
-        public List<ITextChannel> AnimeSubscription { private set; get; } // For each guild, their subscription channel
-        public List<ITextChannel> NHentaiSubscription { private set; get; }
+        public List<(ITextChannel, Subscription.SubscriptionTags)> AnimeSubscription { private set; get; } // For each guild, their subscription channel
+        public List<(ITextChannel, Subscription.SubscriptionTags)> NHentaiSubscription { private set; get; }
     }
 }

@@ -355,6 +355,7 @@
     <Compile Include="Subscription\ASubscription.cs" />
     <Compile Include="Subscription\SubscriptionManager.cs" />
     <Compile Include="Subscription\NHentaiSubscription.cs" />
+    <Compile Include="Subscription\SubscriptionTags.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
