@@ -20,8 +20,8 @@ namespace SanaraV2.Subscription
             List<string> whitelist = new List<string>();
             List<string> blacklist = new List<string>();
             List<string> tagsList = tags.ToList();
-            if (tags.Length > 0 && tagsList[0].ToLower() == "full")
-                tagsList.RemoveAt(0);
+            if (tagsList.Contains("full"))
+                tagsList.Remove("full");
             else
             {
                 foreach (var elem in _defaultBlacklist)
@@ -36,23 +36,43 @@ namespace SanaraV2.Subscription
             {
                 if (string.IsNullOrWhiteSpace(s))
                     continue;
-                if (s[0] == '+' || s[0] == '-')
+                if (s[0] == '+' || s[0] == '-' || s[0] == '*')
                 {
-                    var arr = s[0] == '+' ? whitelist : blacklist;
-                    var otherArr = s[0] == '+' ? blacklist : whitelist;
                     string tag = string.Join("", s.Skip(1)).ToLower();
-                    List<string> toAdd = new List<string>();
-                    if (_defaultBlacklist.ContainsKey(tag))
+                    if (s[0] == '*')
                     {
-                        toAdd.AddRange(_defaultBlacklist[tag]);
+                        List<string> toAdd = new List<string>();
+                        if (_defaultBlacklist.ContainsKey(tag))
+                        {
+                            toAdd.AddRange(_defaultBlacklist[tag]);
+                        }
+                        else
+                            toAdd.Add(tag);
+                        foreach (string t in toAdd)
+                        {
+                            if (whitelist.Contains(t))
+                                whitelist.Remove(t);
+                            if (blacklist.Contains(t))
+                                blacklist.Remove(t);
+                        }
                     }
                     else
-                        toAdd.Add(tag);
-                    foreach (string t in toAdd)
                     {
-                        if (otherArr.Contains(t))
-                            otherArr.Remove(t);
-                        arr.Add(t);
+                        var arr = s[0] == '+' ? whitelist : blacklist;
+                        var otherArr = s[0] == '+' ? blacklist : whitelist;
+                        List<string> toAdd = new List<string>();
+                        if (_defaultBlacklist.ContainsKey(tag))
+                        {
+                            toAdd.AddRange(_defaultBlacklist[tag]);
+                        }
+                        else
+                            toAdd.Add(tag);
+                        foreach (string t in toAdd)
+                        {
+                            if (otherArr.Contains(t))
+                                otherArr.Remove(t);
+                            arr.Add(t);
+                        }
                     }
                 }
                 else
