@@ -37,6 +37,7 @@ namespace SanaraV2.Modules.Tools
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
             IUserMessage message = null;
             string content = string.Join(" ", args);
+            string oldContent = content;
             var result = await Features.Tools.Communication.Complete(args,
                 (e) =>
                 {
@@ -91,7 +92,7 @@ namespace SanaraV2.Modules.Tools
                         while (content != null)
                         {
                             await Task.Delay(2000);
-                            if (content != null)
+                            if (content != null && oldContent != content)
                             {
                                 await message.ModifyAsync(x => x.Embed = new EmbedBuilder
                                 {
@@ -99,6 +100,7 @@ namespace SanaraV2.Modules.Tools
                                     Description = content
                                 }.Build());
                             }
+                            oldContent = content;
                         }
                     });
                     break;
