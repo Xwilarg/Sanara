@@ -180,7 +180,7 @@ namespace SanaraV2.Modules.Tools
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleVisibility")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleUnfriend");
                 if (isServerOwner)
-                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleSaveAll");
+                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleSaveAll");
                 return str;
             }
             return Base.Sentences.NotAvailable(guildId);

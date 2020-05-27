@@ -162,6 +162,8 @@ namespace SanaraV2.Modules.NSFW
         [Command("Download"), Priority(-1)]
         public async Task GetDownloadDefault(params string[] _)
         {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             await ReplyAsync(Sentences.DownloadHelp(Context.Guild.Id));
         }
 
