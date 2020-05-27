@@ -17,6 +17,12 @@ namespace SanaraV2.Features.Tools
 {
     public static class Error
     {
+        public enum Complete
+        {
+            None,
+            Help
+        }
+
         public enum Kanji
         {
             None,

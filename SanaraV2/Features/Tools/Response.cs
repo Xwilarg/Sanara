@@ -20,6 +20,9 @@ namespace SanaraV2.Features.Tools
 {
     public static class Response
     {
+        public class Complete
+        { }
+
         public class Kanji
         {
             public char kanji;

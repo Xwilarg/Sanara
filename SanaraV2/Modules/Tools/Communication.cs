@@ -30,6 +30,84 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        [Command("Complete", RunMode = RunMode.Async)]
+        public async Task Complete(params string[] args)
+        {
+            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            IUserMessage message = null;
+            string content = string.Join(" ", args);
+            var result = await Features.Tools.Communication.Complete(args,
+                (e) =>
+                {
+                    content += " " + e;
+                },
+                (e) =>
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Color = Color.Red,
+                        Description = e
+                    }.Build();
+                    if (message != null)
+                    {
+                        message.ModifyAsync(x => x.Embed = embed).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        ReplyAsync("", false, embed).GetAwaiter().GetResult();
+                    }
+                },
+                () =>
+                {
+                    if (message != null)
+                    {
+                        message.ModifyAsync(x => x.Embed = new EmbedBuilder
+                        {
+                            Color = Color.Blue,
+                            Description = content,
+                            Footer = new EmbedFooterBuilder
+                            {
+                                Text = "Done"
+                            }
+                        }.Build()).GetAwaiter().GetResult();
+                    }
+                    content = null;
+                });
+            switch (result.error)
+            {
+                case Features.Tools.Error.Complete.Help:
+                    await ReplyAsync(Sentences.TranslateHelp(Context.Guild.Id));
+                    break;
+
+                case Features.Tools.Error.Complete.None:
+                    message = await ReplyAsync("", false, new EmbedBuilder
+                    {
+                        Color = Color.Blue,
+                        Description = content
+                    }.Build());
+                    await Task.Run(async () =>
+                    {
+                        while (content != null)
+                        {
+                            await Task.Delay(2000);
+                            if (content != null)
+                            {
+                                await message.ModifyAsync(x => x.Embed = new EmbedBuilder
+                                {
+                                    Color = Color.Blue,
+                                    Description = content
+                                }.Build());
+                            }
+                        }
+                    });
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         [Command("Calc")]
         public async Task Calc(params string[] args)
         {

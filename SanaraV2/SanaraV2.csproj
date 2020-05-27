@@ -249,6 +249,9 @@
     <Reference Include="VndbSharp">
       <HintPath>..\SanaraV2\VndbSharp.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Community\Achievement.cs" />
@@ -279,6 +282,7 @@
     <Compile Include="Features\NSFW\Error.cs" />
     <Compile Include="Features\NSFW\Response.cs" />
     <Compile Include="Features\Tools\Code.cs" />
+    <Compile Include="Features\Tools\Communication.cs" />
     <Compile Include="Features\Tools\Error.cs" />
     <Compile Include="Features\Tools\Linguist.cs" />
     <Compile Include="Features\Tools\Response.cs" />
