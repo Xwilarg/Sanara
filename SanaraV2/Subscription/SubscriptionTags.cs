@@ -147,7 +147,7 @@ namespace SanaraV2.Subscription
             {
                 "othersFetichisms", new[] // Others fetichisms that may seams strange from the outside
                 {
-                    "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification", "urination", "piss drinking", "amputee", "giantess"
+                    "birth", "bbm", "ssbbw", "inflation", "smell", "futanari", "omorashi", "bestiality", "body modification", "urination", "piss drinking", "amputee", "giantess", "bbw"
                 }
             },
             {
