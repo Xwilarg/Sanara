@@ -31,19 +31,29 @@ namespace SanaraV2.Features.NSFW
     public static class Doujinshi
     {
 
-        public static async Task<FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args, bool isChanSafe)
+        public static async Task<FeatureRequest<Response.Subscribe, Error.Subscribe>> Subscribe(IGuild guild, Db.Db db, string[] args, bool isChanSafe)
         {
             if (isChanSafe)
-                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.ChanNotSafe);
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.ChanNotSafe);
             if (args.Length == 0)
-                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.Help);
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.Help);
             ITextChannel chan = await Utilities.GetTextChannelAsync(args[0], guild);
             if (chan == null)
-                return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
-            await db.AddNHentaiSubscription(chan, Subscription.SubscriptionTags.ParseSubscriptionTags(args.Skip(1).ToArray()));
-            return new FeatureRequest<Entertainment.Response.Subscribe, Error.Subscribe>(new Entertainment.Response.Subscribe
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
+            Subscription.SubscriptionTags sub;
+            try
             {
-                chan = chan
+                sub = Subscription.SubscriptionTags.ParseSubscriptionTags(args.Skip(1).ToArray());
+                await db.AddNHentaiSubscription(chan, sub);
+            }
+            catch (ArgumentException)
+            {
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.Help);
+            }
+            return new FeatureRequest<Response.Subscribe, Error.Subscribe>(new Response.Subscribe
+            {
+                chan = chan,
+                subscription = sub
             }, Error.Subscribe.None);
         }
 

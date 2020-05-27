@@ -24,7 +24,6 @@ namespace SanaraV2.Subscription
             List<(int, EmbedBuilder, string[])> allDoujins = new List<(int, EmbedBuilder, string[])>();
             foreach (var x in datas.elements)
             {
-                Console.WriteLine(x.id + " == " + Current);
                 if (x.id == Current)
                     break;
                 allDoujins.Add(((int)x.id, new EmbedBuilder

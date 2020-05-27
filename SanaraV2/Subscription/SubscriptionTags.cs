@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SanaraV2.Subscription
@@ -8,14 +9,18 @@ namespace SanaraV2.Subscription
         private string[] _whitelist;
         private string[] _blacklist;
 
+        public string GetWhitelistTags()
+            => _whitelist.Length > 0 ? "`" + string.Join(", ", _whitelist) + "`" : "None";
+
+        public string GetBlacklistTags()
+            => _blacklist.Length > 0 ? "`" + string.Join(", ", _blacklist) + "`" : "None";
+
         public static SubscriptionTags ParseSubscriptionTags(string[] tags)
         {
-            if (tags.Length == 0)
-                return new SubscriptionTags();
             List<string> whitelist = new List<string>();
             List<string> blacklist = new List<string>();
             List<string> tagsList = tags.ToList();
-            if (tagsList[0].ToLower() == "full")
+            if (tags.Length > 0 && tagsList[0].ToLower() == "full")
                 tagsList.RemoveAt(0);
             else
             {
@@ -50,6 +55,8 @@ namespace SanaraV2.Subscription
                         arr.Add(t);
                     }
                 }
+                else
+                    throw new ArgumentException("Your tag must begin by + or -");
             }
             return new SubscriptionTags
             {

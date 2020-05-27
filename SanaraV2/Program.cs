@@ -554,9 +554,10 @@ namespace SanaraV2
                     string part1 = "";
                     string part2 = "";
                     int partId = 0;
+                    char last = ' ';
                     foreach (char c in s)
                     {
-                        if (c == '"')
+                        if (c == '"' && last != '\\')
                             partId++;
                         else
                         {
@@ -565,6 +566,7 @@ namespace SanaraV2
                             else if (partId == 3)
                                 part2 += c;
                         }
+                        last = c;
                     }
                     if (part1 != "" && part2 != "")
                     {

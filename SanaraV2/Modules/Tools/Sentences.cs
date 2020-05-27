@@ -191,8 +191,11 @@ namespace SanaraV2.Modules.Tools
             {
                 if (isChanNsfw)
                     return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadCosplay");
-                // + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo");
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadCosplay")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleSubscribe")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleUnsubscribe") + Environment.NewLine + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanationsIntro")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations") + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations2")
+                        + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations3") + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations4");
                 else
                     return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*";
             }

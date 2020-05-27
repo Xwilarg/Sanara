@@ -101,7 +101,7 @@ namespace SanaraV2.Db
                 AnimeSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(anime)), null));
             string nhentai = (string)json.nhentaiSubscription;
             if (nhentai != null && nhentai != "0")
-                NHentaiSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(nhentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(((string)json.nhentaiSubscriptionTags).Split(' '))));
+                NHentaiSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(nhentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(json.nhentaiSubscriptionTags.ToObject<string[]>())));
         }
 
         public async Task AddAnimeSubscription(ITextChannel chan)
@@ -120,7 +120,7 @@ namespace SanaraV2.Db
             string channelIdStr = chan.Id.ToString();
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("nhentaiSubscription", channelIdStr)
-                .With("nhentaiSubscriptionTags", tags)
+                .With("nhentaiSubscriptionTags", tags.ToStringArray())
                 ).RunAsync(conn);
             NHentaiSubscription.Add((chan, tags));
         }
@@ -149,7 +149,7 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("nhentaiSubscription", "0")
                 ).RunAsync(conn);
-            NHentaiSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(hentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(((string)json.nhentaiSubscriptionTags).Split(' '))));
+            NHentaiSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(hentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(json.nhentaiSubscriptionTags.ToObject<string[]>())));
             return true;
         }
 

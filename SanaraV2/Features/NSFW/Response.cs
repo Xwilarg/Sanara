@@ -19,6 +19,12 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Response
     {
+        public class Subscribe
+        {
+            public ITextChannel chan;
+            public Subscription.SubscriptionTags subscription;
+        }
+
         public class Download
         {
             public string directoryPath;

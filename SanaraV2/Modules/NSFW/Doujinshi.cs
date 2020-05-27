@@ -25,11 +25,11 @@ namespace SanaraV2.Modules.NSFW
         Program p = Program.p;
 
 
-        [Command("Subscribe Doujinshi")]
+        [Command("Subscribe Doujinshi"), Alias("Subscribe doujin", "Subscribe nhentai")]
         public async Task Subscribe(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
@@ -44,7 +44,7 @@ namespace SanaraV2.Modules.NSFW
                         break;
 
                     case Features.NSFW.Error.Subscribe.Help:
-                        await ReplyAsync(Entertainment.Sentences.SubscribeHelp(Context.Guild.Id));
+                        await ReplyAsync(Sentences.SubscribeNHentaiHelp(Context.Guild.Id));
                         break;
 
                     case Features.NSFW.Error.Subscribe.InvalidChannel:
@@ -52,7 +52,9 @@ namespace SanaraV2.Modules.NSFW
                         break;
 
                     case Features.NSFW.Error.Subscribe.None:
-                        await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild.Id, "doujinshi", result.answer.chan));
+                        await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild.Id, "doujinshi", result.answer.chan) + Environment.NewLine
+                            + Sentences.Blacklist(Context.Guild.Id) + result.answer.subscription.GetBlacklistTags() + Environment.NewLine
+                            + Sentences.Whitelist(Context.Guild.Id) + result.answer.subscription.GetWhitelistTags());
                         break;
 
                     default:
@@ -61,11 +63,11 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        [Command("Unsubscribe Doujinshi")]
+        [Command("Unsubscribe Doujinshi"), Alias("Unsubscribe doujin", "Unsubscribe nhentai")]
         public async Task Unsubcribe(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.AnimeManga);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.AnimeManga);
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
 
             if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
             {

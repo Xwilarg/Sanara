@@ -40,5 +40,8 @@ namespace SanaraV2.Modules.NSFW
         public static string DownloadDoujinshiNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadDoujinshiNotFound")); }
         public static string DownloadCosplayNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "downloadCosplayNotFound")); }
         public static string DeleteTime(ulong guildId, string time) { return (Translation.GetTranslation(guildId, "deleteTime", time)); }
+        public static string SubscribeNHentaiHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "subscribeNHentaiHelp")); }
+        public static string Blacklist(ulong guildId) { return (Translation.GetTranslation(guildId, "blacklist")); }
+        public static string Whitelist(ulong guildId) { return (Translation.GetTranslation(guildId, "whitelist")); }
     }
 }
