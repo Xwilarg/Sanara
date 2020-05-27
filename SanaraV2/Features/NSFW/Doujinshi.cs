@@ -40,6 +40,8 @@ namespace SanaraV2.Features.NSFW
             ITextChannel chan = await Utilities.GetTextChannelAsync(args[0], guild);
             if (chan == null)
                 return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.InvalidChannel);
+            if (!chan.IsNsfw)
+                return new FeatureRequest<Response.Subscribe, Error.Subscribe>(null, Error.Subscribe.DestChanNotSafe);
             Subscription.SubscriptionTags sub;
             try
             {
@@ -57,11 +59,13 @@ namespace SanaraV2.Features.NSFW
             }, Error.Subscribe.None);
         }
 
-        public static async Task<FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db)
+        public static async Task<FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>> Unsubscribe(IGuild guild, Db.Db db, bool isChanSafe)
         {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(null, Error.Unsubscribe.ChanNotSafe);
             if (!await db.RemoveNHentaiSubscription(guild))
-                return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(null, Entertainment.Error.Unsubscribe.NoSubscription);
-            return new FeatureRequest<Entertainment.Response.Unsubscribe, Entertainment.Error.Unsubscribe>(new Entertainment.Response.Unsubscribe(), Entertainment.Error.Unsubscribe.None);
+                return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(null, Error.Unsubscribe.NoSubscription);
+            return new FeatureRequest<Response.Unsubscribe, Error.Unsubscribe>(new Response.Unsubscribe(), Error.Unsubscribe.None);
         }
 
         public static async Task<FeatureRequest<Response.Download, Error.Download>> SearchDownloadDoujinshi(bool isChanSafe, string[] id, Func<Task> onReadyCallback)

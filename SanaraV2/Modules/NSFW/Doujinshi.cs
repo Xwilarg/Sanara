@@ -43,6 +43,10 @@ namespace SanaraV2.Modules.NSFW
                         await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                         break;
 
+                    case Features.NSFW.Error.Subscribe.DestChanNotSafe:
+                        await ReplyAsync(Sentences.SubscribeSafeDestination(Context.Guild.Id));
+                        break;
+
                     case Features.NSFW.Error.Subscribe.Help:
                         await ReplyAsync(Sentences.SubscribeNHentaiHelp(Context.Guild.Id));
                         break;
@@ -68,22 +72,25 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-
             if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
             {
                 await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
             }
             else
             {
-                var result = await Features.NSFW.Doujinshi.Unsubscribe(Context.Guild, Program.p.db);
+                var result = await Features.NSFW.Doujinshi.Unsubscribe(Context.Guild, Program.p.db, !((ITextChannel)Context.Channel).IsNsfw);
                 switch (result.error)
                 {
-                    case Features.Entertainment.Error.Unsubscribe.NoSubscription:
+                    case Features.NSFW.Error.Unsubscribe.NoSubscription:
                         await ReplyAsync(Entertainment.Sentences.NoSubscription(Context.Guild.Id));
                         break;
 
-                    case Features.Entertainment.Error.Unsubscribe.None:
+                    case Features.NSFW.Error.Unsubscribe.None:
                         await ReplyAsync(Entertainment.Sentences.UnsubscribeDone(Context.Guild.Id, "doujinshi"));
+                        break;
+
+                    case Features.NSFW.Error.Unsubscribe.ChanNotSafe:
+                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
                         break;
 
                     default:

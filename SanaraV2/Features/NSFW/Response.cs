@@ -19,6 +19,9 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Response
     {
+        public class Unsubscribe
+        { }
+
         public class Subscribe
         {
             public ITextChannel chan;

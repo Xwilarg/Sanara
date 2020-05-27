@@ -17,12 +17,20 @@ namespace SanaraV2.Features.NSFW
 {
     public static class Error
     {
+        public enum Unsubscribe
+        {
+            None,
+            NoSubscription,
+            ChanNotSafe
+        }
+
         public enum Subscribe
         {
             None,
             Help,
             InvalidChannel,
-            ChanNotSafe
+            ChanNotSafe,
+            DestChanNotSafe
         }
 
         public enum Download
