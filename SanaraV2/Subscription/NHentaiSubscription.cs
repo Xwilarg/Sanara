@@ -39,7 +39,6 @@ namespace SanaraV2.Subscription
                     }
                 }, x.tags.Select(y => y.name).ToArray()));
             }
-            allDoujins.Reverse();
             return allDoujins.ToArray();
         }
 

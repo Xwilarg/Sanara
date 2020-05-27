@@ -286,7 +286,7 @@ namespace SanaraV2.Modules.Tools
             embed.AddField("Doujinshi Subscription Channel", await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild));
             embed.AddField("Profile Count", Program.p.cm.GetProfileCount(), true);
             embed.AddField("Anime Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
-            embed.AddField("Doujinshi Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
+            embed.AddField("Doujinshi Subscription Count", Program.p.db.NHentaiSubscription.Count(), true);
             embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
             foreach (var elem in Program.p.allLanguages)
