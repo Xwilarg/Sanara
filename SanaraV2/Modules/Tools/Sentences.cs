@@ -45,6 +45,7 @@ namespace SanaraV2.Modules.Tools
         public static string PollTooManyChoices(ulong guildId) { return (Translation.GetTranslation(guildId, "pollTooManyChoices")); }
         public static string InvalidCalc(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidCalc")); }
         public static string CompleteHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "completeHelp")); }
+        public static string CompleteWait(ulong guildId) { return (Translation.GetTranslation(guildId, "completeWait")); }
 
         /// --------------------------- Information ---------------------------
         public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }

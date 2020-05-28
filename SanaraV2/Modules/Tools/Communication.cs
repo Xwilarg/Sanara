@@ -66,11 +66,7 @@ namespace SanaraV2.Modules.Tools
                         message.ModifyAsync(x => x.Embed = new EmbedBuilder
                         {
                             Color = Color.Blue,
-                            Description = content,
-                            Footer = new EmbedFooterBuilder
-                            {
-                                Text = "Done"
-                            }
+                            Description = content
                         }.Build()).GetAwaiter().GetResult();
                     }
                     content = null;
@@ -85,7 +81,11 @@ namespace SanaraV2.Modules.Tools
                     message = await ReplyAsync("", false, new EmbedBuilder
                     {
                         Color = Color.Blue,
-                        Description = content
+                        Description = content,
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = Sentences.CompleteWait(Context.Guild.Id)
+                        }
                     }.Build());
                     await Task.Run(async () =>
                     {
@@ -97,7 +97,11 @@ namespace SanaraV2.Modules.Tools
                                 await message.ModifyAsync(x => x.Embed = new EmbedBuilder
                                 {
                                     Color = Color.Blue,
-                                    Description = content
+                                    Description = content,
+                                    Footer = new EmbedFooterBuilder
+                                    {
+                                        Text = Sentences.CompleteWait(Context.Guild.Id)
+                                    }
                                 }.Build());
                             }
                             oldContent = content;
