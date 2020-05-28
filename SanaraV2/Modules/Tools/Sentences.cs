@@ -44,6 +44,7 @@ namespace SanaraV2.Modules.Tools
         public static string PollHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "pollHelp")); }
         public static string PollTooManyChoices(ulong guildId) { return (Translation.GetTranslation(guildId, "pollTooManyChoices")); }
         public static string InvalidCalc(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidCalc")); }
+        public static string CompleteHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "completeHelp")); }
 
         /// --------------------------- Information ---------------------------
         public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }
@@ -167,7 +168,7 @@ namespace SanaraV2.Modules.Tools
             {
                 string str = Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll")
-                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleCalc");
+                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleCalc") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleComplete");
                 return str;
             }
             return Base.Sentences.NotAvailable(guildId);

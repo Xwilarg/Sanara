@@ -78,7 +78,7 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Complete.Help:
-                    await ReplyAsync(Sentences.TranslateHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.CompleteHelp(Context.Guild.Id));
                     break;
 
                 case Features.Tools.Error.Complete.None:

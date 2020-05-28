@@ -266,6 +266,7 @@
     <Compile Include="Db\Community.cs" />
     <Compile Include="Db\Db.cs" />
     <Compile Include="Community\Profile.cs" />
+    <Compile Include="Db\Subscription.cs" />
     <Compile Include="ErrorData.cs" />
     <Compile Include="Features\Entertainment\Error.cs" />
     <Compile Include="Features\Entertainment\Response.cs" />
