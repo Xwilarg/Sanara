@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-curl -LO https://download.rethinkdb.com/windows/rethinkdb-2.3.6.zip
+curl -LO https://download.rethinkdb.com/repository/raw/windows/rethinkdb-2.3.6.zip
 yes | unzip rethinkdb-2.3.6.zip
 rm rethinkdb-2.3.6.zip
 mkdir -p SanaraV2\\bin\\Debug\\Saves
