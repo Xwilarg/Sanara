@@ -25,11 +25,12 @@ namespace SanaraV2.Subscription
     {
         public AnimeSubscription()
         {
+            Program.p.db.InitSubscription("anime").GetAwaiter().GetResult();
             var feed = GetAnimeFeedAsync().GetAwaiter().GetResult();
             if (feed.Length > 0)
-                Current = GetAttribute(feed[0], "title").GetHashCode();
+                SetCurrent(GetAttribute(feed[0], "title").GetHashCode()).GetAwaiter().GetResult();
             else
-                Current = 0;
+                SetCurrent(0).GetAwaiter().GetResult();
         }
 
         public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()
@@ -38,7 +39,7 @@ namespace SanaraV2.Subscription
             foreach (var node in await GetAnimeFeedAsync())
             {
                 string title = GetAttribute(node, "title");
-                if (title.GetHashCode() == Current)
+                if (title.GetHashCode() == GetCurrent())
                     break;
                 string animeName = Regex.Match(title, "(^.+) #[1-9]+$").Groups[1].Value;
                 string description = "";
@@ -86,6 +87,16 @@ namespace SanaraV2.Subscription
                     nodes.Add(node);
             }
             return nodes.ToArray();
+        }
+
+        public override async Task SetCurrent(int value)
+        {
+            await Program.p.db.SetCurrent("anime", value);
+        }
+
+        public override int GetCurrent()
+        {
+            return Program.p.db.GetCurrent("anime");
         }
 
         public struct AnimeData

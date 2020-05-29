@@ -14,7 +14,7 @@ namespace SanaraV2.Subscription
             var data = await GetFeed();
             if (data.Length > 0)
             {
-                Current = data[0].Item1;
+                await SetCurrent(data[0].Item1);
                 for (int i = subscriptions.Count - 1; i >= 0; i--)
                 {
                     try
@@ -38,6 +38,8 @@ namespace SanaraV2.Subscription
             }
         }
 
-        public int Current { set; get; }
+        public abstract Task SetCurrent(int value);
+
+        public abstract int GetCurrent();
     }
 }

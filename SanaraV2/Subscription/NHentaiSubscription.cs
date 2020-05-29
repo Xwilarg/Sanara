@@ -11,11 +11,12 @@ namespace SanaraV2.Subscription
     {
         public NHentaiSubscription()
         {
+            Program.p.db.InitSubscription("nhentai").GetAwaiter().GetResult();
             var feed = GetFeed().GetAwaiter().GetResult();
             if (feed.Length > 0)
-                Current = feed[0].Item1;
+                SetCurrent(feed[0].Item1).GetAwaiter().GetResult();
             else
-                Current = 0;
+                SetCurrent(0).GetAwaiter().GetResult();
         }
 
         public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()
@@ -24,7 +25,7 @@ namespace SanaraV2.Subscription
             List<(int, EmbedBuilder, string[])> allDoujins = new List<(int, EmbedBuilder, string[])>();
             foreach (var x in datas.elements)
             {
-                if (x.id == Current)
+                if (x.id == GetCurrent())
                     break;
                 allDoujins.Add(((int)x.id, new EmbedBuilder
                 {
@@ -40,6 +41,16 @@ namespace SanaraV2.Subscription
                 }, x.tags.Select(y => y.name).ToArray()));
             }
             return allDoujins.ToArray();
+        }
+
+        public override async Task SetCurrent(int value)
+        {
+            await Program.p.db.SetCurrent("nhentai", value);
+        }
+
+        public override int GetCurrent()
+        {
+            return Program.p.db.GetCurrent("nhentai");
         }
 
         public struct NHentaiData

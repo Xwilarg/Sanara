@@ -47,8 +47,8 @@ namespace Sanara_UnitTests
         public async Task TestSubscription(Type t)
         {
             var sub = (ASubscription)Activator.CreateInstance(t);
-            Assert.NotEqual(0, sub.Current);
-            sub.Current = 0;
+            Assert.NotEqual(0, sub.GetCurrent());
+            await sub.SetCurrent(0);
             var datas = await sub.GetFeed();
             Assert.NotEmpty(datas);
             var anime = datas[0];

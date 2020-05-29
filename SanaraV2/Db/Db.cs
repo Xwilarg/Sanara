@@ -53,6 +53,7 @@ namespace SanaraV2.Db
                 R.Db(dbName).TableCreate("Profiles").Run(conn);
             if (!await R.Db(dbName).TableList().Contains("Subscriptions").RunAsync<bool>(conn))
                 R.Db(dbName).TableCreate("Subscriptions").Run(conn);
+            InitSubscription();
             await PreloadProfiles();
         }
 
