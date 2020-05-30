@@ -84,7 +84,7 @@ namespace Sanara_UnitTests
             Assert.NotNull(result.answer);
             Assert.True(await IsLinkValid(result.answer.url));
             Assert.InRange(result.answer.compatibility, 80f, 99f);
-            Assert.Contains("はたらく細胞", result.answer.content);
+            Assert.Contains("ご注文はうさぎですか", result.answer.content);
         }
 
         [Fact]
