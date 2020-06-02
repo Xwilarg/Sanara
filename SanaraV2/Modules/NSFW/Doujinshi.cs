@@ -208,7 +208,11 @@ namespace SanaraV2.Modules.NSFW
             Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
             if (Program.p.categories.Count == 2) // Tags not loaded
             {
-                throw new NullReferenceException("An error occurred while loading tags, the command is therefore temporarily unavailable.");
+                await ReplyAsync("", false, new EmbedBuilder {
+                    Description = "An error occurred while loading tags, the command is therefore temporarily unavailable.",
+                    Color = Color.Red
+                }.Build());
+                return;
             }
             await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
             var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand, Program.p.categories);
