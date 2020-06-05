@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Subscription
@@ -36,9 +37,16 @@ namespace SanaraV2.Subscription
             {
                 for (;;)
                 {
-                    await Task.Delay(600000); // 10 minutes
-                    await anime.UpdateChannelAsync(Program.p.db.AnimeSubscription);
-                    await nhentai.UpdateChannelAsync(Program.p.db.NHentaiSubscription);
+                    try
+                    {
+                        await Task.Delay(600000); // 10 minutes
+                            await anime.UpdateChannelAsync(Program.p.db.AnimeSubscription);
+                        await nhentai.UpdateChannelAsync(Program.p.db.NHentaiSubscription);
+                    }
+                    catch (System.Exception e)
+                    {
+                        await Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    }
                 }
             });
         }

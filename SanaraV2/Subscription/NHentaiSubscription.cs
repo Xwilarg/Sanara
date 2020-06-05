@@ -12,11 +12,15 @@ namespace SanaraV2.Subscription
         public NHentaiSubscription()
         {
             Program.p.db.InitSubscription("nhentai").GetAwaiter().GetResult();
-            var feed = GetFeed().GetAwaiter().GetResult();
-            if (feed.Length > 0)
-                SetCurrent(feed[0].Item1).GetAwaiter().GetResult();
-            else
-                SetCurrent(0).GetAwaiter().GetResult();
+            if (GetCurrent() == 0)
+            {
+                var feed = GetFeed().GetAwaiter().GetResult();
+                if (feed.Length > 0)
+                    SetCurrent(feed[0].Item1).GetAwaiter().GetResult();
+                else
+                    SetCurrent(0).GetAwaiter().GetResult();
+            }
+
         }
 
         public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()

@@ -26,11 +26,14 @@ namespace SanaraV2.Subscription
         public AnimeSubscription()
         {
             Program.p.db.InitSubscription("anime").GetAwaiter().GetResult();
-            var feed = GetAnimeFeedAsync().GetAwaiter().GetResult();
-            if (feed.Length > 0)
-                SetCurrent(GetAttribute(feed[0], "title").GetHashCode()).GetAwaiter().GetResult();
-            else
-                SetCurrent(0).GetAwaiter().GetResult();
+            if (GetCurrent() == 0)
+            {
+                var feed = GetAnimeFeedAsync().GetAwaiter().GetResult();
+                if (feed.Length > 0)
+                    SetCurrent(GetAttribute(feed[0], "title").GetHashCode()).GetAwaiter().GetResult();
+                else
+                    SetCurrent(0).GetAwaiter().GetResult();
+            }
         }
 
         public override async Task<(int, EmbedBuilder, string[])[]> GetFeed()

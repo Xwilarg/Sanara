@@ -28,7 +28,7 @@ namespace SanaraV2.Db
 
         private void AddCurrent(string subscription, int value)
         {
-            if (current.ContainsKey(subscription))
+            if (!current.ContainsKey(subscription))
                 current.Add(subscription, value);
             else
                 current = new Dictionary<string, int>(){ { subscription, value } };
