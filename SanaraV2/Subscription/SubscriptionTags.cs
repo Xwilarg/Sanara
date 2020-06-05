@@ -141,7 +141,7 @@ namespace SanaraV2.Subscription
             {
                 "tos", new[] // Tags that are against Discord's Terms of Service (characters that are too young)
                 {
-                    "shota", "lolicon", "oppai loli", "low lolicon", "low shotacon"
+                    "shotacon", "lolicon", "oppai loli", "low lolicon", "low shotacon"
                 }
             },
             {
