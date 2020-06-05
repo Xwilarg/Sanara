@@ -123,7 +123,7 @@ namespace SanaraV2.Subscription
             {
                 "badbehaviour", new[] // Disrespect towards some characters involved
                 {
-                    "rape", "prostitution", "drugs", "cheating", "humiliation", "slave", "possession", "mind control", "body swap", "netorare"
+                    "rape", "prostitution", "drugs", "cheating", "humiliation", "slave", "possession", "mind control", "body swap", "netorare", "blackmail"
                 }
             },
             {
