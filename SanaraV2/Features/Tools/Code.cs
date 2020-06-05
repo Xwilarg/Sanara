@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -26,6 +27,46 @@ namespace SanaraV2.Features.Tools
 {
     public static class Code
     {
+        public static async Task<FeatureRequest<Response.IncreaseSize, Error.IncreaseSize>> IncreaseSize(string[] args, Random rand)
+        {
+            if (args.Length == 0)
+                return new FeatureRequest<Response.IncreaseSize, Error.IncreaseSize>(null, Error.IncreaseSize.Help);
+            string url = string.Join("%20", args);
+            if (!Modules.Base.Utilities.IsImage(url))
+                return new FeatureRequest<Response.IncreaseSize, Error.IncreaseSize>(null, Error.IncreaseSize.InvalidLink);
+            string pathNew = "Saves/" + rand.Next(0, 9999) + DateTime.Now.ToString("HHmmssff") + "new.png";
+            try
+            {
+                using (HttpClient hc = new HttpClient())
+                {
+                    using (Bitmap old = new Bitmap(Image.FromStream(await hc.GetStreamAsync(url))))
+                    {
+                        using (Bitmap bmp = new Bitmap(old.Width * 2, old.Height * 2))
+                        {
+                            for (int x = 0; x < old.Width; x++)
+                                for (int y = 0; y < old.Height; y++)
+                                {
+                                    var pixel = old.GetPixel(x, y);
+                                    bmp.SetPixel(x * 2, y * 2, pixel);
+                                    bmp.SetPixel(x * 2 + 1, y * 2, pixel);
+                                    bmp.SetPixel(x * 2, y * 2 + 1, pixel);
+                                    bmp.SetPixel(x * 2 + 1, y * 2 + 1, pixel);
+                                }
+                            bmp.Save(pathNew);
+                        }
+                    }
+                }
+            }
+            catch (InvalidOperationException) // Invalid URL
+            {
+                return new FeatureRequest<Response.IncreaseSize, Error.IncreaseSize>(null, Error.IncreaseSize.InvalidLink);
+            }
+            return new FeatureRequest<Response.IncreaseSize, Error.IncreaseSize>(new Response.IncreaseSize
+            {
+                path = pathNew
+            }, Error.IncreaseSize.None);
+        }
+
         public static async Task<FeatureRequest<Response.Shell, Error.Shell>> Shell(string[] args)
         {
             if (args.Length == 0)

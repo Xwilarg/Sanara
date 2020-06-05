@@ -64,6 +64,7 @@ namespace SanaraV2.Modules.Tools
         /// --------------------------- Code ---------------------------
         public static string ShellNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "shellNotFound")); }
         public static string ShellHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "shellHelp")); }
+        public static string IncreaseHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "increaseHelp")); }
 
         /// --------------------------- Image ---------------------------
         public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
@@ -160,7 +161,7 @@ namespace SanaraV2.Modules.Tools
         public static string CodeHelp(ulong guildId)
         {
             if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor");
+                return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleIncrease");
             return Base.Sentences.NotAvailable(guildId);
         }
         public static string CommunicationHelp(ulong guildId)

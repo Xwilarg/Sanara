@@ -15,6 +15,7 @@
 using Discord;
 using Discord.Commands;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV2.Modules.Tools
@@ -80,6 +81,33 @@ namespace SanaraV2.Modules.Tools
                         Description = Sentences.Rgb(Context.Guild.Id) + ": " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
                         Sentences.Hex(Context.Guild.Id) + ": #" + result.answer.colorHex
                     }.Build());
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        [Command("Increase", RunMode = RunMode.Async), Summary("Increase the size of an image")]
+        public async Task IncreaseSize(params string[] args)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            if (Context.Message.Attachments.Count > 0)
+                args = new[] { Context.Message.Attachments.ToArray()[0].Url };
+            var result = await Features.Tools.Code.IncreaseSize(args, Program.p.rand);
+            switch (result.error)
+            {
+                case Features.Tools.Error.IncreaseSize.Help:
+                    await ReplyAsync(Sentences.IncreaseHelp(Context.Guild.Id));
+                    break;
+
+                case Features.Tools.Error.IncreaseSize.InvalidLink:
+                    await ReplyAsync(Sentences.NotAnImage(Context.Guild.Id));
+                    break;
+
+                case Features.Tools.Error.IncreaseSize.None:
+                    await Context.Channel.SendFileAsync(result.answer.path);
                     break;
 
                 default:
