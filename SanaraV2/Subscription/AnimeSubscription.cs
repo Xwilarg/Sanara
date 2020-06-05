@@ -48,7 +48,7 @@ namespace SanaraV2.Subscription
                 string description = "";
                 var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, new[] { animeName }, null);
                 if (result.error == Features.Entertainment.Error.AnimeManga.None
-                    && result.answer.name == animeName)
+                    && result.answer.name.ToLower() == animeName.ToLower())
                 {
                     description = result.answer.synopsis;
                 }
