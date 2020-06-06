@@ -44,7 +44,7 @@ namespace SanaraV2.Subscription
                 string title = GetAttribute(node, "title");
                 if (title.GetHashCode() == GetCurrent())
                     break;
-                string animeName = Regex.Match(title, "(^.+) #[1-9]+$").Groups[1].Value;
+                string animeName = Regex.Match(title, "(^.+) #[0-9]+$").Groups[1].Value;
                 string description = "";
                 var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, new[] { animeName }, null);
                 if (result.error == Features.Entertainment.Error.AnimeManga.None
