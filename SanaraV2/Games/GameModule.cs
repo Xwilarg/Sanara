@@ -26,10 +26,10 @@ namespace SanaraV2.Games
 {
     public class GameModule : ModuleBase
     {
-        public static string DisplayHelp(ulong guildId, bool isChanNsfw)
+        public static string DisplayHelp(IGuild guild, bool isChanNsfw)
         {
-            if (!Program.p.db.IsAvailable(guildId, Program.Module.Game))
-                return Modules.Base.Sentences.NotAvailable(guildId);
+            if (guild != null && !Program.p.db.IsAvailable(guild.Id, Program.Module.Game))
+                return Modules.Base.Sentences.NotAvailable(guild);
             List<Tuple<APreload, string>> soloOnly = new List<Tuple<APreload, string>>();
             List<Tuple<APreload, string>> multiOnly = new List<Tuple<APreload, string>>();
             List<Tuple<APreload, string>> both = new List<Tuple<APreload, string>>();
@@ -56,44 +56,44 @@ namespace SanaraV2.Games
             StringBuilder str = new StringBuilder();
             if (soloOnly.Count > 0)
             {
-                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleSoloOnly") + "**");
-                AppendHelp(soloOnly, str, isChanNsfw, guildId);
+                str.AppendLine("**" + Translation.GetTranslation(guild, "gameModuleSoloOnly") + "**");
+                AppendHelp(soloOnly, str, isChanNsfw, guild);
             }
             if (multiOnly.Count > 0)
             {
-                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleMultiOnly") + "**");
-                AppendHelp(multiOnly, str, isChanNsfw, guildId);
+                str.AppendLine("**" + Translation.GetTranslation(guild, "gameModuleMultiOnly") + "**");
+                AppendHelp(multiOnly, str, isChanNsfw, guild);
             }
             if (both.Count > 0)
             {
-                str.AppendLine("**" + Translation.GetTranslation(guildId, "gameModuleBoth") + "**");
-                AppendHelp(both, str, isChanNsfw, guildId);
+                str.AppendLine("**" + Translation.GetTranslation(guild, "gameModuleBoth") + "**");
+                AppendHelp(both, str, isChanNsfw, guild);
             }
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleReset"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleScore"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleJoin"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleLeave"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleStart"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleReset"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleScore"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleJoin"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleLeave"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleStart"));
             str.AppendLine(Environment.NewLine);
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleNote"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleNote"));
             str.AppendLine(Environment.NewLine);
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties2"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties3"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleDifficulties4"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleDifficulties"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleDifficulties2"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleDifficulties3"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleDifficulties4"));
             str.AppendLine(Environment.NewLine);
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleMultiHelp"));
-            str.AppendLine(Translation.GetTranslation(guildId, "gameModuleSoloHelp"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleMultiHelp"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleSoloHelp"));
             if (!isChanNsfw)
-                str.AppendLine(Environment.NewLine + Translation.GetTranslation(guildId, "nsfwForFull"));
+                str.AppendLine(Environment.NewLine + Translation.GetTranslation(guild, "nsfwForFull"));
             return str.ToString();
         }
 
-        private static void AppendHelp(List<Tuple<APreload, string>> dict, StringBuilder str, bool isChanNsfw, ulong guildId)
+        private static void AppendHelp(List<Tuple<APreload, string>> dict, StringBuilder str, bool isChanNsfw, IGuild guild)
         {
             foreach (var game in dict)
                 if (isChanNsfw || (!game.Item1.IsNsfw() && !isChanNsfw))
-                    str.AppendLine(Translation.GetTranslation(guildId, game.Item2));
+                    str.AppendLine(Translation.GetTranslation(guild, game.Item2));
             str.AppendLine(Environment.NewLine);
         }
 
@@ -105,25 +105,40 @@ namespace SanaraV2.Games
         [Command("Join")]
         public async Task Join(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            await ReplyAsync(Program.p.gm.JoinGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id));
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Modules.Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
+            await ReplyAsync(Program.p.gm.JoinGame(Context.Guild, Context.Channel.Id, Context.User.Id));
         }
 
         [Command("Leave")]
         public async Task Leave(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            await ReplyAsync(Program.p.gm.LeaveGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id));
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Modules.Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
+            await ReplyAsync(Program.p.gm.LeaveGame(Context.Guild, Context.Channel.Id, Context.User.Id));
         }
 
         [Command("Start")]
         public async Task Start(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
-            string error = await Program.p.gm.StartGame(Context.Guild.Id, Context.Channel.Id, Context.User.Id);
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Modules.Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
+            string error = await Program.p.gm.StartGame(Context.Guild, Context.Channel.Id, Context.User.Id);
             if (error != null)
                 await ReplyAsync(error);
         }
@@ -131,34 +146,39 @@ namespace SanaraV2.Games
         [Command("Play", RunMode = RunMode.Async)]
         public async Task Play(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
             ITextChannel chan = (ITextChannel)Context.Channel;
             var error = await Program.p.gm.Play(args, chan, Context.User.Id);
             if (error != null)
-                await ReplyAsync(error(Context.Guild.Id));
+                await ReplyAsync(error(Context.Guild));
         }
 
         [Command("Cancel")]
         public async Task Cancel(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
             if (Program.p.gm.Cancel(Context.Channel.Id))
-                await ReplyAsync(Sentences.ResetDone(Context.Guild.Id));
+                await ReplyAsync(Sentences.ResetDone(Context.Guild));
             else
-                await ReplyAsync(Sentences.ResetNone(Context.Guild.Id));
+                await ReplyAsync(Sentences.ResetNone(Context.Guild));
         }
 
         [Command("Score")]
         public async Task Score(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Game);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Game);
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Modules.Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
             var scores = await Program.p.db.GetAllScores();
             if (!scores.Any(x => x.Key == Context.Guild.Id.ToString()))
             {
-                await ReplyAsync(Sentences.NoScore(Context.Guild.Id));
+                await ReplyAsync(Sentences.NoScore(Context.Guild));
                 return;
             }
             var me = scores[Context.Guild.Id.ToString()];
@@ -173,7 +193,7 @@ namespace SanaraV2.Games
                 if (!me.ContainsKey(preload.GetGameName()))
                 {
                     finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
-                       Sentences.NotRanked(Context.Guild.Id) + Environment.NewLine + Environment.NewLine);
+                       Sentences.NotRanked(Context.Guild) + Environment.NewLine + Environment.NewLine);
                     continue;
                 }
                 ranked = true;
@@ -185,8 +205,8 @@ namespace SanaraV2.Games
                 int myRanking = scores.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(gameName) && int.Parse(x.Value[gameName].Split('|')[0]) > myScore).Count() + 1;
                 int bestScore = scores.Where(x => x.Value.ContainsKey(gameName)).Max(x => int.Parse(x.Value[gameName].Split('|')[0]));
                 finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
-                    Sentences.ScoreText(Context.Guild.Id, myRanking, rankedNumber, myScore, bestScore) + Environment.NewLine +
-                    Sentences.ScoreContributors(Context.Guild.Id) + " " + string.Join(", ", contributors) + Environment.NewLine + Environment.NewLine);
+                    Sentences.ScoreText(Context.Guild, myRanking, rankedNumber, myScore, bestScore) + Environment.NewLine +
+                    Sentences.ScoreContributors(Context.Guild) + " " + string.Join(", ", contributors) + Environment.NewLine + Environment.NewLine);
                 finalScore += myScore * 100f / bestScore;
             }
             int myGlobalRanking = 1;
@@ -204,8 +224,8 @@ namespace SanaraV2.Games
                         myGlobalRanking++;
                 }
             }
-            await ReplyAsync((ranked ? Sentences.GlobalRanking(Context.Guild.Id, myGlobalRanking, nbGuilds, finalScore / Constants.allRankedGames.Length)
-                : Sentences.NoGlobalRanking(Context.Guild.Id))+ Environment.NewLine + Environment.NewLine +
+            await ReplyAsync((ranked ? Sentences.GlobalRanking(Context.Guild, myGlobalRanking, nbGuilds, finalScore / Constants.allRankedGames.Length)
+                : Sentences.NoGlobalRanking(Context.Guild)) + Environment.NewLine + Environment.NewLine +
                 finalStr.ToString());
         }
     }
