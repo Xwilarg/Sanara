@@ -29,17 +29,17 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Vn", RunMode = RunMode.Async)]
         public async Task Vndb(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Vn);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Vn);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Vn);
+            await p.DoAction(Context.User, Program.Module.Vn);
             var result = await Vn.SearchVn(args, !((ITextChannel)Context.Channel).IsNsfw);
             switch (result.error)
             {
                 case Error.Vn.Help:
-                    await ReplyAsync(Sentences.VndbHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.VndbHelp(Context.Guild));
                     break;
 
                 case Error.Vn.NotFound:
-                    await ReplyAsync(Sentences.VndbNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.VndbNotFound(Context.Guild));
                     break;
 
                 case Error.Vn.None:
@@ -51,22 +51,22 @@ namespace SanaraV2.Modules.Entertainment
                         Description = result.answer.description,
                         Color = Color.Blue
                     };
-                    embed.AddField(Sentences.AvailableEnglish(Context.Guild.Id), result.answer.isAvailableEnglish ? Base.Sentences.YesStr(Context.Guild.Id) : Base.Sentences.NoStr(Context.Guild.Id), true);
-                    embed.AddField(Sentences.AvailableWindows(Context.Guild.Id), result.answer.isAvailableWindows ? Base.Sentences.YesStr(Context.Guild.Id) : Base.Sentences.NoStr(Context.Guild.Id), true);
-                    string length = Sentences.Unknown(Context.Guild.Id);
+                    embed.AddField(Sentences.AvailableEnglish(Context.Guild), result.answer.isAvailableEnglish ? Base.Sentences.YesStr(Context.Guild) : Base.Sentences.NoStr(Context.Guild), true);
+                    embed.AddField(Sentences.AvailableWindows(Context.Guild), result.answer.isAvailableWindows ? Base.Sentences.YesStr(Context.Guild) : Base.Sentences.NoStr(Context.Guild), true);
+                    string length = Sentences.Unknown(Context.Guild);
                     switch (result.answer.length)
                     {
-                        case VisualNovelLength.VeryShort: length = Sentences.Hours(Context.Guild.Id, "< 2 "); break;
-                        case VisualNovelLength.Short: length = Sentences.Hours(Context.Guild.Id, "2 - 10 "); break;
-                        case VisualNovelLength.Medium: length = Sentences.Hours(Context.Guild.Id, "10 - 30 "); break;
-                        case VisualNovelLength.Long: length = Sentences.Hours(Context.Guild.Id, "30 - 50 "); break;
-                        case VisualNovelLength.VeryLong: length = Sentences.Hours(Context.Guild.Id, "> 50 "); break;
+                        case VisualNovelLength.VeryShort: length = Sentences.Hours(Context.Guild, "< 2 "); break;
+                        case VisualNovelLength.Short: length = Sentences.Hours(Context.Guild, "2 - 10 "); break;
+                        case VisualNovelLength.Medium: length = Sentences.Hours(Context.Guild, "10 - 30 "); break;
+                        case VisualNovelLength.Long: length = Sentences.Hours(Context.Guild, "30 - 50 "); break;
+                        case VisualNovelLength.VeryLong: length = Sentences.Hours(Context.Guild, "> 50 "); break;
                     }
-                    embed.AddField(Sentences.Length(Context.Guild.Id), length, true);
-                    embed.AddField(Sentences.VndbRating(Context.Guild.Id), result.answer.rating + " / 10", true);
+                    embed.AddField(Sentences.Length(Context.Guild), length, true);
+                    embed.AddField(Sentences.VndbRating(Context.Guild), result.answer.rating + " / 10", true);
                     string releaseDate;
                     if (result.answer.releaseYear == null)
-                        releaseDate = Sentences.Tba(Context.Guild.Id);
+                        releaseDate = Sentences.Tba(Context.Guild);
                     else
                     {
                         releaseDate = result.answer.releaseYear.ToString();
@@ -75,7 +75,7 @@ namespace SanaraV2.Modules.Entertainment
                         if (result.answer.releaseDay != null)
                             releaseDate = Utilities.AddZero(result.answer.releaseDay.ToString()) + "/" + releaseDate;
                     }
-                    embed.AddField(Sentences.ReleaseDate(Context.Guild.Id), releaseDate, true);
+                    embed.AddField(Sentences.ReleaseDate(Context.Guild), releaseDate, true);
                     await ReplyAsync("", false, embed.Build());
                     break;
 

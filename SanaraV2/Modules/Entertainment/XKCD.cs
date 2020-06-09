@@ -26,17 +26,17 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Xkcd", RunMode = RunMode.Async), Summary("Give XKCD commic")]
         public async Task XkcdSearch(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Xkcd);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Xkcd);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Xkcd);
+            await p.DoAction(Context.User, Program.Module.Xkcd);
             var result = await Features.Entertainment.Xkcd.SearchXkcd(args, Program.p.rand);
             switch (result.error)
             {
                 case Features.Entertainment.Error.Xkcd.InvalidNumber:
-                    await ReplyAsync(Sentences.XkcdWrongArg(Context.Guild.Id));
+                    await ReplyAsync(Sentences.XkcdWrongArg(Context.Guild));
                     break;
 
                 case Features.Entertainment.Error.Xkcd.NotFound:
-                    await ReplyAsync(Sentences.XkcdWrongId(Context.Guild.Id, result.answer.maxNb));
+                    await ReplyAsync(Sentences.XkcdWrongId(Context.Guild, result.answer.maxNb));
                     break;
 
                 case Features.Entertainment.Error.Xkcd.None:

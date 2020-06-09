@@ -24,21 +24,21 @@ namespace SanaraV2.Modules.Entertainment
         [Command("Youtube"), Summary("Get a random video given some keywords")]
         public async Task YoutubeVideo(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Youtube);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Youtube);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Youtube);
+            await p.DoAction(Context.User, Program.Module.Youtube);
             var result = await Features.Entertainment.YouTube.SearchYouTube(args, Program.p.youtubeService);
             switch (result.error)
             {
                 case Features.Entertainment.Error.YouTube.InvalidApiKey:
-                    await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.NoApiKey(Context.Guild));
                     break;
 
                 case Features.Entertainment.Error.YouTube.Help:
-                    await ReplyAsync(Sentences.YoutubeHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.YoutubeHelp(Context.Guild));
                     break;
 
                 case Features.Entertainment.Error.YouTube.NotFound:
-                    await ReplyAsync(Sentences.YoutubeNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.YoutubeNotFound(Context.Guild));
                     break;
 
                 case Features.Entertainment.Error.YouTube.None:
