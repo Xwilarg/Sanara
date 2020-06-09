@@ -26,17 +26,17 @@ namespace SanaraV2.Modules.Tools
         public async Task Shell(params string[] args)
         {
 
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Program.Module.Code);
             var result = await Features.Tools.Code.Shell(args);
             switch (result.error)
             {
                 case Features.Tools.Error.Shell.Help:
-                    await ReplyAsync(Sentences.ShellHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.ShellHelp(Context.Guild));
                     break;
 
                 case Features.Tools.Error.Shell.NotFound:
-                    await ReplyAsync(Sentences.ShellNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.ShellNotFound(Context.Guild));
                     break;
 
                 case Features.Tools.Error.Shell.None:
@@ -59,17 +59,17 @@ namespace SanaraV2.Modules.Tools
         [Command("Color", RunMode = RunMode.Async), Summary("Display a RGB color")]
         public async Task SearchColor(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Program.Module.Code);
             var result = await Features.Tools.Code.SearchColor(args, Program.p.rand);
             switch (result.error)
             {
                 case Features.Tools.Error.Image.InvalidArg:
-                    await ReplyAsync(Sentences.HelpColor(Context.Guild.Id));
+                    await ReplyAsync(Sentences.HelpColor(Context.Guild));
                     break;
 
                 case Features.Tools.Error.Image.InvalidColor:
-                    await ReplyAsync(Sentences.InvalidColor(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidColor(Context.Guild));
                     break;
 
                 case Features.Tools.Error.Image.None:
@@ -78,8 +78,8 @@ namespace SanaraV2.Modules.Tools
                         Title = result.answer.name,
                         Color = result.answer.discordColor,
                         ImageUrl = result.answer.colorUrl,
-                        Description = Sentences.Rgb(Context.Guild.Id) + ": " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
-                        Sentences.Hex(Context.Guild.Id) + ": #" + result.answer.colorHex
+                        Description = Sentences.Rgb(Context.Guild) + ": " + result.answer.discordColor.R + ", " + result.answer.discordColor.G + ", " + result.answer.discordColor.B + Environment.NewLine +
+                        Sentences.Hex(Context.Guild) + ": #" + result.answer.colorHex
                     }.Build());
                     break;
 
@@ -91,19 +91,19 @@ namespace SanaraV2.Modules.Tools
         [Command("Increase", RunMode = RunMode.Async), Summary("Increase the size of an image")]
         public async Task IncreaseSize(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Code);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Code);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Code);
+            await Program.p.DoAction(Context.User, Program.Module.Code);
             if (Context.Message.Attachments.Count > 0)
                 args = new[] { Context.Message.Attachments.ToArray()[0].Url };
             var result = await Features.Tools.Code.IncreaseSize(args, Program.p.rand);
             switch (result.error)
             {
                 case Features.Tools.Error.IncreaseSize.Help:
-                    await ReplyAsync(Sentences.IncreaseHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.IncreaseHelp(Context.Guild));
                     break;
 
                 case Features.Tools.Error.IncreaseSize.InvalidLink:
-                    await ReplyAsync(Sentences.NotAnImage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.NotAnImage(Context.Guild));
                     break;
 
                 case Features.Tools.Error.IncreaseSize.None:

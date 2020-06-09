@@ -42,11 +42,11 @@ namespace SanaraV2.Modules.Tools
         [Command("Eval"), Summary("Allow to check the value of some variables in runtime")]
         public async Task EvalFct(params string[] args)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild));
             else if (args.Length == 0)
-                await ReplyAsync(Sentences.EvalHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.EvalHelp(Context.Guild));
             else
             {
                 Interpreter interpreter = new Interpreter()
@@ -59,7 +59,7 @@ namespace SanaraV2.Modules.Tools
                 }
                 catch (Exception e)
                 {
-                    await ReplyAsync(Sentences.EvalError(Context.Guild.Id, e.Message));
+                    await ReplyAsync(Sentences.EvalError(Context.Guild, e.Message));
                 }
             }
         }
@@ -67,23 +67,28 @@ namespace SanaraV2.Modules.Tools
         [Command("Language"), Summary("Set the language of the bot for this server")]
         public async Task SetLanguage(params string[] language)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (!CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            await p.DoAction(Context.User, Program.Module.Settings);
+            if (!CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
             }
             else if (language.Length == 0)
-                await ReplyAsync(Sentences.NeedLanguage(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedLanguage(Context.Guild));
             else
             {
                 string nextLanguage = Utilities.AddArgs(language);
                 string lang = Utilities.GetLanguage(nextLanguage);
                 if (lang == null)
-                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidLanguage(Context.Guild));
                 else
                 {
                     await p.db.SetLanguage(Context.Guild.Id, lang);
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                 }
             }
         }
@@ -91,22 +96,27 @@ namespace SanaraV2.Modules.Tools
         [Command("Prefix"), Summary("Set the prefix of the bot for this server")]
         public async Task SetPrefix(params string[] command)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (!CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            await p.DoAction(Context.User, Program.Module.Settings);
+            if (!CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
             }
             else
             {
                 if (command.Length == 0)
                 {
                     await p.db.SetPrefix(Context.Guild.Id, "");
-                    await ReplyAsync(Sentences.PrefixRemoved(Context.Guild.Id));
+                    await ReplyAsync(Sentences.PrefixRemoved(Context.Guild));
                 }
                 else
                 {
                     await p.db.SetPrefix(Context.Guild.Id, Utilities.AddArgs(command));
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                 }
             }
         }
@@ -114,40 +124,45 @@ namespace SanaraV2.Modules.Tools
         [Command("Reload language"), Summary("Reload the language files")]
         public async Task ReloadLanguage()
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
             {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild));
             }
             else
             {
                 p.UpdateLanguageFiles();
-                await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
             }
         }
 
         [Command("Exit"), Summary("Leave the server")]
         public async Task Exit(params string[] args)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
             {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild));
             }
             else
             {
                 if (args.Length == 0)
-                    await Context.Guild.LeaveAsync();
+                {
+                    if (Context.Guild == null)
+                        await ReplyAsync("I can't leave a private conversation.");
+                    else
+                        await Context.Guild.LeaveAsync();
+                }
                 else
                 {
                     string serverName = string.Join(" ", args);
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
                     if (g == null)
-                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild));
                     else
                     {
                         await g.LeaveAsync();
-                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                     }
                 }
             }
@@ -156,28 +171,28 @@ namespace SanaraV2.Modules.Tools
         [Command("ResetDb")]
         public async Task ResetDb(params string[] args)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
+            await p.DoAction(Context.User, Program.Module.Settings);
             if (Context.User.Id != Base.Sentences.ownerId)
             {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild));
             }
             else
             {
                 if (args.Length == 0)
                 {
                     await Program.p.db.ResetGuild(Context.Guild.Id);
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                 }
                 else
                 {
                     string serverName = string.Join(" ", args);
                     IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
                     if (g == null)
-                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild));
                     else
                     {
                         await Program.p.db.ResetGuild(g.Id);
-                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                     }
                 }
             }
@@ -186,28 +201,33 @@ namespace SanaraV2.Modules.Tools
         [Command("Anonymize")]
         public async Task Anonymize(params string[] args)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (!CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            await p.DoAction(Context.User, Program.Module.Settings);
+            if (!CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
             }
             if (args.Length == 0)
             {
                 if (Program.p.db.IsAnonymized(Context.Guild.Id))
-                    await ReplyAsync(Sentences.AnonymizeCurrentTrue(Context.Guild.Id));
+                    await ReplyAsync(Sentences.AnonymizeCurrentTrue(Context.Guild));
                 else
-                    await ReplyAsync(Sentences.AnonymizeCurrentFalse(Context.Guild.Id));
+                    await ReplyAsync(Sentences.AnonymizeCurrentFalse(Context.Guild));
             }
             else
             {
                 if (bool.TryParse(string.Join(" ", args), out bool value))
                 {
                     await Games.GameModule.Anonymize(Context.Guild.Id, value);
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
                 }
                 else
                 {
-                    await ReplyAsync(Sentences.AnonymizeHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.AnonymizeHelp(Context.Guild));
                 }
             }
         }
@@ -222,15 +242,20 @@ namespace SanaraV2.Modules.Tools
 
         private async Task ManageModule(IMessageChannel chan, string[] args, int enable)
         {
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Settings);
-            if (!CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            await p.DoAction(Context.User, Program.Module.Settings);
+            if (!CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
                 return;
             }
             if (args.Length == 0)
             {
-                await chan.SendMessageAsync(Sentences.ModuleManagementHelp(Context.Guild.Id) + " " + GetModuleList(Context.Guild.Id));
+                await chan.SendMessageAsync(Sentences.ModuleManagementHelp(Context.Guild) + " " + GetModuleList());
                 return;
             }
             Program.Module? module = null;
@@ -238,9 +263,9 @@ namespace SanaraV2.Modules.Tools
             if (name == "all") // Enable/Disable all modules at once
             {
                 if (enable == 1 && Program.p.db.AreAllAvailable(Context.Guild.Id))
-                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild.Id));
+                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyEnabled(Context.Guild));
                 else if (enable == 0 && Program.p.db.AreNoneAvailable(Context.Guild.Id))
-                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyDisabled(Context.Guild.Id));
+                    await chan.SendMessageAsync(Sentences.AllModulesAlreadyDisabled(Context.Guild));
                 else
                 {
                     for (Program.Module i = 0; i <= Program.Module.Youtube; i++)
@@ -252,9 +277,9 @@ namespace SanaraV2.Modules.Tools
                         await Program.p.db.SetAvailability(Context.Guild.Id, i, enable);
                     }
                     if (enable == 1)
-                        await chan.SendMessageAsync(Sentences.AllModulesEnabled(Context.Guild.Id));
+                        await chan.SendMessageAsync(Sentences.AllModulesEnabled(Context.Guild));
                     else
-                        await chan.SendMessageAsync(Sentences.AllModulesDisabled(Context.Guild.Id));
+                        await chan.SendMessageAsync(Sentences.AllModulesDisabled(Context.Guild));
                 }
                 return;
             }
@@ -270,25 +295,25 @@ namespace SanaraV2.Modules.Tools
             }
             if (module == null)
             {
-                await chan.SendMessageAsync(Sentences.ModuleManagementInvalid(Context.Guild.Id) + " " + GetModuleList(Context.Guild.Id));
+                await chan.SendMessageAsync(Sentences.ModuleManagementInvalid(Context.Guild) + " " + GetModuleList());
                 return;
             }
             bool availability = Program.p.db.IsAvailable(Context.Guild.Id, module.Value);
             if (availability && enable == 1)
-                await chan.SendMessageAsync(Sentences.ModuleAlreadyEnabled(Context.Guild.Id, module.ToString()));
+                await chan.SendMessageAsync(Sentences.ModuleAlreadyEnabled(Context.Guild, module.ToString()));
             else if (!availability && enable == 0)
-                await chan.SendMessageAsync(Sentences.ModuleAlreadyDisabled(Context.Guild.Id, module.ToString()));
+                await chan.SendMessageAsync(Sentences.ModuleAlreadyDisabled(Context.Guild, module.ToString()));
             else
             {
                 await Program.p.db.SetAvailability(Context.Guild.Id, module.Value, enable);
                 if (enable == 1)
-                    await chan.SendMessageAsync(Sentences.ModuleEnabled(Context.Guild.Id, module.ToString()));
+                    await chan.SendMessageAsync(Sentences.ModuleEnabled(Context.Guild, module.ToString()));
                 else
-                    await chan.SendMessageAsync(Sentences.ModuleDisabled(Context.Guild.Id, module.ToString()));
+                    await chan.SendMessageAsync(Sentences.ModuleDisabled(Context.Guild, module.ToString()));
             }
         }
 
-        private string GetModuleList(ulong guildId)
+        private string GetModuleList()
         {
             string finalStr = ((Program.Module)0).ToString();
             for (Program.Module i = (Program.Module)1; i <= (Program.Module.Youtube - 1); i++)
@@ -297,7 +322,7 @@ namespace SanaraV2.Modules.Tools
                     continue;
                 finalStr += ", " + i.ToString();
             }
-            finalStr += " " + Base.Sentences.OrStr(guildId) + " " + Program.Module.Youtube.ToString();
+            finalStr += " " + Base.Sentences.OrStr(Context.Guild) + " " + Program.Module.Youtube.ToString();
             return finalStr;
         }
     }

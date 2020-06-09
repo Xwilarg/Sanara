@@ -33,8 +33,8 @@ namespace SanaraV2.Modules.Tools
         [Command("Complete", RunMode = RunMode.Async)]
         public async Task Complete(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             IUserMessage message = null;
             string content = string.Join(" ", args);
             string oldContent = content;
@@ -74,7 +74,7 @@ namespace SanaraV2.Modules.Tools
             switch (result.error)
             {
                 case Features.Tools.Error.Complete.Help:
-                    await ReplyAsync(Sentences.CompleteHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.CompleteHelp(Context.Guild));
                     break;
 
                 case Features.Tools.Error.Complete.None:
@@ -84,7 +84,7 @@ namespace SanaraV2.Modules.Tools
                         Description = content,
                         Footer = new EmbedFooterBuilder
                         {
-                            Text = Sentences.CompleteWait(Context.Guild.Id)
+                            Text = Sentences.CompleteWait(Context.Guild)
                         }
                     }.Build());
                     await Task.Run(async () =>
@@ -100,7 +100,7 @@ namespace SanaraV2.Modules.Tools
                                     Description = content,
                                     Footer = new EmbedFooterBuilder
                                     {
-                                        Text = Sentences.CompleteWait(Context.Guild.Id)
+                                        Text = Sentences.CompleteWait(Context.Guild)
                                     }
                                 }.Build());
                             }
@@ -117,8 +117,8 @@ namespace SanaraV2.Modules.Tools
         [Command("Calc")]
         public async Task Calc(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             DataTable table = new DataTable();
             try
             {
@@ -126,27 +126,27 @@ namespace SanaraV2.Modules.Tools
             }
             catch (EvaluateException)
             {
-                await ReplyAsync(Sentences.InvalidCalc(Context.Guild.Id));
+                await ReplyAsync(Sentences.InvalidCalc(Context.Guild));
             }
             catch (SyntaxErrorException)
             {
-                await ReplyAsync(Sentences.InvalidCalc(Context.Guild.Id));
+                await ReplyAsync(Sentences.InvalidCalc(Context.Guild));
             }
         }
 
         [Command("Poll")]
         public async Task Poll(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             if (args.Length < 2)
             {
-                await ReplyAsync(Sentences.PollHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.PollHelp(Context.Guild));
                 return;
             }
             if (args.Length > 10)
             {
-                await ReplyAsync(Sentences.PollTooManyChoices(Context.Guild.Id));
+                await ReplyAsync(Sentences.PollTooManyChoices(Context.Guild));
                 return;
             }
             var emotes = new[] { new Emoji("1️⃣"), new Emoji("2️⃣"), new Emoji("3️⃣"), new Emoji("4️⃣"), new Emoji("5️⃣"), new Emoji("6️⃣"), new Emoji("7️⃣"), new Emoji("8️⃣"), new Emoji("9️⃣") };
@@ -169,8 +169,8 @@ namespace SanaraV2.Modules.Tools
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             IGuildUser user;
             if (command.Length == 0)
                 user = Context.User as IGuildUser;
@@ -179,7 +179,7 @@ namespace SanaraV2.Modules.Tools
                 user = await Utilities.GetUser(Utilities.AddArgs(command), Context.Guild);
                 if (user == null)
                 {
-                    await ReplyAsync(Sentences.UserNotExist(Context.Guild.Id));
+                    await ReplyAsync(Sentences.UserNotExist(Context.Guild));
                     return;
                 }
             }
@@ -189,16 +189,16 @@ namespace SanaraV2.Modules.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             await InfosUser(await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id) as IGuildUser);
         }
 
         [Command("Quote", RunMode = RunMode.Async), Summary("Quote a message")]
         public async Task Quote(params string[] id)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Communication);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Communication);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
             IUser author = (id.Length == 0) ? (null) : (await Utilities.GetUser(string.Join("", id), Context.Guild));
             if (id.Length == 0 || author != null)
             {
@@ -206,12 +206,12 @@ namespace SanaraV2.Modules.Tools
                     author = Context.User;
                 IMessage msg = (await Context.Channel.GetMessagesAsync().FlattenAsync()).Skip(1).ToList().Find(x => x.Author.Id == author.Id);
                 if (msg == null)
-                    await ReplyAsync(Sentences.QuoteNoMessage(Context.Guild.Id));
+                    await ReplyAsync(Sentences.QuoteNoMessage(Context.Guild));
                 else
                     await ReplyAsync("", false, new EmbedBuilder()
                     {
                         Description = msg.Content
-                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)) + " in " + msg.Channel.Name).Build());
+                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild)) + " in " + msg.Channel.Name).Build());
             }
             else
             {
@@ -232,12 +232,12 @@ namespace SanaraV2.Modules.Tools
                     }
                     catch (FormatException)
                     {
-                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild));
                         return;
                     }
                     catch (OverflowException)
                     {
-                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                        await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild));
                         return;
                     }
                     msg = await Context.Channel.GetMessageAsync(uId);
@@ -259,13 +259,13 @@ namespace SanaraV2.Modules.Tools
                     }
                 }
                 if (msg == null)
-                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild.Id));
+                    await ReplyAsync(Sentences.QuoteInvalidId(Context.Guild));
                 else
                 {
                     await ReplyAsync("", false, new EmbedBuilder()
                     {
                         Description = msg.Content
-                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)) + " in " + msg.Channel.Name).Build());
+                    }.WithAuthor(msg.Author.ToString(), msg.Author.GetAvatarUrl()).WithFooter("The " + msg.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild)) + " in " + msg.Channel.Name).Build());
                 }
             }
         }
@@ -287,25 +287,25 @@ namespace SanaraV2.Modules.Tools
                 ImageUrl = user.GetAvatarUrl(),
                 Color = Color.Purple
             };
-            embed.AddField(Sentences.Username(Context.Guild.Id), user.ToString(), true);
+            embed.AddField(Sentences.Username(Context.Guild), user.ToString(), true);
             if (user.Nickname != null)
-                embed.AddField(Sentences.Nickname(Context.Guild.Id), user.Nickname, true);
-            embed.AddField(Sentences.AccountCreation(Context.Guild.Id), user.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
-            embed.AddField(Sentences.GuildJoined(Context.Guild.Id), user.JoinedAt.Value.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
+                embed.AddField(Sentences.Nickname(Context.Guild), user.Nickname, true);
+            embed.AddField(Sentences.AccountCreation(Context.Guild), user.CreatedAt.ToString(Base.Sentences.DateHourFormat(Context.Guild)), true);
+            embed.AddField(Sentences.GuildJoined(Context.Guild), user.JoinedAt.Value.ToString(Base.Sentences.DateHourFormat(Context.Guild)), true);
             if (user == (await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id)))
             {
-                embed.AddField(Sentences.Creator(Context.Guild.Id), "Zirk#0001", true);
-                embed.AddField(Sentences.LatestVersion(Context.Guild.Id), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Base.Sentences.DateHourFormat(Context.Guild.Id)), true);
-                embed.AddField(Sentences.NumberGuilds(Context.Guild.Id), p.client.Guilds.Count, true);
-                embed.AddField(Sentences.Uptime(Context.Guild.Id), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
+                embed.AddField(Sentences.Creator(Context.Guild), "Zirk#0001", true);
+                embed.AddField(Sentences.LatestVersion(Context.Guild), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Base.Sentences.DateHourFormat(Context.Guild)), true);
+                embed.AddField(Sentences.NumberGuilds(Context.Guild), p.client.Guilds.Count, true);
+                embed.AddField(Sentences.Uptime(Context.Guild), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
-                embed.AddField(Sentences.Website(Context.Guild.Id), "https://sanara.zirk.eu");
-                embed.AddField(Sentences.InvitationLink(Context.Guild.Id), "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");
-                embed.AddField(Sentences.OfficialGuild(Context.Guild.Id), "https://discordapp.com/invite/H6wMRYV");
+                embed.AddField(Sentences.Website(Context.Guild), "https://sanara.zirk.eu");
+                embed.AddField(Sentences.InvitationLink(Context.Guild), "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");
+                embed.AddField(Sentences.OfficialGuild(Context.Guild), "https://discordapp.com/invite/H6wMRYV");
                 embed.AddField("Discord Bot List", "https://discordbots.org/bot/329664361016721408");
-                embed.AddField(Sentences.ProfilePicture(Context.Guild.Id), "BlankSensei");
+                embed.AddField(Sentences.ProfilePicture(Context.Guild), "BlankSensei");
             }
-            embed.AddField(Sentences.Roles(Context.Guild.Id), ((roles == "") ? (Sentences.NoRole(Context.Guild.Id)) : (roles)));
+            embed.AddField(Sentences.Roles(Context.Guild), ((roles == "") ? (Sentences.NoRole(Context.Guild)) : (roles)));
             await ReplyAsync("", false, embed.Build());
         }
     }
