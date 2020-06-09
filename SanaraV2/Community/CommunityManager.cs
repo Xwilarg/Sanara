@@ -142,12 +142,12 @@ namespace SanaraV2.Community
             var textChan = (Discord.ITextChannel)chan;
             if (target.GetId() == Program.p.client.CurrentUser.Id)
             {
-                var sMsg = await chan.SendMessageAsync(Sentences.FriendAccepted(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
+                var sMsg = await chan.SendMessageAsync(Sentences.FriendAccepted(textChan.Guild, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
                 await sMsg.AddReactionAsync(new Discord.Emoji("✅"));
                 await target.AddFriendAsync(author, sMsg);
                 return true;
             }
-            var msg = await chan.SendMessageAsync(Sentences.FriendRequest(textChan.GuildId, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
+            var msg = await chan.SendMessageAsync(Sentences.FriendRequest(textChan.Guild, target.GetUsername() + "#" + target.GetDiscriminator(), author.GetUsername() + "#" + author.GetDiscriminator()));
             _friendRequests.Add(msg.Id, new FriendRequest { author = author, destinator = target });
             await msg.AddReactionAsync(new Discord.Emoji("✅"));
             await msg.AddReactionAsync(new Discord.Emoji("❌"));
@@ -182,7 +182,7 @@ namespace SanaraV2.Community
                     var elem = _friendRequests[msg.Id];
                     await elem.destinator.AddFriendAsync(elem.author, msg);
                     var textChan = (Discord.ITextChannel)msg.Channel;
-                    await msg.ModifyAsync(x => x.Content = Sentences.FriendAccepted(textChan.GuildId, elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator(), elem.author.GetUsername() + "#" + elem.author.GetDiscriminator()));
+                    await msg.ModifyAsync(x => x.Content = Sentences.FriendAccepted(textChan.Guild, elem.destinator.GetUsername() + "#" + elem.destinator.GetDiscriminator(), elem.author.GetUsername() + "#" + elem.author.GetDiscriminator()));
                     await msg.RemoveReactionAsync(new Discord.Emoji("✅"), Program.p.client.CurrentUser);
                     await msg.RemoveReactionAsync(new Discord.Emoji("❌"), Program.p.client.CurrentUser);
                     _friendRequests.Remove(msg.Id);

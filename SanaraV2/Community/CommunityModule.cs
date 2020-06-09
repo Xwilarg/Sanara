@@ -15,8 +15,8 @@ namespace SanaraV2.Community
         [Command("Show"), Alias("Get")]
         public async Task Profile(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             Profile profile;
             if (args.Length == 0)
             {
@@ -34,12 +34,12 @@ namespace SanaraV2.Community
                     var me = Program.p.cm.GetProfile(Context.User.Id);
                     if (v == Visibility.Private)
                     {
-                        await ReplyAsync(Sentences.ErrorPrivate(Context.Guild.Id));
+                        await ReplyAsync(Sentences.ErrorPrivate(Context.Guild));
                         return;
                     }
                     if (v == Visibility.FriendsOnly && (me == null || !me.IsIdFriend(profile.GetId())))
                     {
-                        await ReplyAsync(Sentences.ErrorFriendsOnly(Context.Guild.Id));
+                        await ReplyAsync(Sentences.ErrorFriendsOnly(Context.Guild));
                         return;
                     }
                 }
@@ -52,59 +52,59 @@ namespace SanaraV2.Community
         [Command("Description")]
         public async Task Description(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild));
                 return;
             }
             if (me.UpdateDescription(string.Join(" ", args)))
             {
-                await ReplyAsync(Sentences.DescriptionUpdated(Context.Guild.Id));
+                await ReplyAsync(Sentences.DescriptionUpdated(Context.Guild));
             }
             else
             {
-                await ReplyAsync(Sentences.DescriptionTooLong(Context.Guild.Id));
+                await ReplyAsync(Sentences.DescriptionTooLong(Context.Guild));
             }
         }
 
         [Command("Color")]
         public async Task ColorCmd(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync(Modules.Tools.Sentences.HelpColor(Context.Guild.Id));
+                await ReplyAsync(Modules.Tools.Sentences.HelpColor(Context.Guild));
                 return;
             }
             if (await me.UpdateColor(args))
             {
-                await ReplyAsync(Sentences.ColorUpdated(Context.Guild.Id));
+                await ReplyAsync(Sentences.ColorUpdated(Context.Guild));
             }
             else
             {
-                await ReplyAsync(Modules.Tools.Sentences.InvalidColor(Context.Guild.Id));
+                await ReplyAsync(Modules.Tools.Sentences.InvalidColor(Context.Guild));
             }
         }
 
         [Command("Visibility")]
         public async Task VisibilityCmd(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild));
                 return;
             }
             string visibility = string.Join("", args).ToLower().Replace(" ", "");
@@ -116,25 +116,25 @@ namespace SanaraV2.Community
                 me.UpdateVisibility(Visibility.Private);
             else
             {
-                await ReplyAsync(Sentences.VisibilityHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.VisibilityHelp(Context.Guild));
             }
-            await ReplyAsync(Sentences.VisibilityUpdated(Context.Guild.Id));
+            await ReplyAsync(Sentences.VisibilityUpdated(Context.Guild));
         }
 
         [Command("Unfriend"), Alias("Remove friend")]
         public async Task Unfriend(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync(Sentences.UnfriendHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.UnfriendHelp(Context.Guild));
                 return;
             }
             var profile = await GetProfileAsync(args);
@@ -142,16 +142,16 @@ namespace SanaraV2.Community
                 return;
             if (profile.GetId() == Context.User.Id)
             {
-                await ReplyAsync(Sentences.UnfriendYourself(Context.Guild.Id));
+                await ReplyAsync(Sentences.UnfriendYourself(Context.Guild));
                 return;
             }
             if (me.RemoveFriend(profile))
             {
-                await ReplyAsync(Sentences.UnfriendDone(Context.Guild.Id, profile.GetUsername()));
+                await ReplyAsync(Sentences.UnfriendDone(Context.Guild, profile.GetUsername()));
             }
             else
             {
-                await ReplyAsync(Sentences.UnfriendError(Context.Guild.Id, profile.GetUsername()));
+                await ReplyAsync(Sentences.UnfriendError(Context.Guild, profile.GetUsername()));
             }
         }
 
@@ -159,17 +159,17 @@ namespace SanaraV2.Community
         [Command("Friend"), Alias("Add friend")]
         public async Task Friend(params string[] args)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             var me = Program.p.cm.GetProfile(Context.User.Id);
             if (me == null)
             {
-                await ReplyAsync(Sentences.NeedProfile(Context.Guild.Id));
+                await ReplyAsync(Sentences.NeedProfile(Context.Guild));
                 return;
             }
             if (args.Length == 0)
             {
-                await ReplyAsync(Sentences.FriendHelp(Context.Guild.Id));
+                await ReplyAsync(Sentences.FriendHelp(Context.Guild));
                 return;
             }
             var profile = await GetProfileAsync(args);
@@ -177,17 +177,17 @@ namespace SanaraV2.Community
                 return;
             if (profile.GetId() == Context.User.Id)
             {
-                await ReplyAsync(Sentences.FriendYourself(Context.Guild.Id));
+                await ReplyAsync(Sentences.FriendYourself(Context.Guild));
                 return;
             }
             if (me.IsIdFriend(profile.GetId()))
             {
-                await ReplyAsync(Sentences.FriendError(Context.Guild.Id, profile.GetUsername()));
+                await ReplyAsync(Sentences.FriendError(Context.Guild, profile.GetUsername()));
                 return;
             }
             if (!await Program.p.cm.AddFriendRequestAsync(Context.Channel, me, profile))
             {
-                await ReplyAsync(Sentences.FriendAlreadyActive(Context.Guild.Id, profile.GetUsername()));
+                await ReplyAsync(Sentences.FriendAlreadyActive(Context.Guild, profile.GetUsername()));
             }
         }
 
@@ -220,14 +220,14 @@ namespace SanaraV2.Community
         [Command("Save all")]
         public async Task SaveAll(params string[] _)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Community);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Community);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Community);
+            await Program.p.DoAction(Context.User, Program.Module.Community);
             if (Context.User.Id != Modules.Base.Sentences.ownerId)
-                await ReplyAsync(Modules.Base.Sentences.OnlyMasterStr(Context.Guild.Id));
+                await ReplyAsync(Modules.Base.Sentences.OnlyMasterStr(Context.Guild));
             else
             {
                 Program.p.cm.UpdateAllProfiles();
-                await ReplyAsync(Modules.Base.Sentences.DoneStr(Context.Guild.Id));
+                await ReplyAsync(Modules.Base.Sentences.DoneStr(Context.Guild));
             }
         }
     }
