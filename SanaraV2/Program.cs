@@ -705,7 +705,7 @@ namespace SanaraV2
             if (msg == null) return;
 
             /// When playing games
-            Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id, msg); });
+            _ = Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id, msg); });
 
             int pos = 0;
             string prefix;
@@ -717,7 +717,7 @@ namespace SanaraV2
                 var context = new SocketCommandContext(client, msg);
                 if (textChan != null && !((IGuildUser)await context.Channel.GetUserAsync(client.CurrentUser.Id)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks) // If we are in a guild and we can't embed links
                 {
-                    await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
+                    await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild));
                     return;
                 }
                 await commands.ExecuteAsync(context, pos, null);
@@ -796,7 +796,7 @@ namespace SanaraV2
             if (msg.Exception.InnerException != null && msg.Exception.InnerException.GetType() == typeof(NotAvailable))
             {
                 CommandException ex = (CommandException)msg.Exception;
-                ex.Context.Channel.SendMessageAsync(Modules.Base.Sentences.NotAvailable(ex.Context.Guild.Id));
+                ex.Context.Channel.SendMessageAsync(Modules.Base.Sentences.NotAvailable(ex.Context.Guild));
                 return Task.CompletedTask;
             }
             Log(msg);
@@ -815,8 +815,8 @@ namespace SanaraV2
                 ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                 {
                     Color = Color.Red,
-                    Title = Modules.Base.Sentences.ErrorIntro(ce.Context.Guild.Id),
-                    Description = Modules.Base.Sentences.ErrorBody(ce.Context.Guild.Id, id)
+                    Title = Modules.Base.Sentences.ErrorIntro(ce.Context.Guild),
+                    Description = Modules.Base.Sentences.ErrorBody(ce.Context.Guild, id)
                 }.Build());
                 if (sendStats)
                     AddError(msg.Exception.InnerException.GetType().ToString());

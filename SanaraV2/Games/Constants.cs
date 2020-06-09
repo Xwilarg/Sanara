@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using Discord;
 using SanaraV2.Games.Impl;
 using System;
 using System.Collections.Generic;
@@ -57,18 +58,18 @@ namespace SanaraV2.Games
         public static readonly List<string> arknightsDictionnary = Arknights.LoadDictionnary();
 
         // Used by information module to display stats
-        public static readonly Tuple<Func<ulong, string>, List<string>>[] allDictionnaries = new Tuple<Func<ulong, string>, List<string>>[]
+        public static readonly Tuple<Func<IGuild, string>, List<string>>[] allDictionnaries = new Tuple<Func<IGuild, string>, List<string>>[]
         {
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary),
-            new Tuple<Func<ulong, string>, List<string>>(Sentences.ArknightsGame, arknightsDictionnary)
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.ShiritoriGame, shiritoriDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.KancolleGame, kanColleDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.AnimeGame, animeDictionnaries.Item1),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.AnimeFull, animeDictionnaries.Item2),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.BooruGame, booruDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.AzurLaneGame, azurLaneDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.ArknightsGame, arknightsDictionnary)
         };
     }
 }

@@ -53,13 +53,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.BestOf;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesAnime(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesAnime(guild);
     }
 
     public class Anime : AQuizz
     {
-        public Anime(ITextChannel chan, Config config, ulong playerId) : base(chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config, playerId)
+        public Anime(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, config.isFull ? Constants.animeDictionnaries.Item2 : Constants.animeDictionnaries.Item1, config, playerId)
         {
             _sendImage = config.sendImage;
             if (_sendImage && Directory.Exists("Saves"))

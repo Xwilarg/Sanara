@@ -51,13 +51,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.BestOf;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesKancolle(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesKancolle(guild);
     }
 
     public class AzurLane : AQuizz
     {
-        public AzurLane(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.azurLaneDictionnary, config, playerId)
+        public AzurLane(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, Constants.azurLaneDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

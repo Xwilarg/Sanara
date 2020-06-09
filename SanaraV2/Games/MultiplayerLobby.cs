@@ -68,8 +68,8 @@ namespace SanaraV2.Games
         public string GetLastStanding() // Name of last standing player, called at the end of the game to know the winner
             => _names[0];
 
-        public string GetReadyMessage(ulong guildId)
-            => Sentences.Participants(guildId) + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
+        public string GetReadyMessage(IGuild guild)
+            => Sentences.Participants(guild) + Environment.NewLine + string.Join(", ", _players.Select(x => "<@" + x + ">"));
 
         public void NextTurn()
         {

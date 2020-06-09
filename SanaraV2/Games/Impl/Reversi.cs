@@ -46,13 +46,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.Elimination;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesReversi(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesReversi(guild);
     }
 
     public class Reversi : AGame
     {
-        public Reversi(ITextChannel chan, Config config, ulong playerId) : base(chan, null, config, playerId, true)
+        public Reversi(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, null, config, playerId, true)
         { }
 
         protected override void Init()
@@ -84,7 +84,7 @@ namespace SanaraV2.Games.Impl
                 return;
             if (!CanPlay())
             {
-                await PostText((_nbSkips == 0 ? (await GetPostAsync())[0] + Environment.NewLine : "") + Sentences.ReversiCantPlay(GetGuildId(), GetTurnName()));
+                await PostText((_nbSkips == 0 ? (await GetPostAsync())[0] + Environment.NewLine : "") + Sentences.ReversiCantPlay(GetGuild(), GetTurnName()));
                 _nbSkips++;
                 if (_nbSkips == 2)
                     await EndOfGame();
@@ -215,7 +215,7 @@ namespace SanaraV2.Games.Impl
         {
             StringBuilder str = new StringBuilder();
             if (_firstTurn)
-                str.AppendLine(Sentences.ReversiIntro(GetGuildId(), GetTurnName()));
+                str.AppendLine(Sentences.ReversiIntro(GetGuild(), GetTurnName()));
             _firstTurn = false;
             str.AppendLine("```");
             str.AppendLine("  A B C D E F G H");

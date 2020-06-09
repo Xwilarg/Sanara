@@ -51,13 +51,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.BestOf;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesCharacter(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesCharacter(guild);
     }
 
     public class FateGO : AQuizz
     {
-        public FateGO(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.fateGODictionnary, config, playerId)
+        public FateGO(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, Constants.fateGODictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

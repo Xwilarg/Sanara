@@ -297,7 +297,7 @@ namespace SanaraV2.Modules.Tools
                 embed.AddField(Sentences.Creator(Context.Guild), "Zirk#0001", true);
                 embed.AddField(Sentences.LatestVersion(Context.Guild), new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString(Base.Sentences.DateHourFormat(Context.Guild)), true);
                 embed.AddField(Sentences.NumberGuilds(Context.Guild), p.client.Guilds.Count, true);
-                embed.AddField(Sentences.Uptime(Context.Guild), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild.Id));
+                embed.AddField(Sentences.Uptime(Context.Guild), Utilities.TimeSpanToString(DateTime.Now.Subtract(p.startTime), Context.Guild));
                 embed.AddField("GitHub", "https://github.com/Xwilarg/Sanara");
                 embed.AddField(Sentences.Website(Context.Guild), "https://sanara.zirk.eu");
                 embed.AddField(Sentences.InvitationLink(Context.Guild), "https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot");

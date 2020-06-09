@@ -40,7 +40,7 @@ namespace SanaraV2.Subscription
                     ImageUrl = x.pages[0].imageUrl.ToString(),
                     Footer = new EmbedFooterBuilder()
                     {
-                        Text = Modules.NSFW.Sentences.ClickFull(0) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(0, x.id.ToString())
+                        Text = Modules.NSFW.Sentences.ClickFull(null) + "\n\n" + Modules.NSFW.Sentences.DownloadDoujinshiInfo(null, x.id.ToString())
                     }
                 }, x.tags.Select(y => y.name).ToArray()));
             }

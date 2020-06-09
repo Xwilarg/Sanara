@@ -192,7 +192,7 @@ namespace SanaraV2.Games
                 string gameName = preload.GetGameName();
                 if (!me.ContainsKey(preload.GetGameName()))
                 {
-                    finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
+                    finalStr.Append("**" + preload.GetGameSentence(Context.Guild) + "**:" + Environment.NewLine +
                        Sentences.NotRanked(Context.Guild) + Environment.NewLine + Environment.NewLine);
                     continue;
                 }
@@ -204,7 +204,7 @@ namespace SanaraV2.Games
                 int rankedNumber = scores.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(gameName)).Count();
                 int myRanking = scores.Where(x => Program.p.client.GetGuild(ulong.Parse(x.Key)) != null && x.Value.ContainsKey(gameName) && int.Parse(x.Value[gameName].Split('|')[0]) > myScore).Count() + 1;
                 int bestScore = scores.Where(x => x.Value.ContainsKey(gameName)).Max(x => int.Parse(x.Value[gameName].Split('|')[0]));
-                finalStr.Append("**" + preload.GetGameSentence(Context.Guild.Id) + "**:" + Environment.NewLine +
+                finalStr.Append("**" + preload.GetGameSentence(Context.Guild) + "**:" + Environment.NewLine +
                     Sentences.ScoreText(Context.Guild, myRanking, rankedNumber, myScore, bestScore) + Environment.NewLine +
                     Sentences.ScoreContributors(Context.Guild) + " " + string.Join(", ", contributors) + Environment.NewLine + Environment.NewLine);
                 finalScore += myScore * 100f / bestScore;

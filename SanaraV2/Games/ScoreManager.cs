@@ -103,16 +103,16 @@ namespace SanaraV2.Games
             return (globalRankingStr + "$" + finalStr);
         }
 
-        public static string GetInformation(ulong guildId)
+        public static string GetInformation(IGuild guild)
         {
             StringBuilder finalStr = new StringBuilder();
             foreach (var game in Constants.allDictionnaries)
             {
-                finalStr.Append("**" + game.Item1(guildId) + ":** ");
+                finalStr.Append("**" + game.Item1(guild) + ":** ");
                 if (game.Item2.Count == 0)
-                    finalStr.Append(Sentences.NotLoaded(guildId));
+                    finalStr.Append(Sentences.NotLoaded(guild));
                 else
-                    finalStr.Append(game.Item2.Count + " " + Sentences.Words(guildId));
+                    finalStr.Append(game.Item2.Count + " " + Sentences.Words(guild));
                 finalStr.Append(Environment.NewLine);
             }
             return finalStr.ToString();

@@ -49,13 +49,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.BestOf;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesGirlsFrontline(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesGirlsFrontline(guild);
     }
 
     public class GirlsFrontline : AQuizz
     {
-        public GirlsFrontline(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.girlsfrontlineDictionnary, config, playerId)
+        public GirlsFrontline(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, Constants.girlsfrontlineDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

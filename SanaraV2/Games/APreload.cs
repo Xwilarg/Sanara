@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 
+using Discord;
 using System;
 using System.Linq;
 
@@ -20,7 +21,7 @@ namespace SanaraV2.Games
 {
     public abstract class APreload
     {
-        protected APreload(string[] names, int timer, Func<ulong, string> gameSentence)
+        protected APreload(string[] names, int timer, Func<IGuild, string> gameSentence)
         {
             _names = names;
             _timer = timer;
@@ -61,7 +62,7 @@ namespace SanaraV2.Games
             Elimination, // If player loose, he is eliminated
             BestOf // Player have X chances to find the solution, after Y question best score win
         }
-        public abstract string GetRules(ulong guildId, bool isMultiplayer);
+        public abstract string GetRules(IGuild guildId, bool isMultiplayer);
 
         public bool ContainsName(string name)
             => _names.Contains(name);
@@ -72,11 +73,11 @@ namespace SanaraV2.Games
         public string GetGameName()
             => _names[0];
 
-        public string GetGameSentence(ulong guildId)
-            => _gameSentence(guildId);
+        public string GetGameSentence(IGuild guild)
+            => _gameSentence(guild);
 
         private string[] _names;
         private int _timer;
-        private Func<ulong, string> _gameSentence;
+        private Func<IGuild, string> _gameSentence;
     }
 }

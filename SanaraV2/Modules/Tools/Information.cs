@@ -288,7 +288,7 @@ namespace SanaraV2.Modules.Tools
             if (p.kitsuAuth == null) missingFiles.Add("Kitsu Logins");
             if (p.youtubeService == null) missingFiles.Add("YouTube API Key");
             embed.AddField("Missing Files", missingFiles.Count == 0 ? "None" : string.Join(", ", missingFiles));
-            embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild.Id));
+            embed.AddField("Game Dictionnaries", ScoreManager.GetInformation(Context.Guild));
             if (Context.Guild != null)
             {
                 embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAnimeAsync(Context.Guild));

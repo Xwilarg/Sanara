@@ -26,7 +26,7 @@ namespace SanaraV2.Games
 {
     public abstract class AQuizz : AGame
     {
-        protected AQuizz(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId) : base(chan, dictionnary, config, playerId)
+        protected AQuizz(IGuild guild, IMessageChannel chan, List<string> dictionnary, Config config, ulong playerId) : base(guild, chan, dictionnary, config, playerId)
         { }
 
         protected override void Init()
@@ -76,13 +76,13 @@ namespace SanaraV2.Games
             {
                 string cleanGuess = Utilities.CleanWord(s);
                 if (cleanUserAnswer.Contains(cleanGuess) || cleanGuess.Contains(cleanUserAnswer))
-                    return Sentences.BooruGuessClose(GetGuildId(), userAnswer.Replace("@everyone", "@ everyone"));
+                    return Sentences.BooruGuessClose(GetGuild(), userAnswer.Replace("@everyone", "@ everyone"));
             }
             return "❌";
         }
 
         protected override async Task<string> GetLoose()
-            => Sentences.GoodAnswerWas(GetGuildId(), FormatAnswer());
+            => Sentences.GoodAnswerWas(GetGuild(), FormatAnswer());
 
         private string FormatAnswer()
             => HttpUtility.UrlDecode(new CultureInfo("en-US", false).TextInfo.ToTitleCase(_toGuess[0].Replace('_', ' ')));

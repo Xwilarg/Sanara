@@ -50,13 +50,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.BestOf;
 
-        public override string GetRules(ulong guildId, bool _)
-            => Sentences.RulesKancolle(guildId);
+        public override string GetRules(IGuild guild, bool _)
+            => Sentences.RulesKancolle(guild);
     }
 
     public class KanColle : AQuizz
     {
-        public KanColle(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.kanColleDictionnary, config, playerId)
+        public KanColle(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, Constants.kanColleDictionnary, config, playerId)
         { }
 
         protected override bool IsDictionnaryFull()

@@ -52,13 +52,13 @@ namespace SanaraV2.Games.Impl
         public override MultiplayerType GetMultiplayerType()
             => MultiplayerType.Elimination;
 
-        public override string GetRules(ulong guildId, bool isMultiplayer)
-            => (isMultiplayer ? Sentences.RulesShiritoriMulti(guildId) : Sentences.RulesShiritori(guildId)) + Environment.NewLine + Sentences.RulesShiritori2(guildId);
+        public override string GetRules(IGuild guild, bool isMultiplayer)
+            => (isMultiplayer ? Sentences.RulesShiritoriMulti(guild) : Sentences.RulesShiritori(guild)) + Environment.NewLine + Sentences.RulesShiritori2(guild);
     }
 
     public class Shiritori : AGame
     {
-        public Shiritori(ITextChannel chan, Config config, ulong playerId) : base(chan, Constants.shiritoriDictionnary, config, playerId)
+        public Shiritori(IGuild guild, IMessageChannel chan, Config config, ulong playerId) : base(guild, chan, Constants.shiritoriDictionnary, config, playerId)
         { }
 
         protected override void Init()
@@ -160,7 +160,7 @@ namespace SanaraV2.Games.Impl
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             string lastCharac = GetLastCharacter(_currWord);
             if (!hiraganaAnswer.StartsWith(ReplaceLocalString(GetLastCharacter(_currWord))))
-                return Sentences.ShiritoriMustBegin(GetGuildId(), lastCharac, Linguist.ToRomaji(lastCharac));
+                return Sentences.ShiritoriMustBegin(GetGuild(), lastCharac, Linguist.ToRomaji(lastCharac));
             if (!isNoun)
                 return GetStringFromSentence(Sentences.ShiritoriNotNoun);
             if (GetLastCharacter(hiraganaAnswer) == hiraganaAnswer)
@@ -190,13 +190,13 @@ namespace SanaraV2.Games.Impl
         protected override async Task<string> GetLoose()
         {
             if (_currWord == null) // Multiplayer, if nobody say anything
-                return Sentences.ShiritoriExplainBegin(GetGuildId());
+                return Sentences.ShiritoriExplainBegin(GetGuild());
             string[] validWords = GetValidWords();
             if (validWords.Length == 0)
                 return GetStringFromSentence(Sentences.ShiritoriNoMoreWord);
             string word = validWords[Program.p.rand.Next(0, validWords.Length)];
             string[] splitWord = word.Split('$');
-            return Sentences.ShiritoriSuggestion(GetGuildId(), splitWord[0], Linguist.ToRomaji(splitWord[0]), splitWord[1]);
+            return Sentences.ShiritoriSuggestion(GetGuild(), splitWord[0], Linguist.ToRomaji(splitWord[0]), splitWord[1]);
         }
 
         protected override string AnnounceNextTurnInternal()

@@ -94,7 +94,7 @@ namespace SanaraV2.Games
 
         // If failure return an error message, else return null
         // The error message is a callback to the function to display it
-        public async Task<Func<IGuild, string>> Play(string[] args, ITextChannel chan, ulong playerId)
+        public async Task<Func<IGuild, string>> Play(string[] args, IMessageChannel chan, ulong playerId)
         {
             if (_games.Any(x => x.IsSelf(chan.Id)))
                 return Sentences.GameAlreadyRunning;
@@ -104,10 +104,11 @@ namespace SanaraV2.Games
             return (elem);
         }
 
-        private async Task<Func<IGuild, string>> PlayInternal(string[] args, ITextChannel chan, ulong playerId)
+        private async Task<Func<IGuild, string>> PlayInternal(string[] args, IMessageChannel chan, ulong playerId)
         {
             if (args.Length == 0)
                 return Sentences.InvalidGameName;
+            IGuild guild = (chan as ITextChannel)?.Guild;
             string gameName = args[0].ToLower();
             Difficulty difficulty = Difficulty.Normal;
             bool isFull = false;
@@ -163,7 +164,8 @@ namespace SanaraV2.Games
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                 if (preload.ContainsName(gameName))
                 {
-                    if (!chan.IsNsfw && preload.IsNsfw())
+                    var textChan = chan as ITextChannel;
+                    if (textChan == null ? false : !textChan.IsNsfw && preload.IsNsfw())
                         return Modules.Base.Sentences.ChanIsNotNsfw;
                     if (isMultiplayer == APreload.Multiplayer.MultiOnly && preload.DoesAllowMultiplayer() == APreload.Multiplayer.SoloOnly)
                         return Sentences.MultiNotAvailable;
@@ -184,21 +186,21 @@ namespace SanaraV2.Games
                         string introMsg = "";
                         if (isMultiplayer == APreload.Multiplayer.MultiOnly)
                         {
-                            introMsg += Sentences.LobbyCreation(chan.Guild, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine;
+                            introMsg += Sentences.LobbyCreation(guild, MultiplayerLobby.lobbyTime.ToString()) + Environment.NewLine + Environment.NewLine;
                         }
-                        introMsg += "**" + Sentences.Rules(chan.Guild) + ":**" + Environment.NewLine +
-                            preload.GetRules(chan.GuildId, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
-                            Sentences.RulesTimer(chan.Guild, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine;
+                        introMsg += "**" + Sentences.Rules(guild) + ":**" + Environment.NewLine +
+                            preload.GetRules(guild, isMultiplayer == APreload.Multiplayer.MultiOnly) + Environment.NewLine +
+                            Sentences.RulesTimer(guild, preload.GetTimer() * (int)difficulty) + Environment.NewLine + Environment.NewLine;
                         if (isMultiplayer == APreload.Multiplayer.MultiOnly)
                         {
-                            introMsg += "**" + Sentences.MultiplayerRules(chan.Guild) + ":**" + Environment.NewLine;
+                            introMsg += "**" + Sentences.MultiplayerRules(guild) + ":**" + Environment.NewLine;
                             if (preload.GetMultiplayerType() == APreload.MultiplayerType.Elimination)
-                                introMsg += Sentences.RulesMultiElimination(chan.Guild);
+                                introMsg += Sentences.RulesMultiElimination(guild);
                             else
-                                introMsg += Sentences.RulesMultiBestOf(chan.Guild, AGame.nbMaxTry, AGame.nbQuestions);
+                                introMsg += Sentences.RulesMultiBestOf(guild, AGame.nbMaxTry, AGame.nbQuestions);
                             introMsg += Environment.NewLine + Environment.NewLine;
                         }
-                        introMsg += Sentences.RulesReset(chan.Guild);
+                        introMsg += Sentences.RulesReset(guild);
                         await chan.SendMessageAsync(introMsg);
                         AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);

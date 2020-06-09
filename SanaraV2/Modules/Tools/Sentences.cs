@@ -131,14 +131,16 @@ namespace SanaraV2.Modules.Tools
         /// --------------------------- Help Module Content ---------------------------
         public static string ArknightsHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Arknights))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Arknights))
                 return Translation.GetTranslation(guild, "arknightsModuleCharac");
             return Base.Sentences.NotAvailable(guild);
         }
         public static string AnimeMangaHelp(IGuild guild, bool isServerOwner)
         {
+            ulong guildId = guild?.Id ?? 0;
             string res;
-            if (Program.p.db.IsAvailable(guild, Program.Module.AnimeManga))
+            if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
             {
                 res = Translation.GetTranslation(guild, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleManga") + Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleLN");
                 if (isServerOwner)
@@ -151,7 +153,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string BooruHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Booru))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
                 return Translation.GetTranslation(guild, "booruModuleSource") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleE926")
                 + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guild, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleKonachan")
                 + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleE621")) : (""))
@@ -161,13 +164,15 @@ namespace SanaraV2.Modules.Tools
         }
         public static string CodeHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Communication))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
                 return Translation.GetTranslation(guild, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guild, "codeModuleColor") + Environment.NewLine + Translation.GetTranslation(guild, "codeModuleIncrease");
             return Base.Sentences.NotAvailable(guild);
         }
         public static string CommunicationHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Communication))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
             {
                 string str = Translation.GetTranslation(guild, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleBotInfos")
                     + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModulePoll")
@@ -178,7 +183,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string CommunityHelp(IGuild guild, bool isServerOwner)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Community))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Community))
             {
                 string str = Translation.GetTranslation(guild, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleDescription")
                     + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleVisibility")
@@ -191,7 +197,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string DoujinshiHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Doujinshi))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
                     return Translation.GetTranslation(guild, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleCosplay")
@@ -211,7 +218,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string InformationHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Information))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
                 return Translation.GetTranslation(guild, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleGdpr")
                     + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleInvite")
                     + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleLogs") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleError");
@@ -219,13 +227,15 @@ namespace SanaraV2.Modules.Tools
         }
         public static string KantaiCollectionHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Kancolle))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
                 return Translation.GetTranslation(guild, "kantaiCollectionModuleCharac");// + Environment.NewLine + Translation.GetTranslation(guild, "kantaiCollectionModuleDrop");
             return Base.Sentences.NotAvailable(guild);
         }
         public static string LinguisticHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Linguistic))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic))
                 return Translation.GetTranslation(guild, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guild, "linguisticModuleKanji")
                     + Environment.NewLine + Translation.GetTranslation(guild, "linguisticModuleTranslation")
                  + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guild, "linguisticModuleUrban")) : ("*" + Translation.GetTranslation(guild, "nsfwForFull") + "*"));
@@ -233,7 +243,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string RadioHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Radio))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Radio))
                 return Translation.GetTranslation(guild, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleAdd")
                     + Environment.NewLine + Translation.GetTranslation(guild, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleSkip")
                     + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleRemove") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleStop");
@@ -241,7 +252,8 @@ namespace SanaraV2.Modules.Tools
         }
         public static string SettingsHelp(IGuild guild, bool isServerOwner, bool isBotOwner)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Settings))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Settings))
             {
                 string finalStr = "";
                 if (isServerOwner)
@@ -264,19 +276,22 @@ namespace SanaraV2.Modules.Tools
         }
         public static string VisualNovelHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Vn))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Vn))
                 return Translation.GetTranslation(guild, "visualNovelModuleVn");
             return Base.Sentences.NotAvailable(guild);
         }
         public static string XkcdHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Xkcd))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Xkcd))
                 return Translation.GetTranslation(guild, "xkcdModuleXkcd");
             return Base.Sentences.NotAvailable(guild);
         }
         public static string YouTubeHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guild, Program.Module.Youtube))
+            ulong guildId = guild?.Id ?? 0;
+            if (Program.p.db.IsAvailable(guildId, Program.Module.Youtube))
                 return Translation.GetTranslation(guild, "youtubeModuleYoutube");
             return Base.Sentences.NotAvailable(guild);
         }

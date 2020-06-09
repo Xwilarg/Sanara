@@ -27,8 +27,9 @@ namespace SanaraV2.Games
 {
     public abstract class AGame
     {
-        protected AGame(ITextChannel chan, List<string> dictionnary, Config config, ulong playerId, bool ignoreDictionnarycheck = false)
+        protected AGame(IGuild guild, IMessageChannel chan, List<string> dictionnary, Config config, ulong playerId, bool ignoreDictionnarycheck = false)
         {
+            _guild = guild;
             _chan = chan;
             if (!ignoreDictionnarycheck && (dictionnary == null || dictionnary.Count < 100)) // Dictionnary failed to load
                 throw new NoDictionnaryException();
@@ -90,7 +91,7 @@ namespace SanaraV2.Games
 
         public async Task DisplayCantStart()
         {
-            await _chan.SendMessageAsync(Sentences.LobbyNotEnoughPlayerFatal(_chan.GuildId));
+            await _chan.SendMessageAsync(Sentences.LobbyNotEnoughPlayerFatal(_guild));
             _gameState = GameState.Lost;
         }
 
@@ -124,9 +125,9 @@ namespace SanaraV2.Games
             if (HaveMultiplayerLobby())
             {
                 // Setup for multiplayer:
-                if (await _lobby.LoadNames(_chan)) // We try to load the nickname of everyone in the lobby
+                if (await _lobby.LoadNames(_chan as ITextChannel)) // We try to load the nickname of everyone in the lobby
                 {
-                    var msg = await _chan.SendMessageAsync(_lobby.GetReadyMessage(_chan.GuildId));
+                    var msg = await _chan.SendMessageAsync(_lobby.GetReadyMessage(_guild));
                     var ids = _lobby.GetPlayersId();
                     foreach (var id in ids)
                         await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.PlayWithFriends, ids.Count, null, msg, id);
@@ -134,10 +135,10 @@ namespace SanaraV2.Games
                 else
                 {
                     _gameState = GameState.Lost;
-                    await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_chan.GuildId));
+                    await _chan.SendMessageAsync(Sentences.LobbyLeftChannel(_guild));
                 }
                 if (_multiType == APreload.MultiplayerType.Elimination)
-                    await PostText(Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+                    await PostText(Sentences.AnnounceTurn(_guild, _lobby.GetTurnName()));
             }
             await PostAsync();
         }
@@ -207,7 +208,7 @@ namespace SanaraV2.Games
                         {
                             Color = Color.Red,
                             Title = e.GetType().ToString(),
-                            Description = Sentences.ExceptionGameStop(_chan.GuildId),
+                            Description = Sentences.ExceptionGameStop(_guild),
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = e.Message
@@ -224,7 +225,7 @@ namespace SanaraV2.Games
                         {
                             Color = Color.Orange,
                             Title = e.GetType().ToString(),
-                            Description = Sentences.ExceptionGame(_chan.GuildId, e.Message),
+                            Description = Sentences.ExceptionGame(_guild, e.Message),
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = e.Message
@@ -281,7 +282,7 @@ namespace SanaraV2.Games
                 {
                     Color = Color.Red,
                     Title = e.GetType().ToString(),
-                    Description = Sentences.ExceptionGameCheck(_chan.GuildId),
+                    Description = Sentences.ExceptionGameCheck(_guild),
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = e.Message
@@ -302,7 +303,7 @@ namespace SanaraV2.Games
                 {
                     if (_bestOfTries.ContainsKey(user.ToString())) _bestOfTries[user.ToString()]++;
                     else _bestOfTries.Add(user.ToString(), 1);
-                    error += Environment.NewLine + Sentences.TurnsRemaining(_chan.GuildId, nbMaxTry - _bestOfTries[user.ToString()], user.ToString());
+                    error += Environment.NewLine + Sentences.TurnsRemaining(_guild, nbMaxTry - _bestOfTries[user.ToString()], user.ToString());
                 }
                 if (error != "")
                     await PostText(error);
@@ -313,7 +314,7 @@ namespace SanaraV2.Games
                 _contributors.Add(user.Id);
             string finalStr = AnnounceNextTurnInternal();
             if (CongratulateOnGuess())
-                finalStr += Sentences.GuessGood(_chan.GuildId);
+                finalStr += Sentences.GuessGood(_guild);
             if (HaveMultiplayerLobby())
             {
                 if (_multiType == APreload.MultiplayerType.Elimination)
@@ -321,7 +322,7 @@ namespace SanaraV2.Games
                     await NextTurn();
                     if (finalStr != "")
                         finalStr += Environment.NewLine;
-                    finalStr += Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName());
+                    finalStr += Sentences.AnnounceTurn(_guild, _lobby.GetTurnName());
                 }
                 else if (_multiType == APreload.MultiplayerType.BestOf)
                 {
@@ -334,7 +335,7 @@ namespace SanaraV2.Games
                         return;
                     }
                     _bestOfTries = new Dictionary<string, int>();
-                    finalStr += Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
+                    finalStr += Environment.NewLine + Sentences.CurrentScore(_guild) + Environment.NewLine;
                     finalStr += GetBestOfScore();
                 }
             }
@@ -375,7 +376,7 @@ namespace SanaraV2.Games
                 if (HaveMultiplayerLobby() && _multiType == APreload.MultiplayerType.BestOf)
                 {
                     _bestOfRemainingRounds--;
-                    string finalStr = Sentences.TimeOut(_chan.GuildId) + await GetLoose() + Environment.NewLine + Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine;
+                    string finalStr = Sentences.TimeOut(_guild) + await GetLoose() + Environment.NewLine + Sentences.CurrentScore(_guild) + Environment.NewLine;
                     finalStr += GetBestOfScore();
                     await PostText(finalStr);
                     if (_bestOfRemainingRounds == 0)
@@ -390,7 +391,7 @@ namespace SanaraV2.Games
                 }
                 else
                 {
-                    await LooseAsync(Sentences.TimeoutGame(_chan.GuildId));
+                    await LooseAsync(Sentences.TimeoutGame(_guild));
                 }
             }
         }
@@ -413,12 +414,12 @@ namespace SanaraV2.Games
             }
             string finalStr = "";
             if (didFindGuess)
-                finalStr += Sentences.GuessGood(_chan.GuildId) + Environment.NewLine;
-            finalStr += Sentences.CurrentScore(_chan.GuildId) + Environment.NewLine + GetBestOfScore() + Environment.NewLine + Environment.NewLine + Sentences.ReversiGameEnded(_chan.GuildId) + Environment.NewLine;
+                finalStr += Sentences.GuessGood(_guild) + Environment.NewLine;
+            finalStr += Sentences.CurrentScore(_guild) + Environment.NewLine + GetBestOfScore() + Environment.NewLine + Environment.NewLine + Sentences.ReversiGameEnded(_guild) + Environment.NewLine;
             if (bestName.Count == _lobby.GetFullNames().Count)
-                await PostText(finalStr + Sentences.Draw(_chan.GuildId));
+                await PostText(finalStr + Sentences.Draw(_guild));
             else
-                await PostText(finalStr + Sentences.WonMulti(_chan.GuildId, string.Join(", ", bestName)));
+                await PostText(finalStr + Sentences.WonMulti(_guild, string.Join(", ", bestName)));
             _gameState = GameState.Lost;
         }
 
@@ -469,11 +470,11 @@ namespace SanaraV2.Games
                     {
                         _gameState = GameState.Running;
                         _startTime = DateTime.Now;
-                        await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_chan.GuildId, _lobby.GetTurnName()));
+                        await PostText(Sentences.YouLost(_guild) + (reason == null ? "" : reason + Environment.NewLine) + Sentences.AnnounceTurn(_guild, _lobby.GetTurnName()));
                         _postImage = false;
                         return;
                     }
-                    await PostText(Sentences.YouLost(_chan.GuildId) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_chan.GuildId, _lobby.GetLastStanding()));
+                    await PostText(Sentences.YouLost(_guild) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_guild, _lobby.GetLastStanding()));
                 }
                 else
                     throw new ArgumentException("Multiplayer game " + _gameName + " ended in an unexpected way: " + reason);
@@ -482,9 +483,9 @@ namespace SanaraV2.Games
             {
                 IUserMessage gameOverMsg;
                 if (reason == null)
-                    gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + await GetLoose());
+                    gameOverMsg = await SaveScores(Sentences.YouLost(_guild) + await GetLoose());
                 else
-                    gameOverMsg = await SaveScores(Sentences.YouLost(_chan.GuildId) + reason + Environment.NewLine + await GetLoose());
+                    gameOverMsg = await SaveScores(Sentences.YouLost(_guild) + reason + Environment.NewLine + await GetLoose());
                 if (this is AQuizz)
                 {
                     foreach (ulong c in _contributors)
@@ -500,13 +501,17 @@ namespace SanaraV2.Games
 
         private async Task<IUserMessage> SaveScores(string reason)
         {
-            var newScore = await Program.p.db.SetNewScore(_saveName, _score, _chan.GuildId, string.Join("|", _contributors));
-            if (newScore.Item1 == Db.Db.Comparaison.Best)
-                return await PostText(reason + Environment.NewLine + Sentences.NewBestScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
-            else if (newScore.Item1 == Db.Db.Comparaison.Equal)
-                return await PostText(reason + Environment.NewLine + Sentences.EqualizedScore(_chan.GuildId, _score.ToString()));
+            Tuple<Db.Db.Comparaison, int> newScore;
+            if (_guild == null && _contributors.Count == 0)
+                return await PostText("You did a score of 0."); // TOOD
             else
-                return await PostText(reason + Environment.NewLine + Sentences.DidntBeatScore(_chan.GuildId, newScore.Item2.ToString(), _score.ToString()));
+                newScore = await Program.p.db.SetNewScore(_saveName, _score, _guild == null ? _contributors[0] : _guild.Id, string.Join("|", _contributors));
+            if (newScore.Item1 == Db.Db.Comparaison.Best)
+                return await PostText(reason + Environment.NewLine + Sentences.NewBestScore(_guild, newScore.Item2.ToString(), _score.ToString()));
+            else if (newScore.Item1 == Db.Db.Comparaison.Equal)
+                return await PostText(reason + Environment.NewLine + Sentences.EqualizedScore(_guild, _score.ToString()));
+            else
+                return await PostText(reason + Environment.NewLine + Sentences.DidntBeatScore(_guild, newScore.Item2.ToString(), _score.ToString()));
         }
 
         private async Task PostFromUrl(string url)
@@ -576,14 +581,14 @@ namespace SanaraV2.Games
             await _chan.SendFileAsync(path);
         }
 
-        protected async Task PostText(Func<ulong, string> fct) // Called by children to display sentences
-            => await PostText(fct(_chan.GuildId));
+        protected async Task PostText(Func<IGuild, string> fct) // Called by children to display sentences
+            => await PostText(fct(_guild));
 
-        protected string GetStringFromSentence(Func<ulong, string> fct)
-            => fct(_chan.GuildId);
+        protected string GetStringFromSentence(Func<IGuild, string> fct)
+            => fct(_guild);
 
-        protected ulong GetGuildId() // Use GetStringFromSentence instead if possible
-            => _chan.GuildId;
+        protected IGuild GetGuild() // Use GetStringFromSentence instead if possible
+            => _guild;
 
         protected string GetRandomPath() // Add this to a local file to make sure it doesn't already exists
         {
@@ -610,7 +615,8 @@ namespace SanaraV2.Games
             Lost
         }
 
-        private ITextChannel    _chan; // Channel where the game is
+        private IMessageChannel    _chan; // Channel where the game is
+        private IGuild          _guild;
         private List<ulong>     _contributors; // Ids of the users that contributed to the current score
         private string          _saveName; // Name the game will have in the db
         private string          _gameName;
