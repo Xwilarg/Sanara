@@ -16,8 +16,6 @@ using Discord;
 using Discord.Commands;
 using SanaraV2.Modules.Base;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -31,9 +29,9 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Drop", RunMode = RunMode.Async), Summary("Get informations about a drop")]
         public async Task Drop(params string[] shipNameArr)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Kancolle);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
-            Task<EmbedFieldBuilder> constructionTask = Task.Run(() => GetDropConstructionField(shipNameArr, Context.Guild.Id));
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Kancolle);
+            await p.DoAction(Context.User, Program.Module.Kancolle);
+            Task<EmbedFieldBuilder> constructionTask = Task.Run(() => GetDropConstructionField(shipNameArr));
             Task<EmbedFieldBuilder> mapTask = Task.Run(() => GetDropMapField(shipNameArr, Context.Guild.Id));
             string name = string.Join("", shipNameArr);
             EmbedBuilder embed = new EmbedBuilder();
@@ -51,24 +49,24 @@ namespace SanaraV2.Modules.GamesInfo
             }
         }
 
-        private async Task<EmbedFieldBuilder> GetDropConstructionField(string[] shipNameArr, ulong guildId)
+        private async Task<EmbedFieldBuilder> GetDropConstructionField(string[] shipNameArr)
         {
             string embedMsg = null;
             var result = await Features.GamesInfo.Kancolle.SearchDropConstruction(shipNameArr);
             switch (result.error)
             {
                 case Features.GamesInfo.Error.Drop.Help:
-                    throw new ArgumentException(Sentences.KancolleHelp(guildId));
+                    throw new ArgumentException(Sentences.KancolleHelp(Context.Guild));
 
                 case Features.GamesInfo.Error.Drop.NotFound:
-                    throw new ArgumentException(Sentences.ShipgirlDontExist(guildId));
+                    throw new ArgumentException(Sentences.ShipgirlDontExist(Context.Guild));
 
                 case Features.GamesInfo.Error.Drop.NotReferenced:
-                    embedMsg = Sentences.ShipNotReferencedConstruction(Context.Guild.Id);
+                    embedMsg = Sentences.ShipNotReferencedConstruction(Context.Guild);
                     break;
 
                 case Features.GamesInfo.Error.Drop.DontDrop:
-                    embedMsg = Sentences.DontDropOnMaps(Context.Guild.Id);
+                    embedMsg = Sentences.DontDropOnMaps(Context.Guild);
                     break;
 
                 case Features.GamesInfo.Error.Drop.None:
@@ -76,11 +74,11 @@ namespace SanaraV2.Modules.GamesInfo
                     foreach (var elem in result.answer.elems)
                     {
                         embedMsg += "**" + elem.chance + "%:** "
-                            + Sentences.Fuel(guildId) + " " + elem.fuel + ", "
-                            + Sentences.Ammos(guildId) + " " + elem.ammos + ", "
-                            + Sentences.Iron(guildId) + " " + elem.iron + ", "
-                            + Sentences.Bauxite(guildId) + " " + elem.bauxite + ", "
-                            + Sentences.DevMat(guildId) + " " + elem.devMat
+                            + Sentences.Fuel(Context.Guild) + " " + elem.fuel + ", "
+                            + Sentences.Ammos(Context.Guild) + " " + elem.ammos + ", "
+                            + Sentences.Iron(Context.Guild) + " " + elem.iron + ", "
+                            + Sentences.Bauxite(Context.Guild) + " " + elem.bauxite + ", "
+                            + Sentences.DevMat(Context.Guild) + " " + elem.devMat
                             + Environment.NewLine;
                         i++;
                     }
@@ -91,7 +89,7 @@ namespace SanaraV2.Modules.GamesInfo
             }
             return (new EmbedFieldBuilder()
             {
-                Name = Sentences.ConstructionDrop(guildId),
+                Name = Sentences.ConstructionDrop(Context.Guild),
                 Value = embedMsg
             });
         }
@@ -103,17 +101,17 @@ namespace SanaraV2.Modules.GamesInfo
             switch (result.error)
             {
                 case Features.GamesInfo.Error.Drop.Help:
-                    throw new ArgumentException(Sentences.KancolleHelp(guildId));
+                    throw new ArgumentException(Sentences.KancolleHelp(Context.Guild));
 
                 case Features.GamesInfo.Error.Drop.NotFound:
-                    throw new ArgumentException(Sentences.ShipgirlDontExist(guildId));
+                    throw new ArgumentException(Sentences.ShipgirlDontExist(Context.Guild));
 
                 case Features.GamesInfo.Error.Drop.NotReferenced:
-                    embedMsg = Sentences.ShipNotReferencedMap(Context.Guild.Id);
+                    embedMsg = Sentences.ShipNotReferencedMap(Context.Guild);
                     break;
 
                 case Features.GamesInfo.Error.Drop.DontDrop:
-                    embedMsg = Sentences.DontDropOnMaps(Context.Guild.Id);
+                    embedMsg = Sentences.DontDropOnMaps(Context.Guild);
                     break;
 
                 case Features.GamesInfo.Error.Drop.None:
@@ -123,15 +121,15 @@ namespace SanaraV2.Modules.GamesInfo
                         switch (k.Value)
                         {
                             case Features.GamesInfo.Response.DropMapLocation.NormalOnly:
-                                embedMsg += Sentences.OnlyNormalNodes(Context.Guild.Id);
+                                embedMsg += Sentences.OnlyNormalNodes(Context.Guild);
                                 break;
 
                             case Features.GamesInfo.Response.DropMapLocation.BossOnly:
-                                embedMsg += Sentences.OnlyBossNode(Context.Guild.Id);
+                                embedMsg += Sentences.OnlyBossNode(Context.Guild);
                                 break;
 
                             case Features.GamesInfo.Response.DropMapLocation.Anywhere:
-                                embedMsg += Sentences.AnyNode(Context.Guild.Id);
+                                embedMsg += Sentences.AnyNode(Context.Guild);
                                 break;
                         }
                         embedMsg += Environment.NewLine;
@@ -143,7 +141,7 @@ namespace SanaraV2.Modules.GamesInfo
             }
             return (new EmbedFieldBuilder()
             {
-                Name = Sentences.MapDrop(guildId) + ((result.answer != null && result.answer.rarity != null) ? (Sentences.Rarity(guildId)    + ": " + result.answer.rarity.ToString() + " / 7") : ("")),
+                Name = Sentences.MapDrop(Context.Guild) + ((result.answer != null && result.answer.rarity != null) ? (Sentences.Rarity(Context.Guild)    + ": " + result.answer.rarity.ToString() + " / 7") : ("")),
                 Value = embedMsg
             });
         }
@@ -154,17 +152,17 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Charac", RunMode = RunMode.Async), Summary("Get informations about a Kancolle character")]
         public async Task Charac(params string[] shipNameArr)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Kancolle);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Kancolle);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Kancolle);
+            await p.DoAction(Context.User, Program.Module.Kancolle);
             var result = await Features.GamesInfo.Kancolle.SearchCharac(shipNameArr);
             switch (result.error)
             {
                 case Features.GamesInfo.Error.Charac.Help:
-                    await ReplyAsync(Sentences.KancolleHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.KancolleHelp(Context.Guild));
                     break;
 
                 case Features.GamesInfo.Error.Charac.NotFound:
-                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild.Id));
+                    await ReplyAsync(Sentences.ShipgirlDontExist(Context.Guild));
                     break;
 
                 case Features.GamesInfo.Error.Charac.None:

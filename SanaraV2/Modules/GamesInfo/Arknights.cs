@@ -16,17 +16,17 @@ namespace SanaraV2.Modules.GamesInfo
         [Command("Charac", RunMode = RunMode.Async), Alias("Character")]
         public async Task Charac(params string[] name)
         {
-            Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Arknights);
-            await Program.p.DoAction(Context.User, Context.Guild.Id, Program.Module.Arknights);
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Arknights);
+            await Program.p.DoAction(Context.User, Program.Module.Arknights);
             var result = await Features.GamesInfo.Arknights.SearchCharac(name);
             switch (result.error)
             {
                 case Features.GamesInfo.Error.Charac.Help:
-                    await ReplyAsync(Sentences.ArknightsHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.ArknightsHelp(Context.Guild));
                     break;
 
                 case Features.GamesInfo.Error.Charac.NotFound:
-                    await ReplyAsync(Sentences.OperatorDontExist(Context.Guild.Id));
+                    await ReplyAsync(Sentences.OperatorDontExist(Context.Guild));
                     break;
 
                 case Features.GamesInfo.Error.Charac.None:
