@@ -20,59 +20,59 @@ namespace SanaraV2.Modules.Entertainment
     public static class Sentences
     {
         /// --------------------------- AnimeManga ---------------------------
-        public static string MangaHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaHelp")); }
-        public static string AnimeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "animeHelp")); }
-        public static string LNHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "LNHelp")); }
-        public static string SourceHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "sourceHelp")); }
-        public static string MangaNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "mangaNotFound")); }
-        public static string AnimeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "animeNotFound")); }
-        public static string LNNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "LNNotFound")); }
-        public static string AnimeEpisodes(ulong guildId) { return (Translation.GetTranslation(guildId, "animeEpisodes")); }
-        public static string AnimeLength(ulong guildId, int length) { return (Translation.GetTranslation(guildId, "animeLength", length.ToString())); }
-        public static string AnimeRating(ulong guildId) { return (Translation.GetTranslation(guildId, "animeRating")); }
-        public static string AnimeAudiance(ulong guildId) { return (Translation.GetTranslation(guildId, "animeAudiance")); }
-        public static string ToBeAnnounced(ulong guildId) { return (Translation.GetTranslation(guildId, "toBeAnnounced")); }
-        public static string Unknown(ulong guildId) { return (Translation.GetTranslation(guildId, "unknown")); }
-        public static string Certitude(ulong guildId) { return (Translation.GetTranslation(guildId, "certitude")); }
-        public static string NotAnUrl(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnUrl")); }
-        public static string SubscribeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "subscribeHelp")); }
-        public static string InvalidChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidChannel")); }
-        public static string NoSubscription(ulong guildId) { return (Translation.GetTranslation(guildId, "noSubscription")); }
-        public static string SubscribeDone(ulong guildId, string name, ITextChannel channel) { return (Translation.GetTranslation(guildId, "subscribeDone", name, channel.Mention)); }
-        public static string UnsubscribeDone(ulong guildId, string name) { return (Translation.GetTranslation(guildId, "unsubscribeDone", name)); }
+        public static string MangaHelp(IGuild guild) { return (Translation.GetTranslation(guild, "mangaHelp")); }
+        public static string AnimeHelp(IGuild guild) { return (Translation.GetTranslation(guild, "animeHelp")); }
+        public static string LNHelp(IGuild guild) { return (Translation.GetTranslation(guild, "LNHelp")); }
+        public static string SourceHelp(IGuild guild) { return (Translation.GetTranslation(guild, "sourceHelp")); }
+        public static string MangaNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "mangaNotFound")); }
+        public static string AnimeNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "animeNotFound")); }
+        public static string LNNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "LNNotFound")); }
+        public static string AnimeEpisodes(IGuild guild) { return (Translation.GetTranslation(guild, "animeEpisodes")); }
+        public static string AnimeLength(IGuild guild, int length) { return (Translation.GetTranslation(guild, "animeLength", length.ToString())); }
+        public static string AnimeRating(IGuild guild) { return (Translation.GetTranslation(guild, "animeRating")); }
+        public static string AnimeAudiance(IGuild guild) { return (Translation.GetTranslation(guild, "animeAudiance")); }
+        public static string ToBeAnnounced(IGuild guild) { return (Translation.GetTranslation(guild, "toBeAnnounced")); }
+        public static string Unknown(IGuild guild) { return (Translation.GetTranslation(guild, "unknown")); }
+        public static string Certitude(IGuild guild) { return (Translation.GetTranslation(guild, "certitude")); }
+        public static string NotAnUrl(IGuild guild) { return (Translation.GetTranslation(guild, "notAnUrl")); }
+        public static string SubscribeHelp(IGuild guild) { return (Translation.GetTranslation(guild, "subscribeHelp")); }
+        public static string InvalidChannel(IGuild guild) { return (Translation.GetTranslation(guild, "invalidChannel")); }
+        public static string NoSubscription(IGuild guild) { return (Translation.GetTranslation(guild, "noSubscription")); }
+        public static string SubscribeDone(IGuild guild, string name, ITextChannel channel) { return (Translation.GetTranslation(guild, "subscribeDone", name, channel.Mention)); }
+        public static string UnsubscribeDone(IGuild guild, string name) { return (Translation.GetTranslation(guild, "unsubscribeDone", name)); }
 
         /// --------------------------- Radio ---------------------------
-        public static string RadioAlreadyStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyStarted")); }
-        public static string RadioNeedChannel(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNeedChannel")); }
-        public static string RadioNeedArg(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNeedArg")); }
-        public static string RadioNotStarted(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNotStarted")); }
-        public static string RadioAlreadyInList(ulong guildId) { return (Translation.GetTranslation(guildId, "radioAlreadyInList")); }
-        public static string RadioTooMany(ulong guildId) { return (Translation.GetTranslation(guildId, "radioTooMany")); }
-        public static string RadioNoSong(ulong guildId) { return (Translation.GetTranslation(guildId, "radioNoSong")); }
-        public static string SongSkipped(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songSkipped", songName)); }
-        public static string SongsSkipped(ulong guildId, int nb) { return (Translation.GetTranslation(guildId, "songSkipped", nb.ToString())); }
-        public static string InvalidSong(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidSong")); }
-        public static string Current(ulong guildId) { return (Translation.GetTranslation(guildId, "current")); }
-        public static string Downloading(ulong guildId) { return (Translation.GetTranslation(guildId, "downloading")); }
-        public static string SongAdded(ulong guildId, string songName) { return (Translation.GetTranslation(guildId, "songAdded", songName)); }
+        public static string RadioAlreadyStarted(IGuild guild) { return (Translation.GetTranslation(guild, "radioAlreadyStarted")); }
+        public static string RadioNeedChannel(IGuild guild) { return (Translation.GetTranslation(guild, "radioNeedChannel")); }
+        public static string RadioNeedArg(IGuild guild) { return (Translation.GetTranslation(guild, "radioNeedArg")); }
+        public static string RadioNotStarted(IGuild guild) { return (Translation.GetTranslation(guild, "radioNotStarted")); }
+        public static string RadioAlreadyInList(IGuild guild) { return (Translation.GetTranslation(guild, "radioAlreadyInList")); }
+        public static string RadioTooMany(IGuild guild) { return (Translation.GetTranslation(guild, "radioTooMany")); }
+        public static string RadioNoSong(IGuild guild) { return (Translation.GetTranslation(guild, "radioNoSong")); }
+        public static string SongSkipped(IGuild guild, string songName) { return (Translation.GetTranslation(guild, "songSkipped", songName)); }
+        public static string SongsSkipped(IGuild guild, int nb) { return (Translation.GetTranslation(guild, "songSkipped", nb.ToString())); }
+        public static string InvalidSong(IGuild guild) { return (Translation.GetTranslation(guild, "invalidSong")); }
+        public static string Current(IGuild guild) { return (Translation.GetTranslation(guild, "current")); }
+        public static string Downloading(IGuild guild) { return (Translation.GetTranslation(guild, "downloading")); }
+        public static string SongAdded(IGuild guild, string songName) { return (Translation.GetTranslation(guild, "songAdded", songName)); }
 
         /// --------------------------- VN ---------------------------
-        public static string VndbHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbHelp")); }
-        public static string VndbNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbNotFound")); }
-        public static string AvailableEnglish(ulong guildId) { return (Translation.GetTranslation(guildId, "availableEnglish")); }
-        public static string AvailableWindows(ulong guildId) { return (Translation.GetTranslation(guildId, "availableWindows")); }
-        public static string VndbRating(ulong guildId) { return (Translation.GetTranslation(guildId, "vndbRating")); }
-        public static string Hours(ulong guildId, string length) { return (Translation.GetTranslation(guildId, "hours", length)); }
-        public static string Length(ulong guildId) { return (Translation.GetTranslation(guildId, "length")); }
-        public static string Tba(ulong guildId) { return (Translation.GetTranslation(guildId, "tba")); }
-        public static string ReleaseDate(ulong guildId) { return (Translation.GetTranslation(guildId, "releaseDate")); }
+        public static string VndbHelp(IGuild guild) { return (Translation.GetTranslation(guild, "vndbHelp")); }
+        public static string VndbNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "vndbNotFound")); }
+        public static string AvailableEnglish(IGuild guild) { return (Translation.GetTranslation(guild, "availableEnglish")); }
+        public static string AvailableWindows(IGuild guild) { return (Translation.GetTranslation(guild, "availableWindows")); }
+        public static string VndbRating(IGuild guild) { return (Translation.GetTranslation(guild, "vndbRating")); }
+        public static string Hours(IGuild guild, string length) { return (Translation.GetTranslation(guild, "hours", length)); }
+        public static string Length(IGuild guild) { return (Translation.GetTranslation(guild, "length")); }
+        public static string Tba(IGuild guild) { return (Translation.GetTranslation(guild, "tba")); }
+        public static string ReleaseDate(IGuild guild) { return (Translation.GetTranslation(guild, "releaseDate")); }
 
         /// --------------------------- XKCD ---------------------------
-        public static string XkcdWrongArg(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdWrongArg")); }
-        public static string XkcdWrongId(ulong guildId, int max) { return (Translation.GetTranslation(guildId, "xkcdWrongId", max.ToString())); }
+        public static string XkcdWrongArg(IGuild guild) { return (Translation.GetTranslation(guild, "xkcdWrongArg")); }
+        public static string XkcdWrongId(IGuild guild, int max) { return (Translation.GetTranslation(guild, "xkcdWrongId", max.ToString())); }
 
         /// --------------------------- Youtube ---------------------------
-        public static string YoutubeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeHelp")); }
-        public static string YoutubeNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeNotFound")); }
+        public static string YoutubeHelp(IGuild guild) { return (Translation.GetTranslation(guild, "youtubeHelp")); }
+        public static string YoutubeNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "youtubeNotFound")); }
     }
 }

@@ -29,9 +29,11 @@ namespace SanaraV2.Modules.Tools
         /// <summary>
         /// Only guild owner and users that have "Manage Guild" permission can modify bot settings for the guild
         /// </summary>
-        public static bool CanModify(IUser user, ulong ownerId)
+        public static bool CanModify(IUser user, IGuild guild)
         {
-            if (user.Id == ownerId)
+            if (guild == null)
+                return true;
+            if (user.Id == guild.OwnerId)
                 return true;
             IGuildUser guildUser = (IGuildUser)user;
             return guildUser.GuildPermissions.ManageGuild;

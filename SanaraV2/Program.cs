@@ -627,7 +627,7 @@ namespace SanaraV2
         /// <param name="u">User that sent the message</param>
         /// <param name="serverId">The ID of the current guild</param>
         /// <param name="m">The module that was called (see above)</param>
-        public async Task DoAction(IUser u, ulong serverId, Module m)
+        public async Task DoAction(IUser u, Module m)
         {
             if (!u.IsBot && sendStats)
                 await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("modules", m.ToString()) });
@@ -708,16 +708,14 @@ namespace SanaraV2
             Task.Run(() => { gm.ReceiveMessageAsync(arg.Content, arg.Author, arg.Channel.Id, msg); });
 
             int pos = 0;
-            if (arg.Channel as ITextChannel == null) // The bot doesn't handle private messages
-            {
-                await arg.Channel.SendMessageAsync(Modules.Base.Sentences.DontPm(0));
-                return;
-            }
-            string prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId]; // We get the bot prefix for this guild
+            string prefix;
+            var textChan = arg.Channel as ITextChannel;
+            if (textChan == null) prefix = "s.";
+            else prefix = db.Prefixs[(arg.Channel as ITextChannel).GuildId]; // We get the bot prefix for this guild
             if (msg.HasMentionPrefix(client.CurrentUser, ref pos) || (prefix != "" && msg.HasStringPrefix(prefix, ref pos)))
             {
                 var context = new SocketCommandContext(client, msg);
-                if (!((IGuildUser)await context.Channel.GetUserAsync(client.CurrentUser.Id)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks)
+                if (textChan != null && !((IGuildUser)await context.Channel.GetUserAsync(client.CurrentUser.Id)).GetPermissions((IGuildChannel)context.Channel).EmbedLinks) // If we are in a guild and we can't embed links
                 {
                     await context.Channel.SendMessageAsync(Modules.Base.Sentences.NeedEmbedLinks(context.Guild.Id));
                     return;
@@ -808,7 +806,11 @@ namespace SanaraV2
                 if (ravenClient != null)
                     ravenClient.Capture(new SentryEvent(new Exception(ce.Context.Message.ToString(), msg.Exception)));
                 var now = DateTime.Now;
-                string id = now.ToString("ddHHmmssfff") + ce.Context.Guild.Id.ToString().Substring(0, 4);
+                string id;
+                if (ce.Context.Guild == null)
+                    id = now.ToString("ddHHmmssfff") + ce.Context.User.Id.ToString().Substring(0, 4);
+                else
+                    id = now.ToString("ddHHmmssfff") + ce.Context.Guild.Id.ToString().Substring(0, 4);
                 exceptions.Add(id, new ErrorData() { date = now, exception = ce });
                 ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                 {

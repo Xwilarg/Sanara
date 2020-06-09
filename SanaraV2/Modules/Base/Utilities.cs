@@ -21,9 +21,9 @@ namespace SanaraV2.Modules.Base
 {
     public static class Utilities
     {
-        public static void CheckAvailability(ulong guildId, Program.Module module)
+        public static void CheckAvailability(IGuild guild, Program.Module module)
         {
-            if (!Program.p.db.IsAvailable(guildId, module))
+            if (guild != null && !Program.p.db.IsAvailable(guild.Id, module))
                 throw new NotAvailable();
         }
 

@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using SanaraV2.Modules.Base;
 using System;
 
@@ -20,264 +21,264 @@ namespace SanaraV2.Modules.Tools
     public static class Sentences
     {
         /// --------------------------- Communication ---------------------------
-        public static string UserNotExist(ulong guildId) { return (Translation.GetTranslation(guildId, "userNotExist")); }
-        public static string Username(ulong guildId) { return (Translation.GetTranslation(guildId, "username")); }
-        public static string Nickname(ulong guildId) { return (Translation.GetTranslation(guildId, "nickname")); }
-        public static string AccountCreation(ulong guildId) { return (Translation.GetTranslation(guildId, "accountCreation")); }
-        public static string GuildJoined(ulong guildId) { return (Translation.GetTranslation(guildId, "guildJoined")); }
-        public static string Creator(ulong guildId) { return (Translation.GetTranslation(guildId, "creator")); }
-        public static string Uptime(ulong guildId) { return (Translation.GetTranslation(guildId, "uptime")); }
-        public static string Website(ulong guildId) { return (Translation.GetTranslation(guildId, "website")); }
-        public static string OfficialGuild(ulong guildId) { return (Translation.GetTranslation(guildId, "officialGuild")); }
-        public static string Roles(ulong guildId) { return (Translation.GetTranslation(guildId, "roles")); }
-        public static string NoRole(ulong guildId) { return (Translation.GetTranslation(guildId, "noRole")); }
-        public static string LatestVersion(ulong guildId) { return (Translation.GetTranslation(guildId, "latestVersion")); }
-        public static string NumberGuilds(ulong guildId) { return (Translation.GetTranslation(guildId, "numberGuilds")); }
-        public static string QuoteInvalidId(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteInvalidId")); }
-        public static string QuoteNoMessage(ulong guildId) { return (Translation.GetTranslation(guildId, "quoteNoMessage")); }
-        public static string Enabled(ulong guildId) { return (Translation.GetTranslation(guildId, "enabled")); }
-        public static string Disabled(ulong guildId) { return (Translation.GetTranslation(guildId, "disabled")); }
-        public static string EvalHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "evalHelp")); }
-        public static string EvalError(ulong guildId, string msg) { return (Translation.GetTranslation(guildId, "evalError", msg)); }
-        public static string InvitationLink(ulong guildId) { return (Translation.GetTranslation(guildId, "invitationLink")); }
-        public static string ProfilePicture(ulong guildId) { return (Translation.GetTranslation(guildId, "profilePicture")); }
-        public static string PollHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "pollHelp")); }
-        public static string PollTooManyChoices(ulong guildId) { return (Translation.GetTranslation(guildId, "pollTooManyChoices")); }
-        public static string InvalidCalc(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidCalc")); }
-        public static string CompleteHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "completeHelp")); }
-        public static string CompleteWait(ulong guildId) { return (Translation.GetTranslation(guildId, "completeWait")); }
+        public static string UserNotExist(IGuild guild) { return (Translation.GetTranslation(guild, "userNotExist")); }
+        public static string Username(IGuild guild) { return (Translation.GetTranslation(guild, "username")); }
+        public static string Nickname(IGuild guild) { return (Translation.GetTranslation(guild, "nickname")); }
+        public static string AccountCreation(IGuild guild) { return (Translation.GetTranslation(guild, "accountCreation")); }
+        public static string GuildJoined(IGuild guild) { return (Translation.GetTranslation(guild, "guildJoined")); }
+        public static string Creator(IGuild guild) { return (Translation.GetTranslation(guild, "creator")); }
+        public static string Uptime(IGuild guild) { return (Translation.GetTranslation(guild, "uptime")); }
+        public static string Website(IGuild guild) { return (Translation.GetTranslation(guild, "website")); }
+        public static string OfficialGuild(IGuild guild) { return (Translation.GetTranslation(guild, "officialGuild")); }
+        public static string Roles(IGuild guild) { return (Translation.GetTranslation(guild, "roles")); }
+        public static string NoRole(IGuild guild) { return (Translation.GetTranslation(guild, "noRole")); }
+        public static string LatestVersion(IGuild guild) { return (Translation.GetTranslation(guild, "latestVersion")); }
+        public static string NumberGuilds(IGuild guild) { return (Translation.GetTranslation(guild, "numberGuilds")); }
+        public static string QuoteInvalidId(IGuild guild) { return (Translation.GetTranslation(guild, "quoteInvalidId")); }
+        public static string QuoteNoMessage(IGuild guild) { return (Translation.GetTranslation(guild, "quoteNoMessage")); }
+        public static string Enabled(IGuild guild) { return (Translation.GetTranslation(guild, "enabled")); }
+        public static string Disabled(IGuild guild) { return (Translation.GetTranslation(guild, "disabled")); }
+        public static string EvalHelp(IGuild guild) { return (Translation.GetTranslation(guild, "evalHelp")); }
+        public static string EvalError(IGuild guild, string msg) { return (Translation.GetTranslation(guild, "evalError", msg)); }
+        public static string InvitationLink(IGuild guild) { return (Translation.GetTranslation(guild, "invitationLink")); }
+        public static string ProfilePicture(IGuild guild) { return (Translation.GetTranslation(guild, "profilePicture")); }
+        public static string PollHelp(IGuild guild) { return (Translation.GetTranslation(guild, "pollHelp")); }
+        public static string PollTooManyChoices(IGuild guild) { return (Translation.GetTranslation(guild, "pollTooManyChoices")); }
+        public static string InvalidCalc(IGuild guild) { return (Translation.GetTranslation(guild, "invalidCalc")); }
+        public static string CompleteHelp(IGuild guild) { return (Translation.GetTranslation(guild, "completeHelp")); }
+        public static string CompleteWait(IGuild guild) { return (Translation.GetTranslation(guild, "completeWait")); }
 
         /// --------------------------- Information ---------------------------
-        public static string DataSaved(ulong guildId, string about) { return (Translation.GetTranslation(guildId, "dataSaved", about)); }
-        public static string ServicesAvailability(ulong guildId) { return (Translation.GetTranslation(guildId, "servicesAvailability")); }
-        public static string TranslationsAvailability(ulong guildId) { return (Translation.GetTranslation(guildId, "translationsAvailability")); }
-        public static string LatestChanges(ulong guildId) { return (Translation.GetTranslation(guildId, "latestChanges")); }
-        public static string ByStr(ulong guildId) { return (Translation.GetTranslation(guildId, "by")); }
-        public static string ErrorHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "errorHelp")); }
-        public static string ErrorNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "errorNotFound")); }
-        public static string ErrorGdpr(ulong guildId, string link) { return (Translation.GetTranslation(guildId, "errorGdpr", link)); }
-        public static string ErrorDetails(ulong guildId, string error) { return (Translation.GetTranslation(guildId, "errorDetails", error)); }
-        public static string Command(ulong guildId) { return (Translation.GetTranslation(guildId, "command")); }
-        public static string Date(ulong guildId) { return (Translation.GetTranslation(guildId, "date")); }
-        public static string CantPM(ulong guildId) { return (Translation.GetTranslation(guildId, "cantPM")); }
+        public static string DataSaved(IGuild guild, string about) { return (Translation.GetTranslation(guild, "dataSaved", about)); }
+        public static string ServicesAvailability(IGuild guild) { return (Translation.GetTranslation(guild, "servicesAvailability")); }
+        public static string TranslationsAvailability(IGuild guild) { return (Translation.GetTranslation(guild, "translationsAvailability")); }
+        public static string LatestChanges(IGuild guild) { return (Translation.GetTranslation(guild, "latestChanges")); }
+        public static string ByStr(IGuild guild) { return (Translation.GetTranslation(guild, "by")); }
+        public static string ErrorHelp(IGuild guild) { return (Translation.GetTranslation(guild, "errorHelp")); }
+        public static string ErrorNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "errorNotFound")); }
+        public static string ErrorGdpr(IGuild guild, string link) { return (Translation.GetTranslation(guild, "errorGdpr", link)); }
+        public static string ErrorDetails(IGuild guild, string error) { return (Translation.GetTranslation(guild, "errorDetails", error)); }
+        public static string Command(IGuild guild) { return (Translation.GetTranslation(guild, "command")); }
+        public static string Date(IGuild guild) { return (Translation.GetTranslation(guild, "date")); }
+        public static string CantPM(IGuild guild) { return (Translation.GetTranslation(guild, "cantPM")); }
 
         /// --------------------------- Code ---------------------------
-        public static string ShellNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "shellNotFound")); }
-        public static string ShellHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "shellHelp")); }
-        public static string IncreaseHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "increaseHelp")); }
+        public static string ShellNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "shellNotFound")); }
+        public static string ShellHelp(IGuild guild) { return (Translation.GetTranslation(guild, "shellHelp")); }
+        public static string IncreaseHelp(IGuild guild) { return (Translation.GetTranslation(guild, "increaseHelp")); }
 
         /// --------------------------- Image ---------------------------
-        public static string InvalidColor(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidColor")); }
-        public static string HelpColor(ulong guildId) { return (Translation.GetTranslation(guildId, "helpColor")); }
-        public static string Rgb(ulong guildId) { return (Translation.GetTranslation(guildId, "rgb")); }
-        public static string Hex(ulong guildId) { return (Translation.GetTranslation(guildId, "hex")); }
+        public static string InvalidColor(IGuild guild) { return (Translation.GetTranslation(guild, "invalidColor")); }
+        public static string HelpColor(IGuild guild) { return (Translation.GetTranslation(guild, "helpColor")); }
+        public static string Rgb(IGuild guild) { return (Translation.GetTranslation(guild, "rgb")); }
+        public static string Hex(IGuild guild) { return (Translation.GetTranslation(guild, "hex")); }
 
         /// --------------------------- Linguist ---------------------------
-        public static string JapaneseHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "japaneseHelp")); }
-        public static string KanjiHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "kanjiHelp")); }
-        public static string TranslateHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "translateHelp")); }
-        public static string InvalidLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "invalidLanguage")); }
-        public static string NoJapaneseTranslation(ulong guildId) { return (Translation.GetTranslation(guildId, "noJapaneseTranslation")); }
-        public static string NoTextOnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "noTextOnImage")); }
-        public static string NotAnImage(ulong guildId) { return (Translation.GetTranslation(guildId, "notAnImage")); }
-        public static string UrbanHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "urbanHelp")); }
-        public static string UrbanNotFound(ulong guildId) { return (Translation.GetTranslation(guildId, "urbanNotFound")); }
-        public static string Definition(ulong guildId) { return (Translation.GetTranslation(guildId, "definition")); }
-        public static string Example(ulong guildId) { return (Translation.GetTranslation(guildId, "example")); }
-        public static string Radical(ulong guildId) { return (Translation.GetTranslation(guildId, "radical")); }
-        public static string Parts(ulong guildId) { return (Translation.GetTranslation(guildId, "parts")); }
+        public static string JapaneseHelp(IGuild guild) { return (Translation.GetTranslation(guild, "japaneseHelp")); }
+        public static string KanjiHelp(IGuild guild) { return (Translation.GetTranslation(guild, "kanjiHelp")); }
+        public static string TranslateHelp(IGuild guild) { return (Translation.GetTranslation(guild, "translateHelp")); }
+        public static string InvalidLanguage(IGuild guild) { return (Translation.GetTranslation(guild, "invalidLanguage")); }
+        public static string NoJapaneseTranslation(IGuild guild) { return (Translation.GetTranslation(guild, "noJapaneseTranslation")); }
+        public static string NoTextOnImage(IGuild guild) { return (Translation.GetTranslation(guild, "noTextOnImage")); }
+        public static string NotAnImage(IGuild guild) { return (Translation.GetTranslation(guild, "notAnImage")); }
+        public static string UrbanHelp(IGuild guild) { return (Translation.GetTranslation(guild, "urbanHelp")); }
+        public static string UrbanNotFound(IGuild guild) { return (Translation.GetTranslation(guild, "urbanNotFound")); }
+        public static string Definition(IGuild guild) { return (Translation.GetTranslation(guild, "definition")); }
+        public static string Example(IGuild guild) { return (Translation.GetTranslation(guild, "example")); }
+        public static string Radical(IGuild guild) { return (Translation.GetTranslation(guild, "radical")); }
+        public static string Parts(IGuild guild) { return (Translation.GetTranslation(guild, "parts")); }
 
         /// --------------------------- Settings ---------------------------
-        public static string NeedLanguage(ulong guildId) { return (Translation.GetTranslation(guildId, "needLanguage")); }
-        public static string PrefixRemoved(ulong guildId) { return (Translation.GetTranslation(guildId, "prefixRemoved")); }
-        public static string ModuleManagementHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "moduleManagementHelp")); }
-        public static string ModuleManagementInvalid(ulong guildId) { return (Translation.GetTranslation(guildId, "moduleManagementInvalid")); }
-        public static string ModuleEnabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleEnabled", moduleName)); }
-        public static string ModuleDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleDisabled", moduleName)); }
-        public static string ModuleAlreadyEnabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyEnabled", moduleName)); }
-        public static string ModuleAlreadyDisabled(ulong guildId, string moduleName) { return (Translation.GetTranslation(guildId, "moduleAlreadyDisabled", moduleName)); }
-        public static string AllModulesEnabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesEnabled")); }
-        public static string AllModulesDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesDisabled")); }
-        public static string AllModulesAlreadyEnabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyEnabled")); }
-        public static string AllModulesAlreadyDisabled(ulong guildId) { return (Translation.GetTranslation(guildId, "allModulesAlreadyDisabled")); }
-        public static string AnonymizeCurrentTrue(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeCurrentTrue")); }
-        public static string AnonymizeCurrentFalse(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeCurrentFalse")); }
-        public static string AnonymizeHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "anonymizeHelp")); }
+        public static string NeedLanguage(IGuild guild) { return (Translation.GetTranslation(guild, "needLanguage")); }
+        public static string PrefixRemoved(IGuild guild) { return (Translation.GetTranslation(guild, "prefixRemoved")); }
+        public static string ModuleManagementHelp(IGuild guild) { return (Translation.GetTranslation(guild, "moduleManagementHelp")); }
+        public static string ModuleManagementInvalid(IGuild guild) { return (Translation.GetTranslation(guild, "moduleManagementInvalid")); }
+        public static string ModuleEnabled(IGuild guild, string moduleName) { return (Translation.GetTranslation(guild, "moduleEnabled", moduleName)); }
+        public static string ModuleDisabled(IGuild guild, string moduleName) { return (Translation.GetTranslation(guild, "moduleDisabled", moduleName)); }
+        public static string ModuleAlreadyEnabled(IGuild guild, string moduleName) { return (Translation.GetTranslation(guild, "moduleAlreadyEnabled", moduleName)); }
+        public static string ModuleAlreadyDisabled(IGuild guild, string moduleName) { return (Translation.GetTranslation(guild, "moduleAlreadyDisabled", moduleName)); }
+        public static string AllModulesEnabled(IGuild guild) { return (Translation.GetTranslation(guild, "allModulesEnabled")); }
+        public static string AllModulesDisabled(IGuild guild) { return (Translation.GetTranslation(guild, "allModulesDisabled")); }
+        public static string AllModulesAlreadyEnabled(IGuild guild) { return (Translation.GetTranslation(guild, "allModulesAlreadyEnabled")); }
+        public static string AllModulesAlreadyDisabled(IGuild guild) { return (Translation.GetTranslation(guild, "allModulesAlreadyDisabled")); }
+        public static string AnonymizeCurrentTrue(IGuild guild) { return (Translation.GetTranslation(guild, "anonymizeCurrentTrue")); }
+        public static string AnonymizeCurrentFalse(IGuild guild) { return (Translation.GetTranslation(guild, "anonymizeCurrentFalse")); }
+        public static string AnonymizeHelp(IGuild guild) { return (Translation.GetTranslation(guild, "anonymizeHelp")); }
 
         /// --------------------------- Help ---------------------------
-        public static string NoCommandAvailable(ulong guildId) { return (Translation.GetTranslation(guildId, "noCommandAvailable")); }
-        public static string HelpHelp(ulong guildId) { return (Translation.GetTranslation(guildId, "helpHelp")); }
-        public static string Help(ulong guildId) { return (Translation.GetTranslation(guildId, "help")); }
+        public static string NoCommandAvailable(IGuild guild) { return (Translation.GetTranslation(guild, "noCommandAvailable")); }
+        public static string HelpHelp(IGuild guild) { return (Translation.GetTranslation(guild, "helpHelp")); }
+        public static string Help(IGuild guild) { return (Translation.GetTranslation(guild, "help")); }
 
         /// --------------------------- Help Module Name ---------------------------
-        public static string AnimeMangaModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "animeMangaModuleName")); }
-        public static string ArknightsModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "arknightsModuleName")); }
-        public static string BooruModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "booruModuleName")); }
-        public static string CodeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "codeModuleName")); }
-        public static string CommunicationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communicationModuleName")); }
-        public static string CommunityModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "communityModuleName")); }
-        public static string DoujinshiModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "doujinshiModuleName")); }
-        public static string GameModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "gameModuleName")); }
-        public static string ImageModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "imageModuleName")); }
-        public static string InformationModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "informationModuleName")); }
-        public static string KantaiCollectionModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "kantaiCollectionModuleName")); }
-        public static string LinguisticModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "linguisticModuleName")); }
-        public static string RadioModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "radioModuleName")); }
-        public static string SettingsModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "settingsModuleName")); }
-        public static string VisualNovelModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "visualNovelModuleName")); }
-        public static string XkcdModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "xkcdModuleName")); }
-        public static string YoutubeModuleName(ulong guildId) { return (Translation.GetTranslation(guildId, "youtubeModuleName")); }
+        public static string AnimeMangaModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "animeMangaModuleName")); }
+        public static string ArknightsModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "arknightsModuleName")); }
+        public static string BooruModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "booruModuleName")); }
+        public static string CodeModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "codeModuleName")); }
+        public static string CommunicationModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "communicationModuleName")); }
+        public static string CommunityModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "communityModuleName")); }
+        public static string DoujinshiModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "doujinshiModuleName")); }
+        public static string GameModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "gameModuleName")); }
+        public static string ImageModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "imageModuleName")); }
+        public static string InformationModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "informationModuleName")); }
+        public static string KantaiCollectionModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "kantaiCollectionModuleName")); }
+        public static string LinguisticModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "linguisticModuleName")); }
+        public static string RadioModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "radioModuleName")); }
+        public static string SettingsModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "settingsModuleName")); }
+        public static string VisualNovelModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "visualNovelModuleName")); }
+        public static string XkcdModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "xkcdModuleName")); }
+        public static string YoutubeModuleName(IGuild guild) { return (Translation.GetTranslation(guild, "youtubeModuleName")); }
         /// --------------------------- Help Module Content ---------------------------
-        public static string ArknightsHelp(ulong guildId)
+        public static string ArknightsHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Arknights))
-                return Translation.GetTranslation(guildId, "arknightsModuleCharac");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Arknights))
+                return Translation.GetTranslation(guild, "arknightsModuleCharac");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string AnimeMangaHelp(ulong guildId, bool isServerOwner)
+        public static string AnimeMangaHelp(IGuild guild, bool isServerOwner)
         {
             string res;
-            if (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga))
+            if (Program.p.db.IsAvailable(guild, Program.Module.AnimeManga))
             {
-                res = Translation.GetTranslation(guildId, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleManga") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleLN");
+                res = Translation.GetTranslation(guild, "animeMangaModuleAnime") + Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleManga") + Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleLN");
                 if (isServerOwner)
-                    res += Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guildId, "animeMangaModuleUnsubscribe");
+                    res += Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleSubscribe") + Environment.NewLine + Translation.GetTranslation(guild, "animeMangaModuleUnsubscribe");
                 else
-                    res += Environment.NewLine + "*" + Translation.GetTranslation(guildId, "ownerForFull") + "*";
+                    res += Environment.NewLine + "*" + Translation.GetTranslation(guild, "ownerForFull") + "*";
                 return res;
             }
-            return Base.Sentences.NotAvailable(guildId);
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string BooruHelp(ulong guildId, bool isChanNsfw)
+        public static string BooruHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Booru))
-                return Translation.GetTranslation(guildId, "booruModuleSource") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE926")
-                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleKonachan")
-                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleE621")) : (""))
-                + Environment.NewLine + Translation.GetTranslation(guildId, "booruModuleTags")
-                + (isChanNsfw ? "" : Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Booru))
+                return Translation.GetTranslation(guild, "booruModuleSource") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleSafebooru") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleE926")
+                + ((isChanNsfw) ? (Environment.NewLine + Translation.GetTranslation(guild, "booruModuleGelbooru") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleKonachan")
+                + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleRule34") + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleE621")) : (""))
+                + Environment.NewLine + Translation.GetTranslation(guild, "booruModuleTags")
+                + (isChanNsfw ? "" : Environment.NewLine + "*" + Translation.GetTranslation(guild, "nsfwForFull") + "*");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string CodeHelp(ulong guildId)
+        public static string CodeHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
-                return Translation.GetTranslation(guildId, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "codeModuleIncrease");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Communication))
+                return Translation.GetTranslation(guild, "codeModuleShell") + Environment.NewLine + Translation.GetTranslation(guild, "codeModuleColor") + Environment.NewLine + Translation.GetTranslation(guild, "codeModuleIncrease");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string CommunicationHelp(ulong guildId)
+        public static string CommunicationHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Communication))
+            if (Program.p.db.IsAvailable(guild, Program.Module.Communication))
             {
-                string str = Translation.GetTranslation(guildId, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleBotInfos")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModulePoll")
-                     + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleCalc") + Environment.NewLine + Translation.GetTranslation(guildId, "communicationModuleComplete");
+                string str = Translation.GetTranslation(guild, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleBotInfos")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModulePoll")
+                     + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleCalc") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleComplete");
                 return str;
             }
-            return Base.Sentences.NotAvailable(guildId);
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string CommunityHelp(ulong guildId, bool isServerOwner)
+        public static string CommunityHelp(IGuild guild, bool isServerOwner)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Community))
+            if (Program.p.db.IsAvailable(guild, Program.Module.Community))
             {
-                string str = Translation.GetTranslation(guildId, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleDescription")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleVisibility")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleUnfriend");
+                string str = Translation.GetTranslation(guild, "communityModuleGet") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleDescription")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleColor") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleVisibility")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleUnfriend");
                 if (isServerOwner)
-                    str += Environment.NewLine + Translation.GetTranslation(guildId, "communityModuleSaveAll");
+                    str += Environment.NewLine + Translation.GetTranslation(guild, "communityModuleSaveAll");
                 return str;
             }
-            return Base.Sentences.NotAvailable(guildId);
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string DoujinshiHelp(ulong guildId, bool isChanNsfw)
+        public static string DoujinshiHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
+            if (Program.p.db.IsAvailable(guild, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
-                    return Translation.GetTranslation(guildId, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleCosplay")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleDownloadCosplay")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleAdultVideo") + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleSubscribe")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "doujinshiModuleUnsubscribe") + Environment.NewLine + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanationsIntro")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations") + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations2")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations3") + Environment.NewLine + Translation.GetTranslation(guildId, "blacklistExplanations4");
+                    return Translation.GetTranslation(guild, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleCosplay")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleDownloadCosplay")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleAdultVideo") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleSubscribe")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleUnsubscribe") + Environment.NewLine + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanationsIntro")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanations") + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanations2")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanations3") + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanations4");
                 else
-                    return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*";
+                    return NoCommandAvailable(guild) + Environment.NewLine + "*" + Translation.GetTranslation(guild, "nsfwForFull") + "*";
             }
-            return Base.Sentences.NotAvailable(guildId);
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string GameHelp(ulong guildId, bool isChanNsfw)
+        public static string GameHelp(IGuild guild, bool isChanNsfw)
         {
-            return Games.GameModule.DisplayHelp(guildId, isChanNsfw);
+            return Games.GameModule.DisplayHelp(guild, isChanNsfw);
         }
-        public static string InformationHelp(ulong guildId)
+        public static string InformationHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Information))
-                return Translation.GetTranslation(guildId, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleGdpr")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleInvite")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleLogs") + Environment.NewLine + Translation.GetTranslation(guildId, "informationModuleError");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Information))
+                return Translation.GetTranslation(guild, "informationModuleHelp") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleGdpr")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleStatus") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleInvite")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleLogs") + Environment.NewLine + Translation.GetTranslation(guild, "informationModuleError");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string KantaiCollectionHelp(ulong guildId)
+        public static string KantaiCollectionHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle))
-                return Translation.GetTranslation(guildId, "kantaiCollectionModuleCharac");// + Environment.NewLine + Translation.GetTranslation(guildId, "kantaiCollectionModuleDrop");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Kancolle))
+                return Translation.GetTranslation(guild, "kantaiCollectionModuleCharac");// + Environment.NewLine + Translation.GetTranslation(guild, "kantaiCollectionModuleDrop");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string LinguisticHelp(ulong guildId, bool isChanNsfw)
+        public static string LinguisticHelp(IGuild guild, bool isChanNsfw)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic))
-                return Translation.GetTranslation(guildId, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleKanji")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "linguisticModuleTranslation")
-                 + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guildId, "linguisticModuleUrban")) : ("*" + Translation.GetTranslation(guildId, "nsfwForFull") + "*"));
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Linguistic))
+                return Translation.GetTranslation(guild, "linguisticModuleJapanese") + Environment.NewLine + Translation.GetTranslation(guild, "linguisticModuleKanji")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "linguisticModuleTranslation")
+                 + Environment.NewLine + ((isChanNsfw) ? (Translation.GetTranslation(guild, "linguisticModuleUrban")) : ("*" + Translation.GetTranslation(guild, "nsfwForFull") + "*"));
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string RadioHelp(ulong guildId)
+        public static string RadioHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Radio))
-                return Translation.GetTranslation(guildId, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleAdd")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleSkip")
-                    + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleRemove") + Environment.NewLine + Translation.GetTranslation(guildId, "radioModuleStop");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Radio))
+                return Translation.GetTranslation(guild, "radioModuleLaunch") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleAdd")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "radioModulePlaylist") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleSkip")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleRemove") + Environment.NewLine + Translation.GetTranslation(guild, "radioModuleStop");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string SettingsHelp(ulong guildId, bool isServerOwner, bool isBotOwner)
+        public static string SettingsHelp(IGuild guild, bool isServerOwner, bool isBotOwner)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Settings))
+            if (Program.p.db.IsAvailable(guild, Program.Module.Settings))
             {
                 string finalStr = "";
                 if (isServerOwner)
-                    finalStr = Translation.GetTranslation(guildId, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModulePrefix")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleDisable")
-                         + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleAnonymize");
+                    finalStr = Translation.GetTranslation(guild, "settingsModuleLanguage") + Environment.NewLine + Translation.GetTranslation(guild, "settingsModulePrefix")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleEnable") + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleDisable")
+                         + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleAnonymize");
                 if (isBotOwner)
                 {
                     if (finalStr != "")
                         finalStr += Environment.NewLine;
-                    finalStr += Translation.GetTranslation(guildId, "settingsModuleReload")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleResetDb")
-                        + Environment.NewLine + Translation.GetTranslation(guildId, "settingsModuleEval");
+                    finalStr += Translation.GetTranslation(guild, "settingsModuleReload")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleResetDb")
+                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleEval");
                 }
                 if (finalStr == "")
-                    return NoCommandAvailable(guildId) + Environment.NewLine + "*" + Translation.GetTranslation(guildId, "ownerForFull") + "*"; ;
+                    return NoCommandAvailable(guild) + Environment.NewLine + "*" + Translation.GetTranslation(guild, "ownerForFull") + "*"; ;
                 return finalStr;
             }
-            return Base.Sentences.NotAvailable(guildId);
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string VisualNovelHelp(ulong guildId)
+        public static string VisualNovelHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Vn))
-                return Translation.GetTranslation(guildId, "visualNovelModuleVn");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Vn))
+                return Translation.GetTranslation(guild, "visualNovelModuleVn");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string XkcdHelp(ulong guildId)
+        public static string XkcdHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Xkcd))
-                return Translation.GetTranslation(guildId, "xkcdModuleXkcd");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Xkcd))
+                return Translation.GetTranslation(guild, "xkcdModuleXkcd");
+            return Base.Sentences.NotAvailable(guild);
         }
-        public static string YouTubeHelp(ulong guildId)
+        public static string YouTubeHelp(IGuild guild)
         {
-            if (Program.p.db.IsAvailable(guildId, Program.Module.Youtube))
-                return Translation.GetTranslation(guildId, "youtubeModuleYoutube");
-            return Base.Sentences.NotAvailable(guildId);
+            if (Program.p.db.IsAvailable(guild, Program.Module.Youtube))
+                return Translation.GetTranslation(guild, "youtubeModuleYoutube");
+            return Base.Sentences.NotAvailable(guild);
         }
     }
 }

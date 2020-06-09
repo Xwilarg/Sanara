@@ -12,6 +12,7 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
+using Discord;
 using System;
 using System.Linq;
 
@@ -31,8 +32,9 @@ namespace SanaraV2.Modules.Base
             public string content;
         }
 
-        public static string GetTranslation(ulong guildId, string id, params string[] args)
+        public static string GetTranslation(IGuild guild, string id, params string[] args)
         {
+            ulong guildId = guild?.Id ?? 0;
             string language = "en";
             if (guildId != 0)
                 language = Program.p.db.Languages[guildId];
