@@ -30,8 +30,8 @@ namespace SanaraV2.Modules.NSFW
         [Command("Source", RunMode = RunMode.Async), Alias("Sauce", "AnimeSource", "SourceAnime")]
         public async Task Source(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
             if (Context.Message.Attachments.Count > 0)
                 args = new[] { Context.Message.Attachments.ToArray()[0].Url };
             var result = await Features.NSFW.Booru.SearchSourceBooru(args);
@@ -55,26 +55,26 @@ namespace SanaraV2.Modules.NSFW
                             Color = color,
                             Footer = new EmbedFooterBuilder
                             {
-                                Text = Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%"
+                                Text = Entertainment.Sentences.Certitude(Context.Guild) + ": " + result.answer.compatibility + "%"
                             }
                         }.Build());
                     }
                     else
                     {
-                        await ReplyAsync(result.answer.content + Environment.NewLine + result.answer.url + Environment.NewLine + Entertainment.Sentences.Certitude(Context.Guild.Id) + ": " + result.answer.compatibility + "%");
+                        await ReplyAsync(result.answer.content + Environment.NewLine + result.answer.url + Environment.NewLine + Entertainment.Sentences.Certitude(Context.Guild) + ": " + result.answer.compatibility + "%");
                     }
                     break;
 
                 case Features.NSFW.Error.SourceBooru.Help:
-                    await ReplyAsync(Entertainment.Sentences.SourceHelp(Context.Guild.Id));
+                    await ReplyAsync(Entertainment.Sentences.SourceHelp(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.SourceBooru.NotFound:
-                    await ReplyAsync(Tools.Sentences.NotAnImage(Context.Guild.Id));
+                    await ReplyAsync(Tools.Sentences.NotAnImage(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.SourceBooru.NotAnUrl:
-                    await ReplyAsync(Entertainment.Sentences.NotAnUrl(Context.Guild.Id));
+                    await ReplyAsync(Entertainment.Sentences.NotAnUrl(Context.Guild));
                     break;
 
                 default:
@@ -95,65 +95,65 @@ namespace SanaraV2.Modules.NSFW
         [Command("Safebooru", RunMode = RunMode.Async), Summary("Get an image from Safebooru")]
         public async Task SafebooruSearch(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task GelbooruSearch(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
         public async Task KonachanSearch(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
         public async Task Rule34Search(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
         public async Task E621Search(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
         public async Task E926Search(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild.Id, Context.User.Id);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
+            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
         public async Task TagsSearch(params string[] tags)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Booru);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Booru);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
+            await p.DoAction(Context.User, Program.Module.Booru);
             var result = await Features.NSFW.Booru.SearchTags(tags);
             switch (result.error)
             {
                 case Features.NSFW.Error.BooruTags.NotFound:
-                    await ReplyAsync(Sentences.InvalidId(Context.Guild.Id));
+                    await ReplyAsync(Sentences.InvalidId(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.BooruTags.Help:
-                    await ReplyAsync(Sentences.HelpId(Context.Guild.Id));
+                    await ReplyAsync(Sentences.HelpId(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.BooruTags.None:
@@ -165,9 +165,9 @@ namespace SanaraV2.Modules.NSFW
                         Description = result.answer.width + " x " + result.answer.height +
                         (result.answer.width == result.answer.aspectRatio.Item1 ? "" : " (" + result.answer.aspectRatio.Item1 + ":" + result.answer.aspectRatio.Item2 + ")")
                     };
-                    eb.AddField(((result.answer.sourceTags.Length > 1) ? (Sentences.Sources(Context.Guild.Id)) : (Sentences.Source(Context.Guild.Id))), "`" + string.Join(", ", result.answer.sourceTags) + "`");
-                    eb.AddField(((result.answer.characTags.Length > 1) ? (Sentences.Characters(Context.Guild.Id)) : (Sentences.Character(Context.Guild.Id))), "`" + string.Join(", ", result.answer.characTags) + "`");
-                    eb.AddField(((result.answer.artistTags.Length > 1) ? (Sentences.Artists(Context.Guild.Id)) : (Sentences.Artist(Context.Guild.Id))), "`" + string.Join(", ", result.answer.artistTags) + "`");
+                    eb.AddField(((result.answer.sourceTags.Length > 1) ? (Sentences.Sources(Context.Guild)) : (Sentences.Source(Context.Guild))), "`" + string.Join(", ", result.answer.sourceTags) + "`");
+                    eb.AddField(((result.answer.characTags.Length > 1) ? (Sentences.Characters(Context.Guild)) : (Sentences.Character(Context.Guild))), "`" + string.Join(", ", result.answer.characTags) + "`");
+                    eb.AddField(((result.answer.artistTags.Length > 1) ? (Sentences.Artists(Context.Guild)) : (Sentences.Artist(Context.Guild))), "`" + string.Join(", ", result.answer.artistTags) + "`");
                     await ReplyAsync("", false, eb.Build());
                     break;
 
@@ -176,24 +176,25 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        private static async Task PostImage(ABooru booru, ITextChannel chan, string[] tags, ulong guildId, ulong userId)
+        private static async Task PostImage(ABooru booru, IMessageChannel chan, string[] tags, IGuild guild, ulong userId)
         {
-            var result = await Features.NSFW.Booru.SearchBooru(!chan.IsNsfw, tags, booru, Program.p.rand);
+            var textChan = chan as ITextChannel;
+            var result = await Features.NSFW.Booru.SearchBooru(textChan == null ? true : !textChan.IsNsfw, tags, booru, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Booru.ChanNotNSFW:
-                    await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(chan.GuildId));
+                    await chan.SendMessageAsync(Base.Sentences.ChanIsNotNsfw(guild));
                     break;
 
                 case Features.NSFW.Error.Booru.NotFound:
-                    await chan.SendMessageAsync(Base.Sentences.TagsNotFound(guildId, tags));
+                    await chan.SendMessageAsync(Base.Sentences.TagsNotFound(guild, tags));
                     break;
 
                 case Features.NSFW.Error.Booru.None:
                     IUserMessage msg;
                     if (!Utilities.IsImage(result.answer.url))
                     {
-                        msg = await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guildId, result.answer.saveId) + "*");
+                        msg = await chan.SendMessageAsync(result.answer.url + Environment.NewLine + "*" + Sentences.ImageInfo(guild, result.answer.saveId) + "*");
                     }
                     else
                     {
@@ -204,7 +205,7 @@ namespace SanaraV2.Modules.NSFW
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = (result.answer.newTags != null ? "Some of your tags were invalid. The current search tags are: " + string.Join(", ", result.answer.newTags) + "\n\n" :
-                                "") + Sentences.ImageInfo(guildId, result.answer.saveId)
+                                "") + Sentences.ImageInfo(guild, result.answer.saveId)
                             }
                         }.Build());
                     }

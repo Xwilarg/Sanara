@@ -28,11 +28,16 @@ namespace SanaraV2.Modules.NSFW
         [Command("Subscribe Doujinshi"), Alias("Subscribe doujin", "Subscribe nhentai")]
         public async Task Subscribe(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
             }
             else
             {
@@ -40,25 +45,25 @@ namespace SanaraV2.Modules.NSFW
                 switch (result.error)
                 {
                     case Features.NSFW.Error.Subscribe.ChanNotSafe:
-                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                         break;
 
                     case Features.NSFW.Error.Subscribe.DestChanNotSafe:
-                        await ReplyAsync(Sentences.SubscribeSafeDestination(Context.Guild.Id));
+                        await ReplyAsync(Sentences.SubscribeSafeDestination(Context.Guild));
                         break;
 
                     case Features.NSFW.Error.Subscribe.Help:
-                        await ReplyAsync(Sentences.SubscribeNHentaiHelp(Context.Guild.Id));
+                        await ReplyAsync(Sentences.SubscribeNHentaiHelp(Context.Guild));
                         break;
 
                     case Features.NSFW.Error.Subscribe.InvalidChannel:
-                        await ReplyAsync(Entertainment.Sentences.InvalidChannel(Context.Guild.Id));
+                        await ReplyAsync(Entertainment.Sentences.InvalidChannel(Context.Guild));
                         break;
 
                     case Features.NSFW.Error.Subscribe.None:
-                        await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild.Id, "doujinshi", result.answer.chan) + Environment.NewLine
-                            + Sentences.Blacklist(Context.Guild.Id) + result.answer.subscription.GetBlacklistTags() + Environment.NewLine
-                            + Sentences.Whitelist(Context.Guild.Id) + result.answer.subscription.GetWhitelistTags());
+                        await ReplyAsync(Entertainment.Sentences.SubscribeDone(Context.Guild, "doujinshi", result.answer.chan) + Environment.NewLine
+                            + Sentences.Blacklist(Context.Guild) + result.answer.subscription.GetBlacklistTags() + Environment.NewLine
+                            + Sentences.Whitelist(Context.Guild) + result.answer.subscription.GetWhitelistTags());
                         break;
 
                     default:
@@ -70,11 +75,16 @@ namespace SanaraV2.Modules.NSFW
         [Command("Unsubscribe Doujinshi"), Alias("Unsubscribe doujin", "Unsubscribe nhentai")]
         public async Task Unsubcribe(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            if (!Tools.Settings.CanModify(Context.User, Context.Guild.OwnerId))
+            if (Context.Guild == null)
             {
-                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild.Id, Context.Guild.OwnerId));
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
+            if (!Tools.Settings.CanModify(Context.User, Context.Guild))
+            {
+                await ReplyAsync(Base.Sentences.OnlyOwnerStr(Context.Guild, Context.Guild.OwnerId));
             }
             else
             {
@@ -82,15 +92,15 @@ namespace SanaraV2.Modules.NSFW
                 switch (result.error)
                 {
                     case Features.NSFW.Error.Unsubscribe.NoSubscription:
-                        await ReplyAsync(Entertainment.Sentences.NoSubscription(Context.Guild.Id));
+                        await ReplyAsync(Entertainment.Sentences.NoSubscription(Context.Guild));
                         break;
 
                     case Features.NSFW.Error.Unsubscribe.None:
-                        await ReplyAsync(Entertainment.Sentences.UnsubscribeDone(Context.Guild.Id, "doujinshi"));
+                        await ReplyAsync(Entertainment.Sentences.UnsubscribeDone(Context.Guild, "doujinshi"));
                         break;
 
                     case Features.NSFW.Error.Unsubscribe.ChanNotSafe:
-                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                        await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                         break;
 
                     default:
@@ -103,25 +113,26 @@ namespace SanaraV2.Modules.NSFW
         [Command("Download doujinshi", RunMode = RunMode.Async)]
         public async Task GetDownloadDoujinshi(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
             IMessage msg = null;
-            var result = await Features.NSFW.Doujinshi.SearchDownloadDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
+            var textChan = Context.Channel as ITextChannel;
+            var result = await Features.NSFW.Doujinshi.SearchDownloadDoujinshi(textChan == null ? true : !textChan.IsNsfw, args, async () =>
             {
                 msg = await ReplyAsync("Preparing download, this might take some time...");
             });
             switch (result.error)
             {
                 case Features.NSFW.Error.Download.ChanNotSafe:
-                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.Help:
-                    await ReplyAsync(Sentences.DownloadDoujinshiHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadDoujinshiHelp(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.NotFound:
-                    await ReplyAsync(Sentences.DownloadDoujinshiNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadDoujinshiNotFound(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.None:
@@ -136,25 +147,26 @@ namespace SanaraV2.Modules.NSFW
         [Command("Download cosplay", RunMode = RunMode.Async)]
         public async Task GetDownloadCosplay(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
             IMessage msg = null;
-            var result = await Features.NSFW.Doujinshi.SearchDownloadCosplay(!(Context.Channel as ITextChannel).IsNsfw, args, async () =>
+            var textChan = Context.Channel as ITextChannel;
+            var result = await Features.NSFW.Doujinshi.SearchDownloadCosplay(textChan == null ? true : !textChan.IsNsfw, args, async () =>
             {
                 msg = await ReplyAsync("Preparing download, this might take some time...");
             });
             switch (result.error)
             {
                 case Features.NSFW.Error.Download.ChanNotSafe:
-                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.Help:
-                    await ReplyAsync(Sentences.DownloadCosplayHelp(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadCosplayHelp(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.NotFound:
-                    await ReplyAsync(Sentences.DownloadCosplayNotFound(Context.Guild.Id));
+                    await ReplyAsync(Sentences.DownloadCosplayNotFound(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Download.None:
@@ -169,9 +181,9 @@ namespace SanaraV2.Modules.NSFW
         [Command("Download"), Priority(-1)]
         public async Task GetDownloadDefault(params string[] _)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            await ReplyAsync(Sentences.DownloadHelp(Context.Guild.Id));
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
+            await ReplyAsync(Sentences.DownloadHelp(Context.Guild));
         }
 
         public async Task GetDownloadResult(IMessage msg, Features.NSFW.Response.Download answer)
@@ -188,7 +200,7 @@ namespace SanaraV2.Modules.NSFW
                     string now = DateTime.Now.ToString("yyyyMMddHHmmss");
                     Directory.CreateDirectory(Program.p.websiteUpload + "/" + now);
                     File.Copy(answer.filePath, Program.p.websiteUpload + "/" + now + "/" + answer.id + ".zip");
-                    await ReplyAsync(Program.p.websiteUrl + "/" + now + "/" + answer.id + ".zip" + Environment.NewLine + Sentences.DeleteTime(Context.Guild.Id, "10"));
+                    await ReplyAsync(Program.p.websiteUrl + "/" + now + "/" + answer.id + ".zip" + Environment.NewLine + Sentences.DeleteTime(Context.Guild, "10"));
                     _ = Task.Run(async () =>
                     {
                         await Task.Delay(600000); // 10 minutes
@@ -205,7 +217,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("AdultVideo", RunMode = RunMode.Async), Alias("AV")]
         public async Task GetAdultVideo(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
             if (Program.p.categories.Count == 2) // Tags not loaded
             {
                 await ReplyAsync("", false, new EmbedBuilder {
@@ -214,20 +226,21 @@ namespace SanaraV2.Modules.NSFW
                 }.Build());
                 return;
             }
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
-            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand, Program.p.categories);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
+            var textChan = Context.Channel as ITextChannel;
+            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(textChan == null ? true : !textChan.IsNsfw, args, Program.p.rand, Program.p.categories);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
-                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.NotFound:
-                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild.Id, args));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild, args));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, null));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, null));
                     break;
 
                 default:
@@ -238,21 +251,21 @@ namespace SanaraV2.Modules.NSFW
         [Command("Cosplay", RunMode = RunMode.Async)]
         public async Task GetCosplay(params string[] args)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
             var result = await Features.NSFW.Doujinshi.SearchCosplay(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
-                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.NotFound:
-                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild.Id, args));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild, args));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, Sentences.DownloadCosplayInfo));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Sentences.DownloadCosplayInfo));
                     break;
 
                 default:
@@ -263,21 +276,21 @@ namespace SanaraV2.Modules.NSFW
         [Command("Doujinshi", RunMode = RunMode.Async), Summary("Give a random doujinshi using nhentai API")]
         public async Task GetNhentai(params string[] keywords)
         {
-            Base.Utilities.CheckAvailability(Context.Guild.Id, Program.Module.Doujinshi);
-            await p.DoAction(Context.User, Context.Guild.Id, Program.Module.Doujinshi);
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
             var result = await Features.NSFW.Doujinshi.SearchDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, keywords, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
-                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild.Id));
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.NotFound:
-                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild.Id, keywords));
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild, keywords));
                     break;
 
                 case Features.NSFW.Error.Doujinshi.None:
-                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Context.Guild.Id, Sentences.DownloadDoujinshiInfo));
+                    await ReplyAsync("", false, CreateFinalEmbed(result.answer, Sentences.DownloadDoujinshiInfo));
                     break;
 
                 default:
@@ -285,7 +298,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        public Embed CreateFinalEmbed(Features.NSFW.Response.Doujinshi result, ulong guildId, Func<ulong, string, string> downloadInfo)
+        public Embed CreateFinalEmbed(Features.NSFW.Response.Doujinshi result, Func<IGuild, string, string> downloadInfo)
         {
             return new EmbedBuilder()
             {
@@ -296,7 +309,7 @@ namespace SanaraV2.Modules.NSFW
                 ImageUrl = result.imageUrl,
                 Footer = new EmbedFooterBuilder()
                 {
-                    Text = Sentences.ClickFull(guildId) + (downloadInfo == null ? "" : "\n\n" + downloadInfo(guildId, result.id.ToString()))
+                    Text = Sentences.ClickFull(Context.Guild) + (downloadInfo == null ? "" : "\n\n" + downloadInfo(Context.Guild, result.id.ToString()))
                 }
             }.Build();
         }
