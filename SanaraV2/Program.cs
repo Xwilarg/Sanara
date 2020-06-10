@@ -747,7 +747,8 @@ namespace SanaraV2
                 {
                     await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
                     await AddError("OK");
-                    await AddCommandServs(context.Guild.Id);
+                    if (context.Guild != null)
+                        await AddCommandServs(context.Guild.Id);
                 }
             }
         }
