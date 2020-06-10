@@ -148,8 +148,7 @@ namespace SanaraV2.Games
         {
             Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
             await Program.p.DoAction(Context.User, Program.Module.Game);
-            ITextChannel chan = (ITextChannel)Context.Channel;
-            var error = await Program.p.gm.Play(args, chan, Context.User.Id);
+            var error = await Program.p.gm.Play(args, Context.Channel, Context.User.Id);
             if (error != null)
                 await ReplyAsync(error(Context.Guild));
         }

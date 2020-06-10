@@ -164,8 +164,7 @@ namespace SanaraV2.Games
                 APreload preload = (APreload)Activator.CreateInstance(game.Item1);
                 if (preload.ContainsName(gameName))
                 {
-                    var textChan = chan as ITextChannel;
-                    if (textChan == null ? false : !textChan.IsNsfw && preload.IsNsfw())
+                    if ((chan is ITextChannel ? !((ITextChannel)chan).IsNsfw : false) && preload.IsNsfw())
                         return Modules.Base.Sentences.ChanIsNotNsfw;
                     if (isMultiplayer == APreload.Multiplayer.MultiOnly && preload.DoesAllowMultiplayer() == APreload.Multiplayer.SoloOnly)
                         return Sentences.MultiNotAvailable;
@@ -202,7 +201,7 @@ namespace SanaraV2.Games
                         }
                         introMsg += Sentences.RulesReset(guild);
                         await chan.SendMessageAsync(introMsg);
-                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
+                        AGame newGame = (AGame)Activator.CreateInstance(game.Item2, guild, chan, new Config(preload.GetTimer(), difficulty, preload.GetGameName(), isFull, sendImage, isCropped, isShaded, isMultiplayer, preload.GetMultiplayerType()), playerId);
                          _games.Add(newGame);
                         if (Program.p.sendStats)
                             await Program.p.UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", preload.GetGameName()) });

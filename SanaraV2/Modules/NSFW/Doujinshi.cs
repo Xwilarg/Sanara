@@ -117,7 +117,7 @@ namespace SanaraV2.Modules.NSFW
             await p.DoAction(Context.User, Program.Module.Doujinshi);
             IMessage msg = null;
             var textChan = Context.Channel as ITextChannel;
-            var result = await Features.NSFW.Doujinshi.SearchDownloadDoujinshi(textChan == null ? true : !textChan.IsNsfw, args, async () =>
+            var result = await Features.NSFW.Doujinshi.SearchDownloadDoujinshi(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, args, async () =>
             {
                 msg = await ReplyAsync("Preparing download, this might take some time...");
             });
@@ -150,8 +150,7 @@ namespace SanaraV2.Modules.NSFW
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Program.Module.Doujinshi);
             IMessage msg = null;
-            var textChan = Context.Channel as ITextChannel;
-            var result = await Features.NSFW.Doujinshi.SearchDownloadCosplay(textChan == null ? true : !textChan.IsNsfw, args, async () =>
+            var result = await Features.NSFW.Doujinshi.SearchDownloadCosplay(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, args, async () =>
             {
                 msg = await ReplyAsync("Preparing download, this might take some time...");
             });
@@ -227,8 +226,7 @@ namespace SanaraV2.Modules.NSFW
                 return;
             }
             await p.DoAction(Context.User, Program.Module.Doujinshi);
-            var textChan = Context.Channel as ITextChannel;
-            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(textChan == null ? true : !textChan.IsNsfw, args, Program.p.rand, Program.p.categories);
+            var result = await Features.NSFW.Doujinshi.SearchAdultVideo(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, args, Program.p.rand, Program.p.categories);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
@@ -253,7 +251,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Program.Module.Doujinshi);
-            var result = await Features.NSFW.Doujinshi.SearchCosplay(!(Context.Channel as ITextChannel).IsNsfw, args, Program.p.rand);
+            var result = await Features.NSFW.Doujinshi.SearchCosplay(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, args, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
@@ -278,7 +276,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Program.Module.Doujinshi);
-            var result = await Features.NSFW.Doujinshi.SearchDoujinshi(!(Context.Channel as ITextChannel).IsNsfw, keywords, Program.p.rand);
+            var result = await Features.NSFW.Doujinshi.SearchDoujinshi(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, keywords, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:

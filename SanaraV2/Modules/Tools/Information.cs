@@ -209,23 +209,24 @@ namespace SanaraV2.Modules.Tools
             }
             else
             {
+                var guildId = Context.Guild?.Id ?? 0;
                 embed.Description = Sentences.HelpHelp(Context.Guild) + Environment.NewLine +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.AnimeManga) ? "**1**: " + animeMangaModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Arknights) ? "**2**: " + arknightsModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Booru) ? "**3**: " + booruModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Code) ? "**4**: " + codeModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Communication) ? "**5**: " + communicationModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Community) ? "**6**: " + communityModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Doujinshi) ? "**7**: " + doujinshiModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Game) ? "**8**: " + gameModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Information) ? "**9**: " + informationModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Kancolle) ? "**10**: " + kantaiCollectionModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Linguistic) ? "**11**: " + linguisticModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Radio) ? "**12**: " + radioModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Settings) ? "**13**: " + settingsModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Vn) ? "**14**: " + visualNovelModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Xkcd) ? "**15**: " + xkcdModule + Environment.NewLine : "") +
-                    (Program.p.db.IsAvailable(Context.Guild.Id, Program.Module.Youtube) ? "**16**: " + youtubeModule + Environment.NewLine: "");
+                    (Program.p.db.IsAvailable(guildId, Program.Module.AnimeManga) ? "**1**: " + animeMangaModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Arknights) ? "**2**: " + arknightsModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Booru) ? "**3**: " + booruModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Code) ? "**4**: " + codeModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Communication) ? "**5**: " + communicationModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Community) ? "**6**: " + communityModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi) ? "**7**: " + doujinshiModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Game) ? "**8**: " + gameModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Information) ? "**9**: " + informationModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Kancolle) ? "**10**: " + kantaiCollectionModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Linguistic) ? "**11**: " + linguisticModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Radio) ? "**12**: " + radioModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Settings) ? "**13**: " + settingsModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Vn) ? "**14**: " + visualNovelModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Xkcd) ? "**15**: " + xkcdModule + Environment.NewLine : "") +
+                    (Program.p.db.IsAvailable(guildId, Program.Module.Youtube) ? "**16**: " + youtubeModule + Environment.NewLine: "");
             }
             await ReplyAsync("", false, embed.Build());
         }
@@ -234,13 +235,15 @@ namespace SanaraV2.Modules.Tools
         public async Task GDPR(params string[] command)
         {
             await p.DoAction(Context.User, Program.Module.Information);
-            if (Context.Guild != null)
+            var guildId = Context.Guild == null ? Context.User.Id : Context.Guild.Id;
+            var guild = await Program.p.db.GetGuild(guildId);
+            if (guild != null)
             {
                 await ReplyAsync("", false, new EmbedBuilder()
                 {
                     Color = Color.Blue,
-                    Title = Sentences.DataSaved(Context.Guild, Context.Guild.Name),
-                    Description = await Program.p.db.GetGuild(Context.Guild.Id)
+                    Title = Sentences.DataSaved(Context.Guild, Context.Guild?.Name ?? Context.User.ToString()),
+                    Description = guild
                 }.Build());
             }
             var me = Program.p.cm.GetProfile(Context.User.Id);
@@ -257,7 +260,7 @@ namespace SanaraV2.Modules.Tools
                     }
                 }.Build());
             }
-            else if (Context.Guild == null)
+            else if (guild == null)
                 await ReplyAsync("I don't have any information stored about you.");
         }
 
@@ -271,7 +274,7 @@ namespace SanaraV2.Modules.Tools
             };
             List<string> disabledModules = new List<string>();
             for (Program.Module i = 0; i <= Enum.GetValues(typeof(Program.Module)).Cast<Program.Module>().Max(); i++)
-                if (!Program.p.db.IsAvailable(Context.Guild.Id, i))
+                if (!Program.p.db.IsAvailable(Context.Guild?.Id ?? 0, i))
                     disabledModules.Add(i.ToString());
             embed.Description = disabledModules.Count == 0 ? "All modules are enabled" : "Disabled modules:" + string.Join(", ", disabledModules);
             string[] toCheck = new[]

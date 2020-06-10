@@ -265,8 +265,7 @@ namespace SanaraV2.Modules.Tools
                     if (finalStr != "")
                         finalStr += Environment.NewLine;
                     finalStr += Translation.GetTranslation(guild, "settingsModuleReload")
-                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleResetDb")
-                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleEval");
+                        + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleExit") + Environment.NewLine + Translation.GetTranslation(guild, "settingsModuleEval");
                 }
                 if (finalStr == "")
                     return NoCommandAvailable(guild) + Environment.NewLine + "*" + Translation.GetTranslation(guild, "ownerForFull") + "*"; ;

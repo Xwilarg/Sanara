@@ -85,8 +85,7 @@ namespace SanaraV2.Modules.NSFW
         [Command("Booru", RunMode = RunMode.Async)]
         public async Task BooruSearch(params string[] tags)
         {
-            ITextChannel chan = (ITextChannel)Context.Channel;
-            if (chan.IsNsfw)
+            if (!(Context.Channel is ITextChannel) || ((ITextChannel)Context.Channel).IsNsfw)
                 await GelbooruSearch(tags);
             else
                 await SafebooruSearch(tags);
@@ -97,7 +96,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new Safebooru(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new Safebooru(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Gelbooru", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -105,7 +104,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new Gelbooru(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new Gelbooru(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Konachan", RunMode = RunMode.Async), Summary("Get an image from Gelbooru")]
@@ -113,7 +112,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new Konachan(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new Konachan(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Rule34", RunMode = RunMode.Async), Summary("Get an image from Rule34")]
@@ -121,7 +120,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new Rule34(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new Rule34(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Get an image from E621")]
@@ -129,7 +128,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new E621(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new E621(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("E926", RunMode = RunMode.Async), Summary("Get an image from E926")]
@@ -137,7 +136,7 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Booru);
             await p.DoAction(Context.User, Program.Module.Booru);
-            await PostImage(new E926(), Context.Channel as ITextChannel, tags, Context.Guild, Context.User.Id);
+            await PostImage(new E926(), Context.Channel, tags, Context.Guild, Context.User.Id);
         }
 
         [Command("Tags", RunMode = RunMode.Async), Summary("Get informations about tags"), Alias("Tag")]
@@ -178,8 +177,8 @@ namespace SanaraV2.Modules.NSFW
 
         private static async Task PostImage(ABooru booru, IMessageChannel chan, string[] tags, IGuild guild, ulong userId)
         {
-            var textChan = chan as ITextChannel;
-            var result = await Features.NSFW.Booru.SearchBooru(textChan == null ? true : !textChan.IsNsfw, tags, booru, Program.p.rand);
+            
+                var result = await Features.NSFW.Booru.SearchBooru(chan is ITextChannel ? !((ITextChannel)chan).IsNsfw : false, tags, booru, Program.p.rand);
             switch (result.error)
             {
                 case Features.NSFW.Error.Booru.ChanNotNSFW:

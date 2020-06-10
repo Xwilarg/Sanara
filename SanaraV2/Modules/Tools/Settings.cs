@@ -168,36 +168,6 @@ namespace SanaraV2.Modules.Tools
             }
         }
 
-        [Command("ResetDb")]
-        public async Task ResetDb(params string[] args)
-        {
-            await p.DoAction(Context.User, Program.Module.Settings);
-            if (Context.User.Id != Base.Sentences.ownerId)
-            {
-                await ReplyAsync(Base.Sentences.OnlyMasterStr(Context.Guild));
-            }
-            else
-            {
-                if (args.Length == 0)
-                {
-                    await Program.p.db.ResetGuild(Context.Guild.Id);
-                    await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
-                }
-                else
-                {
-                    string serverName = string.Join(" ", args);
-                    IGuild g = p.client.Guilds.ToList().Find(x => x.Name.ToUpper() == serverName.ToUpper() || x.Id.ToString() == serverName);
-                    if (g == null)
-                        await ReplyAsync(Base.Sentences.NoCorrespondingGuild(Context.Guild));
-                    else
-                    {
-                        await Program.p.db.ResetGuild(g.Id);
-                        await ReplyAsync(Base.Sentences.DoneStr(Context.Guild));
-                    }
-                }
-            }
-        }
-
         [Command("Anonymize")]
         public async Task Anonymize(params string[] args)
         {

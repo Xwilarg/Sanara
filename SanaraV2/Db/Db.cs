@@ -59,15 +59,6 @@ namespace SanaraV2.Db
 
         private static readonly string defaultAvailability = "1111111111111111";
 
-        public async Task ResetGuild(ulong guildId)
-        {
-            await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
-                   .With("Prefix", "s.")
-                   .With("Language", "en")
-                   .With("Availability", defaultAvailability)
-                   ).RunAsync(conn);
-        }
-
         public async Task InitGuild(IGuild guild)
         {
             if (Languages.ContainsKey(guild.Id)) // If somehow InitGuild is called 2 times for the same guild we ignore it
@@ -222,13 +213,13 @@ namespace SanaraV2.Db
         }
 
         public bool IsAvailable(ulong guildId, Program.Module module)
-            => Availability[guildId][(int)module] == '1';
+            => guildId == 0 ? true : Availability[guildId][(int)module] == '1';
 
         public bool AreAllAvailable(ulong guildId)
-            => Availability[guildId].All(x => x == '1');
+            => guildId == 0 ? true : Availability[guildId].All(x => x == '1');
 
         public bool AreNoneAvailable(ulong guildId)
-            => Availability[guildId].Count(x => x == '0') == 2;
+            => guildId == 0 ? true : Availability[guildId].Count(x => x == '0') == 2;
 
         public bool IsAnonymized(ulong guildId)
         {
@@ -239,6 +230,8 @@ namespace SanaraV2.Db
 
         public async Task<string> GetGuild(ulong guildId)
         {
+            if (await R.Db(dbName).Table("Guilds").GetAll(guildId.ToString()).Count().Eq(0).RunAsync<bool>(conn))
+                return null;
             return (JsonConvert.SerializeObject(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn)));
         }
 
@@ -251,7 +244,7 @@ namespace SanaraV2.Db
 
         public async Task<Tuple<Comparaison, int>> SetNewScore(string gameName, int score, ulong guildId, string ids)
         {
-            string scoreStr = ((string)(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn))[gameName])?.Split('|').First();
+            string scoreStr = ((string)(await R.Db(dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(conn))?[gameName])?.Split('|').First();
             int? currScore = null;
             if (scoreStr != null)
                 currScore = int.Parse(scoreStr);
@@ -264,13 +257,18 @@ namespace SanaraV2.Db
                 cmp = Comparaison.Inferior;
             if (cmp == Comparaison.Best)
             {
-                await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
-                .With(gameName, score + "|" + ids)
-                ).RunAsync(conn);
+                if (await R.Db(dbName).Table("Guilds").GetAll(guildId.ToString()).Count().Eq(0).RunAsync<bool>(conn))
+                    await R.Db(dbName).Table("Guilds").Insert(R.HashMap("id", guildId.ToString())
+                        .With(gameName, score + "|" + ids)
+                        ).RunAsync(conn);
+                else
+                    await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildId.ToString())
+                        .With(gameName, score + "|" + ids)
+                        ).RunAsync(conn);
             }
             if (currScore == null)
                 currScore = 0;
-            return (new Tuple<Comparaison, int>(cmp, currScore.Value));
+            return new Tuple<Comparaison, int>(cmp, currScore.Value);
         }
 
         /// <returns>

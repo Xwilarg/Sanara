@@ -12,7 +12,6 @@
 ///
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
-
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -503,7 +502,7 @@ namespace SanaraV2.Games
         {
             Tuple<Db.Db.Comparaison, int> newScore;
             if (_guild == null && _contributors.Count == 0)
-                return await PostText("You did a score of 0."); // TOOD
+                return await PostText(reason); // TODO
             else
                 newScore = await Program.p.db.SetNewScore(_saveName, _score, _guild == null ? _contributors[0] : _guild.Id, string.Join("|", _contributors));
             if (newScore.Item1 == Db.Db.Comparaison.Best)
