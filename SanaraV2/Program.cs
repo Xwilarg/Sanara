@@ -284,7 +284,6 @@ namespace SanaraV2
         private async Task DoujinshiReactionAdded(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
-            // Doujinshi infos
             if (react.User.Value.Id != client.CurrentUser.Id && (emote == "◀️" || emote == "▶️") && DOUJINSHI_POPULARITY_INFO.ContainsKey(msg.Id))
             {
                 var elem = DOUJINSHI_POPULARITY_INFO[msg.Id];
@@ -314,7 +313,9 @@ namespace SanaraV2
                         Text = tuple.Item1 + "\nTags: " + tuple.Item2
                     }
                 }.Build());
-                await dMsg.RemoveReactionAsync(react.Emote, react.User.Value);
+                var author = dMsg.Author as IGuildUser;
+                if (author != null && author.GuildPermissions.ManageMessages)
+                    await dMsg.RemoveReactionAsync(react.Emote, react.User.Value);
             }
         }
 
