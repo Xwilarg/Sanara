@@ -308,7 +308,7 @@ namespace SanaraV2
                     Title = embed.Title,
                     ImageUrl = tuple.Item3,
                     Color = embed.Color,
-                    Fields = embed.Fields.Select(x => new EmbedFieldBuilder { Name = x.Name, Value = x.Value, IsInline = x.Inline }).ToList(),
+                    Fields = embed.Fields.Select(z => new EmbedFieldBuilder { Name = z.Name, Value = z.Value, IsInline = z.Inline }).ToList(),
                     Footer = new EmbedFooterBuilder
                     {
                         Text = tuple.Item1 + "\nTags: " + tuple.Item2
