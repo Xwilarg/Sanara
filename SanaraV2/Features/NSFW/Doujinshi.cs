@@ -338,5 +338,33 @@ namespace SanaraV2.Features.NSFW
                 id = doujinshi.id.ToString()
             }, Error.Doujinshi.None);
         }
+
+        public static async Task<FeatureRequest<Response.Doujinshi[], Error.Doujinshi>> SearchDoujinshiByPopularity(bool isChanSafe, string[] tags)
+        {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
+            SearchResult result;
+            try
+            {
+                result = await SearchClient.SearchWithTagsAsync(tags, 1, PopularitySort.AllTime);
+            }
+            catch (InvalidArgumentException)
+            {
+                return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(null, Error.Doujinshi.NotFound);
+            }
+            List<Response.Doujinshi> doujins = new List<Response.Doujinshi>();
+            foreach (var doujinshi in result.elements.Take(5))
+            {
+                doujins.Add(new Response.Doujinshi()
+                {
+                    url = doujinshi.url.AbsoluteUri,
+                    imageUrl = doujinshi.pages[0].imageUrl.AbsoluteUri,
+                    title = doujinshi.prettyTitle,
+                    tags = doujinshi.tags.Select(x => x.name).ToArray(),
+                    id = doujinshi.id.ToString()
+                });
+            }
+            return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(doujins.ToArray(), Error.Doujinshi.None);
+        }
     }
 }

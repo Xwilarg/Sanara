@@ -135,6 +135,12 @@ namespace SanaraV2
         public Dictionary<string, dynamic> ARKNIGHTS_GENERAL;
         public Dictionary<string, string> ARKNIGHTS_DESCRIPTIONS;
 
+        /// <summary>
+        /// Associe a message with an array of doujinshi (tuple containing doujin name, doujin tags and doujin image)
+        /// The int is the current index in the array
+        /// </summary>
+        public Dictionary<ulong, Tuple<int, Tuple<string, string, string>[]>> DOUJINSHI_POPULARITY_INFO;
+
         public Program()
         {
             client = new DiscordSocketClient(new DiscordSocketConfig
@@ -159,6 +165,7 @@ namespace SanaraV2
             });
 
             p = this;
+            DOUJINSHI_POPULARITY_INFO = new Dictionary<ulong, Tuple<int, Tuple<string, string, string>[]>>();
 
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot"));
             inamiToken = inamiId;
@@ -250,6 +257,7 @@ namespace SanaraV2
             client.Connected += Connected;
             client.Ready += Ready;
             client.ReactionAdded += cm.ReactionAdded;
+            client.ReactionAdded += DoujinshiReactionAdded;
             commands.CommandExecuted += CommandExecuted;
 
             await client.LoginAsync(TokenType.Bot, botToken);
@@ -271,6 +279,43 @@ namespace SanaraV2
             }
             if (botToken == null) // Unit test manage the bot life
                 await Task.Delay(-1);
+        }
+
+        private async Task DoujinshiReactionAdded(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        {
+            string emote = react.Emote.ToString();
+            // Doujinshi infos
+            if (react.User.Value.Id != client.CurrentUser.Id && (emote == "◀️" || emote == "▶️") && DOUJINSHI_POPULARITY_INFO.ContainsKey(msg.Id))
+            {
+                var elem = DOUJINSHI_POPULARITY_INFO[msg.Id];
+                var dMsg = await msg.GetOrDownloadAsync();
+                var embed = dMsg.Embeds.ElementAt(0);
+                var i = elem.Item1;
+                if (emote == "◀️")
+                {
+                    i--;
+                    if (i < 0) i = elem.Item2.Length - 1;
+                }
+                else
+                {
+                    i++;
+                    if (i > elem.Item2.Length - 1) i = 0;
+                }
+                DOUJINSHI_POPULARITY_INFO[msg.Id] = new Tuple<int, Tuple<string, string, string>[]>(i, elem.Item2);
+                var tuple = elem.Item2[i];
+                await dMsg.ModifyAsync(x => x.Embed = new EmbedBuilder
+                {
+                    Title = embed.Title,
+                    ImageUrl = tuple.Item3,
+                    Color = embed.Color,
+                    Fields = embed.Fields.Select(x => new EmbedFieldBuilder { Name = x.Name, Value = x.Value, IsInline = x.Inline }).ToList(),
+                    Footer = new EmbedFooterBuilder
+                    {
+                        Text = tuple.Item1 + "\nTags: " + tuple.Item2
+                    }
+                }.Build());
+                await dMsg.RemoveReactionAsync(react.Emote, react.User.Value);
+            }
         }
 
 

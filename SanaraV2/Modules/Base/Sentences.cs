@@ -32,7 +32,7 @@ namespace SanaraV2.Modules.Base
         private static string TagNotFoundInternal(IGuild guild, string tag) { return Translation.GetTranslation(guild, "tagNotFound", tag); }
         private static string TagsNotFoundInternal(IGuild guild, string[] tags) {
             string finalStr = string.Join(", ", tags.ToList().Take(tags.Length - 1).Select(x => "'" + x + "'"));
-            return Translation.GetTranslation(guild, "tagsNotFound", finalStr, tags[tags.Length - 1]);
+            return Translation.GetTranslation(guild, "tagsNotFound", finalStr, "'" + tags[tags.Length - 1] + "'");
         }
         public static string TagsNotFound(IGuild guild, string[] tags)
         {

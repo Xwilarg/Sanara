@@ -15,6 +15,7 @@
 using Discord;
 using Discord.Commands;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -271,7 +272,7 @@ namespace SanaraV2.Modules.NSFW
             }
         }
 
-        [Command("Doujinshi", RunMode = RunMode.Async), Summary("Give a random doujinshi using nhentai API")]
+        [Command("Doujinshi", RunMode = RunMode.Async), Priority(-1), Summary("Give a random doujinshi using nhentai API")]
         public async Task GetNhentai(params string[] keywords)
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
@@ -289,6 +290,56 @@ namespace SanaraV2.Modules.NSFW
 
                 case Features.NSFW.Error.Doujinshi.None:
                     await ReplyAsync("", false, CreateFinalEmbed(result.answer, Sentences.DownloadDoujinshiInfo));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        [Command("Doujinshi popularity", RunMode = RunMode.Async), Alias("Doujinshi p")]
+        public async Task GetNhentaiPopularity(params string[] keywords)
+        {
+            Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
+            await p.DoAction(Context.User, Program.Module.Doujinshi);
+            if (keywords.Length == 0) // Should probably move that to the Features namespace
+            {
+                await ReplyAsync("You must provide the tags you want popularity info about.");
+                return;
+            }
+            var result = await Features.NSFW.Doujinshi.SearchDoujinshiByPopularity(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, keywords);
+            switch (result.error)
+            {
+                case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
+                    await ReplyAsync(Base.Sentences.ChanIsNotNsfw(Context.Guild));
+                    break;
+
+                case Features.NSFW.Error.Doujinshi.NotFound:
+                    await ReplyAsync(Base.Sentences.TagsNotFound(Context.Guild, keywords));
+                    break;
+
+                case Features.NSFW.Error.Doujinshi.None:
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Most popular doujinshi with tag" + (keywords.Length > 1 ? "s" : "") + string.Join(", ", keywords),
+                        ImageUrl = result.answer[0].imageUrl,
+                        Color = new Color(255, 20, 147),
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = result.answer[0].title + "\nTags: " + string.Join(", ", result.answer[0].tags)
+                        }
+                    };
+                    int i = 1;
+                    List<Tuple<string, string, string>> doujinInfos = new List<Tuple<string, string, string>>();
+                    foreach (var elem in result.answer)
+                    {
+                        embed.AddField("#" + i + ": " + elem.title, elem.url);
+                        doujinInfos.Add(new Tuple<string, string, string>(elem.title, string.Join(", ", elem.tags), elem.imageUrl));
+                        i++;
+                    }
+                    var msg = await ReplyAsync("", false, embed.Build());
+                    await msg.AddReactionsAsync(new[] { new Emoji("◀️"), new Emoji("▶️") });
+                    Program.p.DOUJINSHI_POPULARITY_INFO.Add(msg.Id, new Tuple<int, Tuple<string, string, string>[]>(0, doujinInfos.ToArray()));
                     break;
 
                 default:
