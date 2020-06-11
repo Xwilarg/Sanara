@@ -326,7 +326,7 @@ namespace SanaraV2.Modules.NSFW
                         Color = new Color(255, 20, 147),
                         Footer = new EmbedFooterBuilder
                         {
-                            Text = result.answer[0].title + "\nTags: " + string.Join(", ", result.answer[0].tags)
+                            Text = "#1: " +  result.answer[0].title + "\nTags: " + string.Join(", ", result.answer[0].tags)
                         }
                     };
                     int i = 1;

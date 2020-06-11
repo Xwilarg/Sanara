@@ -201,7 +201,8 @@ namespace SanaraV2.Modules.Tools
             if (Program.p.db.IsAvailable(guildId, Program.Module.Doujinshi))
             {
                 if (isChanNsfw)
-                    return Translation.GetTranslation(guild, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleCosplay")
+                    return Translation.GetTranslation(guild, "doujinshiModuleDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleDoujinshiPopularity") + Environment.NewLine
+                        + Translation.GetTranslation(guild, "doujinshiModuleCosplay")
                         + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleDownloadDoujinshi") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleDownloadCosplay")
                         + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleAdultVideo") + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleSubscribe")
                         + Environment.NewLine + Translation.GetTranslation(guild, "doujinshiModuleUnsubscribe") + Environment.NewLine + Environment.NewLine + Translation.GetTranslation(guild, "blacklistExplanationsIntro")

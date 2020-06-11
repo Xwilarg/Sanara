@@ -310,7 +310,7 @@ namespace SanaraV2
                     Fields = embed.Fields.Select(z => new EmbedFieldBuilder { Name = z.Name, Value = z.Value, IsInline = z.Inline }).ToList(),
                     Footer = new EmbedFooterBuilder
                     {
-                        Text = tuple.Item1 + "\nTags: " + tuple.Item2
+                        Text = "#" + (i + 1) + ": " + tuple.Item1 + "\nTags: " + tuple.Item2
                     }
                 }.Build());
                 var author = dMsg.Author as IGuildUser;
