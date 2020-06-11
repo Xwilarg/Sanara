@@ -272,6 +272,9 @@ namespace SanaraV2.Modules.Tools
             {
                 Title = Sentences.ServicesAvailability(Context.Guild)
             };
+            var textChan = Context.Channel as ITextChannel;
+            if (textChan != null && !textChan.IsNsfw)
+                embed.WithFooter("Ask again in a NSFW channel for a more complete status.");
             List<string> disabledModules = new List<string>();
             for (Program.Module i = 0; i <= Enum.GetValues(typeof(Program.Module)).Cast<Program.Module>().Max(); i++)
                 if (!Program.p.db.IsAvailable(Context.Guild?.Id ?? 0, i))
@@ -295,17 +298,21 @@ namespace SanaraV2.Modules.Tools
             if (Context.Guild != null)
             {
                 embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAnimeAsync(Context.Guild));
-                var doujinChan = await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild);
-                embed.AddField("Doujinshi Subscription Channel", doujinChan?.Mention ?? "None");
-                if (doujinChan != null)
+                if (textChan.IsNsfw)
                 {
-                    var tags = Program.p.db.NHentaiSubscription.Where(x => x.Item1 == doujinChan).ElementAt(0);
-                    embed.AddField("Doujinshi Subscription Tags", "Whitelist: " + tags.Item2.GetWhitelistTags() + Environment.NewLine + "Blacklist: " + tags.Item2.GetBlacklistTags());
+                    var doujinChan = await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild);
+                    embed.AddField("Doujinshi Subscription Channel", doujinChan?.Mention ?? "None");
+                    if (doujinChan != null)
+                    {
+                        var tags = Program.p.db.NHentaiSubscription.Where(x => x.Item1 == doujinChan).ElementAt(0);
+                        embed.AddField("Doujinshi Subscription Tags", "Whitelist: " + tags.Item2.GetWhitelistTags() + Environment.NewLine + "Blacklist: " + tags.Item2.GetBlacklistTags());
+                    }
                 }
             }
             embed.AddField("Profile Count", Program.p.cm.GetProfileCount(), true);
             embed.AddField("Anime Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
-            embed.AddField("Doujinshi Subscription Count", Program.p.db.NHentaiSubscription.Count(), true);
+            if (textChan == null || textChan.IsNsfw)
+                embed.AddField("Doujinshi Subscription Count", Program.p.db.NHentaiSubscription.Count(), true);
             embed.Color = Color.Blue;
             Dictionary<string, int> allTrads = new Dictionary<string, int>();
             foreach (var elem in Program.p.allLanguages)
