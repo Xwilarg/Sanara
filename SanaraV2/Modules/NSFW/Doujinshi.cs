@@ -321,7 +321,7 @@ namespace SanaraV2.Modules.NSFW
                 case Features.NSFW.Error.Doujinshi.None:
                     var embed = new EmbedBuilder
                     {
-                        Title = "Most popular doujinshi with tag" + (keywords.Length > 1 ? "s" : "") + string.Join(", ", keywords),
+                        Title = "Most popular doujinshi with the tag" + (keywords.Length > 1 ? "s" : "") + " " + string.Join(", ", keywords),
                         ImageUrl = result.answer[0].imageUrl,
                         Color = new Color(255, 20, 147),
                         Footer = new EmbedFooterBuilder
