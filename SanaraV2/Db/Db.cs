@@ -162,7 +162,7 @@ namespace SanaraV2.Db
             return "None";
         }
 
-        public async Task<string> GetMyChannelNameDoujinshiAsync(IGuild guild)
+        public async Task<ITextChannel> GetMyChannelNameDoujinshiAsync(IGuild guild)
         {
             dynamic json = await R.Db(dbName).Table("Guilds").Get(guild.Id.ToString()).RunAsync(conn);
             string nhentai = (string)json.nhentaiSubscription;
@@ -171,10 +171,10 @@ namespace SanaraV2.Db
                 ITextChannel chan = await guild.GetTextChannelAsync(ulong.Parse(nhentai));
                 if (chan != null)
                 {
-                    return chan.Mention;
+                    return chan;
                 }
             }
-            return "None";
+            return null;
         }
 
         public async Task SetPrefix(ulong guildId, string prefix)

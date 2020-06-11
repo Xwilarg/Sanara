@@ -295,7 +295,13 @@ namespace SanaraV2.Modules.Tools
             if (Context.Guild != null)
             {
                 embed.AddField("Anime/Manga Subscription Channel", await p.db.GetMyChannelNameAnimeAsync(Context.Guild));
-                embed.AddField("Doujinshi Subscription Channel", await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild));
+                var doujinChan = await p.db.GetMyChannelNameDoujinshiAsync(Context.Guild);
+                embed.AddField("Doujinshi Subscription Channel", doujinChan?.Mention ?? "None");
+                if (doujinChan != null)
+                {
+                    var tags = Program.p.db.NHentaiSubscription.Where(x => x.Item1 == doujinChan).ElementAt(0);
+                    embed.AddField("Doujinshi Subscription Tags", "Whitelist: " + tags.Item2.GetWhitelistTags() + Environment.NewLine + "Blacklist: " + tags.Item2.GetBlacklistTags());
+                }
             }
             embed.AddField("Profile Count", Program.p.cm.GetProfileCount(), true);
             embed.AddField("Anime Subscription Count", Program.p.db.AnimeSubscription.Count(), true);
