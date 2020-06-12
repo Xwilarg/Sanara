@@ -105,6 +105,8 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("animeSubscription", channelIdStr)
                 ).RunAsync(conn);
+            if (AnimeSubscription.Any(x => x.Item1.Id == chan.Id))
+                AnimeSubscription.Remove(AnimeSubscription.Where(x => x.Item1.Id == chan.Id).ElementAt(0));
             AnimeSubscription.Add((chan, null));
         }
 
@@ -116,6 +118,8 @@ namespace SanaraV2.Db
                 .With("nhentaiSubscription", channelIdStr)
                 .With("nhentaiSubscriptionTags", tags.ToStringArray())
                 ).RunAsync(conn);
+            if (NHentaiSubscription.Any(x => x.Item1.Id == chan.Id))
+                NHentaiSubscription.Remove(NHentaiSubscription.Where(x => x.Item1.Id == chan.Id).ElementAt(0));
             NHentaiSubscription.Add((chan, tags));
         }
 
@@ -129,7 +133,8 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("animeSubscription", "0")
                 ).RunAsync(conn);
-            AnimeSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(anime)), null));
+            var id = ulong.Parse(anime);
+            AnimeSubscription.Remove(AnimeSubscription.Where(x => x.Item1.Id == id).ElementAt(0));
             return true;
         }
 
@@ -143,7 +148,8 @@ namespace SanaraV2.Db
             await R.Db(dbName).Table("Guilds").Update(R.HashMap("id", guildIdStr)
                 .With("nhentaiSubscription", "0")
                 ).RunAsync(conn);
-            NHentaiSubscription.Remove((await guild.GetTextChannelAsync(ulong.Parse(hentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(json.nhentaiSubscriptionTags.ToObject<string[]>())));
+            var id = ulong.Parse(hentai);
+            NHentaiSubscription.Remove(NHentaiSubscription.Where(x => x.Item1.Id == id).ElementAt(0));
             return true;
         }
 
