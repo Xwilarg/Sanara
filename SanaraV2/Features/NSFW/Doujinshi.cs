@@ -86,7 +86,7 @@ namespace SanaraV2.Features.NSFW
                 }
                 catch (InvalidArgumentException)
                 {
-                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.None);
+                    return new FeatureRequest<Response.Download, Error.Download>(null, Error.Download.NotFound);
                 }
             }
             else
