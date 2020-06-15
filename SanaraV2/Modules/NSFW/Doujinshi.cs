@@ -302,12 +302,9 @@ namespace SanaraV2.Modules.NSFW
         {
             Base.Utilities.CheckAvailability(Context.Guild, Program.Module.Doujinshi);
             await p.DoAction(Context.User, Program.Module.Doujinshi);
-            if (keywords.Length == 0) // Should probably move that to the Features namespace
-            {
-                await ReplyAsync("You must provide the tags you want popularity info about.");
-                return;
-            }
-            var result = await Features.NSFW.Doujinshi.SearchDoujinshiByPopularity(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, keywords);
+            var result = keywords.Length == 0
+                ? await Features.NSFW.Doujinshi.SearchDoujinshiRecentPopularity(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false)
+                : await Features.NSFW.Doujinshi.SearchDoujinshiByPopularity(Context.Channel is ITextChannel ? !((ITextChannel)Context.Channel).IsNsfw : false, keywords);
             switch (result.error)
             {
                 case Features.NSFW.Error.Doujinshi.ChanNotNSFW:
@@ -321,7 +318,7 @@ namespace SanaraV2.Modules.NSFW
                 case Features.NSFW.Error.Doujinshi.None:
                     var embed = new EmbedBuilder
                     {
-                        Title = "Most popular doujinshi with the tag" + (keywords.Length > 1 ? "s" : "") + " " + string.Join(", ", keywords),
+                        Title = keywords.Length == 0 ?  "Recently popular doujinshi" : ("Most popular doujinshi with the tag" + (keywords.Length > 1 ? "s" : "") + " " + string.Join(", ", keywords)),
                         ImageUrl = result.answer[0].imageUrl,
                         Color = new Color(255, 20, 147),
                         Footer = new EmbedFooterBuilder

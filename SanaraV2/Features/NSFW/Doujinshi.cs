@@ -366,5 +366,30 @@ namespace SanaraV2.Features.NSFW
             }
             return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(doujins.ToArray(), Error.Doujinshi.None);
         }
+
+        public static async Task<FeatureRequest<Response.Doujinshi[], Error.Doujinshi>> SearchDoujinshiRecentPopularity(bool isChanSafe)
+        {
+            if (isChanSafe)
+                return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(null, Error.Doujinshi.ChanNotNSFW);
+            string html;
+            using (HttpClient hc = new HttpClient())
+                html = await hc.GetStringAsync("https://nhentai.net/");
+            html = html.Split(new[] { "<div class=\"container index-container index-popular\">" }, StringSplitOptions.None)[1]
+                .Split(new[] { "<div class=\"container index-container\">" }, StringSplitOptions.None)[0];
+            List<Response.Doujinshi> doujins = new List<Response.Doujinshi>();
+            foreach (var match in Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>())
+            {
+                var doujinshi = await SearchClient.SearchByIdAsync(int.Parse(match.Groups[1].Value));
+                doujins.Add(new Response.Doujinshi()
+                {
+                    url = doujinshi.url.AbsoluteUri,
+                    imageUrl = doujinshi.pages[0].imageUrl.AbsoluteUri,
+                    title = doujinshi.prettyTitle,
+                    tags = doujinshi.tags.Select(x => x.name).ToArray(),
+                    id = doujinshi.id.ToString()
+                });
+            }
+            return new FeatureRequest<Response.Doujinshi[], Error.Doujinshi>(doujins.ToArray(), Error.Doujinshi.None);
+        }
     }
 }

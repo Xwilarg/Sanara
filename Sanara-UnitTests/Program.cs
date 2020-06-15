@@ -142,6 +142,34 @@ namespace Sanara_UnitTests
         }
 
         [Fact]
+        public async Task TestDoujinshiPopularityTags()
+        {
+            var result = await Doujinshi.SearchDoujinshiByPopularity(false, new[] { "futanari" });
+            Assert.Equal(Error.Doujinshi.None, result.error);
+            Assert.Equal(5, result.answer.Length);
+            foreach (var doujin in result.answer)
+            {
+                Assert.True(await IsLinkValid(doujin.url));
+                Assert.True(await IsLinkValid(doujin.imageUrl));
+                Assert.Contains("futanari", doujin.tags);
+            }
+        }
+
+        [Fact]
+        public async Task TestDoujinshiPopularity()
+        {
+            var result = await Doujinshi.SearchDoujinshiRecentPopularity(false);
+            Assert.Equal(Error.Doujinshi.None, result.error);
+            Assert.Equal(5, result.answer.Length);
+            foreach (var doujin in result.answer)
+            {
+                Assert.True(await IsLinkValid(doujin.url));
+                Assert.True(await IsLinkValid(doujin.imageUrl));
+                Assert.Contains("futanari", doujin.tags);
+            }
+        }
+
+        [Fact]
         public async Task TestAdultVideo()
         {
             var result = await Doujinshi.SearchAdultVideo(false, new string[] { "lesbian" }, new Random(), new List<string>() { "lesbian" });
