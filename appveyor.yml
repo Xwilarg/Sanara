@@ -1,5 +1,8 @@
 image: Visual Studio 2017
 
+configuration:
+  - Debug
+
 before_build:
 - nuget restore
 - choco install opencover.portable
