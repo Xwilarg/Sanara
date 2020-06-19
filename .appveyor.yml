@@ -1,5 +1,8 @@
 image: Visual Studio 2017
 
+configuration:
+  - Debug
+
 before_build:
 - nuget restore
 - choco install opencover.portable
@@ -13,5 +16,5 @@ test_script:
 - curl -LO http://www.commandline.co.uk/chp/chp-0.1.1.13.zip
 - unzip chp-0.1.1.13.zip
 - start chp/chp.exe rethinkdb-2.3.6/rethinkdb.exe
-- OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Sanara-UnitTests\bin\Debug\Sanara-UnitTests.dll -noshadow" -filter:"+[SanaraV2*]* -[SanaraV2*]*.Features.Tools.LinguistResources.*" -output:".\coverage.xml"
+- OpenCover.Console.exe -register:Path32 -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Sanara-UnitTests\bin\Debug\Sanara-UnitTests.dll -noshadow" -filter:"+[SanaraV2*]* -[SanaraV2*]*.Features.Tools.LinguistResources.*" -output:".\coverage.xml"
 - codecov -f "coverage.xml"
