@@ -95,7 +95,7 @@ namespace SanaraV2.Db
                 AnimeSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(anime)), null));
             string nhentai = (string)json.nhentaiSubscription;
             if (nhentai != null && nhentai != "0")
-                NHentaiSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(nhentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(json.nhentaiSubscriptionTags.ToObject<string[]>())));
+                NHentaiSubscription.Add((await guild.GetTextChannelAsync(ulong.Parse(nhentai)), Subscription.SubscriptionTags.ParseSubscriptionTags(json.nhentaiSubscriptionTags.ToObject<string[]>(), false)));
         }
 
         public async Task AddAnimeSubscription(ITextChannel chan)

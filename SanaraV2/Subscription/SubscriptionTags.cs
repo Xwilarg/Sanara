@@ -15,20 +15,23 @@ namespace SanaraV2.Subscription
         public string GetBlacklistTags()
             => _blacklist.Length > 0 ? "`" + string.Join(", ", _blacklist) + "`" : "None";
 
-        public static SubscriptionTags ParseSubscriptionTags(string[] tags)
+        public static SubscriptionTags ParseSubscriptionTags(string[] tags, bool addDefaultTags = true)
         {
             List<string> whitelist = new List<string>();
             List<string> blacklist = new List<string>();
             List<string> tagsList = tags.ToList();
-            if (tagsList.Contains("full"))
-                tagsList.Remove("full");
-            else
+            if (addDefaultTags)
             {
-                foreach (var elem in _defaultBlacklist)
+                if (tagsList.Contains("full"))
+                    tagsList.Remove("full");
+                else
                 {
-                    foreach (string tag in elem.Value)
+                    foreach (var elem in _defaultBlacklist)
                     {
-                        blacklist.Add(tag);
+                        foreach (string tag in elem.Value)
+                        {
+                            blacklist.Add(tag);
+                        }
                     }
                 }
             }
