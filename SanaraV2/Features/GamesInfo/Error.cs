@@ -30,7 +30,8 @@ namespace SanaraV2.Features.GamesInfo
         {
             None,
             Help,
-            NotFound
+            NotFound,
+            InvalidLevel
         }
     }
 }

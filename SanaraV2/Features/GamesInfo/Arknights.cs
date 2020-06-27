@@ -12,7 +12,19 @@ namespace SanaraV2.Features.GamesInfo
         {
             if (args.Length == 0)
                 return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.Help);
-            string name = Utilities.CleanWord(string.Join(" ", args).ToLower());
+            int skillLevel;
+            string name;
+            if (int.TryParse(args[0], out skillLevel))
+            {
+                if (skillLevel < 0)
+                    return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.InvalidLevel);
+                name = Utilities.CleanWord(string.Join(" ", args.Skip(1)).ToLower());
+            }
+            else
+            {
+                skillLevel = 1;
+                name = Utilities.CleanWord(string.Join(" ", args).ToLower());
+            }
             using (HttpClient hc = new HttpClient())
             {
                 if (Program.p.ARKNIGHTS_ALIASES.ContainsKey(name))
@@ -26,11 +38,13 @@ namespace SanaraV2.Features.GamesInfo
                     {
                         var skills = new List<Response.ArknightsSkill>();
                         List<string> skillsStr = new List<string>();
+                        if (skillLevel > elem.Value.skills.Count)
+                            return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.InvalidLevel);
                         foreach (dynamic skill in elem.Value.skills)
                         {
                             var skillArr = Program.p.ARKNIGHTS_SKILLS[(string)skill.skillId];
                             skillsStr.Add((string)skill.skillId);
-                            skills.Add(new Response.ArknightsSkill { name = skillArr[0].Item1, description = skillArr[0].Item2 });
+                            skills.Add(new Response.ArknightsSkill { name = skillArr[skillLevel].Item1, description = skillArr[skillLevel].Item2 });
                         }
                         return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(new Response.ArknightsCharac()
                         {
@@ -41,7 +55,8 @@ namespace SanaraV2.Features.GamesInfo
                             wikiUrl = "https://aceship.github.io/AN-EN-Tags/akhrchars.html?opname=" + ((string)elem.Value.appellation).Replace(' ', '_'),
                             skills = skills.ToArray(),
                             skillKeys = skillsStr.ToArray(),
-                            description = Program.p.ARKNIGHTS_DESCRIPTIONS[(string)elem.Value.appellation]
+                            description = Program.p.ARKNIGHTS_DESCRIPTIONS[(string)elem.Value.appellation],
+                            skillLevel = skillLevel
                         }, Error.Charac.None);
                     }
                 }

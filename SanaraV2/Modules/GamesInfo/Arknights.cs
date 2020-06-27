@@ -29,6 +29,10 @@ namespace SanaraV2.Modules.GamesInfo
                     await ReplyAsync(Sentences.OperatorDontExist(Context.Guild));
                     break;
 
+                case Features.GamesInfo.Error.Charac.InvalidLevel:
+                    await ReplyAsync("The level given must be between 1 and the maximum skill level.");
+                    break;
+
                 case Features.GamesInfo.Error.Charac.None:
                     List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>
                     {
@@ -58,7 +62,7 @@ namespace SanaraV2.Modules.GamesInfo
                     {
                         footer = new EmbedFooterBuilder
                         {
-                            Text = "Skills displayed are at level 1"
+                            Text = "Skills displayed are at " + (result.answer.skillLevel < 8 ? "level " + result.answer.skillLevel : "mastery " + (result.answer.skillLevel - 7))
                         };
                     }
                     var msg = await ReplyAsync("", false, new EmbedBuilder
@@ -74,7 +78,7 @@ namespace SanaraV2.Modules.GamesInfo
                     if (result.answer.skills.Length > 2)
                     {
                         await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
-                        Program.p.ARKNIGHTS_SKILLS_INFO.Add(msg.Id, (0, result.answer.skillKeys));
+                        Program.p.ARKNIGHTS_SKILLS_INFO.Add(msg.Id, (result.answer.skillLevel - 1, result.answer.skillKeys));
                     }
                     break;
 

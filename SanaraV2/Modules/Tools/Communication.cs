@@ -169,6 +169,11 @@ namespace SanaraV2.Modules.Tools
         [Command("Infos"), Summary("Give informations about an user"), Alias("Info")]
         public async Task Infos(params string[] command)
         {
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
             Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
             await p.DoAction(Context.User, Program.Module.Communication);
             IGuildUser user;
@@ -189,6 +194,11 @@ namespace SanaraV2.Modules.Tools
         [Command("BotInfos"), Summary("Give informations about the bot"), Alias("BotInfo", "InfosBot", "InfoBot")]
         public async Task BotInfos(params string[] command)
         {
+            if (Context.Guild == null)
+            {
+                await ReplyAsync(Base.Sentences.CommandDontPm(Context.Guild));
+                return;
+            }
             Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
             await p.DoAction(Context.User, Program.Module.Communication);
             await InfosUser(await Context.Channel.GetUserAsync(Program.p.client.CurrentUser.Id) as IGuildUser);
