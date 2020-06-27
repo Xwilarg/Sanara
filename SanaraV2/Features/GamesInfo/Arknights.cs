@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -26,10 +25,12 @@ namespace SanaraV2.Features.GamesInfo
                     if (elem.Key.StartsWith("char_") && name == Utilities.CleanWord((string)elem.Value.appellation))
                     {
                         var skills = new List<Response.ArknightsSkill>();
+                        List<string> skillsStr = new List<string>();
                         foreach (dynamic skill in elem.Value.skills)
                         {
                             var skillArr = Program.p.ARKNIGHTS_SKILLS[(string)skill.skillId];
-                            skills.Add(new Response.ArknightsSkill { name = skillArr.Item1, description = skillArr.Item2 });
+                            skillsStr.Add((string)skill.skillId);
+                            skills.Add(new Response.ArknightsSkill { name = skillArr[0].Item1, description = skillArr[0].Item2 });
                         }
                         return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(new Response.ArknightsCharac()
                         {
@@ -39,6 +40,7 @@ namespace SanaraV2.Features.GamesInfo
                             tags = ((JArray)elem.Value.tagList).Select(x => ToSentenceCase(Program.p.ARKNIGHTS_TAGS[x.Value<string>()])).ToArray(),
                             wikiUrl = "https://aceship.github.io/AN-EN-Tags/akhrchars.html?opname=" + ((string)elem.Value.appellation).Replace(' ', '_'),
                             skills = skills.ToArray(),
+                            skillKeys = skillsStr.ToArray(),
                             description = Program.p.ARKNIGHTS_DESCRIPTIONS[(string)elem.Value.appellation]
                         }, Error.Charac.None);
                     }

@@ -53,15 +53,29 @@ namespace SanaraV2.Modules.GamesInfo
                             Value = skill.description
                         });
                     }
-                    await ReplyAsync("", false, new EmbedBuilder
+                    EmbedFooterBuilder footer = null;
+                    if (result.answer.skills.Length > 2)
+                    {
+                        footer = new EmbedFooterBuilder
+                        {
+                            Text = "Skills displayed are at level 1"
+                        };
+                    }
+                    var msg = await ReplyAsync("", false, new EmbedBuilder
                     {
                         Title = result.answer.name,
                         Url = result.answer.wikiUrl,
                         Description = result.answer.description,
                         ImageUrl = result.answer.imgUrl,
                         Color = Color.Blue,
-                        Fields = fields
+                        Fields = fields,
+                        Footer = footer
                     }.Build());
+                    if (result.answer.skills.Length > 2)
+                    {
+                        await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
+                        Program.p.ARKNIGHTS_SKILLS_INFO.Add(msg.Id, (0, result.answer.skillKeys));
+                    }
                     break;
 
                 default:

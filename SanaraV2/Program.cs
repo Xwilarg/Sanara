@@ -131,9 +131,13 @@ namespace SanaraV2
         /// ARKNIGHTS INFOS
         public Dictionary<string, string> ARKNIGHTS_ALIASES;
         public Dictionary<string, string> ARKNIGHTS_TAGS;
-        public Dictionary<string, Tuple<string, string>> ARKNIGHTS_SKILLS;
+        public Dictionary<string, Tuple<string, string>[]> ARKNIGHTS_SKILLS;
         public Dictionary<string, dynamic> ARKNIGHTS_GENERAL;
         public Dictionary<string, string> ARKNIGHTS_DESCRIPTIONS;
+        /// <summary>
+        /// Keep tracks of Arknights commands for skills, int is the current skill level, List<string> are all the skills (their keys)
+        /// </summary>
+        public Dictionary<ulong, (int, string[])> ARKNIGHTS_SKILLS_INFO;
 
         /// <summary>
         /// Associe a message with an array of doujinshi (tuple containing doujin name, doujin tags and doujin image)
@@ -165,6 +169,7 @@ namespace SanaraV2
             });
 
             p = this;
+            ARKNIGHTS_SKILLS_INFO = new Dictionary<ulong, (int, string[])>();
             DOUJINSHI_POPULARITY_INFO = new Dictionary<ulong, Tuple<int, Tuple<string, string, string>[]>>();
 
             await Log(new LogMessage(LogSeverity.Info, "Setup", "Preparing bot"));
@@ -258,6 +263,7 @@ namespace SanaraV2
             client.Ready += Ready;
             client.ReactionAdded += cm.ReactionAdded;
             client.ReactionAdded += DoujinshiReactionAdded;
+            client.ReactionAdded += ArknightsReactionAdded;
             commands.CommandExecuted += CommandExecuted;
 
             await client.LoginAsync(TokenType.Bot, botToken);
@@ -313,6 +319,76 @@ namespace SanaraV2
                         Text = "#" + (i + 1) + ": " + tuple.Item1 + "\nTags: " + tuple.Item2
                     }
                 }.Build());
+                var author = dMsg.Author as IGuildUser;
+                if (author != null && author.GuildPermissions.ManageMessages)
+                    await dMsg.RemoveReactionAsync(react.Emote, react.User.Value);
+            }
+        }
+
+        private async Task ArknightsReactionAdded(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        {
+            string emote = react.Emote.ToString();
+            if (react.User.Value.Id != client.CurrentUser.Id && (emote == "◀️" || emote == "▶️" || emote == "⏪" || emote == "⏩") && ARKNIGHTS_SKILLS_INFO.ContainsKey(msg.Id))
+            {
+                var elem = ARKNIGHTS_SKILLS_INFO[msg.Id];
+                var dMsg = await msg.GetOrDownloadAsync();
+                var embed = dMsg.Embeds.ElementAt(0);
+                if (embed.Fields.Length < 3) // No skill available
+                {
+                    var i = elem.Item1;
+                    var length = ARKNIGHTS_SKILLS[elem.Item2[0]].Length;
+                    if (emote == "◀️")
+                    {
+                        i--;
+                        if (i < 0) i = length - 1;
+                    }
+                    else if (emote == "⏪")
+                    {
+                        i = 0;
+                    }
+                    else if (emote == "⏩")
+                    {
+                        i = length - 1;
+                    }
+                    else
+                    {
+                        i++;
+                        if (i > length - 1) i = 0;
+                    }
+                    ARKNIGHTS_SKILLS_INFO[msg.Id] = (i, ARKNIGHTS_SKILLS_INFO[msg.Id].Item2);
+                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+                    for (int z = 0; z < 2; z++)
+                    {
+                        var e = embed.Fields[z];
+                        fields.Add(new EmbedFieldBuilder
+                        {
+                            Name = e.Name,
+                            Value = e.Value,
+                            IsInline = e.Inline
+                        });
+                    }
+                    for (int z = 0; z < elem.Item2.Length; z++)
+                    {
+                        fields.Add(new EmbedFieldBuilder
+                        {
+                            Name = embed.Fields[z + 2].Name, // We skip the 2 firsts embeds cause they are Position and HR tags
+                            Value = ARKNIGHTS_SKILLS[elem.Item2[z]][i].Item2
+                        });
+                    }
+                    await dMsg.ModifyAsync(x => x.Embed = new EmbedBuilder
+                    {
+                        Title = embed.Title,
+                        Url = embed.Url,
+                        Description = embed.Description,
+                        ImageUrl = embed.Image.Value.Url,
+                        Color = embed.Color,
+                        Fields = fields,
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = "Skills displayed are at " + (i < 7 ? "level " + (i + 1) : "mastery " + (i - 6))
+                        }
+                    }.Build());
+                }
                 var author = dMsg.Author as IGuildUser;
                 if (author != null && author.GuildPermissions.ManageMessages)
                     await dMsg.RemoveReactionAsync(react.Emote, react.User.Value);
@@ -513,7 +589,7 @@ namespace SanaraV2
         {
             ARKNIGHTS_ALIASES = new Dictionary<string, string>();
             ARKNIGHTS_TAGS = new Dictionary<string, string>();
-            ARKNIGHTS_SKILLS = new Dictionary<string, Tuple<string, string>>();
+            ARKNIGHTS_SKILLS = new Dictionary<string, Tuple<string, string>[]>();
             ARKNIGHTS_DESCRIPTIONS = new Dictionary<string, string>();
 
             using (HttpClient hc = new HttpClient())
@@ -538,14 +614,19 @@ namespace SanaraV2
                 j = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/skill_table.json"));
                 foreach (var elem in tab)
                 {
-                    string description = elem.Value.desc[0];
-                    foreach (var d in j[elem.Key].levels[0].blackboard)
+                    Tuple<string, string>[] skillLevels = new Tuple<string, string>[elem.Value.desc.Count];
+                    for (int i = 0; i < elem.Value.desc.Count; i++) // Skill lvl 1 to 7 (+ 3 lvl of mastery = 10 (so 0 to 9) if > 4 star)
                     {
-                        description = description.Replace("{" + d.key + "}", (string)d.value);
+                        string description = elem.Value.desc[i];
+                        foreach (var d in j[elem.Key].levels[i].blackboard)
+                        {
+                            description = description.Replace("{" + d.key + "}", (string)d.value);
+                        }
+                        description = Regex.Replace(description, "{([0-9.-]+):\\.0f}", "$1");
+                        description = Regex.Replace(description, "{([0-9.-]+):\\.0%}", "$1%");
+                        skillLevels[i] = new Tuple<string, string>((string)elem.Value.name, description);
                     }
-                    description = Regex.Replace(description, "{([0-9.-]+):\\.0f}", "$1");
-                    description = Regex.Replace(description, "{([0-9.-]+):\\.0%}", "$1%");
-                    ARKNIGHTS_SKILLS.Add(elem.Key, new Tuple<string, string>((string)elem.Value.name, description));
+                    ARKNIGHTS_SKILLS.Add(elem.Key, skillLevels);
                 }
             }
         }
