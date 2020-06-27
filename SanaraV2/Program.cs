@@ -333,7 +333,7 @@ namespace SanaraV2
                 var elem = ARKNIGHTS_SKILLS_INFO[msg.Id];
                 var dMsg = await msg.GetOrDownloadAsync();
                 var embed = dMsg.Embeds.ElementAt(0);
-                if (embed.Fields.Length < 3) // No skill available
+                if (embed.Fields.Length >= 3) // Skill available
                 {
                     var i = elem.Item1;
                     var length = ARKNIGHTS_SKILLS[elem.Item2[0]].Length;
