@@ -58,7 +58,7 @@ namespace SanaraV2.Modules.GamesInfo
                         });
                     }
                     EmbedFooterBuilder footer = null;
-                    if (result.answer.skills.Length > 2)
+                    if (result.answer.skills.Length > 0)
                     {
                         footer = new EmbedFooterBuilder
                         {
@@ -75,7 +75,7 @@ namespace SanaraV2.Modules.GamesInfo
                         Fields = fields,
                         Footer = footer
                     }.Build());
-                    if (result.answer.skills.Length > 2)
+                    if (result.answer.skills.Length > 0)
                     {
                         await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
                         Program.p.ARKNIGHTS_SKILLS_INFO.Add(msg.Id, (result.answer.skillLevel - 1, result.answer.skillKeys));
