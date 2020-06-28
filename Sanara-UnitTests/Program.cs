@@ -53,7 +53,7 @@ namespace Sanara_UnitTests
             Assert.NotEmpty(datas);
             var anime = datas[0];
             Assert.True(await IsLinkValid(anime.Item2.Url));
-            Assert.True(await IsLinkValid(anime.Item2.ThumbnailUrl));
+            Assert.True(await IsLinkValid(anime.Item2.ImageUrl));
             Assert.NotEmpty(anime.Item2.Title);
         }
 
