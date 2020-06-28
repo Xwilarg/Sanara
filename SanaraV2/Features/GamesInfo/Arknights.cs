@@ -14,6 +14,7 @@ namespace SanaraV2.Features.GamesInfo
                 return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.Help);
             int skillLevel;
             string name;
+            string firstArg = args[0].ToLower();
             if (int.TryParse(args[0], out skillLevel))
             {
                 if (skillLevel < 0)
@@ -22,8 +23,16 @@ namespace SanaraV2.Features.GamesInfo
             }
             else
             {
-                skillLevel = 1;
-                name = Utilities.CleanWord(string.Join(" ", args).ToLower());
+                if (firstArg == "m1") skillLevel = 8;
+                else if (firstArg == "m2") skillLevel = 9;
+                else if (firstArg == "m3") skillLevel = 10;
+                if (firstArg != "m1" && firstArg != "m2" && firstArg != "m3")
+                {
+                    skillLevel = 1;
+                    name = Utilities.CleanWord(string.Join(" ", args).ToLower());
+                }
+                else
+                    name = Utilities.CleanWord(string.Join(" ", args.Skip(1)).ToLower());
             }
             using (HttpClient hc = new HttpClient())
             {
@@ -38,13 +47,13 @@ namespace SanaraV2.Features.GamesInfo
                     {
                         var skills = new List<Response.ArknightsSkill>();
                         List<string> skillsStr = new List<string>();
-                        if (skillLevel > elem.Value.skills.Count)
+                        if ((elem.Value.skills.Count == 0 && skillLevel > 1) || skillLevel > Program.p.ARKNIGHTS_SKILLS[(string)elem.Value.skills[0].skillId].Length + 1)
                             return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.InvalidLevel);
                         foreach (dynamic skill in elem.Value.skills)
                         {
                             var skillArr = Program.p.ARKNIGHTS_SKILLS[(string)skill.skillId];
                             skillsStr.Add((string)skill.skillId);
-                            skills.Add(new Response.ArknightsSkill { name = skillArr[skillLevel].Item1, description = skillArr[skillLevel].Item2 });
+                            skills.Add(new Response.ArknightsSkill { name = skillArr[skillLevel - 1].Item1, description = skillArr[skillLevel - 1].Item2 });
                         }
                         return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(new Response.ArknightsCharac()
                         {
