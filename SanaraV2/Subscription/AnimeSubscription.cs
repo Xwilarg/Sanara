@@ -13,6 +13,7 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -46,11 +47,18 @@ namespace SanaraV2.Subscription
                     break;
                 string animeName = Regex.Match(title, "(^.+) #[0-9]+$").Groups[1].Value;
                 string description = "";
-                var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, new[] { animeName }, null);
-                if (result.error == Features.Entertainment.Error.AnimeManga.None
-                    && result.answer.name.ToLower() == animeName.ToLower())
+                try
                 {
-                    description = result.answer.synopsis;
+                    var result = await Features.Entertainment.AnimeManga.SearchAnime(Features.Entertainment.AnimeManga.SearchType.Anime, new[] { animeName }, null);
+                    if (result.error == Features.Entertainment.Error.AnimeManga.None
+                        && result.answer.name.ToLower() == animeName.ToLower())
+                    {
+                        description = result.answer.synopsis;
+                    }
+                }
+                catch (JsonReaderException) // Not sure why this is happening...
+                {
+                    System.Console.WriteLine("Error while searching description for " + title);
                 }
                 data.Add((title.GetHashCode(), new EmbedBuilder
                 {
