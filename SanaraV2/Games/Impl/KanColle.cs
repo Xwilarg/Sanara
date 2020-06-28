@@ -67,17 +67,14 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
-            using (HttpClient hc = new HttpClient())
-            {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(curr) + "&limit=1"));
-                string shipUrl = json.items[0].url + "/Gallery";
-                string html = await hc.GetStringAsync(shipUrl);
-                return (new Tuple<string[], string[]>(
-                    new[] { html.Split(new string[] { "img src=\"" }, StringSplitOptions.None)[2].Split('"')[0].Split(new string[] { "/revision" }, StringSplitOptions.None)[0] },
-                    new[] { curr }
-                ));
-            }
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            dynamic json = JsonConvert.DeserializeObject(await _http.GetStringAsync("https://kancolle.fandom.com/api/v1/Search/List?query=" + Uri.EscapeDataString(curr) + "&limit=1"));
+            string shipUrl = json.items[0].url + "/Gallery";
+            string html = await _http.GetStringAsync(shipUrl);
+            return (new Tuple<string[], string[]>(
+                new[] { html.Split(new string[] { "img src=\"" }, StringSplitOptions.None)[2].Split('"')[0].Split(new string[] { "/revision" }, StringSplitOptions.None)[0] },
+                new[] { curr }
+            ));
         }
 
         public static List<string> LoadDictionnary()

@@ -91,8 +91,7 @@ namespace SanaraV2.Games.Impl
                     return await GetPostInternalAsync(curr); // We only take .mp4 for now
                 string randomPath = GetRandomPath();
                 string path = "Saves/" + randomPath + ".mp4";
-                using (HttpClient hc = new HttpClient())
-                    File.WriteAllBytes(path, await hc.GetByteArrayAsync(result.answer.url));
+                File.WriteAllBytes(path, await _http.GetByteArrayAsync(result.answer.url));
                 using (var engine = new Engine())
                 {
                     var mp4 = new MediaFile { Filename = path };

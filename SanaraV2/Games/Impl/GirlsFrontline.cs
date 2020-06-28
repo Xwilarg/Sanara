@@ -66,15 +66,12 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
-            using (HttpClient hc = new HttpClient())
-            {
-                string html = await hc.GetStringAsync("https://en.gfwiki.com/wiki/File:" + curr + ".png"); // Dictionnary already contains name corresponding to the URL
-                Match m = Regex.Match(html, "src=\"(\\/images\\/thumb\\/[^\"]+)\"");
-                return (new Tuple<string[], string[]>(
-                    new[] { "https://en.gfwiki.com" + m.Groups[1].Value },
-                    new[] { curr.Replace("%E2%88%95", "/") }
-                ));
-            }
+            string html = await _http.GetStringAsync("https://en.gfwiki.com/wiki/File:" + curr + ".png"); // Dictionnary already contains name corresponding to the URL
+            Match m = Regex.Match(html, "src=\"(\\/images\\/thumb\\/[^\"]+)\"");
+            return (new Tuple<string[], string[]>(
+                new[] { "https://en.gfwiki.com" + m.Groups[1].Value },
+                new[] { curr.Replace("%E2%88%95", "/") }
+            ));
         }
 
         public static List<string> LoadDictionnary()

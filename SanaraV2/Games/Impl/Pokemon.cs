@@ -66,10 +66,7 @@ namespace SanaraV2.Games.Impl
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
             string html;
-            using (HttpClient hc = new HttpClient())
-            {
-                html = await hc.GetStringAsync("https://pokemondb.net/pokedex/" + curr);
-            }
+            html = await _http.GetStringAsync("https://pokemondb.net/pokedex/" + curr);
             string french = Regex.Match(html, "<th>French<\\/th>[^<]*<td>([^<]+)<\\/td>").Groups[1].Value;
             string japanese = Regex.Match(html, "<th>Japanese<\\/th>[^<]*<td>[^\\(]+\\(([^\\)]+)\\)<\\/td>").Groups[1].Value;
             string german = Regex.Match(html, "<th>German<\\/th>[^<]*<td>([^<]+)<\\/td>").Groups[1].Value;

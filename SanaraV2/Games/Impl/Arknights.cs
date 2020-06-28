@@ -65,24 +65,21 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
-            using (HttpClient hc = new HttpClient())
+            dynamic json = JsonConvert.DeserializeObject(await _http.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json"));
+            dynamic jsonName = JsonConvert.DeserializeObject(await _http.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json"));
+            List<string> names = new List<string>();
+            string appelation = json[curr].appellation;
+            foreach (dynamic name in jsonName)
             {
-                dynamic json = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json"));
-                dynamic jsonName = JsonConvert.DeserializeObject(await hc.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json"));
-                List<string> names = new List<string>();
-                string appelation = json[curr].appellation;
-                foreach (dynamic name in jsonName)
-                {
-                    if (name.name == appelation)
-                        names.Add((string)name.name_en);
-                }
-                names.Add(appelation);
-                names.Add((string)json[curr].name);
-                return (new Tuple<string[], string[]>(
-                    new[] { "https://aceship.github.io/AN-EN-Tags/img/characters/" + curr + "_1.png" },
-                    names.ToArray()
-                ));
+                if (name.name == appelation)
+                    names.Add((string)name.name_en);
             }
+            names.Add(appelation);
+            names.Add((string)json[curr].name);
+            return (new Tuple<string[], string[]>(
+                new[] { "https://aceship.github.io/AN-EN-Tags/img/characters/" + curr + "_1.png" },
+                names.ToArray()
+            ));
         }
 
         public static List<string> LoadDictionnary()

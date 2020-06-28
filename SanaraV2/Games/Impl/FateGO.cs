@@ -71,38 +71,35 @@ namespace SanaraV2.Games.Impl
 
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
-            using (HttpClient hc = new HttpClient())
-            {
-                string html = await hc.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + curr);
+            string html = await _http.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + curr);
 
-                List<string> allAnswer = new List<string>();
-                allAnswer.Add(HttpUtility.UrlDecode(curr).Replace("&amp;", "And").Replace("&#39;", "'"));
-                allAnswer.Add(CleanFateGOName(curr));
-                if (html.Contains("AKA:"))
+            List<string> allAnswer = new List<string>();
+            allAnswer.Add(HttpUtility.UrlDecode(curr).Replace("&amp;", "And").Replace("&#39;", "'"));
+            allAnswer.Add(CleanFateGOName(curr));
+            if (html.Contains("AKA:"))
+            {
+                foreach (string s in Regex.Replace(html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0], "\\([^\\)]+\\)", "").Split(','))
                 {
-                    foreach (string s in Regex.Replace(html.Split(new[] { "AKA:" }, StringSplitOptions.None)[1].Split(new[] { "</table>" }, StringSplitOptions.None)[0], "\\([^\\)]+\\)", "").Split(','))
+                    string name = s;
+                    Match m = Regex.Match(name, "<[^>]+>([^<]+)<\\/[^>]+>");
+                    if (m.Success)
+                        name = m.Groups[1].Value;
+                    name = Regex.Replace(name, "<[^>]+>", "");
+                    name = Regex.Replace(name, "<\\/[^>]+>", "");
+                    foreach (string sName in name.Split(','))
                     {
-                        string name = s;
-                        Match m = Regex.Match(name, "<[^>]+>([^<]+)<\\/[^>]+>");
-                        if (m.Success)
-                            name = m.Groups[1].Value;
-                        name = Regex.Replace(name, "<[^>]+>", "");
-                        name = Regex.Replace(name, "<\\/[^>]+>", "");
-                        foreach (string sName in name.Split(','))
+                        if (!string.IsNullOrWhiteSpace(sName))
                         {
-                            if (!string.IsNullOrWhiteSpace(sName))
-                            {
-                                allAnswer.Add(sName.Trim());
-                                allAnswer.Add(CleanFateGOName(sName.Trim()));
-                            }
+                            allAnswer.Add(sName.Trim());
+                            allAnswer.Add(CleanFateGOName(sName.Trim()));
                         }
                     }
                 }
-                return (new Tuple<string[], string[]>(
-                    new[] { Regex.Match(html.Split(new[] { "pi-image-collection-tab-content current" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0] },
-                    allAnswer.ToArray()
-                ));
             }
+            return (new Tuple<string[], string[]>(
+                new[] { Regex.Match(html.Split(new[] { "pi-image-collection-tab-content current" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0] },
+                allAnswer.ToArray()
+            ));
         }
 
         public static List<string> LoadDictionnary()

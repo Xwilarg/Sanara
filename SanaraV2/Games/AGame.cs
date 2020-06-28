@@ -28,6 +28,8 @@ namespace SanaraV2.Games
     {
         protected AGame(IGuild guild, IMessageChannel chan, List<string> dictionnary, Config config, ulong playerId, bool ignoreDictionnarycheck = false)
         {
+            _http = new HttpClient();
+
             _guild = guild;
             _chan = chan;
             if (!ignoreDictionnarycheck && (dictionnary == null || dictionnary.Count < 100)) // Dictionnary failed to load
@@ -170,12 +172,9 @@ namespace SanaraV2.Games
                             if (s == null)
                                 continue;
                             finding = s;
-                            using (HttpClient hc = new HttpClient())
-                            {
-                                var answer = await hc.SendAsync(new HttpRequestMessage(HttpMethod.Head, s));
-                                if (!answer.IsSuccessStatusCode)
-                                    throw new HttpRequestException("Invalid code " + answer.StatusCode);
-                            }
+                            var answer = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Head, s));
+                            if (!answer.IsSuccessStatusCode)
+                                throw new HttpRequestException("Invalid code " + answer.StatusCode);
                             await PostFromUrl(s);
                         }
                     else
@@ -515,57 +514,54 @@ namespace SanaraV2.Games
 
         private async Task PostFromUrl(string url)
         {
-            using (HttpClient hc = new HttpClient())
+            if (_isCropped || _isShaded != APreload.Shadow.None) // If image need to be crop we can't just upload it with the stream, we need to download it and modify it before
             {
-                if (_isCropped || _isShaded != APreload.Shadow.None) // If image need to be crop we can't just upload it with the stream, we need to download it and modify it before
-                {
-                    string fileExtension;
-                    if (url.Contains(".png")) fileExtension = ".png";
-                    else if (url.Contains(".jpg")) fileExtension = ".jpg";
-                    else if (url.Contains(".jpeg")) fileExtension = ".jpeg";
-                    else if (url.Contains(".gif")) fileExtension = ".gif";
-                    else throw new InvalidOperationException("Invalid extension for " + url);
-                    string path = _gameName + DateTime.Now.ToString("HHmmss") + Program.p.rand.Next() + fileExtension;
+                string fileExtension;
+                if (url.Contains(".png")) fileExtension = ".png";
+                else if (url.Contains(".jpg")) fileExtension = ".jpg";
+                else if (url.Contains(".jpeg")) fileExtension = ".jpeg";
+                else if (url.Contains(".gif")) fileExtension = ".gif";
+                else throw new InvalidOperationException("Invalid extension for " + url);
+                string path = _gameName + DateTime.Now.ToString("HHmmss") + Program.p.rand.Next() + fileExtension;
 
-                    System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(await (await hc.GetAsync(url)).Content.ReadAsStreamAsync());
-                    if (_isCropped)
+                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(await (await _http.GetAsync(url)).Content.ReadAsStreamAsync());
+                if (_isCropped)
+                {
+                    System.Drawing.Bitmap finalBmp = new System.Drawing.Bitmap(bmp.Width / 2, bmp.Height);
+                    System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(finalBmp);
+                    g.DrawImage(bmp, 0, 0, new System.Drawing.Rectangle(Program.p.rand.Next(0, 2) == 0 ? 0 : bmp.Width / 2, 0, bmp.Width / 2, bmp.Height), System.Drawing.GraphicsUnit.Pixel);
+                    bmp = finalBmp;
+                }
+                if (_isShaded != APreload.Shadow.None)
+                {
+                    for (int x = 0; x < bmp.Width; x++)
                     {
-                        System.Drawing.Bitmap finalBmp = new System.Drawing.Bitmap(bmp.Width / 2, bmp.Height);
-                        System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(finalBmp);
-                        g.DrawImage(bmp, 0, 0, new System.Drawing.Rectangle(Program.p.rand.Next(0, 2) == 0 ? 0 : bmp.Width / 2, 0, bmp.Width / 2, bmp.Height), System.Drawing.GraphicsUnit.Pixel);
-                        bmp = finalBmp;
-                    }
-                    if (_isShaded != APreload.Shadow.None)
-                    {
-                        for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
                         {
-                            for (int y = 0; y < bmp.Height; y++)
-                            {
-                                var pixel = bmp.GetPixel(x, y);
-                                if ((_isShaded == APreload.Shadow.Transparency && pixel.A > 0)
-                                    || (_isShaded == APreload.Shadow.White && (pixel.R != 255 && pixel.G != 255 && pixel.B != 255)))
-                                    bmp.SetPixel(x, y, System.Drawing.Color.White);
-                                else
-                                    bmp.SetPixel(x, y, System.Drawing.Color.Black);
-                            }
+                            var pixel = bmp.GetPixel(x, y);
+                            if ((_isShaded == APreload.Shadow.Transparency && pixel.A > 0)
+                                || (_isShaded == APreload.Shadow.White && (pixel.R != 255 && pixel.G != 255 && pixel.B != 255)))
+                                bmp.SetPixel(x, y, System.Drawing.Color.White);
+                            else
+                                bmp.SetPixel(x, y, System.Drawing.Color.Black);
                         }
                     }
-                    bmp.Save(path);
-                    await _chan.SendFileAsync(path);
-                    File.Delete(path);
                 }
-                else
+                bmp.Save(path);
+                await _chan.SendFileAsync(path);
+                File.Delete(path);
+            }
+            else
+            {
+                Stream s = await _http.GetStreamAsync(url);
+                Stream s2 = await _http.GetStreamAsync(url); // We create a new Stream because the first one is altered.
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    Stream s = await hc.GetStreamAsync(url);
-                    Stream s2 = await hc.GetStreamAsync(url); // We create a new Stream because the first one is altered.
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        await s.CopyToAsync(ms);
-                        if (ms.ToArray().Length < 8000000)
-                            await _chan.SendFileAsync(s2, "Sanara-image." + url.Split('.').Last());
-                        else
-                            await _chan.SendMessageAsync(url);
-                    }
+                    await s.CopyToAsync(ms);
+                    if (ms.ToArray().Length < 8000000)
+                        await _chan.SendFileAsync(s2, "Sanara-image." + url.Split('.').Last());
+                    else
+                        await _chan.SendMessageAsync(url);
                 }
             }
         }
@@ -631,6 +627,8 @@ namespace SanaraV2.Games
         private bool            _isCropped; // Difficulty level, image is cut in half
         private APreload.Shadow _isShaded; // Difficulty level, only display shadow
         private APreload.MultiplayerType _multiType; // How multiplayer is played
+
+        protected HttpClient _http;
 
         // Multiplayer "BestOf" Game Mode
         private Dictionary<string, int> _bestOfScore;

@@ -122,8 +122,7 @@ namespace SanaraV2.Games.Impl
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 return GetStringFromSentence(Sentences.OnlyHiraganaKatakanaRomaji);
             dynamic json;
-            using (HttpClient hc = new HttpClient())
-                json = JsonConvert.DeserializeObject(await hc.GetStringAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userAnswer)));
+            json = JsonConvert.DeserializeObject(await _http.GetStringAsync("http://www.jisho.org/api/v1/search/words?keyword=" + Uri.EscapeDataString(userAnswer)));
             if (json.data.Count == 0)
                 return GetStringFromSentence(Sentences.ShiritoriDoesntExist);
             bool isCorrect = false, isNoun = false;

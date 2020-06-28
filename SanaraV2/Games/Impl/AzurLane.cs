@@ -69,23 +69,17 @@ namespace SanaraV2.Games.Impl
         protected override async Task<Tuple<string[], string[]>> GetPostInternalAsync(string curr)
         {
             JArray json;
-            using (HttpClient hc = new HttpClient())
-            {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                json = JArray.Parse(hc.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + curr.Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
-            }
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            json = JArray.Parse(_http.GetStringAsync("https://azurlane.koumakan.jp/w/api.php?action=opensearch&search=" + curr.Replace("%20", "+") + "&limit=1").GetAwaiter().GetResult());
             List<string> allNames = new List<string>() { HttpUtility.UrlDecode(curr), json[0].ToObject<string>() };
             if (curr == "HMS_Neptune" || curr == "HDN_Neptune")
                 allNames.Add("Neptune"); // Both ship are named "Neptune" ingame
-            using (HttpClient hc = new HttpClient())
-            {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                return (new Tuple<string[], string[]>(
-                    new[] { "https://azurlane.koumakan.jp" + Regex.Match(await hc.GetStringAsync("https://azurlane.koumakan.jp/" + curr),
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            return (new Tuple<string[], string[]>(
+                new[] { "https://azurlane.koumakan.jp" + Regex.Match(await _http.GetStringAsync("https://azurlane.koumakan.jp/" + curr),
                     "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + curr + ".png)").Groups[1].Value },
-                    allNames.ToArray()
-                ));
-            }
+                allNames.ToArray()
+            ));
         }
 
         public static List<string> LoadDictionnary()
