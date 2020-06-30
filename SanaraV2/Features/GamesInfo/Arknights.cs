@@ -47,7 +47,7 @@ namespace SanaraV2.Features.GamesInfo
                     {
                         var skills = new List<Response.ArknightsSkill>();
                         List<string> skillsStr = new List<string>();
-                        if ((elem.Value.skills.Count == 0 && skillLevel > 1) || skillLevel > Program.p.ARKNIGHTS_SKILLS[(string)elem.Value.skills[0].skillId].Length)
+                        if (skillLevel > 1 && (elem.Value.skills.Count == 0 || skillLevel > Program.p.ARKNIGHTS_SKILLS[(string)elem.Value.skills[0].skillId].Length))
                             return new FeatureRequest<Response.ArknightsCharac, Error.Charac>(null, Error.Charac.InvalidLevel);
                         foreach (dynamic skill in elem.Value.skills)
                         {
