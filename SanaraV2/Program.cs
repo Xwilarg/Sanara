@@ -627,7 +627,7 @@ namespace SanaraV2
                         var matches = Regex.Matches(description, "([0-9.]+)%");
                         foreach (var m in matches.Cast<Match>())
                         {
-                            description = description.Replace(m.Groups[1].Value, (float.Parse(m.Groups[1].Value) * 100f).ToString());
+                            description = description.Replace(m.Groups[1].Value + "%", (float.Parse(m.Groups[1].Value) * 100f).ToString() + "%");
                         }
                         skillLevels[i] = new Tuple<string, string>((string)elem.Value.name, description);
                     }
