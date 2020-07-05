@@ -624,6 +624,11 @@ namespace SanaraV2
                         }
                         description = Regex.Replace(description, "{([0-9.-]+):\\.0f}", "$1");
                         description = Regex.Replace(description, "{([0-9.-]+):\\.0%}", "$1%");
+                        var matches = Regex.Matches(description, "([0-9.]+)%");
+                        foreach (var m in matches.Cast<Match>())
+                        {
+                            description = description.Replace(m.Groups[1].Value, (float.Parse(m.Groups[1].Value) * 100f).ToString());
+                        }
                         skillLevels[i] = new Tuple<string, string>((string)elem.Value.name, description);
                     }
                     ARKNIGHTS_SKILLS.Add(elem.Key, skillLevels);

@@ -199,7 +199,7 @@ namespace SanaraV2.Games
                 catch (Exception e)
                 {
                     counter++;
-                    string msg = "Error posting " + finding;
+                    string msg = "Error posting for game " + _gameName + ": " + finding;
                     if (counter == 3)
                     {
                         await _chan.SendMessageAsync("", false, new EmbedBuilder()
