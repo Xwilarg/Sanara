@@ -135,8 +135,12 @@ namespace SanaraV2.Features.NSFW
             }
             string url = res.fileUrl.AbsoluteUri;
             Color color = GetColorFromRating(res.rating);
-            string saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
-            tagInfos.Add(saveId, new Tuple<Type, BooruSharp.Search.Post.SearchResult>(booru.GetType(), res));
+            string saveId = null;
+            if (!(booru is E621) && !(booru is E926))
+            {
+                saveId = (tagInfos.Count + 1) + Utilities.GenerateRandomCode(4, r);
+                tagInfos.Add(saveId, new Tuple<Type, BooruSharp.Search.Post.SearchResult>(booru.GetType(), res));
+            }
             return new FeatureRequest<Response.Booru, Error.Booru>(new Response.Booru() {
                 url = url,
                 colorRating = color,

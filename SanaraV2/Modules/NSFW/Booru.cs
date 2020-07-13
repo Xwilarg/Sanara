@@ -204,7 +204,7 @@ namespace SanaraV2.Modules.NSFW
                             Footer = new EmbedFooterBuilder()
                             {
                                 Text = (result.answer.newTags != null ? "Some of your tags were invalid. The current search tags are: " + string.Join(", ", result.answer.newTags) + "\n\n" :
-                                "") + Sentences.ImageInfo(guild, result.answer.saveId)
+                                "") + (result.answer.saveId == null ? "" : Sentences.ImageInfo(guild, result.answer.saveId))
                             }
                         }.Build());
                     }
