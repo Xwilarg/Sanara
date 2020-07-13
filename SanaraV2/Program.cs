@@ -357,7 +357,7 @@ namespace SanaraV2
                     }
                     ARKNIGHTS_SKILLS_INFO[msg.Id] = (i, ARKNIGHTS_SKILLS_INFO[msg.Id].Item2);
                     List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
-                    for (int z = 0; z < 2; z++)
+                    for (int z = 0; z < 3; z++)
                     {
                         var e = embed.Fields[z];
                         fields.Add(new EmbedFieldBuilder
@@ -371,7 +371,7 @@ namespace SanaraV2
                     {
                         fields.Add(new EmbedFieldBuilder
                         {
-                            Name = embed.Fields[z + 2].Name, // We skip the 2 firsts embeds cause they are Position and HR tags
+                            Name = embed.Fields[z + 3].Name, // We skip the 3 firsts embeds cause they are Position and HR tags
                             Value = ARKNIGHTS_SKILLS[elem.Item2[z]][i].Item2
                         });
                     }

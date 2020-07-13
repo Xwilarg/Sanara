@@ -65,7 +65,8 @@ namespace SanaraV2.Features.GamesInfo
                             skills = skills.ToArray(),
                             skillKeys = skillsStr.ToArray(),
                             description = Program.p.ARKNIGHTS_DESCRIPTIONS[(string)elem.Value.appellation],
-                            skillLevel = skillLevel
+                            skillLevel = skillLevel,
+                            rarity = (int)elem.Value.rarity + 1
                         }, Error.Charac.None);
                     }
                 }

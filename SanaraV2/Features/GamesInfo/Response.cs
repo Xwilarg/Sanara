@@ -30,6 +30,7 @@ namespace SanaraV2.Features.GamesInfo
             public string[] skillKeys;
             public string description;
             public int skillLevel;
+            public int rarity;
         }
 
         public struct ArknightsSkill

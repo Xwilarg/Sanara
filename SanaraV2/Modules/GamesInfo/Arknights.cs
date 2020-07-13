@@ -47,6 +47,12 @@ namespace SanaraV2.Modules.GamesInfo
                                 Name = "HR Tags",
                                 Value = string.Join(", ", result.answer.tags),
                                 IsInline = true
+                            },
+                            new EmbedFieldBuilder
+                            {
+                                Name = "Rarity",
+                                Value = result.answer.rarity,
+                                IsInline = true
                             }
                     };
                     foreach (var skill in result.answer.skills)
