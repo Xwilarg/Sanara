@@ -475,6 +475,13 @@ namespace Sanara_UnitTests
             Assert.Equal(url, await game.GetUrlTest(name));
         }
 
+        // COMMUNICATION MODULE
+        [Fact]
+        public async Task InspireTest()
+        {
+            await IsLinkValid((await SanaraV2.Features.Tools.Communication.Inspire()).answer.url);
+        }
+
         // BOORU MODULE
         [Fact]
         public async Task TestBooruSafe()

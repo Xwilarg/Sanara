@@ -17,6 +17,11 @@ namespace SanaraV2.Features.Tools
 {
     public static class Error
     {
+        public enum None
+        {
+            None
+        }
+
         public enum IncreaseSize
         {
             None,

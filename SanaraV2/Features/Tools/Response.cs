@@ -20,6 +20,11 @@ namespace SanaraV2.Features.Tools
 {
     public static class Response
     {
+        public class Inspire
+        {
+            public string url;
+        }
+
         public class IncreaseSize
         {
             public string path;

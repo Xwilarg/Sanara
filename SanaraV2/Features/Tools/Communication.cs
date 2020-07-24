@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -26,6 +27,12 @@ namespace SanaraV2.Features.Tools
             ws.Send("g," + string.Join(" ", args));
 
             return new FeatureRequest<Response.Complete, Error.Complete>(new Response.Complete { }, Error.Complete.None);
+        }
+
+        public static async Task<FeatureRequest<Response.Inspire, Error.None>> Inspire()
+        {
+            using (HttpClient hc = new HttpClient())
+                return new FeatureRequest<Response.Inspire, Error.None>(new Response.Inspire { url = await hc.GetStringAsync("https://inspirobot.me/api?generate=true") }, Error.None.None);
         }
     }
 }

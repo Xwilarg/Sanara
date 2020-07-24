@@ -30,6 +30,18 @@ namespace SanaraV2.Modules.Tools
     {
         Program p = Program.p;
 
+        [Command("Inspire")]
+        public async Task Inspire(params string[] _)
+        {
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Communication);
+            await p.DoAction(Context.User, Program.Module.Communication);
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                ImageUrl = (await Features.Tools.Communication.Inspire()).answer.url
+            }.Build());
+        }
+
         [Command("Complete", RunMode = RunMode.Async)]
         public async Task Complete(params string[] args)
         {
