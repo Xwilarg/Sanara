@@ -176,7 +176,8 @@ namespace SanaraV2.Modules.Tools
             {
                 string str = Translation.GetTranslation(guild, "communicationModuleInfos") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleBotInfos")
                     + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleQuote") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModulePoll")
-                     + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleCalc") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleComplete");
+                    + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleCalc") + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleComplete")
+                    + Environment.NewLine + Translation.GetTranslation(guild, "communicationModuleInspire");
                 return str;
             }
             return Base.Sentences.NotAvailable(guild);

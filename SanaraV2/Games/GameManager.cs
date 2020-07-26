@@ -211,6 +211,10 @@ namespace SanaraV2.Games
                     {
                         return Sentences.NoDictionnary;
                     }
+                    catch (NoAudioChannel)
+                    {
+                        return Sentences.NoAudioChannel;
+                    }
                 }
             }
             return Sentences.InvalidGameName;

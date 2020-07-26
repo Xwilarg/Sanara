@@ -298,6 +298,7 @@
     <Compile Include="Games\GameModule.cs" />
     <Compile Include="Games\Impl\Anime.cs" />
     <Compile Include="Games\Impl\Arknights.cs" />
+    <Compile Include="Games\Impl\ArknightsAudio.cs" />
     <Compile Include="Games\Impl\AzurLane.cs" />
     <Compile Include="Games\Impl\Booru.cs" />
     <Compile Include="Games\Impl\FateGO.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="Games\Impl\Reversi.cs" />
     <Compile Include="Games\LooseException.cs" />
     <Compile Include="Games\MultiplayerLobby.cs" />
+    <Compile Include="Games\NoAudioChannel.cs" />
     <Compile Include="Games\NoDictionnaryException.cs" />
     <Compile Include="Games\ScoreManager.cs" />
     <Compile Include="Games\Sentences.cs" />

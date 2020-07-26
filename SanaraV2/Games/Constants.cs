@@ -35,7 +35,8 @@ namespace SanaraV2.Games
             new Tuple<Type, Type, string>(typeof(FateGOPreload), typeof(FateGO), "gameModuleFateGO"),
             new Tuple<Type, Type, string>(typeof(PokemonPreload), typeof(Pokemon), "gameModulePokemon"),
             new Tuple<Type, Type, string>(typeof(GirlsFrontlinePreload), typeof(GirlsFrontline), "gameModuleGirlsFrontline"),
-            new Tuple<Type, Type, string>(typeof(ArknightsPreload), typeof(Arknights), "gameModuleArknights")
+            new Tuple<Type, Type, string>(typeof(ArknightsPreload), typeof(Arknights), "gameModuleArknights"),
+            new Tuple<Type, Type, string>(typeof(ArknightsAudioPreload), typeof(ArknightsAudio), "gameModuleArknightsAudio")
         };
 
         public static readonly Tuple<Type, Type, string>[] allGames = InitAllGames();
@@ -56,6 +57,7 @@ namespace SanaraV2.Games
         public static readonly List<string> pokemonDictionnary = Pokemon.LoadDictionnary();
         public static readonly List<string> girlsfrontlineDictionnary = GirlsFrontline.LoadDictionnary();
         public static readonly List<string> arknightsDictionnary = Arknights.LoadDictionnary();
+        public static readonly List<string> arknightsAudioDictionnary = ArknightsAudio.LoadDictionnary();
 
         // Used by information module to display stats
         public static readonly Tuple<Func<IGuild, string>, List<string>>[] allDictionnaries = new Tuple<Func<IGuild, string>, List<string>>[]
@@ -69,7 +71,8 @@ namespace SanaraV2.Games
             new Tuple<Func<IGuild, string>, List<string>>(Sentences.FateGOGame, fateGODictionnary),
             new Tuple<Func<IGuild, string>, List<string>>(Sentences.PokemonGame, pokemonDictionnary),
             new Tuple<Func<IGuild, string>, List<string>>(Sentences.GirlsFrontlineGame, girlsfrontlineDictionnary),
-            new Tuple<Func<IGuild, string>, List<string>>(Sentences.ArknightsGame, arknightsDictionnary)
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.ArknightsGame, arknightsDictionnary),
+            new Tuple<Func<IGuild, string>, List<string>>(Sentences.ArknightsGame, arknightsAudioDictionnary)
         };
     }
 }

@@ -13,9 +13,11 @@
 /// You should have received a copy of the GNU General Public License
 /// along with Sanara.  If not, see<http://www.gnu.org/licenses/>.
 using Discord;
+using Discord.Audio;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -52,6 +54,23 @@ namespace SanaraV2.Games
             _bestOfScore = new Dictionary<string, int>();
             _bestOfTries = new Dictionary<string, int>();
             _bestOfRemainingRounds = nbQuestions;
+
+            if (GetPostType() == PostType.Audio)
+            {
+                if (!File.Exists("ffmpeg.exe"))
+                    throw new FileNotFoundException("ffmpeg.exe was not found. Please put it near the bot executable.");
+                // TODO: Check is Sanara isn't already in a vocal channel and if we are not in PM
+                var user = chan.GetUserAsync(playerId).GetAwaiter().GetResult() as IGuildUser;
+                if (user == null)
+                    throw new ArgumentException("Can't convert user to IGuildUser");
+                var chanRadio = user.VoiceChannel;
+                if (chanRadio == null)
+                    throw new NoAudioChannel();
+                _voiceSession = chanRadio.ConnectAsync().GetAwaiter().GetResult();
+            }
+            else
+                _voiceSession = null;
+
             Init();
         }
 
@@ -61,6 +80,7 @@ namespace SanaraV2.Games
         public void Cancel()
         {
             _gameState = GameState.Lost;
+            LeaveVocalChannel();
         }
 
         protected abstract void Init(); // User must not use the ctor, they must init things in this function (because GetPost is called from this ctor, who is called before the child ctor)
@@ -177,7 +197,7 @@ namespace SanaraV2.Games
                                 throw new HttpRequestException("Invalid code " + answer.StatusCode);
                             await PostFromUrl(s);
                         }
-                    else
+                    else if (type == PostType.LocalPath)
                         foreach (string s in await GetPostAsync())
                         {
                             if (s == null)
@@ -186,6 +206,43 @@ namespace SanaraV2.Games
                             await PostFromLocalPath(s);
                             File.Delete(s);
                         }
+                    else
+                    {
+                        await PostText("Audio started");
+                        string url = (await GetPostAsync()).First();
+                        string path = "Saves/" + _guild.Id + DateTime.Now.ToString("HHmmssff") + ".mp3";
+                        File.WriteAllBytes(path, await _http.GetByteArrayAsync(url));
+                        Process p = Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "ffmpeg.exe",
+                            Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true
+                        });
+                        using (Stream output = p.StandardOutput.BaseStream)
+                        using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Mixed))
+                        {
+                            try
+                            {
+                                await output.CopyToAsync(discord);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                while (true)
+                                {
+                                    try
+                                    {
+                                        File.Delete(path);
+                                        break;
+                                    }
+                                    catch (IOException)
+                                    { }
+                                }
+                            }
+                            await discord.FlushAsync();
+                        }
+                        File.Delete(path);
+                    }
                     _startTime = DateTime.Now;
                     _isFound = false;
                     break;
@@ -473,9 +530,13 @@ namespace SanaraV2.Games
                         return;
                     }
                     await PostText(Sentences.YouLost(_guild) + (reason == null ? "" : reason + Environment.NewLine) + await GetLoose() + Environment.NewLine + Sentences.WonMulti(_guild, _lobby.GetLastStanding()));
+                    LeaveVocalChannel();
                 }
                 else
+                {
+                    LeaveVocalChannel();
                     throw new ArgumentException("Multiplayer game " + _gameName + " ended in an unexpected way: " + reason);
+                }
             }
             else
             {
@@ -493,6 +554,22 @@ namespace SanaraV2.Games
                         foreach (ulong c in _contributors)
                             await Program.p.cm.ProgressAchievementAsync(Community.AchievementID.GoodScoresShadow, _score, null, gameOverMsg, c);
                     }
+                }
+                LeaveVocalChannel();
+            }
+        }
+
+        private void LeaveVocalChannel()
+        {
+            if (_voiceSession != null)
+            {
+                try
+                {
+                    _voiceSession.StopAsync().GetAwaiter().GetResult();
+                }
+                catch (Exception e) // We catch just in case, cause we don't want an exception thrown in the dtor
+                {
+                    Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
             }
         }
@@ -597,7 +674,8 @@ namespace SanaraV2.Games
         {
             Url,
             Text,
-            LocalPath
+            LocalPath,
+            Audio
         }
 
         /// <summary>
@@ -627,6 +705,7 @@ namespace SanaraV2.Games
         private bool            _isCropped; // Difficulty level, image is cut in half
         private APreload.Shadow _isShaded; // Difficulty level, only display shadow
         private APreload.MultiplayerType _multiType; // How multiplayer is played
+        private IAudioClient    _voiceSession;
 
         protected HttpClient _http;
 

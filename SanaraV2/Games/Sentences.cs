@@ -26,6 +26,7 @@ namespace SanaraV2.Games
         public static string RulesShiritori2(IGuild guild) { return (Translation.GetTranslation(guild, "rulesShiritori2")); }
         public static string RulesKancolle(IGuild guild) { return (Translation.GetTranslation(guild, "rulesKancolle")); }
         public static string RulesArknights(IGuild guild) { return (Translation.GetTranslation(guild, "rulesArknights")); }
+        public static string RulesArknightsAudio(IGuild guild) { return (Translation.GetTranslation(guild, "rulesArknightsAudio")); }
         public static string RulesGirlsFrontline(IGuild guild) { return (Translation.GetTranslation(guild, "rulesGirlsFrontline")); }
         public static string RulesBooru(IGuild guild) { return (Translation.GetTranslation(guild, "rulesBooru")); }
         public static string RulesAnime(IGuild guild) { return (Translation.GetTranslation(guild, "rulesAnime")); }
@@ -69,11 +70,13 @@ namespace SanaraV2.Games
         public static string BooruGuessClose(IGuild guild, string attempt) { return (Translation.GetTranslation(guild, "booruGuessClose", attempt)); }
         public static string InvalidGameArgument(IGuild guild) { return (Translation.GetTranslation(guild, "invalidGameArgument")); }
         public static string NoDictionnary(IGuild guild) { return (Translation.GetTranslation(guild, "noDictionnary")); }
+        public static string NoAudioChannel(IGuild guild) { return (Translation.GetTranslation(guild, "noAudioChannel")); }
         public static string ExceptionGame(IGuild guild, string url) { return (Translation.GetTranslation(guild, "exceptionGame", url)); }
         public static string ExceptionGameStop(IGuild guild) { return (Translation.GetTranslation(guild, "exceptionGameStop")); }
         public static string AnimeGame(IGuild guild) { return (Translation.GetTranslation(guild, "animeGame")); }
         public static string BooruGame(IGuild guild) { return (Translation.GetTranslation(guild, "booruGame")); }
         public static string ArknightsGame(IGuild guild) { return (Translation.GetTranslation(guild, "arknightsGame")); }
+        public static string ArknightsAudioGame(IGuild guild) { return (Translation.GetTranslation(guild, "arknightsAudioGame")); }
         public static string KancolleGame(IGuild guild) { return (Translation.GetTranslation(guild, "kancolleGame")); }
         public static string GirlsFrontlineGame(IGuild guild) { return (Translation.GetTranslation(guild, "girlsFrontlineGame")); }
         public static string DestinyChildGame(IGuild guild) { return (Translation.GetTranslation(guild, "destinyChildGame")); }
