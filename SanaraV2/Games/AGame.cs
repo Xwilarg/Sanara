@@ -55,6 +55,8 @@ namespace SanaraV2.Games
             _bestOfTries = new Dictionary<string, int>();
             _bestOfRemainingRounds = nbQuestions;
 
+            _audioFilePath = null;
+            _process = null;
             if (GetPostType() == PostType.Audio)
             {
                 if (!File.Exists("ffmpeg.exe"))
@@ -208,40 +210,13 @@ namespace SanaraV2.Games
                         }
                     else
                     {
-                        await PostText("Audio started");
+                        if (_audioFilePath != null)
+                            File.Delete(_audioFilePath);
                         string url = (await GetPostAsync()).First();
-                        string path = "Saves/" + _guild.Id + DateTime.Now.ToString("HHmmssff") + ".mp3";
-                        File.WriteAllBytes(path, await _http.GetByteArrayAsync(url));
-                        Process p = Process.Start(new ProcessStartInfo
-                        {
-                            FileName = "ffmpeg.exe",
-                            Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true
-                        });
-                        using (Stream output = p.StandardOutput.BaseStream)
-                        using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Mixed))
-                        {
-                            try
-                            {
-                                await output.CopyToAsync(discord);
-                            }
-                            catch (OperationCanceledException)
-                            {
-                                while (true)
-                                {
-                                    try
-                                    {
-                                        File.Delete(path);
-                                        break;
-                                    }
-                                    catch (IOException)
-                                    { }
-                                }
-                            }
-                            await discord.FlushAsync();
-                        }
-                        File.Delete(path);
+                        _audioFilePath = "Saves/" + _guild.Id + DateTime.Now.ToString("HHmmssff") + ".mp3";
+                        File.WriteAllBytes(_audioFilePath, await _http.GetByteArrayAsync(url));
+                        await PostText("Audio started, use the 'replay' command to play it again.");
+                        await PlayAudioFile();
                     }
                     _startTime = DateTime.Now;
                     _isFound = false;
@@ -294,6 +269,50 @@ namespace SanaraV2.Games
             if (help != null)
                 await PostText(help);
             _postImage = false;
+        }
+
+        public async Task<bool> ReplayAudio()
+        {
+            if (_audioFilePath == null)
+                return false;
+            await PlayAudioFile();
+            return true;
+        }
+
+        private async Task PlayAudioFile()
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                _process.Kill();
+            }
+            _process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "ffmpeg.exe",
+                Arguments = $"-hide_banner -loglevel panic -i \"{_audioFilePath}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            });
+            using (Stream output = _process.StandardOutput.BaseStream)
+            using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Mixed))
+            {
+                try
+                {
+                    await output.CopyToAsync(discord);
+                }
+                catch (OperationCanceledException)
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            break;
+                        }
+                        catch (IOException)
+                        { }
+                    }
+                }
+                await discord.FlushAsync();
+            }
         }
 
         public async Task CheckCorrectAsync(IUser user, string userAnswer, SocketUserMessage msg)
@@ -561,13 +580,15 @@ namespace SanaraV2.Games
 
         private void LeaveVocalChannel()
         {
+            if (_audioFilePath != null)
+                File.Delete(_audioFilePath);
             if (_voiceSession != null)
             {
                 try
                 {
                     _voiceSession.StopAsync().GetAwaiter().GetResult();
                 }
-                catch (Exception e) // We catch just in case, cause we don't want an exception thrown in the dtor
+                catch (Exception e)
                 {
                     Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }
@@ -705,7 +726,11 @@ namespace SanaraV2.Games
         private bool            _isCropped; // Difficulty level, image is cut in half
         private APreload.Shadow _isShaded; // Difficulty level, only display shadow
         private APreload.MultiplayerType _multiType; // How multiplayer is played
+
+        // Audio quizz
         private IAudioClient    _voiceSession;
+        private string          _audioFilePath;
+        private Process         _process;
 
         protected HttpClient _http;
 

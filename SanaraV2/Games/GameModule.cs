@@ -74,6 +74,7 @@ namespace SanaraV2.Games
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleJoin"));
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleLeave"));
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleStart"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleReplay"));
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleNote"));
             str.AppendLine(Environment.NewLine);
@@ -162,6 +163,17 @@ namespace SanaraV2.Games
                 await ReplyAsync(Sentences.ResetDone(Context.Guild));
             else
                 await ReplyAsync(Sentences.ResetNone(Context.Guild));
+        }
+
+        [Command("Replay")]
+        public async Task Replay(params string[] _)
+        {
+            Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
+            await Program.p.DoAction(Context.User, Program.Module.Game);
+            if (await Program.p.gm.Replay(Context.Channel.Id))
+                await ReplyAsync(Modules.Base.Sentences.DoneStr(Context.Guild));
+            else
+                await ReplyAsync("There is no audio game running.");
         }
 
         [Command("Score")]

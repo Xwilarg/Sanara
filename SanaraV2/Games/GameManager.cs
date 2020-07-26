@@ -43,6 +43,15 @@ namespace SanaraV2.Games
             return true;
         }
 
+        public async Task<bool> Replay(ulong chanId)
+        {
+            AGame game = _games.Find(x => x.IsSelf(chanId));
+            if (game == null)
+                return false;
+            await game.ReplayAudio();
+            return true;
+        }
+
         public string JoinGame(IGuild guild, ulong chanId, ulong playerId)
         {
             AGame game = _games.Find(x => x.IsSelf(chanId));
@@ -222,6 +231,8 @@ namespace SanaraV2.Games
 
         public async Task ReceiveMessageAsync(string message, SocketUser user, ulong chanId, SocketUserMessage msg) // Called everytimes a message is sent somewhere
         {
+            if (message.ToLower().EndsWith("replay") || message.ToLower().EndsWith("cancel")) // replay and cancel are commands that can be used in the middle of a game
+                return;
             AGame game = _games.Find(x => x.IsSelf(chanId));
             if (game != null)
                 await game.CheckCorrectAsync(user, message, msg);
