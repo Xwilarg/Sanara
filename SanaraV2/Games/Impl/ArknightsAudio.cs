@@ -82,7 +82,7 @@ namespace SanaraV2.Games.Impl
             names.Add(appelation);
             names.Add((string)json[curr].name);
             return (new Tuple<string[], string[]>(
-                new[] { "https://aceship.github.io/AN-EN-Tags/etc/voice/" + curr + "/CN_001.mp3" },
+                new[] { "https://aceship.github.io/AN-EN-Tags/etc/voice/" + curr + "/CN_042.mp3" },
                 names.ToArray()
             ));
         }
