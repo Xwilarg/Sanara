@@ -309,17 +309,9 @@ namespace SanaraV2.Games
                 }
                 catch (OperationCanceledException)
                 {
-                    while (true)
-                    {
-                        try
-                        {
-                            break;
-                        }
-                        catch (IOException)
-                        { }
-                    }
+                    return;
                 }
-                await _audioStream.FlushAsync();
+                _ = Task.Run(async () => { await _audioStream.FlushAsync(); });
             }
         }
 
