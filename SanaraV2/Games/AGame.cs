@@ -293,7 +293,7 @@ namespace SanaraV2.Games
                 RedirectStandardOutput = true
             });
             using (Stream output = _process.StandardOutput.BaseStream)
-            using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Mixed))
+            using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Voice))
             {
                 try
                 {

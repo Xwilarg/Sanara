@@ -165,7 +165,7 @@ namespace SanaraV2.Games
                 await ReplyAsync(Sentences.ResetNone(Context.Guild));
         }
 
-        [Command("Replay")]
+        [Command("Replay", RunMode = RunMode.Async)]
         public async Task Replay(params string[] _)
         {
             Utilities.CheckAvailability(Context.Guild, Program.Module.Game);
