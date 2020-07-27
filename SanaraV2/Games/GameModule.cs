@@ -71,10 +71,11 @@ namespace SanaraV2.Games
             }
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleReset"));
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleScore"));
-            str.AppendLine(Translation.GetTranslation(guild, "gameModuleJoin"));
+            /*str.AppendLine(Translation.GetTranslation(guild, "gameModuleJoin"));
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleLeave"));
-            str.AppendLine(Translation.GetTranslation(guild, "gameModuleStart"));
+            str.AppendLine(Translation.GetTranslation(guild, "gameModuleStart"));*/
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleReplay"));
+            str.Append("**Others multiplayer commands**: Join, Leave, Start");
             str.AppendLine(Environment.NewLine);
             str.AppendLine(Translation.GetTranslation(guild, "gameModuleNote"));
             str.AppendLine(Environment.NewLine);

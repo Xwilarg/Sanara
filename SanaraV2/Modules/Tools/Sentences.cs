@@ -192,6 +192,7 @@ namespace SanaraV2.Modules.Tools
                     + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleFriend") + Environment.NewLine + Translation.GetTranslation(guild, "communityModuleUnfriend");
                 if (isServerOwner)
                     str += Environment.NewLine + Translation.GetTranslation(guild, "communityModuleSaveAll");
+                str += Environment.NewLine + Environment.NewLine + "See https://sanara.zirk.eu/achievements.html for more information about the achievements";
                 return str;
             }
             return Base.Sentences.NotAvailable(guild);
