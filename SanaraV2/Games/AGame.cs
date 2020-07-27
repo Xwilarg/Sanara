@@ -57,6 +57,7 @@ namespace SanaraV2.Games
 
             _audioFilePath = null;
             _process = null;
+            _audioStream = null;
             if (GetPostType() == PostType.Audio)
             {
                 if (!File.Exists("ffmpeg.exe"))
@@ -215,6 +216,7 @@ namespace SanaraV2.Games
                         string url = (await GetPostAsync()).First();
                         _audioFilePath = "Saves/" + _guild.Id + DateTime.Now.ToString("HHmmssff") + ".mp3";
                         File.WriteAllBytes(_audioFilePath, await _http.GetByteArrayAsync(url));
+                        _audioStream = _voiceSession.CreatePCMStream(AudioApplication.Voice);
                         await PostText("Audio started, use the 'replay' command to play it again.");
                         await PlayAudioFile();
                     }
@@ -293,11 +295,10 @@ namespace SanaraV2.Games
                 RedirectStandardOutput = true
             });
             using (Stream output = _process.StandardOutput.BaseStream)
-            using (AudioOutStream discord = _voiceSession.CreatePCMStream(AudioApplication.Voice))
             {
                 try
                 {
-                    await output.CopyToAsync(discord);
+                    await output.CopyToAsync(_audioStream);
                 }
                 catch (OperationCanceledException)
                 {
@@ -311,7 +312,7 @@ namespace SanaraV2.Games
                         { }
                     }
                 }
-                await discord.FlushAsync();
+                await _audioStream.FlushAsync();
             }
         }
 
@@ -582,6 +583,8 @@ namespace SanaraV2.Games
         {
             if (_audioFilePath != null)
                 File.Delete(_audioFilePath);
+            if (_audioStream != null)
+                _audioStream.Dispose();
             if (_voiceSession != null)
             {
                 try
@@ -731,6 +734,7 @@ namespace SanaraV2.Games
         private IAudioClient    _voiceSession;
         private string          _audioFilePath;
         private Process         _process;
+        private AudioOutStream  _audioStream;
 
         protected HttpClient _http;
 
