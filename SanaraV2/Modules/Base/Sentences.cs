@@ -25,8 +25,8 @@ namespace SanaraV2.Modules.Base
         public static ulong ownerId;
 
         /// --------------------------- General ---------------------------
-        public static string OnlyMasterStr(IGuild guild) { return (Translation.GetTranslation(guild, "onlyMaster", ownerStr)); }
-        public static string OnlyOwnerStr(IGuild guild, ulong guildOwnerId) { return (Translation.GetTranslation(guild, "onlyMaster", ((SocketGuild)guild).GetUser(guildOwnerId).ToString())); }
+        public static string OnlyMasterStr(IGuild guild) { return (Translation.GetTranslation(guild, "onlyMaster")); }
+        public static string OnlyOwnerStr(IGuild guild, ulong guildOwnerId) { return (Translation.GetTranslation(guild, "onlyOwner", ((SocketGuild)guild).GetUser(guildOwnerId).ToString())); }
         public static string ChanIsNotNsfw(IGuild guild) { return (Translation.GetTranslation(guild, "chanIsNotNsfw")); }
         public static string AnswerNsfw(IGuild guild) { return (Translation.GetTranslation(guild, "answerNsfw")); }
         private static string TagNotFoundInternal(IGuild guild, string tag) { return Translation.GetTranslation(guild, "tagNotFound", tag); }
