@@ -264,8 +264,8 @@ namespace SanaraV2.Games
                     {
                         Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     }
-                    _games.RemoveAll(x => x.DidLost());
                 }
+                _games.RemoveAll(x => x.DidLost());
                 Thread.Sleep(250);
             }
         }

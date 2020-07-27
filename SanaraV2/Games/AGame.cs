@@ -69,7 +69,14 @@ namespace SanaraV2.Games
                 var chanRadio = user.VoiceChannel;
                 if (chanRadio == null)
                     throw new NoAudioChannel();
-                _voiceSession = chanRadio.ConnectAsync().GetAwaiter().GetResult();
+                try
+                {
+                    _voiceSession = chanRadio.ConnectAsync().GetAwaiter().GetResult();
+                } catch (TaskCanceledException e)
+                {
+                    LooseAsync("An error occured while connecting to vocal channel.").GetAwaiter().GetResult();
+                    Program.p.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                }
             }
             else
                 _voiceSession = null;
@@ -581,8 +588,14 @@ namespace SanaraV2.Games
 
         private void LeaveVocalChannel()
         {
+            if (_process != null && !_process.HasExited)
+                _process.Kill();
             if (_audioFilePath != null)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 File.Delete(_audioFilePath);
+            }
             if (_audioStream != null)
                 _audioStream.Dispose();
             if (_voiceSession != null)
