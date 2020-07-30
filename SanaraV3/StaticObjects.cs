@@ -1,5 +1,7 @@
 ﻿using BooruSharp.Booru;
 using SanaraV3.Modules.Nsfw;
+using SanaraV3.Modules.Radio;
+using System.Collections.Generic;
 using System.Net.Http;
 
 namespace SanaraV3
@@ -19,6 +21,9 @@ namespace SanaraV3
         public static Rule34    Rule34      = new Rule34();
         public static Konachan  Konachan    = new Konachan();
         public static TagsManager Tags      = new TagsManager();
+
+        // RADIO MODULE
+        public static List<RadioChannel> Radios = new List<RadioChannel>();
 
         public static void Init()
         {

@@ -9,7 +9,7 @@ namespace SanaraV3.Modules.Entertainment
     /// <summary>
     /// All "Fun" commands that have no real purposes
     /// </summary>
-    public sealed class Fun : ModuleBase, IModule
+    public sealed class FunModule : ModuleBase, IModule
     {
         public string GetModuleName()
             => "Entertainment";

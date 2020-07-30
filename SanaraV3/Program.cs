@@ -79,8 +79,8 @@ namespace SanaraV3
             _client.Connected += Connected;
 
             // Discord modules
-            await _commands.AddModuleAsync<Modules.Nsfw.Booru>(null);
-            await _commands.AddModuleAsync<Modules.Entertainment.Fun>(null);
+            await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
+            await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
 
             await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await _client.StartAsync();
