@@ -1,3 +1,3 @@
-[submodule "SanaraV2/Sanara-translations"]
-	path = SanaraV2/Sanara-translations
-	url = https://github.com/Xwilarg/Sanara-translations.git
+[submodule "SanaraV3/Discord-Utils"]
+	path = SanaraV3/Discord-Utils
+	url = https://github.com/Xwilarg/Discord-Utils
