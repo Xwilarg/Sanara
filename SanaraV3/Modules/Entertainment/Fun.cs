@@ -14,6 +14,16 @@ namespace SanaraV3.Modules.Entertainment
         public string GetModuleName()
             => "Entertainment";
 
+        [Command("Inspire")]
+        public async Task Inspire()
+        {
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
+            }.Build());
+        }
+
         [Command("Complete", RunMode = RunMode.Async)]
         public async Task Complete([Remainder]string sentence)
         {
@@ -28,8 +38,8 @@ namespace SanaraV3.Modules.Entertainment
             // Instead we store it in "content"
             ws.OnMessage += (sender, e) =>
             {
-                // For some reasons, there are some weird spaces around punctuation
-                content += " " + e.Data.Replace(" .", ".").Replace(" '", "'").Replace(" ,", ",");
+                // For some reasons, there are some weird spaces around punctuation, also need to escape things for Discord markdown
+                content += " " + e.Data.Replace(" .", ".").Replace(" '", "'").Replace(" ,", ",").Replace("*", "\\*").Replace("_", "\\_");
             };
 
             ws.OnError += (sender, e) =>
