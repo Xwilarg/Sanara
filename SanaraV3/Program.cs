@@ -2,6 +2,8 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
 using SanaraV3.Exceptions;
 using System;
@@ -68,6 +70,9 @@ namespace SanaraV3
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
 
+            // Initialize services
+            InitializeServices();
+
             // Initialize culture
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             CultureInfo culture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
@@ -80,13 +85,26 @@ namespace SanaraV3
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
+            await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
+            await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
 
             await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await _client.StartAsync();
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private void InitializeServices()
+        {
+            if (_credentials.YouTubeKey != null)
+            {
+                StaticObjects.YouTube = new YouTubeService(new BaseClientService.Initializer
+                {
+                    ApiKey = _credentials.YouTubeKey
+                });
+            }
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)

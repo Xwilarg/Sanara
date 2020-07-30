@@ -1,6 +1,8 @@
 ﻿using BooruSharp.Booru;
+using Google.Apis.YouTube.v3;
 using SanaraV3.Modules.Nsfw;
 using SanaraV3.Modules.Radio;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
@@ -12,6 +14,7 @@ namespace SanaraV3
     public static class StaticObjects
     {
         public static HttpClient HttpClient = new HttpClient();
+        public static Random Random = new Random();
 
         // NSFW MODULE
         public static Safebooru Safebooru   = new Safebooru();
@@ -24,6 +27,9 @@ namespace SanaraV3
 
         // RADIO MODULE
         public static List<RadioChannel> Radios = new List<RadioChannel>();
+
+        // ENTERTAINMENT MODULE
+        public static YouTubeService YouTube = null;
 
         public static void Init()
         {

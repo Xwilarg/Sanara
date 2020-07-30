@@ -62,7 +62,7 @@ namespace SanaraV3.Modules.Nsfw
 
             // If the post is SFW or if we are in a NSFW channel
             bool isPostAcceptable = res.Booru.IsSafe() || (!res.Booru.IsSafe() && Utils.CanSendNsfw(Context.Channel));
-            int gcd = GCD(res.Post.width, res.Post.height);
+            int gcd = Utils.GCD(res.Post.width, res.Post.height);
 
             var embed = new EmbedBuilder
             {
@@ -148,21 +148,6 @@ namespace SanaraV3.Modules.Nsfw
                         "Do the 'Tags' command with then id '" + id + "' to have more information about this image."
                 }
             }.Build());
-        }
-
-        /// <summary>
-        /// Greatest Common Divisor
-        /// </summary>
-        private int GCD(int a, int b)
-        {
-            while (a != 0 && b != 0)
-            {
-                if (a > b)
-                    a %= b;
-                else
-                    b %= a;
-            }
-            return a == 0 ? b : a;
         }
 
         private Color RatingToColor(Rating rating)
