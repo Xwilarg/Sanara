@@ -69,6 +69,7 @@ namespace SanaraV3
 
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
+            if (!Directory.Exists("Saves/Radio")) Directory.CreateDirectory("Saves/Radio");
 
             // Initialize services
             InitializeServices();

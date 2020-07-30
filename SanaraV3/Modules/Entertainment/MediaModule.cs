@@ -24,6 +24,33 @@ namespace SanaraV3.Modules.Entertainment
         [Command("Youtube", RunMode = RunMode.Async)]
         public async Task Youtube([Remainder]string search)
         {
+            await ReplyAsync(embed: GetEmbedFromVideo(await GetYoutubeVideoAsync(search)).Build());
+        }
+
+        public static EmbedBuilder GetEmbedFromVideo(Video video)
+        {
+            var description = video.Snippet.Description.Split('\n');
+            // We make likes/dislikes easier to read: 4000 -> 4k
+            var finalViews = Utils.MakeNumberReadable(video.Statistics.ViewCount.ToString());
+            var finalLikes = Utils.MakeNumberReadable(video.Statistics.LikeCount.ToString());
+            var finalDislikes = Utils.MakeNumberReadable(video.Statistics.DislikeCount.ToString());
+            return new EmbedBuilder
+            {
+                ImageUrl = video.Snippet.Thumbnails.High.Url,
+                Title = video.Snippet.Title,
+                Url = "https://youtu.be/" + video.Id,
+                Description = description.Length > 10 ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(10)) + "\n[...]") : video.Snippet.Description,
+                Color = Color.Blue,
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Views: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value.ToString("0.0")}"
+                }
+            };
+        }
+
+        // We split this into another function because it's also used by the Radio
+        public static async Task<Video> GetYoutubeVideoAsync(string search)
+        {
             // Check if the search given in an URL
             string id = null;
             Match match = Regex.Match(search, "https:\\/\\/www.youtube.com\\/watch\\?v=([^&]+)");
@@ -93,24 +120,7 @@ namespace SanaraV3.Modules.Entertainment
                     }
                 }
             }
-
-            var description = result.Snippet.Description.Split('\n');
-            // We make likes/dislikes easier to read: 4000 -> 4k
-            var finalViews = Utils.MakeNumberReadable(result.Statistics.ViewCount.ToString());
-            var finalLikes = Utils.MakeNumberReadable(result.Statistics.LikeCount.ToString());
-            var finalDislikes = Utils.MakeNumberReadable(result.Statistics.DislikeCount.ToString());
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                ImageUrl = result.Snippet.Thumbnails.High.Url,
-                Title = result.Snippet.Title,
-                Url = "https://youtu.be/" + result.Id,
-                Description = description.Length > 10 ? (string.Join("\n", result.Snippet.Description.Split('\n').Take(10)) + "\n[...]") : result.Snippet.Description,
-                Color = Color.Blue,
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Views: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)result.Statistics.LikeCount / result.Statistics.DislikeCount).Value.ToString("0.0")}"
-                }
-            }.Build());
+            return result;
         }
 
         [Command("Xkcd")]

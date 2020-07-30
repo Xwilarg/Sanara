@@ -1,14 +1,16 @@
-﻿namespace SanaraV3.Modules.Radio
+﻿using Discord;
+
+namespace SanaraV3.Modules.Radio
 {
     public sealed class Music
     {
-        public Music(string path, string title, string url, string imageUrl, string requester)
+        public Music(string path, string title, string url, Embed embed, string requester)
         {
             Path = path;
             Title = title;
             Url = url;
             Downloading = false;
-            ImageUrl = imageUrl;
+            Embed = embed;
             Requester = requester;
         }
 
@@ -16,7 +18,7 @@
         public string Title { private set; get; } // Title of the song
         public string Url { private set; get; } // Url to the YouTube video
         public bool Downloading { set; get; } // Is the file being downloaded
-        public string ImageUrl { private set; get; } // Url of the image of the YouTube video
-        public string Requester { private set; get; } // Discord name of the user who requested the song
+        public Embed Embed { private set; get; } // Embed to be sent when the song begin
+        public string Requester { private set; get; } // User that requested the music
     }
 }

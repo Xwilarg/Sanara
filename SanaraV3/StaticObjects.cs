@@ -26,7 +26,7 @@ namespace SanaraV3
         public static TagsManager Tags      = new TagsManager();
 
         // RADIO MODULE
-        public static List<RadioChannel> Radios = new List<RadioChannel>();
+        public static Dictionary<ulong, RadioChannel> Radios = new Dictionary<ulong, RadioChannel>();
 
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube = null;

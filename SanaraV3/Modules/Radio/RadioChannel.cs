@@ -91,7 +91,7 @@ namespace SanaraV3.Modules.Radio
         /// Stop the radio
         /// </summary>
         /// <returns></returns>
-        public async Task Stop()
+        public async Task StopAsync()
         {
             for (int i = 1; i < _playlist.Count; i++) // We skip the first one because it'll be handled by the radio
                 File.Delete(_playlist[i].Path);
@@ -128,17 +128,7 @@ namespace SanaraV3.Modules.Radio
             // If the playlist is empty, the current song is not finished yet or the song that need to be played is still downloading
             if (_playlist.Count == 0 || (_process != null && !_process.HasExited) || _playlist[0].Downloading)
                 return;
-            await _textChan.SendMessageAsync("", false, new EmbedBuilder()
-            {
-                Title = _playlist[0].Title,
-                Url = _playlist[0].Url,
-                ImageUrl = _playlist[0].ImageUrl,
-                Color = Color.Blue,
-                Footer = new EmbedFooterBuilder()
-                {
-                    Text = "Requested by " + _playlist[0].Requester
-                }
-            }.Build());
+            await _textChan.SendMessageAsync(embed: _playlist[0].Embed);
             if (!File.Exists("ffmpeg.exe"))
                 throw new FileNotFoundException("ffmpeg.exe was not found near the bot executable.");
             _process = Process.Start(new ProcessStartInfo
@@ -169,8 +159,8 @@ namespace SanaraV3.Modules.Radio
             _playlist.RemoveAt(0);
             if (_playlist.Count == 0)
             {
-                await Stop();
-                StaticObjects.Radios.Remove(this);
+                await StopAsync();
+                StaticObjects.Radios.Remove(_guildId);
             }
             else
                 await Play(); // If there are others songs in the playlist, we play the next one
@@ -179,7 +169,7 @@ namespace SanaraV3.Modules.Radio
         private IVoiceChannel _voiceChan; // Voice channel where the bot is streaming music
         private IMessageChannel _textChan; // Text channel where the bot was asked to join, and where she will send the next music to be played
         private List<Music> _playlist; // Next musics to be played
-        private ulong _guildId; // ID of this guild
+        private ulong _guildId; // ID of this guild, used to remove the radio from the dictionary
         private Process _process; // Process of FFMPEG playing the song
         private IAudioClient _audioClient; // Client streaming the song to Discord
 
