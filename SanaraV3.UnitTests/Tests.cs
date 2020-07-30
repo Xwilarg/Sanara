@@ -6,6 +6,8 @@ namespace SanaraV3.UnitTests
     {
         [Fact]
         public void EmptyTest()
-        { }
+        {
+            Assert.True(false);
+        }
     }
 }
