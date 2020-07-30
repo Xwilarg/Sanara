@@ -80,6 +80,7 @@ namespace SanaraV3
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Nsfw.Booru>(null);
+            await _commands.AddModuleAsync<Modules.Entertainment.Fun>(null);
 
             await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await _client.StartAsync();
@@ -104,8 +105,10 @@ namespace SanaraV3
                 if (!result.IsSuccess)
                 {
                     var error = result.Error.Value;
-                    if (error == CommandError.UnmetPrecondition || error == CommandError.BadArgCount)
+                    if (error == CommandError.UnmetPrecondition)
                         await context.Channel.SendMessageAsync(result.ErrorReason);
+                    else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)
+                        await context.Channel.SendMessageAsync("This command have some invalid parameters."); // TODO: Display help
                 }
             }
         }

@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Nsfw
 {
+    /// <summary>
+    /// Contains all Booru related commands (booru are websites such as Gelbooru and Rule34)
+    /// </summary>
     public sealed class Booru : ModuleBase, IModule
     {
         public string GetModuleName()
