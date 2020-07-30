@@ -46,7 +46,6 @@ namespace SanaraV3
         {
             // Setting Logs callback
             _client.Log += Utils.Log;
-            _commands.Log += Utils.Log;
             _commands.Log += LogError;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
@@ -105,7 +104,7 @@ namespace SanaraV3
                 if (!result.IsSuccess)
                 {
                     var error = result.Error.Value;
-                    if (error == CommandError.UnmetPrecondition)
+                    if (error == CommandError.UnmetPrecondition || error == CommandError.BadArgCount)
                         await context.Channel.SendMessageAsync(result.ErrorReason);
                 }
             }
@@ -128,6 +127,7 @@ namespace SanaraV3
                 }
                 else // Unexpected exception
                 {
+                    await Utils.Log(msg);
                     await ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                     {
                         Color = Color.Red,
@@ -136,6 +136,8 @@ namespace SanaraV3
                     }.Build());
                 }
             }
+            else
+                await Utils.Log(msg);
         }
     }
 }

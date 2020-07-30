@@ -1,4 +1,5 @@
 ﻿using BooruSharp.Booru;
+using SanaraV3.Modules.Nsfw;
 using System.Net.Http;
 
 namespace SanaraV3
@@ -10,12 +11,14 @@ namespace SanaraV3
     {
         public static HttpClient HttpClient = new HttpClient();
 
+        // NSFW MODULE
         public static Safebooru Safebooru   = new Safebooru();
         public static Gelbooru  Gelbooru    = new Gelbooru();
         public static E621      E621        = new E621();
         public static E926      E926        = new E926();
         public static Rule34    Rule34      = new Rule34();
         public static Konachan  Konachan    = new Konachan();
+        public static TagsManager Tags      = new TagsManager();
 
         public static void Init()
         {
