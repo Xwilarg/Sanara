@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.Audio;
+using DiscordUtils;
+using Google.Apis.YouTube.v3.Data;
 using SanaraV3.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,7 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Called when a music is done downloading
         /// </summary>
-        public void DownloadDone(string url)
+        private void DownloadDone(string url)
             => _playlist.Find(x => x.Url == url).Downloading = false;
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Add a music to the playlist
         /// </summary>
-        public void AddMusic(Music m)
+        private void AddMusic(Music m)
             => _playlist.Add(m);
 
         /// <summary>
@@ -74,6 +76,14 @@ namespace SanaraV3.Modules.Radio
             string musicTitle = _playlist[index].Title;
             _playlist.RemoveAt(index);
             return musicTitle;
+        }
+
+        /// <summary>
+        /// Remove the last music of the playlist
+        /// </summary>
+        public void RemoveLastMusic()
+        {
+            _playlist.RemoveAt(_playlist.Count - 1);
         }
 
         /// <summary>
@@ -128,6 +138,15 @@ namespace SanaraV3.Modules.Radio
             // If the playlist is empty, the current song is not finished yet or the song that need to be played is still downloading
             if (_playlist.Count == 0 || (_process != null && !_process.HasExited) || _playlist[0].Downloading)
                 return;
+            if (_playlist.Count == 1) // There is only one music remaining in the playlist so we add a custom suggestion based on the last one
+            {
+                var r = StaticObjects.YouTube.Search.List("snippet");
+                r.RelatedToVideoId = _playlist.Last().Id;
+                r.Type = "video";
+                var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
+                rr.Id = (await r.ExecuteAsync()).Items[0].Id.VideoId;
+                DownloadMusic(_guildId, (await rr.ExecuteAsync()).Items[0], "Sanara#1537 (Autosuggestion)", true);
+            }
             await _textChan.SendMessageAsync(embed: _playlist[0].Embed);
             if (!File.Exists("ffmpeg.exe"))
                 throw new FileNotFoundException("ffmpeg.exe was not found near the bot executable.");
@@ -164,6 +183,32 @@ namespace SanaraV3.Modules.Radio
             }
             else
                 await Play(); // If there are others songs in the playlist, we play the next one
+        }
+
+        /// <summary>
+        /// Is the last video of the playlist a suggestion made by the bot
+        /// </summary>
+        public bool IsLastMusicSuggestion()
+            => _playlist.Count == 0 ? false : _playlist.Last().IsAutoSuggestion;
+
+        public void DownloadMusic(ulong guildId, Video video, string requester, bool isAutoSuggestion)
+        {
+            string url = "https://youtu.be/" + video.Id;
+            string fileName = $"Saves/Radio/{guildId}/{Utils.CleanWord(video.Snippet.Title)}{DateTime.Now:HHmmssff}.mp3";
+            var embed = Entertainment.MediaModule.GetEmbedFromVideo(video);
+            embed.Description = "Requested by " + requester;
+            AddMusic(new Music(video.Id, fileName, video.Snippet.Title, url, embed.Build(), requester, isAutoSuggestion));
+            if (!File.Exists("youtube-dl.exe"))
+                throw new FileNotFoundException("youtube-dl.exe was not found near the bot executable.");
+            ProcessStartInfo youtubeDownload = new ProcessStartInfo()
+            {
+                FileName = "youtube-dl",
+                Arguments = $"-x --audio-format mp3 -o " + fileName + " " + url,
+                CreateNoWindow = true
+            };
+            youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
+            Process.Start(youtubeDownload).WaitForExit();
+            DownloadDone(url);
         }
 
         private IVoiceChannel _voiceChan; // Voice channel where the bot is streaming music

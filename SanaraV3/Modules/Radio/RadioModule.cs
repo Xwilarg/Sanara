@@ -85,21 +85,12 @@ namespace SanaraV3.Modules.Radio
             await ReplyAsync(video.Snippet.Title + " was added to the playlist.");
             if (!Directory.Exists($"Saves/Radio/{Context.Guild.Id}"))
                 Directory.CreateDirectory($"Saves/Radio/{Context.Guild.Id}");
-            string fileName = $"Saves/Radio/{Context.Guild.Id}/{Utils.CleanWord(video.Snippet.Title)}{DateTime.Now.ToString("HHmmssff")}.mp3";
-            var embed = Entertainment.MediaModule.GetEmbedFromVideo(video);
-            embed.Description = "Requested by " + Context.User.ToString();
-            radio.AddMusic(new Music(fileName, video.Snippet.Title, url, embed.Build(), Context.User.ToString()));
-            if (!File.Exists("youtube-dl.exe"))
-                throw new FileNotFoundException("youtube-dl.exe was not found near the bot executable.");
-            ProcessStartInfo youtubeDownload = new ProcessStartInfo()
+            if (radio.IsLastMusicSuggestion())
             {
-                FileName = "youtube-dl",
-                Arguments = $"-x --audio-format mp3 -o " + fileName + " " + url,
-                CreateNoWindow = true
-            };
-            youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
-            Process.Start(youtubeDownload).WaitForExit();
-            radio.DownloadDone(url);
+                File.Delete($"Saves/Radio/{Context.Guild.Id}/{Utils.CleanWord(video.Snippet.Title)}suggestion.mp3");
+                radio.RemoveLastMusic();
+            }
+            radio.DownloadMusic(Context.Guild.Id, video, Context.User.ToString(), false);
             await radio.Play();
         }
 
