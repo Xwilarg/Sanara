@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Copy coverage
       run: sh copy_coverage.sh
     - name: Upload coverage
