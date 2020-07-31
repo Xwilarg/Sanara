@@ -57,6 +57,18 @@ namespace SanaraV3.Modules.Radio
             }
         }
 
+        [Command("Remove radio"), Alias("Radio remove"), Priority(1)]
+        public async Task Remove(int id)
+        {
+            if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
+                await ReplyAsync("There is no radio running.");
+            else
+            {
+                StaticObjects.Radios[Context.Guild.Id].RemoveMusicWithId(id);
+                await ReplyAsync("Done~");
+            }
+        }
+
         [Command("Add radio", RunMode = RunMode.Async), Alias("Radio add")]
         public async Task Add([Remainder]string search)
         {
