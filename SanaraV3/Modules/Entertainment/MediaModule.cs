@@ -43,7 +43,7 @@ namespace SanaraV3.Modules.Entertainment
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Views: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value.ToString("0.0")}"
+                    Text = $"Views: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value:0.0}"
                 }
             };
         }
@@ -139,7 +139,7 @@ namespace SanaraV3.Modules.Entertainment
             {
                 Color = Color.Blue,
                 Title = json["title"].Value<string>(),
-                Url = "https://xkcd.com/" + nb,
+                Url = $"https://xkcd.com/{nb}/",
                 ImageUrl = json["img"].Value<string>(),
                 Footer = new EmbedFooterBuilder
                 {

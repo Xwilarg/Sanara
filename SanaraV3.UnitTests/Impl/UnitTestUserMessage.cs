@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests
+namespace SanaraV3.UnitTests.Impl
 {
     public sealed class UnitTestUserMessage : IUserMessage
     {

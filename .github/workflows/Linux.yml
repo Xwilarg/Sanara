@@ -28,6 +28,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Copy coverage
       run: sh copy_coverage.sh

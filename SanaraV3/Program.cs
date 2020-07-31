@@ -64,9 +64,6 @@ namespace SanaraV3
                 throw new FileNotFoundException("Missing Credentials file");
             _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
 
-            // Initialize static objects
-            StaticObjects.Init();
-
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
             if (!Directory.Exists("Saves/Radio")) Directory.CreateDirectory("Saves/Radio");

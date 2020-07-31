@@ -31,7 +31,7 @@ namespace SanaraV3
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube = null;
 
-        public static void Init()
+        static StaticObjects()
         {
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;

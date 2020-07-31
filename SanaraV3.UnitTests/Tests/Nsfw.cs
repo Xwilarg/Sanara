@@ -1,51 +1,17 @@
 ﻿using Discord;
-using Discord.Commands;
 using DiscordUtils;
+using SanaraV3.UnitTests.Impl;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SanaraV3.UnitTests
+namespace SanaraV3.UnitTests.Tests
 {
-    public class Tests
+    public class Nsfw
     {
-        /// <summary>
-        /// Create and assign a context to a module
-        /// Since the SetContext method is private and from an interface we need to load the assemble and une reflection to get the method
-        /// </summary>
-        private void AddContext(ModuleBase module, Func<UnitTestUserMessage, Task> callback)
-        {
-            StaticObjects.Init();
-            var assembly = Assembly.LoadFrom("Discord.Net.Commands.dll");
-            var method = assembly.GetType("Discord.Commands.IModuleBase").GetMethod("SetContext", BindingFlags.Instance | BindingFlags.Public);
-            var context = new CommandContext(new UnitTestDiscordClient(), new UnitTestUserMessage(callback));
-            method.Invoke(module, new[] { context });
-        }
-
-        [Fact]
-        public async Task InspireTest()
-        {
-            bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            {
-                Assert.Single(msg.Embeds);
-                var embed = msg.Embeds.ElementAt(0);
-                Assert.NotNull(embed.Image);
-                Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
-                Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url+ " is not an image.");
-                isDone = true;
-            });
-
-            var mod = new Modules.Entertainment.FunModule();
-            AddContext(mod, callback);
-            await mod.Inspire();
-            while (!isDone)
-            { }
-        }
-
         /// <summary>
         /// Generic unit test method for all booru
         /// </summary>
@@ -55,7 +21,7 @@ namespace SanaraV3.UnitTests
             Assert.NotNull(embed.Footer);
             Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
-            string title = embed.Title.Substring(5).ToLower();
+            string title = Regex.Match(embed.Title, "From ([a-zA-Z0-9]+)").Groups[1].Value.ToLower();
             Assert.Contains(title, embed.Url); // Title is for example For Gelbooru and url must be like "gelbooru.com/XXXX"
             Assert.Contains(title, embed.Image.Value.Url);
         }
@@ -78,7 +44,7 @@ namespace SanaraV3.UnitTests
             });
 
             var mod = new Modules.Nsfw.BooruModule();
-            AddContext(mod, callback);
+            Common.AddContext(mod, callback);
             var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new object[] { null });
             while (!isDone)
@@ -103,7 +69,7 @@ namespace SanaraV3.UnitTests
             });
 
             var mod = new Modules.Nsfw.BooruModule();
-            AddContext(mod, callback);
+            Common.AddContext(mod, callback);
             var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
             while (!isDone)
@@ -130,7 +96,7 @@ namespace SanaraV3.UnitTests
             });
 
             var mod = new Modules.Nsfw.BooruModule();
-            AddContext(mod, callback);
+            Common.AddContext(mod, callback);
             var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
             while (!isDone)
