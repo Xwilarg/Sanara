@@ -8,12 +8,12 @@ namespace SanaraV3.UnitTests
 {
     public sealed class UnitTestMessageChannel : IMessageChannel
     {
-        public UnitTestMessageChannel(Action<UnitTestUserMessage> callback)
+        public UnitTestMessageChannel(Func<UnitTestUserMessage, Task> callback)
         {
             _callback = callback;
         }
 
-        private readonly Action<UnitTestUserMessage> _callback;
+        private readonly Func<UnitTestUserMessage, Task> _callback;
 
         public string Name => "Channel";
 
@@ -21,11 +21,11 @@ namespace SanaraV3.UnitTests
 
         public ulong Id => 0;
 
-        public Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public async Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             var msg = new UnitTestUserMessage(this, text, embed);
-            _callback(msg);
-            return Task.FromResult((IUserMessage)msg);
+            await _callback(msg);
+            return msg;
         }
 
         public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)

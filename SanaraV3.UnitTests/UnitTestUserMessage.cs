@@ -7,7 +7,7 @@ namespace SanaraV3.UnitTests
 {
     public sealed class UnitTestUserMessage : IUserMessage
     {
-        public UnitTestUserMessage(Action<UnitTestUserMessage> callback)
+        public UnitTestUserMessage(Func<UnitTestUserMessage, Task> callback)
         {
             Channel = new UnitTestMessageChannel(callback);
             Content = "";
