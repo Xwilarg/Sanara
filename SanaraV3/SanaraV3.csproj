@@ -9,6 +9,7 @@
     <PackageReference Include="BooruSharp" Version="2.7.0" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.47.0.2008" />
+    <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
   </ItemGroup>
 
