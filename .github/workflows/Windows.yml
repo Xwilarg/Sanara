@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      env:
-        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: dotnet build --configuration Release --no-restore
     - name: Test
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: dotnet test --no-restore --verbosity normal
