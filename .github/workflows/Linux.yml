@@ -19,6 +19,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+    - name: Init submodules
+      run: git submodule init && git submodule update
     - name: Install Codecov
       run: dotnet tool install --global Codecov.Tool
     - name: Install dependencies
