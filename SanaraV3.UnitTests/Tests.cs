@@ -52,6 +52,7 @@ namespace SanaraV3.UnitTests
         private async Task CheckBooruAsync(Embed embed)
         {
             Assert.NotNull(embed.Image);
+            Assert.NotNull(embed.Footer);
             Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
             string title = embed.Title.Substring(5).ToLower();
@@ -105,6 +106,33 @@ namespace SanaraV3.UnitTests
             AddContext(mod, callback);
             var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
+            while (!isDone)
+            { }
+        }
+
+        [Theory]
+        [InlineData("E621")]
+        [InlineData("E926")]
+        [InlineData("Safebooru")]
+        [InlineData("Gelbooru")]
+        [InlineData("Rule34")]
+        [InlineData("Konachan")]
+        public async Task BooruWithTagInvalidTest(string methodName)
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            {
+                Assert.Single(msg.Embeds);
+                var embed = (Embed)msg.Embeds.ElementAt(0);
+                await CheckBooruAsync(embed);
+                Assert.Contains("arknights", embed.Footer.Value.Text);
+                isDone = true;
+            });
+
+            var mod = new Modules.Nsfw.BooruModule();
+            AddContext(mod, callback);
+            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+            await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
             while (!isDone)
             { }
         }
