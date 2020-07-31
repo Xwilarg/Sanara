@@ -51,14 +51,14 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Remove a music from the playlist
         /// </summary>
-        public string RemoveMusic(string title)
+        public async Task<string> RemoveMusic(string title)
         {
             var music = _playlist.Find(x => x.Title == title);
             if (music == null)
                 throw new CommandFailed("There is no music with this name in the playlist.");
 
             int index = _playlist.IndexOf(music);
-            return RemoveMusicWithId(index);
+            return await RemoveMusicWithId(index);
         }
 
         /// <summary>
@@ -67,15 +67,17 @@ namespace SanaraV3.Modules.Radio
         /// <param name="chan"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public string RemoveMusicWithId(int index)
+        public async Task<string> RemoveMusicWithId(int index)
         {
             if (index < 0 || index >= _playlist.Count)
                 throw new CommandFailed("There is no music on the given index.");
             if (index == 0) // The music is the one currently being played
                 return Skip();
-            string musicTitle = _playlist[index].Title;
+            var music = _playlist[index];
             _playlist.RemoveAt(index);
-            return musicTitle;
+            if (_playlist.Count == 1 && !music.IsAutoSuggestion)
+                _ = Task.Run(AddAutosuggestionAsync);
+            return music.Title;
         }
 
         /// <summary>
@@ -130,6 +132,16 @@ namespace SanaraV3.Modules.Radio
         public bool CanAddMusic()
             => _playlist.Count < MUSIC_COUNT_LIMIT;
 
+        private async Task AddAutosuggestionAsync()
+        {
+            var r = StaticObjects.YouTube.Search.List("snippet");
+            r.RelatedToVideoId = _playlist.Last().Id;
+            r.Type = "video";
+            var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
+            rr.Id = (await r.ExecuteAsync()).Items[0].Id.VideoId;
+            DownloadMusic(_guildId, (await rr.ExecuteAsync()).Items[0], "Sanara#1537 (Autosuggestion)", true);
+        }
+
         /// <summary>
         /// Play a music
         /// </summary>
@@ -139,14 +151,7 @@ namespace SanaraV3.Modules.Radio
             if (_playlist.Count == 0 || (_process != null && !_process.HasExited) || _playlist[0].Downloading)
                 return;
             if (_playlist.Count == 1) // There is only one music remaining in the playlist so we add a custom suggestion based on the last one
-            {
-                var r = StaticObjects.YouTube.Search.List("snippet");
-                r.RelatedToVideoId = _playlist.Last().Id;
-                r.Type = "video";
-                var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
-                rr.Id = (await r.ExecuteAsync()).Items[0].Id.VideoId;
-                DownloadMusic(_guildId, (await rr.ExecuteAsync()).Items[0], "Sanara#1537 (Autosuggestion)", true);
-            }
+                _ = Task.Run(AddAutosuggestionAsync);
             await _textChan.SendMessageAsync(embed: _playlist[0].Embed);
             if (!File.Exists("ffmpeg.exe"))
                 throw new FileNotFoundException("ffmpeg.exe was not found near the bot executable.");

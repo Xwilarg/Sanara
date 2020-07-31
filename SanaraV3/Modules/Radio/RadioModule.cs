@@ -3,8 +3,6 @@ using Discord.Audio;
 using Discord.Commands;
 using DiscordUtils;
 using SanaraV3.Exceptions;
-using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -15,7 +13,7 @@ namespace SanaraV3.Modules.Radio
         public string GetModuleName()
             => "Radio";
 
-        [Command("Skip radio"), Alias("Radio skip")]
+        [Command("Skip radio", RunMode = RunMode.Async), Alias("Radio skip")]
         public async Task Skip()
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
@@ -45,26 +43,26 @@ namespace SanaraV3.Modules.Radio
             }
         }
 
-        [Command("Remove radio"), Alias("Radio remove")]
+        [Command("Remove radio", RunMode = RunMode.Async), Alias("Radio remove")]
         public async Task Remove([Remainder]string search)
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
             else
             {
-                StaticObjects.Radios[Context.Guild.Id].RemoveMusic(search);
+                await StaticObjects.Radios[Context.Guild.Id].RemoveMusic(search);
                 await ReplyAsync("Done~");
             }
         }
 
-        [Command("Remove radio"), Alias("Radio remove"), Priority(1)]
+        [Command("Remove radio", RunMode = RunMode.Async), Alias("Radio remove"), Priority(1)]
         public async Task Remove(int id)
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
             else
             {
-                StaticObjects.Radios[Context.Guild.Id].RemoveMusicWithId(id);
+                await StaticObjects.Radios[Context.Guild.Id].RemoveMusicWithId(id);
                 await ReplyAsync("Done~");
             }
         }
