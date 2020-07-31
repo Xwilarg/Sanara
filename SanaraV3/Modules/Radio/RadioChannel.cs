@@ -22,6 +22,7 @@ namespace SanaraV3.Modules.Radio
             _guildId = voiceChan.GuildId;
             _process = null;
             _audioClient = audioClient;
+            _recentlyPlayed = new List<string>();
         }
 
         /// <summary>
@@ -137,9 +138,23 @@ namespace SanaraV3.Modules.Radio
             var r = StaticObjects.YouTube.Search.List("snippet");
             r.RelatedToVideoId = _playlist.Last().Id;
             r.Type = "video";
-            var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
-            rr.Id = (await r.ExecuteAsync()).Items[0].Id.VideoId;
-            DownloadMusic(_guildId, (await rr.ExecuteAsync()).Items[0], "Sanara#1537 (Autosuggestion)", true);
+            r.MaxResults = 10;
+            string id = null;
+            foreach (var res in (await r.ExecuteAsync()).Items)
+            {
+                if (!_recentlyPlayed.Contains(res.Id.VideoId))
+                {
+                    id = res.Id.VideoId;
+                    break;
+                }
+            }
+            if (id != null)
+            {
+                var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
+                rr.Id = id;
+                Video video = (await rr.ExecuteAsync()).Items[0];
+                DownloadMusic(_guildId, video, "Sanara#1537 (Autosuggestion)", true);
+            }
         }
 
         /// <summary>
@@ -213,6 +228,9 @@ namespace SanaraV3.Modules.Radio
             };
             youtubeDownload.WindowStyle = ProcessWindowStyle.Hidden;
             Process.Start(youtubeDownload).WaitForExit();
+            _recentlyPlayed.Add(video.Id);
+            if (_recentlyPlayed.Count > MUSIC_COUNT_KEEP_ID)
+                _recentlyPlayed.RemoveAt(0);
             DownloadDone(url);
         }
 
@@ -222,7 +240,9 @@ namespace SanaraV3.Modules.Radio
         private ulong _guildId; // ID of this guild, used to remove the radio from the dictionary
         private Process _process; // Process of FFMPEG playing the song
         private IAudioClient _audioClient; // Client streaming the song to Discord
+        private List<string> _recentlyPlayed; // IDs of recently played musics so we don't autosuggest things that were played not so long ago
 
-        private const int MUSIC_COUNT_LIMIT = 11; // Maximum number of song that can be in a playlist
+        private const int MUSIC_COUNT_LIMIT = 11; // Maximum number of musics that can be in a playlist
+        private const int MUSIC_COUNT_KEEP_ID = 10; // Maximum of we IDs we keep in _recentlyPlayed
     }
 }
