@@ -35,7 +35,11 @@ namespace SanaraV3.Modules.Radio
         /// Called when a music is done downloading
         /// </summary>
         private void DownloadDone(string url)
-            => _playlist.Find(x => x.Url == url).Downloading = false;
+        {
+            var music = _playlist.Find(x => x.Url == url);
+            if (music != null)
+                music.Downloading = false;
+        }
 
         /// <summary>
         /// Check if a song is already in the playlist
@@ -120,9 +124,9 @@ namespace SanaraV3.Modules.Radio
         {
             if (_process == null || _process.HasExited)
                 return "There is no song currently being played.";
-            string finalStr = $"🎵 Current: {_playlist[0].Title} requested by {_playlist[0].Requester}\n";
+            string finalStr = $"🎵 Current: {_playlist[0].Title} ({_playlist[0].Duration}) requested by {_playlist[0].Requester}\n";
             for (int i = 1; i < _playlist.Count; i++)
-                finalStr += i + $". {_playlist[i].Title} " + (_playlist[i].Downloading ? "(Download...)" : "") + $" requested by {_playlist[i].Requester}\n";
+                finalStr += i + $". {_playlist[i].Title} ({ _playlist[0].Duration}) " + (_playlist[i].Downloading ? "(Download...)" : "") + $" requested by {_playlist[i].Requester}\n";
             return finalStr;
         }
 
@@ -150,7 +154,7 @@ namespace SanaraV3.Modules.Radio
             }
             if (id != null)
             {
-                var rr = StaticObjects.YouTube.Videos.List("snippet,statistics");
+                var rr = StaticObjects.YouTube.Videos.List("snippet");
                 rr.Id = id;
                 Video video = (await rr.ExecuteAsync()).Items[0];
                 DownloadMusic(_guildId, video, "Sanara#1537 (Autosuggestion)", true);
@@ -215,9 +219,10 @@ namespace SanaraV3.Modules.Radio
         {
             string url = "https://youtu.be/" + video.Id;
             string fileName = $"Saves/Radio/{guildId}/{Utils.CleanWord(video.Snippet.Title)}{DateTime.Now:HHmmssff}.mp3";
-            var embed = Entertainment.MediaModule.GetEmbedFromVideo(video);
+            string duration;
+            var embed = Entertainment.MediaModule.GetEmbedFromVideo(video, out duration);
             embed.Description = "Requested by " + requester;
-            AddMusic(new Music(video.Id, fileName, video.Snippet.Title, url, embed.Build(), requester, isAutoSuggestion));
+            AddMusic(new Music(video.Id, fileName, video.Snippet.Title, url, embed.Build(), requester, isAutoSuggestion, duration));
             if (!File.Exists("youtube-dl.exe"))
                 throw new FileNotFoundException("youtube-dl.exe was not found near the bot executable.");
             ProcessStartInfo youtubeDownload = new ProcessStartInfo()

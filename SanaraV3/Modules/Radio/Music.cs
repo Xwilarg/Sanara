@@ -4,7 +4,7 @@ namespace SanaraV3.Modules.Radio
 {
     public sealed class Music
     {
-        public Music(string id, string path, string title, string url, Embed embed, string requester, bool isAutoSuggestion)
+        public Music(string id, string path, string title, string url, Embed embed, string requester, bool isAutoSuggestion, string duration)
         {
             Id = id;
             Path = path;
@@ -14,6 +14,7 @@ namespace SanaraV3.Modules.Radio
             Embed = embed;
             Requester = requester;
             IsAutoSuggestion = isAutoSuggestion;
+            Duration = duration;
         }
 
         public string Id { private set; get; } // ID of the video
@@ -24,5 +25,6 @@ namespace SanaraV3.Modules.Radio
         public Embed Embed { private set; get; } // Embed to be sent when the song begin
         public string Requester { private set; get; } // User that requested the music
         public bool IsAutoSuggestion { private set; get; } // Is the music an autosuggestion
+        public string Duration { private set; get; } // Duration of the song
     }
 }
