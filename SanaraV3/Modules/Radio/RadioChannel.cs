@@ -154,7 +154,7 @@ namespace SanaraV3.Modules.Radio
             }
             if (id != null)
             {
-                var rr = StaticObjects.YouTube.Videos.List("snippet");
+                var rr = StaticObjects.YouTube.Videos.List("snippet,statistics,contentDetails");
                 rr.Id = id;
                 Video video = (await rr.ExecuteAsync()).Items[0];
                 DownloadMusic(_guildId, video, "Sanara#1537 (Autosuggestion)", true);

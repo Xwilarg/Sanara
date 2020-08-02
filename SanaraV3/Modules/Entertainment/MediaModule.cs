@@ -34,7 +34,8 @@ namespace SanaraV3.Modules.Entertainment
             var finalViews = Utils.MakeNumberReadable(video.Statistics.ViewCount.ToString());
             var finalLikes = Utils.MakeNumberReadable(video.Statistics.LikeCount.ToString());
             var finalDislikes = Utils.MakeNumberReadable(video.Statistics.DislikeCount.ToString());
-            duration = MSToString(video.FileDetails.DurationMs.Value);
+            var match = Regex.Match(video.ContentDetails.Duration, "PT([0-9]+)M([0-9]+)S");
+            duration = match.Groups[1] + ":" + match.Groups[2];
             return new EmbedBuilder
             {
                 ImageUrl = video.Snippet.Thumbnails.High.Url,
@@ -47,12 +48,6 @@ namespace SanaraV3.Modules.Entertainment
                     Text = $"Duration: {duration}\nViews: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value:0.0}"
                 }
             };
-        }
-
-        private static string MSToString(ulong ms)
-        {
-            ulong tmp = ms / 60;
-            return (tmp / 60) + ":" + (tmp % 60);
         }
 
         // We split this into another function because it's also used by the Radio
@@ -79,7 +74,7 @@ namespace SanaraV3.Modules.Entertainment
             Video result = null;
             if (id != null) // If managed to get the Id of the video thanks to the previous REGEX
             {
-                VideosResource.ListRequest r = StaticObjects.YouTube.Videos.List("snippet,statistics,fileDetails");
+                VideosResource.ListRequest r = StaticObjects.YouTube.Videos.List("snippet,statistics,contentDetails");
                 r.Id = id;
                 var resp = (await r.ExecuteAsync()).Items;
                 if (resp.Count == 0)
@@ -100,7 +95,7 @@ namespace SanaraV3.Modules.Entertainment
                     throw new CommandFailed($"There is no video with these search terms.");
 
                 // For each video, we contact the statistics endpoint
-                VideosResource.ListRequest videoRequest = StaticObjects.YouTube.Videos.List("snippet,statistics,fileDetails");
+                VideosResource.ListRequest videoRequest = StaticObjects.YouTube.Videos.List("snippet,statistics,contentDetails");
                 videoRequest.Id = string.Join(",", correctVideos.Select(x => x.Id.VideoId));
                 var videoResponse = (await videoRequest.ExecuteAsync()).Items;
                 ulong likes = ulong.MinValue;
