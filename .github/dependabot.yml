@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "SanaraV3/" # Location of package manifests
+    schedule:
+      interval: "daily"
