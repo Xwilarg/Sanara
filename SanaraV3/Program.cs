@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -86,6 +87,8 @@ namespace SanaraV3
             await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
             await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
+            await _commands.AddModuleAsync<Modules.Game.GameModule>(null);
+            await _commands.AddModuleAsync<Modules.Tool.LanguageModule>(null);
 
             await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await _client.StartAsync();
@@ -109,8 +112,14 @@ namespace SanaraV3
         {
             if (arg.Author.IsBot) // We ignore messages from bots
                 return;
-
             var msg = arg as SocketUserMessage;
+
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
+            if (game != null) // If we are in a game
+            {
+                _ = Task.Run(async () => { await game.CheckAnswerAsync(msg.Content); });
+            }
+
             if (msg == null) return; // The message received isn't a message we can deal with
 
             int pos = 0;

@@ -1,5 +1,7 @@
 ﻿using BooruSharp.Booru;
 using Google.Apis.YouTube.v3;
+using SanaraV3.Modules.Game;
+using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Nsfw;
 using SanaraV3.Modules.Radio;
 using System;
@@ -30,6 +32,11 @@ namespace SanaraV3
 
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube = null;
+
+        // GAME MODULE
+        public static List<AGame> Games = new List<AGame>();
+        public static TextMode ModeText = new TextMode();
+        public static UrlMode ModeUrl = new UrlMode();
 
         static StaticObjects()
         {

@@ -2,8 +2,8 @@
 {
     public enum GameState
     {
-        PREPARE,
-        RUNNING,
-        LOST
+        PREPARE, // Waiting for multiplayer
+        RUNNING, // Game is running
+        LOST // Game ended
     }
 }
