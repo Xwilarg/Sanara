@@ -36,10 +36,13 @@ namespace SanaraV3.Modules.Tool
                 string title = string.Join(", ", elem["senses"][0]["english_definitions"].Value<JArray>().Select(x => x.Value<string>()));
                 string content = string.Join('\n', elem["japanese"].Value<JArray>().Select(x =>
                 {
-                    string word = x["word"].Value<string>();
+                    var word = x["word"];
+                    var reading = x["reading"];
                     if (word == null)
-                        return x["reading"].Value<string>();
-                    return word + " - " + x["reading"].Value<string>();
+                        return reading.Value<string>();
+                    if (reading == null)
+                        return word.Value<string>();
+                    return word.Value<string>() + " - " + reading.Value<string>();
                 }));
                 embed.AddField(title, content);
             }
