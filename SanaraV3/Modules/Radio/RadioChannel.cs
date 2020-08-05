@@ -56,14 +56,14 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Remove a music from the playlist
         /// </summary>
-        public async Task<string> RemoveMusic(string title)
+        public string RemoveMusic(string title)
         {
             var music = _playlist.Find(x => x.Title == title);
             if (music == null)
                 throw new CommandFailed("There is no music with this name in the playlist.");
 
             int index = _playlist.IndexOf(music);
-            return await RemoveMusicWithId(index);
+            return RemoveMusicWithId(index);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace SanaraV3.Modules.Radio
         /// <param name="chan"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public async Task<string> RemoveMusicWithId(int index)
+        public string RemoveMusicWithId(int index)
         {
             if (index < 0 || index >= _playlist.Count)
                 throw new CommandFailed("There is no music on the given index.");

@@ -15,7 +15,7 @@ namespace SanaraV3.UnitTests.Tests
         public async Task InspireTest(string entry, string title1, string contentLine1) // If the first line is okay, the rest should be okay too
         {
             bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            var callback = new Func<UnitTestUserMessage, Task>((msg) =>
             {
                 Assert.Single(msg.Embeds);
                 var embed = msg.Embeds.ElementAt(0);
@@ -24,6 +24,7 @@ namespace SanaraV3.UnitTests.Tests
                 Assert.Equal(title1, firstField.Name);
                 Assert.Equal(contentLine1, firstField.Value.Split('\n')[0]);
                 isDone = true;
+                return Task.CompletedTask;
             });
 
             var mod = new Modules.Tool.LanguageModule();
