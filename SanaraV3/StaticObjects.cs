@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace SanaraV3
 {
@@ -50,6 +52,14 @@ namespace SanaraV3
 
         static StaticObjects()
         {
+            // So somehow _defaultRequestHeaders is null by default and everytimes I doing a new request, it add some default headers
+            // But because of all the async stuffs, 2 HttpClient can be used at the same time, making it crash (cause it modify the collection while being used elsewhere)
+            // To be sure it doesn't add something, we set something by default
+            // https://github.com/dotnet/runtime/blob/master/src/libraries/System.Net.Http/src/System/Net/Http/HttpClient.cs#L752-L755
+            var property = typeof(HttpClient).GetField("_defaultRequestHeaders", BindingFlags.Instance | BindingFlags.NonPublic);
+            var ctor = typeof(HttpRequestHeaders).GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)[0];
+            property.SetValue(HttpClient, (HttpRequestHeaders)ctor.Invoke(new object[0]));
+
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;
             E621.HttpClient = HttpClient;
