@@ -15,6 +15,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="LanguageResources\Hiragana.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Hiragana.resx</DependentUpon>
+    </Compile>
+    <Compile Update="LanguageResources\Katakana.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Katakana.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="LanguageResources\Hiragana.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Hiragana.Designer.cs</LastGenOutput>

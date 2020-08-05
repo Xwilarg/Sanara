@@ -62,9 +62,10 @@ namespace SanaraV3.Modules.Tool
         {
             StringBuilder result = new StringBuilder();
             var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
-            bool doubleNext = false; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
+            bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
             while (entry.Length > 0)
             {
+                doubleNext = false;
                 if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
                 {
                     entry = entry.Substring(1);
