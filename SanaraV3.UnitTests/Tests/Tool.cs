@@ -21,8 +21,8 @@ namespace SanaraV3.UnitTests.Tests
                 var embed = msg.Embeds.ElementAt(0);
                 Assert.Equal(5, embed.Fields.Length);
                 var firstField = embed.Fields[0];
-                Assert.Equal(title1, embed.Title);
-                Assert.Equal(contentLine1, embed.Description.Split('\n')[0]);
+                Assert.Equal(title1, firstField.Name);
+                Assert.Equal(contentLine1, firstField.Value.Split('\n')[0]);
                 isDone = true;
             });
 
