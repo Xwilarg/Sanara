@@ -9,9 +9,9 @@ namespace SanaraV3.UnitTests.Tests
     public sealed class Tool
     {
         [Theory]
-        [InlineData("power plant", "power plant, power station", "発電所 - はつでんしょ")]
-        [InlineData("妖精", "fairy, sprite, elf", "妖精 - ようせい")]
-        [InlineData("フランス", "France", "仏蘭西 - フランス")]
+        [InlineData("power plant", "power plant, power station", "発電所 - はつでんしょ (hatsudensho)")]
+        [InlineData("妖精", "fairy, sprite, elf", "妖精 - ようせい (yousei)")]
+        [InlineData("フランス", "France", "仏蘭西 - フランス (furansu)")]
         public async Task InspireTest(string entry, string title1, string contentLine1) // If the first line is okay, the rest should be okay too
         {
             bool isDone = false;
@@ -31,6 +31,19 @@ namespace SanaraV3.UnitTests.Tests
             await mod.Japanese(entry);
             while (!isDone)
             { }
+        }
+
+        [Theory]
+        [InlineData("つき", "tsuki")]
+        [InlineData("にちじょう", "nichijou")]
+        [InlineData("がっこう", "gakkou")]
+        [InlineData("にゃんぱす", "nyanpasu")]
+        [InlineData("フランス", "furansu")]
+        [InlineData("aあアaあアaあア", "aaaaaaaaa")]
+        [InlineData("エレベーター", "erebeta")]
+        public void ToRomajiTest(string entry, string result)
+        {
+            Assert.Equal(result, Modules.Tool.LanguageModule.ToRomaji(entry));
         }
     }
 }

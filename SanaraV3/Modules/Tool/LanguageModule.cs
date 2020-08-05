@@ -39,38 +39,64 @@ namespace SanaraV3.Modules.Tool
                     var word = x["word"];
                     var reading = x["reading"];
                     if (word == null)
-                        return reading.Value<string>();
+                        return reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
                     if (reading == null)
                         return word.Value<string>();
-                    return word.Value<string>() + " - " + reading.Value<string>();
+                    return word.Value<string>() + " - " + reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
                 }));
                 embed.AddField(title, content);
             }
             await ReplyAsync(embed: embed.Build());
         }
 
+        public static string ToRomaji(string entry)
+            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.HiraganaToRomaji, 'っ'), StaticObjects.KatakanaToRomaji, 'ッ');
+
         /// <summary>
         /// Convert an entry from a language to another
         /// </summary>
         /// <param name="entry">The entry to translate</param>
-        /// <param name="manager">The resource manager that contains the from/to for each character</param>
-        public static string ConvertLanguage(string entry, ResourceManager manager)
+        /// <param name="dictionary">The dictionary that contains the from/to for each character</param>
+        /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
+        public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
         {
             StringBuilder result = new StringBuilder();
+            var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
+            bool doubleNext = false; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
             while (entry.Length > 0)
             {
-                // Iterate on 3 to 1 (We assume that 3 is the max number of character)
+                if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
+                {
+                    entry = entry.Substring(1);
+                    continue;
+                }
+                if (entry.Length >= 2 && entry[0] == entry[1] && dictionary.Values.Any(x => x == entry[0].ToString())) // kko -> っこ
+                {
+                    result.Append(doubleChar);
+                    entry = entry.Substring(1);
+                    continue;
+                }
+                if (entry[0] == doubleChar)
+                {
+                    doubleNext = true;
+                    entry = entry.Substring(1);
+                }
+                // Iterate on biggest to 1 (We assume that 3 is the max number of character)
                 // We then test for each entry if we can convert
                 // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
-                for (int i = 3; i > 0; i++)
+                for (int i = biggest; i > 0; i--)
                 {
                     if (entry.Length >= i)
                     {
-                        string value = manager.GetString(entry[0..i]);
-                        if (value != null)
-                            result.Append(value);
-                        entry = entry.Substring(i);
-                        goto found;
+                        var value = entry[0..i];
+                        if (dictionary.ContainsKey(value))
+                        {
+                            if (doubleNext)
+                                result.Append(dictionary[value][0]);
+                            result.Append(dictionary[value]);
+                            entry = entry.Substring(i);
+                            goto found;
+                        }
                     }
                 }
                 result.Append(entry[0]);
