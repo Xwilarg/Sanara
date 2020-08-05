@@ -62,6 +62,7 @@ namespace SanaraV3.Modules.Tool
         {
             StringBuilder result = new StringBuilder();
             var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
+            bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
             bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
             while (entry.Length > 0)
             {
@@ -71,7 +72,7 @@ namespace SanaraV3.Modules.Tool
                     entry = entry.Substring(1);
                     continue;
                 }
-                if (entry.Length >= 2 && entry[0] == entry[1] && dictionary.Values.Any(x => x == entry[0].ToString())) // kko -> っこ
+                if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
                 {
                     result.Append(doubleChar);
                     entry = entry.Substring(1);
@@ -106,5 +107,8 @@ namespace SanaraV3.Modules.Tool
             }
             return result.ToString();
         }
+
+        private static bool IsLatinLetter(char c)
+            => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 }
