@@ -9,6 +9,7 @@ namespace SanaraV3.Modules.Game.Impl
 
         protected override string GetPostInternal()
         {
+            return null;
         }
     }
 }
