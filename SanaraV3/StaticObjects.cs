@@ -3,6 +3,7 @@ using Google.Apis.YouTube.v3;
 using SanaraV3.LanguageResources;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
+using SanaraV3.Modules.Game.Preload;
 using SanaraV3.Modules.Game.Preload.Shiritori;
 using SanaraV3.Modules.Nsfw;
 using SanaraV3.Modules.Radio;
@@ -44,7 +45,7 @@ namespace SanaraV3
         public static List<AGame>   Games = new List<AGame>();
         public static TextMode      ModeText = new TextMode();
         public static UrlMode       ModeUrl = new UrlMode();
-        public static ShiritoriPreload ShiritoriPreload = new ShiritoriPreload();
+        public static IPreload[]    Preloads;
         private static readonly GameManager _gm = new GameManager();
 
         // LANGUAGE MODULE
@@ -80,6 +81,11 @@ namespace SanaraV3
                 RomajiToKatakana.Add((string)elem.Key, (string)elem.Value);
                 KatakanaToRomaji.Add((string)elem.Value, (string)elem.Key);
             }
+
+            Preloads = new[]
+            {
+                new ShiritoriPreload()
+            };
         }
     }
 }

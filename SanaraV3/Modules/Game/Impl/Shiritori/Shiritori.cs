@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
+using SanaraV3.Modules.Game.Preload;
 using SanaraV3.Modules.Game.Preload.Shiritori;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,9 @@ using System.Web;
 
 namespace SanaraV3.Modules.Game.Impl
 {
-    public abstract class Shiritori : AGame
+    public sealed class Shiritori : AGame
     {
-        public Shiritori(IMessageChannel textChan, ShiritoriPreload preload) : base(textChan, StaticObjects.ModeText)
+        public Shiritori(IMessageChannel textChan, IPreload preload) : base(textChan, StaticObjects.ModeText)
         {
             _words = preload.Load().Cast<ShiritoriPreloadResult>().ToList();
             _isFirst = true;

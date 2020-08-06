@@ -16,11 +16,22 @@ namespace SanaraV3.Modules.Game
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
             else
-                StaticObjects.Games.Add(LoadGame(gameName, Context.Channel));
+            {
+                var game = LoadGame(gameName.ToLower(), Context.Channel);
+                if (game == null)
+                    await ReplyAsync("There is no game with this name.");
+                else
+                    StaticObjects.Games.Add(game);
+            }
         }
 
         public AGame LoadGame(string gameName, IMessageChannel textChan)
         {
+            foreach (var preload in StaticObjects.Preloads)
+            {
+                if (preload.GetGameNames().Contains(gameName))
+                    return preload.CreateGame(textChan);
+            }
             return null;
         }
     }
