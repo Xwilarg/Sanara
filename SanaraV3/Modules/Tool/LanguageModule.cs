@@ -84,6 +84,8 @@ namespace SanaraV3.Modules.Tool
                 {
                     doubleNext = true;
                     entry = entry.Substring(1);
+                    if (entry.Length == 0)
+                        continue;
                 }
                 // Iterate on biggest to 1 (We assume that 3 is the max number of character)
                 // We then test for each entry if we can convert

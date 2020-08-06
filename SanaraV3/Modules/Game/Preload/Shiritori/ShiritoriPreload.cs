@@ -18,11 +18,6 @@ namespace SanaraV3.Modules.Game.Preload.Shiritori
                 {
                     string[] curr = lines[i].Split('$');
                     string word = curr[0];
-                    System.Console.WriteLine("A");
-                    System.Console.WriteLine(word);
-                    System.Console.WriteLine(Tool.LanguageModule.ToRomaji(word));
-                    System.Console.WriteLine(curr[1]);
-                    System.Console.WriteLine("A END");
                     _preload[i] = new ShiritoriPreloadResult(word, Tool.LanguageModule.ToRomaji(word), curr[1]);
                 }
             }
