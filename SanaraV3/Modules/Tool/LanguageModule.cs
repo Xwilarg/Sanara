@@ -52,6 +52,9 @@ namespace SanaraV3.Modules.Tool
         public static string ToRomaji(string entry)
             => ConvertLanguage(ConvertLanguage(entry, StaticObjects.HiraganaToRomaji, 'っ'), StaticObjects.KatakanaToRomaji, 'ッ');
 
+        public static string ToHiragana(string entry)
+            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
+
         /// <summary>
         /// Convert an entry from a language to another
         /// </summary>

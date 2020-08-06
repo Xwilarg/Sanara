@@ -4,7 +4,11 @@ namespace SanaraV3.Modules.Game
 {
     public sealed class GameManager
     {
-
+        public GameManager()
+        {
+            thread = new Thread(new ThreadStart(Loop));
+            thread.Start();
+        }
 
         private void Loop()
         {
@@ -15,6 +19,6 @@ namespace SanaraV3.Modules.Game
             }
         }
 
-        private Thread thread;
+        private readonly Thread thread;
     }
 }
