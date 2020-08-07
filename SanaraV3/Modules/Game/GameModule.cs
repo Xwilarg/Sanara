@@ -21,7 +21,10 @@ namespace SanaraV3.Modules.Game
                 if (game == null)
                     await ReplyAsync("There is no game with this name.");
                 else
+                {
                     StaticObjects.Games.Add(game);
+                    await game.Start();
+                }
             }
         }
 

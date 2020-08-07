@@ -14,7 +14,9 @@ namespace SanaraV3.Modules.Game
         {
             while (Thread.CurrentThread.IsAlive)
             {
-                //StaticObjects.Games.RemoveAll(x => x.IsLost()); // Remove all the game that were lost
+                foreach (var game in StaticObjects.Games)
+                    game.CheckTimerAsync().GetAwaiter().GetResult();
+                StaticObjects.Games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
                 Thread.Sleep(200);
             }
         }

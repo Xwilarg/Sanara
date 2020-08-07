@@ -33,13 +33,14 @@ namespace SanaraV3.Modules.Game.Impl
             _words.Remove(randomWord);
             _alreadySaid.Add(randomWord.Word);
             _currWord = randomWord.Word;
-            return randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings}";
+            return randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings})";
         }
 
         protected override async Task CheckAnswerInternalAsync(string answer)
         {
-            string hiraganaAnswer = Tool.LanguageModule.ToHiragana(answer); // We convert to hiragana so it's then easier to check if the word really exist
-            System.Console.WriteLine(hiraganaAnswer); // DEBUG
+            // We convert to hiragana so it's then easier to check if the word really exist
+            // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
+            string hiraganaAnswer = Tool.LanguageModule.ToHiragana(answer);
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
@@ -60,7 +61,7 @@ namespace SanaraV3.Modules.Game.Impl
                     var readingObj = jp["reading"];
                     if (readingObj == null)
                         continue;
-                    reading = readingObj.Value<string>();
+                    reading = Tool.LanguageModule.ToHiragana(readingObj.Value<string>());
                     if (reading == hiraganaAnswer)
                     {
                         isCorrect = true;
@@ -84,12 +85,14 @@ namespace SanaraV3.Modules.Game.Impl
             if (!isCorrect)
                 throw new InvalidGameAnswer("This word doesn't exist.");
             var ending = GetWordEnding(_currWord);
-            if (hiraganaAnswer.StartsWith(ending))
+            if (!hiraganaAnswer.StartsWith(ending))
                 throw new InvalidGameAnswer($"Your word must begin by {ending} ({Tool.LanguageModule.ToRomaji(ending)}).");
             if (!isNoun)
                 throw new InvalidGameAnswer("Your word must be a noun.");
             if (hiraganaAnswer == GetWordEnding(hiraganaAnswer)) // We can't just check the word count since しゃ would count as only one character
                 throw new InvalidGameAnswer("Your word must be at least 2 characters.");
+            if (_alreadySaid.Contains(hiraganaAnswer))
+                throw new GameLost("This word was already said.");
             if (hiraganaAnswer.Last() == 'ん')
                 throw new GameLost("Your word is finishing with a ん (n).");
             if (_words.Any(x => x.Word == hiraganaAnswer))
@@ -100,7 +103,7 @@ namespace SanaraV3.Modules.Game.Impl
 
         protected override string GetAnswer()
         {
-            var word = GetRandomValidWord(_currWord);
+            var word = GetRandomValidWord(GetWordEnding(_currWord));
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
 
@@ -122,6 +125,9 @@ namespace SanaraV3.Modules.Game.Impl
                 return word.Substring(word.Length - 2, 2);
             return lastChar.ToString();
         }
+
+        protected override int GetGameTime()
+            => 15;
 
         private List<ShiritoriPreloadResult> _words;
         private bool _isFirst; // Is the first word (because we must start by saying "shiritori")
