@@ -31,7 +31,7 @@ namespace SanaraV3.Modules.Game
             await PostAsync();
         }
 
-        public async Task PostAsync()
+        private async Task PostAsync()
         {
             if (_state != GameState.RUNNING)
                 return;
@@ -63,7 +63,18 @@ namespace SanaraV3.Modules.Game
             }
         }
 
-        public async Task LooseAsync(string reason)
+        public async Task CancelAsync()
+        {
+            if (_state == GameState.LOST) // No point cancelling a game that is already lost
+            {
+                await _textChan.SendMessageAsync("The game is already lost.");
+                return;
+            }
+
+            await LooseAsync("Game cancelled");
+        }
+
+        private async Task LooseAsync(string reason)
         {
             _state = GameState.LOST;
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}");
