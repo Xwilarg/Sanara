@@ -1,4 +1,5 @@
 ﻿using BooruSharp.Booru;
+using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using SanaraV3.LanguageResources;
 using SanaraV3.Modules.Game;
@@ -13,8 +14,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Reflection;
 
 namespace SanaraV3
 {
@@ -80,6 +79,17 @@ namespace SanaraV3
             {
                 new ShiritoriPreload()
             };
+        }
+
+        public static void Initialize(Credentials credentials)
+        {
+            if (credentials.YouTubeKey != null)
+            {
+                YouTube = new YouTubeService(new BaseClientService.Initializer
+                {
+                    ApiKey = credentials.YouTubeKey
+                });
+            }
         }
     }
 }
