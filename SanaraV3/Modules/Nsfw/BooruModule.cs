@@ -107,7 +107,7 @@ namespace SanaraV3.Modules.Nsfw
             List<string> newTags = null;
             try
             {
-                post = await booru.GetRandomImageAsync(tags);
+                post = await booru.GetRandomPostAsync(tags);
             }
             catch (InvalidTags)
             {
@@ -124,7 +124,7 @@ namespace SanaraV3.Modules.Nsfw
                 try
                 {
                     // Once we got our new tags, we try doing a new search with them
-                    post = await booru.GetRandomImageAsync(newTags.ToArray());
+                    post = await booru.GetRandomPostAsync(newTags.ToArray());
                 }
                 catch (InvalidTags)
                 {
