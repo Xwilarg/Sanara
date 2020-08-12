@@ -41,7 +41,7 @@ namespace SanaraV3.Modules.Game
             foreach (var preload in StaticObjects.Preloads)
             {
                 if (preload.GetGameNames().Contains(gameName))
-                    return preload.CreateGame(textChan);
+                    return preload.CreateGame(textChan, new GameSettings(false));
             }
             return null;
         }

@@ -29,8 +29,8 @@ namespace SanaraV3.Modules.Game.Preload.Shiritori
         public string[] GetGameNames()
             => new[] { "shiritori" };
 
-        public AGame CreateGame(IMessageChannel chan)
-            => new Impl.Shiritori(chan, this);
+        public AGame CreateGame(IMessageChannel chan, GameSettings settings)
+            => new Impl.Shiritori(chan, this, settings);
 
         private readonly ShiritoriPreloadResult[] _preload;
     }

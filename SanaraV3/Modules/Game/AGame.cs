@@ -8,11 +8,12 @@ namespace SanaraV3.Modules.Game
 {
     public abstract class AGame
     {
-        public AGame(IMessageChannel textChan, IPostMode postMode)
+        public AGame(IMessageChannel textChan, IPostMode postMode, GameSettings settings)
         {
             _state = GameState.PREPARE;
             _textChan = textChan;
             _postMode = postMode;
+            _settings = settings;
         }
 
         protected abstract string GetPostInternal(); // Get next post
@@ -102,5 +103,6 @@ namespace SanaraV3.Modules.Game
         private IMessageChannel _textChan; // Textual channel where the game is happening
         private IPostMode       _postMode; // How things should be posted
         private DateTime        _lastPost; // Used to know when the user lost because of the time
+        private GameSettings    _settings; // Contains various settings about the game
     }
 }
