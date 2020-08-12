@@ -50,7 +50,7 @@ namespace SanaraV3.Modules.Radio
                 await ReplyAsync("There is no radio running.");
             else
             {
-                await StaticObjects.Radios[Context.Guild.Id].RemoveMusic(search);
+                StaticObjects.Radios[Context.Guild.Id].RemoveMusic(search);
                 await ReplyAsync("Done~");
             }
         }
@@ -62,7 +62,7 @@ namespace SanaraV3.Modules.Radio
                 await ReplyAsync("There is no radio running.");
             else
             {
-                await StaticObjects.Radios[Context.Guild.Id].RemoveMusicWithId(id);
+                StaticObjects.Radios[Context.Guild.Id].RemoveMusicWithId(id);
                 await ReplyAsync("Done~");
             }
         }

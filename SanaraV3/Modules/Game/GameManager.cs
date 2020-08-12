@@ -4,17 +4,23 @@ namespace SanaraV3.Modules.Game
 {
     public sealed class GameManager
     {
-
+        public GameManager()
+        {
+            thread = new Thread(new ThreadStart(Loop));
+            thread.Start();
+        }
 
         private void Loop()
         {
             while (Thread.CurrentThread.IsAlive)
             {
-                StaticObjects.Games.RemoveAll(x => x.IsLost()); // Remove all the game that were lost
+                foreach (var game in StaticObjects.Games)
+                    game.CheckTimerAsync().GetAwaiter().GetResult();
+                StaticObjects.Games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
                 Thread.Sleep(200);
             }
         }
 
-        private Thread thread;
+        private readonly Thread thread;
     }
 }

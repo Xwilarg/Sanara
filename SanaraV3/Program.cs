@@ -113,13 +113,6 @@ namespace SanaraV3
             if (arg.Author.IsBot) // We ignore messages from bots
                 return;
             var msg = arg as SocketUserMessage;
-
-            var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
-            if (game != null) // If we are in a game
-            {
-                _ = Task.Run(async () => { await game.CheckAnswerAsync(msg.Content); });
-            }
-
             if (msg == null) return; // The message received isn't a message we can deal with
 
             int pos = 0;
@@ -130,10 +123,19 @@ namespace SanaraV3
                 if (!result.IsSuccess)
                 {
                     var error = result.Error.Value;
+                    Console.WriteLine(error.ToString());
                     if (error == CommandError.UnmetPrecondition)
                         await context.Channel.SendMessageAsync(result.ErrorReason);
                     else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)
                         await context.Channel.SendMessageAsync("This command have some invalid parameters."); // TODO: Display help
+                }
+            }
+            else
+            {
+                var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
+                if (game != null) // If we are in a game
+                {
+                    _ = Task.Run(async () => { await game.CheckAnswerAsync(msg.Content); });
                 }
             }
         }

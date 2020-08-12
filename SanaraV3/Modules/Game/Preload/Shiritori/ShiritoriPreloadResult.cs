@@ -2,7 +2,7 @@
 {
     public struct ShiritoriPreloadResult : IPreloadResult
     {
-        public ShiritoriPreloadResult(string word, string wordEnglish, string[] meanings)
+        public ShiritoriPreloadResult(string word, string wordEnglish, string meanings)
         {
             Word = word;
             WordEnglish = wordEnglish;
@@ -11,6 +11,6 @@
 
         public string Word; // Word in the local language
         public string WordEnglish; // Word in latin alphabet (ex: romaji for japanese)
-        public string[] Meanings; // What the word mean
+        public string Meanings; // What the word mean
     }
 }

@@ -19,6 +19,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
     - name: Init submodules
       run: git submodule init && git submodule update
     - name: Install Codecov
@@ -30,8 +32,10 @@ jobs:
     - name: Test
       env:
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
-      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage" --settings coverlet.runsettings
     - name: Copy coverage
       run: sh copy_coverage.sh
     - name: Upload coverage
       run: codecov -f "coverage.xml"
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1

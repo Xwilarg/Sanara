@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using SanaraV3.Attributes;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,11 +17,32 @@ namespace SanaraV3.Modules.Game
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
             else
-                StaticObjects.Games.Add(LoadGame(gameName, Context.Channel));
+            {
+                var game = LoadGame(gameName.ToLower(), Context.Channel);
+                if (game == null)
+                    await ReplyAsync("There is no game with this name.");
+                else
+                {
+                    StaticObjects.Games.Add(game);
+                    await game.Start();
+                }
+            }
+        }
+
+        [Command("Cancel"), RequireRunningGame]
+        public async Task Cancel()
+        {
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
+            await game.CancelAsync();
         }
 
         public AGame LoadGame(string gameName, IMessageChannel textChan)
         {
+            foreach (var preload in StaticObjects.Preloads)
+            {
+                if (preload.GetGameNames().Contains(gameName))
+                    return preload.CreateGame(textChan, new GameSettings(false));
+            }
             return null;
         }
     }
