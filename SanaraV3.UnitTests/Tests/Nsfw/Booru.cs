@@ -45,7 +45,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Modules.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new object[] { null });
             while (!isDone)
             { }
@@ -70,7 +70,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Modules.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
             while (!isDone)
             { }
@@ -97,7 +97,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Modules.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
             while (!isDone)
             { }
