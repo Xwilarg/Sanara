@@ -1,8 +1,8 @@
 [<img src="https://discordbots.org/api/widget/owner/329664361016721408.svg"/>](https://discordbots.org/bot/329664361016721408)
 [![Server Count](https://img.shields.io/endpoint?color=deepgreen&url=https%3A%2F%2Fapi.zirk.eu%2Fbots.php%3Fname%3DSanara%26shield%3Dtrue)](https://sanara.zirk.eu/stats.html)
 
-| Linux          | Windows      |
-| -------------- | ------------ |
+| Linux                                                                 | Windows                                                                   |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | ![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg) | ![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg) |
 
 [![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)
@@ -10,11 +10,11 @@
 
 Sanara is a multipurpose bot that is now in more than 300 servers (12/2019).<br/>
 Here are some of her features:
- - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), try to do a better scores than others servers
- - Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
- - Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
- - Achievements, generate your profile and go hunt them
- - Subscription, stay aware of the new anime airing
+- Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), try to do a better scores than others servers
+- Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
+- Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
+- Achievements, generate your profile and go hunt them
+- Subscription, stay aware of the new anime airing
  
 There are also a multitude of others commands and if the one you're looking for isn't here, just suggest it
 
@@ -26,7 +26,7 @@ Or by doing the help command
 ```
 
 ## How to invite her on my server
-You can just use her invite link: https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot
+You can just use her invite link: <https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot>
 
 ## Contact
 If you need anything you can come [open an issue](https://github.com/Xwilarg/Sanara/issues), [come to her official server](https://discordapp.com/invite/H6wMRYV) or contact Zirk#0001 on Discord.
