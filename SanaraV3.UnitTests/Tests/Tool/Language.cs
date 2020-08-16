@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SanaraV3.UnitTests.Tests
+namespace SanaraV3.UnitTests.Tests.Tool
 {
-    public sealed class Tool
+    public sealed class Language
     {
         [Theory]
         [InlineData("power plant", "power plant, power station", "発電所 - はつでんしょ (hatsudensho)")]

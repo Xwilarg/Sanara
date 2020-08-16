@@ -11,31 +11,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SanaraV3.UnitTests.Tests
+namespace SanaraV3.UnitTests.Tests.Entertainment
 {
-    public sealed class Entertainment
+    public sealed class Media
     {
-        [Fact]
-        public async Task InspireTest()
-        {
-            bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            {
-                Assert.Single(msg.Embeds);
-                var embed = msg.Embeds.ElementAt(0);
-                Assert.NotNull(embed.Image);
-                Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
-                Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
-                isDone = true;
-            });
-
-            var mod = new Modules.Entertainment.FunModule();
-            Common.AddContext(mod, callback);
-            await mod.Inspire();
-            while (!isDone)
-            { }
-        }
-
         private async Task CheckYoutubeAsync(Embed embed, string expectedTitle, string expectedDescription, int expectedViews, int expectedLikes, int expectedDislikes)
         {
             Assert.NotNull(embed.Image);

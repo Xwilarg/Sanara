@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SanaraV3.UnitTests.Tests
+namespace SanaraV3.UnitTests.Tests.Nsfw
 {
-    public class Nsfw
+    public sealed class Booru
     {
         /// <summary>
         /// Generic unit test method for all booru

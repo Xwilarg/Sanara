@@ -81,6 +81,8 @@ namespace SanaraV3
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
+            await _commands.AddModuleAsync<Modules.Nsfw.DoujinshiModule>(null);
+            await _commands.AddModuleAsync<Modules.Nsfw.CosplayModule>(null);
             await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
             await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
@@ -109,7 +111,7 @@ namespace SanaraV3
                 if (!result.IsSuccess)
                 {
                     var error = result.Error.Value;
-                    Console.WriteLine(error.ToString());
+                    Console.WriteLine(error.ToString()); // TODO: Debug
                     if (error == CommandError.UnmetPrecondition)
                         await context.Channel.SendMessageAsync(result.ErrorReason);
                     else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)

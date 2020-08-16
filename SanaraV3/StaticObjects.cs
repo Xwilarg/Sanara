@@ -62,12 +62,12 @@ namespace SanaraV3
             Rule34.HttpClient = HttpClient;
             Konachan.HttpClient = HttpClient;
 
-            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("Hiragana.json"));
+            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Hiragana.json"));
             foreach (var elem in RomajiToHiragana)
             {
                 HiraganaToRomaji.Add(elem.Value, elem.Key);
             }
-            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("Katakana.json"));
+            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Katakana.json"));
             foreach (var elem in RomajiToKatakana)
             {
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
