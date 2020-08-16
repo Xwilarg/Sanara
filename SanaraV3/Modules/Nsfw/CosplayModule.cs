@@ -18,9 +18,7 @@ namespace SanaraV3.Modules.Nsfw
         public async Task Cosplay([Remainder]string tags = "")
         {
             // 959 means we only take cosplays
-            // f_sname=on&f_stags=on search for tags in title and tags
-            // f_srdd=4 only take cosplay with rating of 4/5 and higher
-            string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags) + "&advsearch=1&f_sname=on&f_stags=on&f_sr=on&f_srdd=4";
+            string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags);
             string html = await StaticObjects.HttpClient.GetStringAsync(url);
             Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
 
@@ -28,7 +26,7 @@ namespace SanaraV3.Modules.Nsfw
                 throw new CommandFailed("There is no cosplay with these tags");
 
             int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
-            html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + rand / 25); // There are 25 results by page
+            html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
             var sM = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/([a-z0-9]+)\\/([a-z0-9]+)\\/)\"")[rand % 25];
             string finalUrl = sM.Groups[1].Value;
             html = await StaticObjects.HttpClient.GetStringAsync(finalUrl);
@@ -43,6 +41,8 @@ namespace SanaraV3.Modules.Nsfw
             string htmlCover = await StaticObjects.HttpClient.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
             string imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
 
+            // Getting rating
+            string rating = Regex.Match(html, "average_rating = ([0-9.]+)").Groups[1].Value;
 
             await ReplyAsync(embed: new EmbedBuilder
             {
@@ -54,6 +54,15 @@ namespace SanaraV3.Modules.Nsfw
                 Footer = new EmbedFooterBuilder()
                 {
                     Text = $"Do the 'Download doujinshi' command with the id '{sM.Groups[2].Value + "/" + sM.Groups[3].Value}' to download the doujinshi."
+                },
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Rating",
+                        Value = rating,
+                        IsInline = true
+                    }
                 }
             }.Build());
         }
