@@ -11,8 +11,7 @@ namespace SanaraV3.Modules.Nsfw
 {
     public sealed class CosplayModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "NSFW";
+        public string ModuleName { get { return "Nsfw"; } }
 
         [Command("Cosplay", RunMode = RunMode.Async)]
         public async Task CosplayAsync([Remainder]string tags = "")

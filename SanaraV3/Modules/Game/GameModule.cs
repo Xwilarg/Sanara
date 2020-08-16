@@ -8,8 +8,7 @@ namespace SanaraV3.Modules.Game
 {
     public sealed class GameModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Game";
+        public string ModuleName { get { return "Game"; } }
 
         [Command("Play")]
         public async Task PlayAsync(string gameName)
@@ -24,7 +23,7 @@ namespace SanaraV3.Modules.Game
                 else
                 {
                     StaticObjects.Games.Add(game);
-                    await game.Start();
+                    await game.StartAsync();
                 }
             }
         }

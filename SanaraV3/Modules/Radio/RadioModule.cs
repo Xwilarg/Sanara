@@ -3,6 +3,7 @@ using Discord.Audio;
 using Discord.Commands;
 using DiscordUtils;
 using SanaraV3.Exceptions;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -10,8 +11,7 @@ namespace SanaraV3.Modules.Radio
 {
     public sealed class RadioModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Radio";
+        public string ModuleName { get { return "Radio"; } }
 
         [Command("Skip radio", RunMode = RunMode.Async), Alias("Radio skip")]
         public async Task SkipAsync()
@@ -77,7 +77,7 @@ namespace SanaraV3.Modules.Radio
             if (radio == null)
                 radio = await StartInternalAsync();
             var video = await Entertainment.MediaModule.GetYoutubeVideoAsync(search);
-            string url = "https://youtu.be/" + video.Id;
+            var url = new Uri("https://youtu.be/" + video.Id);
             if (radio.HaveMusic(url))
                 throw new CommandFailed("This music is already in the playlist.");
             await ReplyAsync(video.Snippet.Title + " was added to the playlist.");

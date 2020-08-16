@@ -34,7 +34,7 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Called when a music is done downloading
         /// </summary>
-        private void DownloadDone(string url)
+        private void DownloadDone(Uri url)
         {
             var music = _playlist.Find(x => x.Url == url);
             if (music != null)
@@ -44,7 +44,7 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Check if a song is already in the playlist
         /// </summary>
-        public bool HaveMusic(string url)
+        public bool HaveMusic(Uri url)
             => _playlist.Any(x => x.Url == url);
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace SanaraV3.Modules.Radio
 
         public void DownloadMusic(ulong guildId, Video video, string requester, bool isAutoSuggestion)
         {
-            string url = "https://youtu.be/" + video.Id;
+            var url = new Uri("https://youtu.be/" + video.Id);
             string fileName = $"Saves/Radio/{guildId}/{Utils.CleanWord(video.Snippet.Title)}{DateTime.Now:HHmmssff}.mp3";
             string duration;
             var embed = Entertainment.MediaModule.GetEmbedFromVideo(video, out duration);

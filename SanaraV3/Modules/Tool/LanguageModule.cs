@@ -13,8 +13,7 @@ namespace SanaraV3.Modules.Tool
 {
     public sealed class LanguageModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Tool";
+        public string ModuleName { get { return "Tool"; } }
 
         [Command("Japanese", RunMode = RunMode.Async)]
         public async Task JapaneseAsync([Remainder]string str)

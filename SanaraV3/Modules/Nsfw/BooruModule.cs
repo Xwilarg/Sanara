@@ -17,38 +17,37 @@ namespace SanaraV3.Modules.Nsfw
     /// </summary>
     public sealed class BooruModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "NSFW";
+        public string ModuleName { get { return "Nsfw"; } }
 
         [Command("Safebooru", RunMode = RunMode.Async)]
         public async Task SafebooruAsync(params string[] tags)
-            => await SearchBooru(StaticObjects.Safebooru, tags, 0);
+            => await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU);
 
         [Command("E926", RunMode = RunMode.Async)]
         public async Task E926Async(params string[] tags)
-            => await SearchBooru(StaticObjects.E926, tags, 1);
+            => await SearchBooruAsync(StaticObjects.E926, tags, BooruType.E926);
 
         [Command("Gelbooru", RunMode = RunMode.Async), RequireNsfw]
         public async Task GelbooruAsync(params string[] tags)
-            => await SearchBooru(StaticObjects.Gelbooru, tags, 2);
+            => await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU);
 
         [Command("E621", RunMode = RunMode.Async), RequireNsfw]
         public async Task E621Async(params string[] tags)
-            => await SearchBooru(StaticObjects.E621, tags, 3);
+            => await SearchBooruAsync(StaticObjects.E621, tags, BooruType.E621);
 
         [Command("Rule34", RunMode = RunMode.Async), RequireNsfw]
         public async Task Rule34Async(params string[] tags)
-            => await SearchBooru(StaticObjects.Rule34, tags, 4);
+            => await SearchBooruAsync(StaticObjects.Rule34, tags, BooruType.RULE34);
 
         [Command("Konachan", RunMode = RunMode.Async), RequireNsfw]
         public async Task KonachanAsync(params string[] tags)
-            => await SearchBooru(StaticObjects.Konachan, tags, 5);
+            => await SearchBooruAsync(StaticObjects.Konachan, tags, BooruType.KONACHAN);
 
         [Command("Booru", RunMode = RunMode.Async), Alias("Image")]
         public async Task ImageAsync(params string[] tags)
         {
-            if (Utils.CanSendNsfw(Context.Channel)) await SearchBooru(StaticObjects.Gelbooru, tags, 2);
-            else await SearchBooru(StaticObjects.Safebooru, tags, 0);
+            if (Utils.CanSendNsfw(Context.Channel)) await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU);
+            else await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU);
         }
 
         [Command("Tags", RunMode = RunMode.Async)]
@@ -97,11 +96,10 @@ namespace SanaraV3.Modules.Nsfw
             await ReplyAsync(embed: embed.Build());
         }
 
-        private async Task SearchBooru(ABooru booru, string[] tags, int booruId)
+        private async Task SearchBooruAsync(ABooru booru, string[] tags, BooruType booruId)
         {
             // GetRandomImageAsync crash if we send it something null
-            if (tags == null)
-                tags = new string[0];
+            tags ??= new string[0];
 
             BooruSharp.Search.Post.SearchResult post;
             List<string> newTags = null;
@@ -115,11 +113,10 @@ namespace SanaraV3.Modules.Nsfw
                 newTags = new List<string>();
                 foreach (string s in tags)
                 {
-                    string tag = s;
                     var related = await new Konachan().GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
                     if (related.Length == 0)
                         throw new CommandFailed("There is no image with those tags.");
-                    newTags.Add(tag = related.OrderBy(x => GetStringDistance(x.name, s)).First().name);
+                    newTags.Add(related.OrderBy(x => GetStringDistance(x.name, s)).First().name);
                 }
                 try
                 {
@@ -133,7 +130,7 @@ namespace SanaraV3.Modules.Nsfw
                 }
             }
 
-            int id = int.Parse("" + booruId + post.id);
+            int id = int.Parse("" + (int)booruId + post.id);
             StaticObjects.Tags.AddTag(id, booru, post);
 
             await ReplyAsync(embed: new EmbedBuilder

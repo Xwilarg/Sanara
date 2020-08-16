@@ -11,8 +11,7 @@ namespace SanaraV3.Modules.Entertainment
     /// </summary>
     public sealed class FunModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Entertainment";
+        public string ModuleName { get { return "Entertainment"; } }
 
         [Command("Inspire")]
         public async Task InspireAsync()

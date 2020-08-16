@@ -18,8 +18,7 @@ namespace SanaraV3.Modules.Entertainment
     /// </summary>
     public sealed class MediaModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Entertainment";
+        public string ModuleName { get { return "Entertainment"; } }
 
         [Command("Youtube", RunMode = RunMode.Async)]
         public async Task YoutubeAsync([Remainder]string search)

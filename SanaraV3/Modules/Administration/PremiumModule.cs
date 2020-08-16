@@ -7,8 +7,7 @@ namespace SanaraV3.Modules.Administration
 {
     public sealed class PremiumModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "Administration";
+        public string ModuleName { get { return "Premium"; } }
 
         [Command("Premium")]
         public async Task PremiumAsync()

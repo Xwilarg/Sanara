@@ -8,7 +8,7 @@ namespace SanaraV3.Modules.Game
 {
     public abstract class AGame
     {
-        public AGame(IMessageChannel textChan, IPostMode postMode, GameSettings settings)
+        protected AGame(IMessageChannel textChan, IPostMode postMode, GameSettings settings)
         {
             _state = GameState.PREPARE;
             _textChan = textChan;
@@ -24,7 +24,7 @@ namespace SanaraV3.Modules.Game
         /// <summary>
         /// Start the game, that's where lobby management is done
         /// </summary>
-        public async Task Start()
+        public async Task StartAsync()
         {
             if (_state != GameState.PREPARE)
                 return;

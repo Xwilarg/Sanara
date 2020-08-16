@@ -11,8 +11,7 @@ namespace SanaraV3.Modules.Nsfw
 {
     public sealed class DoujinshiModule : ModuleBase, IModule
     {
-        public string GetModuleName()
-            => "NSFW";
+        public string ModuleName { get { return "Nsfw"; } }
 
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
         public async Task GetDoujinshiAsync() // Doujin search with no tags
