@@ -15,7 +15,7 @@ namespace SanaraV3.Modules.Nsfw
             => "NSFW";
 
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
-        public async Task GetDoujinshi() // Doujin search with no tags
+        public async Task GetDoujinshiAsync() // Doujin search with no tags
         {
             var result = await SearchClient.SearchAsync();
             int page = StaticObjects.Random.Next(0, result.numPages) + 1;
@@ -24,7 +24,7 @@ namespace SanaraV3.Modules.Nsfw
         }
 
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
-        public async Task GetDoujinshi([Remainder]string tags) // Doujin search with tags given
+        public async Task GetDoujinshiAsync([Remainder]string tags) // Doujin search with tags given
         {
             NHentaiSharp.Search.SearchResult result;
             try
@@ -41,7 +41,7 @@ namespace SanaraV3.Modules.Nsfw
         }
 
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Priority(1), Alias("Doujin")]
-        public async Task GetDoujinshi(int id)
+        public async Task GetDoujinshiAsync(int id)
         {
             try
             {

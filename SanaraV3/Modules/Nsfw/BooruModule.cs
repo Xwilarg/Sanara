@@ -21,38 +21,38 @@ namespace SanaraV3.Modules.Nsfw
             => "NSFW";
 
         [Command("Safebooru", RunMode = RunMode.Async)]
-        public async Task Safebooru(params string[] tags)
+        public async Task SafebooruAsync(params string[] tags)
             => await SearchBooru(StaticObjects.Safebooru, tags, 0);
 
         [Command("E926", RunMode = RunMode.Async)]
-        public async Task E926(params string[] tags)
+        public async Task E926Async(params string[] tags)
             => await SearchBooru(StaticObjects.E926, tags, 1);
 
         [Command("Gelbooru", RunMode = RunMode.Async), RequireNsfw]
-        public async Task Gelbooru(params string[] tags)
+        public async Task GelbooruAsync(params string[] tags)
             => await SearchBooru(StaticObjects.Gelbooru, tags, 2);
 
         [Command("E621", RunMode = RunMode.Async), RequireNsfw]
-        public async Task E621(params string[] tags)
+        public async Task E621Async(params string[] tags)
             => await SearchBooru(StaticObjects.E621, tags, 3);
 
         [Command("Rule34", RunMode = RunMode.Async), RequireNsfw]
-        public async Task Rule34(params string[] tags)
+        public async Task Rule34Async(params string[] tags)
             => await SearchBooru(StaticObjects.Rule34, tags, 4);
 
         [Command("Konachan", RunMode = RunMode.Async), RequireNsfw]
-        public async Task Konachan(params string[] tags)
+        public async Task KonachanAsync(params string[] tags)
             => await SearchBooru(StaticObjects.Konachan, tags, 5);
 
         [Command("Booru", RunMode = RunMode.Async), Alias("Image")]
-        public async Task Image(params string[] tags)
+        public async Task ImageAsync(params string[] tags)
         {
             if (Utils.CanSendNsfw(Context.Channel)) await SearchBooru(StaticObjects.Gelbooru, tags, 2);
             else await SearchBooru(StaticObjects.Safebooru, tags, 0);
         }
 
         [Command("Tags", RunMode = RunMode.Async)]
-        public async Task Tags(int id)
+        public async Task TagsAsync(int id)
         {
             var info = await StaticObjects.Tags.GetTagAsync(id);
             if (!info.HasValue)

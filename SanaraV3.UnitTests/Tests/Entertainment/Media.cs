@@ -65,7 +65,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
-            await mod.Youtube(search);
+            await mod.YoutubeAsync(search);
             while (!isDone)
             { }
         }
@@ -83,7 +83,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
-            await mod.Xkcd();
+            await mod.XkcdAsync();
             while (!isDone)
             { }
         }
@@ -101,7 +101,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
-            await mod.XkcdLast();
+            await mod.XkcdLastAsync();
             while (!isDone)
             { }
         }
@@ -122,7 +122,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
-            await mod.Xkcd(1172);
+            await mod.XkcdAsync(1172);
             while (!isDone)
             { }
         }

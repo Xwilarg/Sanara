@@ -4,7 +4,6 @@ using SanaraV3.UnitTests.Impl;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,7 +36,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Modules.Nsfw.CosplayModule();
             Common.AddContext(mod, callback);
-            await mod.Cosplay(tags);
+            await mod.CosplayAsync(tags);
             while (!isDone)
             { }
         }
@@ -55,7 +54,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Modules.Nsfw.CosplayModule();
             Common.AddContext(mod, callback);
-            await mod.Cosplay();
+            await mod.CosplayAsync();
             while (!isDone)
             { }
         }

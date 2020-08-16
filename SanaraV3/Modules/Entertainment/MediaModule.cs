@@ -22,7 +22,7 @@ namespace SanaraV3.Modules.Entertainment
             => "Entertainment";
 
         [Command("Youtube", RunMode = RunMode.Async)]
-        public async Task Youtube([Remainder]string search)
+        public async Task YoutubeAsync([Remainder]string search)
         {
             await ReplyAsync(embed: GetEmbedFromVideo(await GetYoutubeVideoAsync(search), out _).Build());
         }
@@ -126,7 +126,7 @@ namespace SanaraV3.Modules.Entertainment
         }
 
         [Command("Xkcd")]
-        public async Task Xkcd(uint? nb = null)
+        public async Task XkcdAsync(uint? nb = null)
         {
             JToken json;
             int max;
@@ -154,7 +154,7 @@ namespace SanaraV3.Modules.Entertainment
         /// Get the last xkcd comic
         /// </summary>
         [Command("Xkcd last")]
-        public async Task XkcdLast()
+        public async Task XkcdLastAsync()
         {
             JToken json;
             json = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync("https://xkcd.com/info.0.json"));

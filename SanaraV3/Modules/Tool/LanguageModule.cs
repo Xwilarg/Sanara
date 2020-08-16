@@ -17,7 +17,7 @@ namespace SanaraV3.Modules.Tool
             => "Tool";
 
         [Command("Japanese", RunMode = RunMode.Async)]
-        public async Task Japanese([Remainder]string str)
+        public async Task JapaneseAsync([Remainder]string str)
         {
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", str))));
             var data = ((JArray)json["data"]).Select(x => x).ToArray();

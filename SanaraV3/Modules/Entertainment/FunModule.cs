@@ -15,7 +15,7 @@ namespace SanaraV3.Modules.Entertainment
             => "Entertainment";
 
         [Command("Inspire")]
-        public async Task Inspire()
+        public async Task InspireAsync()
         {
             await ReplyAsync(embed: new EmbedBuilder
             {
@@ -25,7 +25,7 @@ namespace SanaraV3.Modules.Entertainment
         }
 
         [Command("Complete", RunMode = RunMode.Async)]
-        public async Task Complete([Remainder]string sentence)
+        public async Task CompleteAsync([Remainder]string sentence)
         {
             IUserMessage msg = null;
             string content = sentence;

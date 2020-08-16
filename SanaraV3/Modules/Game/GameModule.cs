@@ -12,7 +12,7 @@ namespace SanaraV3.Modules.Game
             => "Game";
 
         [Command("Play")]
-        public async Task Play(string gameName)
+        public async Task PlayAsync(string gameName)
         {
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
@@ -30,7 +30,7 @@ namespace SanaraV3.Modules.Game
         }
 
         [Command("Cancel"), RequireRunningGame]
-        public async Task Cancel()
+        public async Task CancelAsync()
         {
             var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
             await game.CancelAsync();

@@ -20,36 +20,36 @@ namespace SanaraV3
     /// </summary>
     public static class StaticObjects
     {
-        public static HttpClient HttpClient = new HttpClient();
-        public static Random Random = new Random();
+        public static readonly HttpClient HttpClient = new HttpClient();
+        public static readonly Random Random = new Random();
 
         // NSFW MODULE
-        public static Safebooru Safebooru   = new Safebooru();
-        public static Gelbooru  Gelbooru    = new Gelbooru();
-        public static E621      E621        = new E621();
-        public static E926      E926        = new E926();
-        public static Rule34    Rule34      = new Rule34();
-        public static Konachan  Konachan    = new Konachan();
-        public static TagsManager Tags      = new TagsManager();
+        public static readonly Safebooru Safebooru   = new Safebooru();
+        public static readonly Gelbooru  Gelbooru    = new Gelbooru();
+        public static readonly E621      E621        = new E621();
+        public static readonly E926      E926        = new E926();
+        public static readonly Rule34    Rule34      = new Rule34();
+        public static readonly Konachan  Konachan    = new Konachan();
+        public static readonly TagsManager Tags      = new TagsManager();
 
         // RADIO MODULE
-        public static Dictionary<ulong, RadioChannel> Radios = new Dictionary<ulong, RadioChannel>();
+        public static readonly Dictionary<ulong, RadioChannel> Radios = new Dictionary<ulong, RadioChannel>();
 
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube = null;
 
         // GAME MODULE
-        public static List<AGame>   Games = new List<AGame>();
-        public static TextMode      ModeText = new TextMode();
-        public static UrlMode       ModeUrl = new UrlMode();
-        public static IPreload[]    Preloads;
+        public static readonly List<AGame>   Games = new List<AGame>();
+        public static readonly TextMode      ModeText = new TextMode();
+        public static readonly UrlMode ModeUrl = new UrlMode();
+        public static readonly IPreload[]    Preloads;
         private static readonly GameManager _gm = new GameManager();
 
         // LANGUAGE MODULE
-        public static Dictionary<string, string> RomajiToHiragana = new Dictionary<string, string>();
-        public static Dictionary<string, string> HiraganaToRomaji = new Dictionary<string, string>();
-        public static Dictionary<string, string> RomajiToKatakana = new Dictionary<string, string>();
-        public static Dictionary<string, string> KatakanaToRomaji = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> RomajiToHiragana = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> HiraganaToRomaji = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> RomajiToKatakana = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> KatakanaToRomaji = new Dictionary<string, string>();
 
         static StaticObjects()
         {

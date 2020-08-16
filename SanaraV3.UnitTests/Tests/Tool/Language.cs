@@ -29,7 +29,7 @@ namespace SanaraV3.UnitTests.Tests.Tool
 
             var mod = new Modules.Tool.LanguageModule();
             Common.AddContext(mod, callback);
-            await mod.Japanese(entry);
+            await mod.JapaneseAsync(entry);
             while (!isDone)
             { }
         }

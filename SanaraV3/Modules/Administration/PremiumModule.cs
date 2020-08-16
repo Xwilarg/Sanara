@@ -11,7 +11,7 @@ namespace SanaraV3.Modules.Administration
             => "Administration";
 
         [Command("Premium")]
-        public async Task Premium()
+        public async Task PremiumAsync()
         {
             await ReplyAsync(embed: new EmbedBuilder
             {

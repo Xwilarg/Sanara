@@ -26,7 +26,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 
             var mod = new Modules.Entertainment.FunModule();
             Common.AddContext(mod, callback);
-            await mod.Inspire();
+            await mod.InspireAsync();
             while (!isDone)
             { }
         }

@@ -14,7 +14,7 @@ namespace SanaraV3.Modules.Radio
             => "Radio";
 
         [Command("Skip radio", RunMode = RunMode.Async), Alias("Radio skip")]
-        public async Task Skip()
+        public async Task SkipAsync()
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
@@ -23,7 +23,7 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Playlist radio"), Alias("Radio playlist")]
-        public async Task Playlist()
+        public async Task PlaylistAsync()
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
@@ -32,7 +32,7 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Stop radio"), Alias("Radio stop")]
-        public async Task Stop()
+        public async Task StopAsync()
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
@@ -44,7 +44,7 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Remove radio", RunMode = RunMode.Async), Alias("Radio remove")]
-        public async Task Remove([Remainder]string search)
+        public async Task RemoveAsync([Remainder]string search)
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
@@ -56,7 +56,7 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Remove radio", RunMode = RunMode.Async), Alias("Radio remove"), Priority(1)]
-        public async Task Remove(int id)
+        public async Task RemoveAsync(int id)
         {
             if (!StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 await ReplyAsync("There is no radio running.");
@@ -68,14 +68,14 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Add radio", RunMode = RunMode.Async), Alias("Radio add")]
-        public async Task Add([Remainder]string search)
+        public async Task AddAsync([Remainder]string search)
         {
             var radio = StaticObjects.Radios.ContainsKey(Context.Guild.Id) ? StaticObjects.Radios[Context.Guild.Id] : null;
             if (radio != null && !radio.CanAddMusic())
                 throw new CommandFailed("You can't add more musics to the playlist.");
 
             if (radio == null)
-                radio = await StartAsync();
+                radio = await StartInternalAsync();
             var video = await Entertainment.MediaModule.GetYoutubeVideoAsync(search);
             string url = "https://youtu.be/" + video.Id;
             if (radio.HaveMusic(url))
@@ -93,12 +93,12 @@ namespace SanaraV3.Modules.Radio
         }
 
         [Command("Start radio"), Alias("Radio start", "Launch radio", "Radio launch")]
-        public async Task Start()
+        public async Task StartAsync()
         {
-            await StartAsync();
+            await StartInternalAsync();
         }
 
-        private async Task<RadioChannel> StartAsync()
+        private async Task<RadioChannel> StartInternalAsync()
         {
             if (StaticObjects.Radios.ContainsKey(Context.Guild.Id))
                 throw new CommandFailed("You radio is already on.");
