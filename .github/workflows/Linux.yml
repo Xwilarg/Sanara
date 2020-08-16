@@ -35,7 +35,12 @@ jobs:
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage" --settings coverlet.runsettings
     - name: Copy coverage
       run: sh copy_coverage.sh
-    - name: Upload coverage
+    - name: Upload coverage to Codecov
       run: codecov -f "coverage.xml"
+    - name: Upload coverage to Codacy
+      uses: codacy/codacy-coverage-reporter-action@master
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: coverage.xml
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
