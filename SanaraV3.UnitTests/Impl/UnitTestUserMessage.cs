@@ -66,11 +66,11 @@ namespace SanaraV3.UnitTests.Impl
 
         public DateTimeOffset CreatedAt => DateTimeOffset.MinValue;
 
-        public ulong Id => 0;
+        public ulong Id => ulong.Parse(DateTime.Now.ToString("mmssff"));
 
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task DeleteAsync(RequestOptions options = null)
@@ -85,7 +85,7 @@ namespace SanaraV3.UnitTests.Impl
 
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null)

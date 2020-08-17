@@ -3,6 +3,7 @@ using DiscordUtils;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
+using SanaraV3.Exceptions;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.IO;
@@ -15,6 +16,125 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
 {
     public sealed class Media
     {
+        private async Task CheckRedditAsync(Embed embed, bool isImage)
+        {
+            if (isImage)
+            {
+                Assert.NotNull(embed.Image);
+                Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
+            }
+            Assert.NotNull(embed.Footer);
+            Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
+            Assert.NotNull(embed.Footer);
+        }
+
+        [Fact]
+        public async Task RedditRandomInvalid()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            { });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditRandomAsync("awawawawawawawawa"));
+        }
+
+        [Fact]
+        public async Task RedditTopInvalid()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            { });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditTopAsync("awawawawawawawawa"));
+        }
+
+        [Fact]
+        public async Task RedditRandomNotHandled()
+        {
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            { });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditRandomAsync("KanMusuNights"));
+        }
+
+        [Fact]
+        public async Task RedditRandom()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            {
+                Assert.Single(msg.Embeds);
+                await CheckRedditAsync((Embed)msg.Embeds.ElementAt(0), true);
+                isDone = true;
+            });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await mod.RedditRandomAsync("arknuts");
+            while (!isDone)
+            { }
+        }
+
+        [Fact]
+        public async Task RedditHot()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            {
+                Assert.Single(msg.Embeds);
+                await CheckRedditAsync((Embed)msg.Embeds.ElementAt(0), false);
+                isDone = true;
+            });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await mod.RedditHotAsync("touhou");
+            while (!isDone)
+            { }
+        }
+
+        [Fact]
+        public async Task RedditNew()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            {
+                Assert.Single(msg.Embeds);
+                await CheckRedditAsync((Embed)msg.Embeds.ElementAt(0), false);
+                isDone = true;
+            });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await mod.RedditNewAsync("arknights");
+            while (!isDone)
+            { }
+        }
+
+        [Fact]
+        public async Task RedditTop()
+        {
+            bool isDone = false;
+            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
+            {
+                Assert.Single(msg.Embeds);
+                await CheckRedditAsync((Embed)msg.Embeds.ElementAt(0), false);
+                isDone = true;
+            });
+
+            var mod = new Modules.Entertainment.MediaModule();
+            Common.AddContext(mod, callback);
+            await mod.RedditHotAsync("wholesomeyuri");
+            while (!isDone)
+            { }
+        }
+
         private async Task CheckYoutubeAsync(Embed embed, string expectedTitle, string expectedDescription, int expectedViews, int expectedLikes, int expectedDislikes)
         {
             Assert.NotNull(embed.Image);
