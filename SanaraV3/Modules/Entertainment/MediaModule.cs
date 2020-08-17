@@ -6,6 +6,8 @@ using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,6 +21,47 @@ namespace SanaraV3.Modules.Entertainment
     public sealed class MediaModule : ModuleBase, IModule
     {
         public string ModuleName { get { return "Entertainment"; } }
+
+        [Command("Reddit hot", RunMode = RunMode.Async), Alias("Reddit"), Priority(-1)]
+        public async Task RedditHotAsync([Remainder]string name)
+        {
+            await GetRedditEmbedAsync(name, "hot");
+        }
+
+        [Command("Reddit top", RunMode = RunMode.Async)]
+        public async Task RedditTopAsync([Remainder]string name)
+        {
+            await GetRedditEmbedAsync(name, "hot");
+        }
+
+        [Command("Reddit new", RunMode = RunMode.Async)]
+        public async Task RedditNewAsync([Remainder]string name)
+        {
+            await GetRedditEmbedAsync(name, "new");
+        }
+
+        private async Task GetRedditEmbedAsync(string name, string filter)
+        {
+            name = name.ToLower();
+            JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/{filter}"))["data"]["children"].Value<JArray>();
+            var isSafe = !(Context.Channel is ITextChannel) || !((ITextChannel)Context.Channel).IsNsfw;
+            List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
+            foreach (var e in arr)
+            {
+                var elem = e["data"];
+                var elemNsfw = elem["over_18"].Value<bool>();
+                if (!isSafe && elemNsfw) // Result is NSFW and we aren't in a safe channel
+                    continue;
+                elems.Add(new Diaporama.Reddit(elem["title"].Value<string>(), new Uri(elem["thumbnail"].Value<string>()), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
+                    elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>()));
+            }
+            if (elems.Count == 0)
+                throw new CommandFailed("There is no post available in this subreddit");
+            var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0]));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
+            StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+
+        }
 
         [Command("Youtube", RunMode = RunMode.Async)]
         public async Task YoutubeAsync([Remainder]string search)

@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
 using Newtonsoft.Json;
+using SanaraV3.Diaporama;
 using SanaraV3.Exceptions;
 using System;
 using System.Diagnostics;
@@ -78,6 +79,7 @@ namespace SanaraV3
             // Discord callbacks
             _client.MessageReceived += HandleCommandAsync;
             _client.Connected += Connected;
+            _client.ReactionAdded += ReactionManager.ReactionAdded;
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
@@ -131,6 +133,7 @@ namespace SanaraV3
         private async Task Connected()
         {
             _didStart = true;
+            StaticObjects.ClientId = _client.CurrentUser.Id;
             await _client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
         }
 

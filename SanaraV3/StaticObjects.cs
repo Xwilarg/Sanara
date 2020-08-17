@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
+using SanaraV3.Diaporama;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -22,6 +23,8 @@ namespace SanaraV3
     {
         public static readonly HttpClient HttpClient = new HttpClient();
         public static readonly Random Random = new Random();
+
+        public static ulong ClientId;
 
         // NSFW MODULE
         public static readonly Safebooru Safebooru   = new Safebooru();
@@ -50,6 +53,9 @@ namespace SanaraV3
         public static readonly Dictionary<string, string> HiraganaToRomaji = new Dictionary<string, string>();
         public static readonly Dictionary<string, string> RomajiToKatakana = new Dictionary<string, string>();
         public static readonly Dictionary<string, string> KatakanaToRomaji = new Dictionary<string, string>();
+
+        // DIAPORAMA
+        public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();
 
         static StaticObjects()
         {
