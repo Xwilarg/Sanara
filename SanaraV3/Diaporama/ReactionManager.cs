@@ -41,7 +41,7 @@ namespace SanaraV3.Diaporama
                 {
                     var next = elem.Elements[nextPage];
                     if (next is Reddit)
-                        await dMsg.ModifyAsync(x => x.Embed = Post((Reddit)next));
+                        await dMsg.ModifyAsync(x => x.Embed = Post((Reddit)next, nextPage + 1, elem.Elements.Length));
                     else
                         throw new ArgumentException("Unknown type for next");
                     StaticObjects.Diaporamas[msg.Id].CurrentPage = nextPage;
@@ -52,7 +52,7 @@ namespace SanaraV3.Diaporama
             }
         }
 
-        public static Embed Post(Reddit reddit)
+        public static Embed Post(Reddit reddit, int currPage, int maxPage)
         {
             return new EmbedBuilder
             {
@@ -63,7 +63,7 @@ namespace SanaraV3.Diaporama
                 Description = reddit.Content,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = reddit.Flairs + "\nScore: " + reddit.Ups
+                    Text = reddit.Flairs + $"\nScore: {reddit.Ups}" + (maxPage == 1 ? "" : $"\nPage {currPage} out of {maxPage}")
                 }
             }.Build();
         }

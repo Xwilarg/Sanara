@@ -46,11 +46,14 @@ namespace SanaraV3.Modules.Entertainment
         public async Task RedditRandomAsync([Remainder]string name)
         {
             name = name.ToLower();
-            JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random")).Value<JArray>();
-            if (arr.Count == 0)
+            var arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random"));
+            if (!(arr is JArray))
                 throw new CommandFailed("There is no post available in this subreddit");
             JToken token = arr[0]["data"]["children"][0]["data"];
-            await ReplyAsync(embed: Diaporama.ReactionManager.Post(GetRedditEmbed(token))); // TODO: Check for NSFW
+            var post = GetRedditEmbed(token);
+            if (post == null) // If the post returned is null that means we weren't able to send it because the chan is not NSFW
+                throw new CommandFailed("There is no safe post available in this subreddit");
+            await ReplyAsync(embed: Diaporama.ReactionManager.Post(post, 1, 1));
         }
 
         private async Task GetRedditEmbedAsync(string name, string filter)
@@ -65,15 +68,19 @@ namespace SanaraV3.Modules.Entertainment
                     elems.Add(data);
             }
             if (elems.Count == 0)
-                throw new CommandFailed("There is no post available in this subreddit");
-            var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0]));
+            {
+                if (arr.Count == 0)
+                    throw new CommandFailed("There is no post available in this subreddit");
+                throw new CommandFailed("There is no safe post available in this subreddit");
+            }
+            var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
             await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
         }
 
         private Diaporama.Reddit GetRedditEmbed(JToken elem)
         {
-            var isSafe = !(Context.Channel is ITextChannel) || !((ITextChannel)Context.Channel).IsNsfw;
+            var isSafe = !Utils.CanSendNsfw(Context.Channel);
             var elemNsfw = elem["over_18"].Value<bool>();
             if (isSafe && elemNsfw) // Result is NSFW and we aren't in a safe channel
                 return null;
