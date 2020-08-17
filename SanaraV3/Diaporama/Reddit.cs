@@ -15,12 +15,12 @@ namespace SanaraV3.Diaporama
             Content = content;
         }
 
-        public string Title;
-        public Uri Image;
-        public Uri Link;
-        public int Ups;
-        public string Flairs;
-        public bool IsNsfw;
-        public string Content;
+        public string Title { get; }
+        public Uri Image { get; }
+        public Uri Link { get; }
+        public int Ups { get; }
+        public string Flairs { get; }
+        public bool IsNsfw { get; }
+        public string Content { get; }
     }
 }

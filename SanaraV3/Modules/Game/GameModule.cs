@@ -17,7 +17,7 @@ namespace SanaraV3.Modules.Game
                 await ReplyAsync("A game is already running in this channel.");
             else
             {
-                var game = LoadGame(gameName.ToLower(), Context.Channel);
+                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel);
                 if (game == null)
                     await ReplyAsync("There is no game with this name.");
                 else

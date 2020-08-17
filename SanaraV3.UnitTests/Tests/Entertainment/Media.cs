@@ -31,9 +31,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         [Fact]
         public async Task RedditRandomInvalid()
         {
-            bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            { });
+            var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
@@ -43,9 +41,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         [Fact]
         public async Task RedditTopInvalid()
         {
-            bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            { });
+            var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
@@ -55,8 +51,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         [Fact]
         public async Task RedditRandomNotHandled()
         {
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            { });
+            var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
             var mod = new Modules.Entertainment.MediaModule();
             Common.AddContext(mod, callback);

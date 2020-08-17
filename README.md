@@ -11,18 +11,18 @@
 
 Sanara is a multipurpose bot that is now in more than 500 servers (08/2020).<br/>
 Here are some of her features:
-- Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), try to do a better scores than others servers
-- Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
-- Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
-- Achievements, generate your profile and go hunt them
-- Subscription, stay aware of the new anime airing
+-  Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), try to do a better scores than others servers
+-  Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
+-  Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
+-  Achievements, generate your profile and go hunt them
+-  Subscription, stay aware of the new anime airing
  
 There are also a multitude of others commands and if the one you're looking for isn't here, just suggest it
 
 ## Commands
 You can see the full list on [Sanara's command page](https://sanara.zirk.eu/commands.html)<br/>
 Or by doing the help command
-```
+```allowEmpty
 @Sanara#1537 help
 ```
 

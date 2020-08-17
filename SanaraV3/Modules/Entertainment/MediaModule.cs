@@ -8,9 +8,7 @@ using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -45,7 +43,7 @@ namespace SanaraV3.Modules.Entertainment
         [Command("Reddit random", RunMode = RunMode.Async), Alias("Reddit"), Priority(-1)]
         public async Task RedditRandomAsync([Remainder]string name)
         {
-            name = name.ToLower();
+            name = name.ToLowerInvariant();
             var arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random"));
             if (!(arr is JArray))
             {
@@ -115,11 +113,12 @@ namespace SanaraV3.Modules.Entertainment
                 ImageUrl = video.Snippet.Thumbnails.High.Url,
                 Title = video.Snippet.Title,
                 Url = "https://youtu.be/" + video.Id,
-                Description = description.Length > 10 ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(10)) + "\n[...]") : video.Snippet.Description,
+                Description = description.Length > Constants.YOUTUBE_DESC_MAX_SIZE ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(10)) + "\n[...]") : video.Snippet.Description,
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Duration: {duration}\nViews: {finalViews}\nLikes: {finalLikes}\nDislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value:0.0}"
+                    Text = $"Duration: {duration}\nViews: {finalViews}\nLikes: {finalLikes}\n" +
+                    $"Dislikes: {finalDislikes}\nRatio: {((float)video.Statistics.LikeCount / video.Statistics.DislikeCount).Value:0.0}"
                 }
             };
         }

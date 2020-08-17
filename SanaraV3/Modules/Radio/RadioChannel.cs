@@ -239,13 +239,13 @@ namespace SanaraV3.Modules.Radio
             DownloadDone(url);
         }
 
-        private IVoiceChannel _voiceChan; // Voice channel where the bot is streaming music
-        private IMessageChannel _textChan; // Text channel where the bot was asked to join, and where she will send the next music to be played
-        private List<Music> _playlist; // Next musics to be played
-        private ulong _guildId; // ID of this guild, used to remove the radio from the dictionary
+        private readonly IVoiceChannel _voiceChan; // Voice channel where the bot is streaming music
+        private readonly IMessageChannel _textChan; // Text channel where the bot was asked to join, and where she will send the next music to be played
+        private readonly List<Music> _playlist; // Next musics to be played
+        private readonly ulong _guildId; // ID of this guild, used to remove the radio from the dictionary
         private Process _process; // Process of FFMPEG playing the song
-        private IAudioClient _audioClient; // Client streaming the song to Discord
-        private List<string> _recentlyPlayed; // IDs of recently played musics so we don't autosuggest things that were played not so long ago
+        private readonly IAudioClient _audioClient; // Client streaming the song to Discord
+        private readonly List<string> _recentlyPlayed; // IDs of recently played musics so we don't autosuggest things that were played not so long ago
 
         private const int MUSIC_COUNT_LIMIT = 11; // Maximum number of musics that can be in a playlist
         private const int MUSIC_COUNT_KEEP_ID = 10; // Maximum of we IDs we keep in _recentlyPlayed

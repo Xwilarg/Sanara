@@ -53,7 +53,7 @@ namespace SanaraV3
             // If the bot takes way too much time to start, we stop the program
             _ = Task.Run(async () =>
             {
-                await Task.Delay(300000);
+                await Task.Delay(Constants.PROGRAM_TIMEOUT);
                 if (!_didStart)
                     Environment.Exit(1);
             });
@@ -149,7 +149,7 @@ namespace SanaraV3
                 else // Unexpected exception
                 {
                     await Utils.Log(msg);
-                    await ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
+                    await ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Color = Color.Red,
                         Title = msg.Exception.InnerException.GetType().ToString(),

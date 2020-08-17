@@ -14,7 +14,11 @@ namespace SanaraV3.Modules.Nsfw
         public string ModuleName { get { return "Nsfw"; } }
 
         [Command("Cosplay", RunMode = RunMode.Async)]
-        public async Task CosplayAsync([Remainder]string tags = "")
+        public async Task CosplayAsync()
+            => await CosplayAsync("");
+
+        [Command("Cosplay", RunMode = RunMode.Async)]
+        public async Task CosplayAsync([Remainder]string tags)
         {
             // 959 means we only take cosplays
             string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags);

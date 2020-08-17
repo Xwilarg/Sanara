@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Diaporama
@@ -10,33 +11,17 @@ namespace SanaraV3.Diaporama
     /// </summary>
     public static class ReactionManager
     {
+
+
         public static async Task ReactionAdded(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
-            if (react.User.Value.Id != StaticObjects.ClientId && (emote == "◀️" || emote == "▶️" || emote == "⏪" || emote == "⏩") && StaticObjects.Diaporamas.ContainsKey(msg.Id))
+            if (react.User.Value.Id != StaticObjects.ClientId && Constants.DIAPORAMA_EMOTES.Contains(emote) && StaticObjects.Diaporamas.ContainsKey(msg.Id))
             {
                 var dMsg = await msg.GetOrDownloadAsync();
                 var elem = StaticObjects.Diaporamas[msg.Id];
-                int nextPage = elem.CurrentPage;
-                if (emote == "◀️")
-                {
-                    if (nextPage != 0)
-                        nextPage--;
-                }
-                else if (emote == "▶️")
-                {
-                    if (nextPage != elem.Elements.Length - 1)
-                        nextPage++;
-                }
-                else if (emote == "⏪")
-                {
-                    nextPage = 0;
-                }
-                else if (emote == "⏩")
-                {
-                    nextPage = elem.Elements.Length - 1;
-                }
+                int nextPage = GetNextPage(elem.CurrentPage, elem.Elements.Length - 1, emote);
                 if (nextPage != elem.CurrentPage) // No need to modify anything if we didn't change the page
                 {
                     var next = elem.Elements[nextPage];
@@ -46,10 +31,32 @@ namespace SanaraV3.Diaporama
                         throw new ArgumentException("Unknown type for next");
                     StaticObjects.Diaporamas[msg.Id].CurrentPage = nextPage;
                 }
-                var author = dMsg.Author as IGuildUser;
-                if (author == null || author.GuildPermissions.ManageMessages) // If we have the perms to delete the emote we do so
+                if (!(dMsg.Author is IGuildUser author) || author.GuildPermissions.ManageMessages) // If we have the perms to delete the emote we do so
                     await dMsg.RemoveReactionAsync(react.Emote, react.User.Value); // TODO: Check for channel perms
             }
+        }
+
+        private static int GetNextPage(int current, int max, string emote)
+        {
+            if (emote == "◀️")
+            {
+                if (current != 0)
+                    return current - 1;
+            }
+            else if (emote == "▶️")
+            {
+                if (current != max)
+                    return current + 1;
+            }
+            else if (emote == "⏪")
+            {
+                return 0;
+            }
+            else if (emote == "⏩")
+            {
+                return max;
+            }
+            return current;
         }
 
         public static Embed Post(Reddit reddit, int currPage, int maxPage)
