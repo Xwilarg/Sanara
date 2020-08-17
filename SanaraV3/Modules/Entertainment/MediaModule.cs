@@ -89,6 +89,8 @@ namespace SanaraV3.Modules.Entertainment
             string preview = elem["url"].Value<string>();
             if (!Utils.IsImage(preview.Split('.').Last()))
                 preview = elem["thumbnail"].Value<string>();
+            if (preview == "spoiler") // We don't want to display spoilers
+                return null;
             return new Diaporama.Reddit(elem["title"].Value<string>(), preview == "self" ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
                 elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
