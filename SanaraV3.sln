@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanaraV3", "SanaraV3\SanaraV3.csproj", "{2A4551D4-02D0-4705-80CC-DE4F7329C7F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanaraV3.UnitTests", "SanaraV3.UnitTests\SanaraV3.UnitTests.csproj", "{41D9EAFA-2BDC-44E5-B80D-6B3A898B1D48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanaraV3.UnitTests", "SanaraV3.UnitTests\SanaraV3.UnitTests.csproj", "{41D9EAFA-2BDC-44E5-B80D-6B3A898B1D48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
