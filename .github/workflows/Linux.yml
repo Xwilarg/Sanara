@@ -23,8 +23,6 @@ jobs:
       uses: github/codeql-action/init@v1
     - name: Init submodules
       run: git submodule init && git submodule update
-    - name: Install Codecov
-      run: dotnet tool install --global Codecov.Tool
     - name: Install dependencies
       run: dotnet restore
     - name: Build
