@@ -13,7 +13,7 @@ namespace SanaraV3.Diaporama
     {
 
 
-        public static async Task ReactionAdded(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
@@ -56,6 +56,8 @@ namespace SanaraV3.Diaporama
             {
                 return max;
             }
+            else
+                throw new ArgumentException("Invalid value for emote: " + emote);
             return current;
         }
 

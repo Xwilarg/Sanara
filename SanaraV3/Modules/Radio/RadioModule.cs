@@ -74,8 +74,7 @@ namespace SanaraV3.Modules.Radio
             if (radio != null && !radio.CanAddMusic())
                 throw new CommandFailed("You can't add more musics to the playlist.");
 
-            if (radio == null)
-                radio = await StartInternalAsync();
+            radio ??= await StartInternalAsync();
             var video = await Entertainment.MediaModule.GetYoutubeVideoAsync(search);
             var url = new Uri("https://youtu.be/" + video.Id);
             if (radio.HaveMusic(url))
@@ -89,7 +88,7 @@ namespace SanaraV3.Modules.Radio
                 radio.RemoveLastMusic();
             }
             radio.DownloadMusic(Context.Guild.Id, video, Context.User.ToString(), false);
-            await radio.Play();
+            await radio.PlayAsync();
         }
 
         [Command("Start radio"), Alias("Radio start", "Launch radio", "Radio launch")]

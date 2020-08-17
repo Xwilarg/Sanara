@@ -11,7 +11,7 @@ namespace SanaraV3.Modules.Nsfw
         /// <summary>
         /// Associate an id with a booru and a post
         /// </summary>
-        private Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>>();
+        private readonly Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>>();
 
         public void AddTag(int id, ABooru booru, BooruSharp.Search.Post.SearchResult post)
         {

@@ -129,9 +129,9 @@ namespace SanaraV3.Modules.Game.Impl
         protected override int GetGameTime()
             => 15;
 
-        private List<ShiritoriPreloadResult> _words;
+        private readonly List<ShiritoriPreloadResult> _words;
         private bool _isFirst; // Is the first word (because we must start by saying "shiritori")
-        private List<string> _alreadySaid; // A word can't be said twice
+        private readonly List<string> _alreadySaid; // A word can't be said twice
         private string _currWord; // The last word that was said
     }
 }

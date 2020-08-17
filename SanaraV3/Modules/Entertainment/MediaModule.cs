@@ -60,7 +60,7 @@ namespace SanaraV3.Modules.Entertainment
 
         private async Task GetRedditEmbedAsync(string name, string filter)
         {
-            name = name.ToLower();
+            name = name.ToLowerInvariant();
             JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/{filter}"))["data"]["children"].Value<JArray>();
             List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
             foreach (var e in arr)
@@ -113,7 +113,7 @@ namespace SanaraV3.Modules.Entertainment
                 ImageUrl = video.Snippet.Thumbnails.High.Url,
                 Title = video.Snippet.Title,
                 Url = "https://youtu.be/" + video.Id,
-                Description = description.Length > Constants.YOUTUBE_DESC_MAX_SIZE ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(10)) + "\n[...]") : video.Snippet.Description,
+                Description = description.Length > Constants.YOUTUBE_DESC_MAX_SIZE ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(Constants.YOUTUBE_DESC_MAX_SIZE)) + "\n[...]") : video.Snippet.Description,
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
@@ -174,7 +174,7 @@ namespace SanaraV3.Modules.Entertainment
                 ulong likes = ulong.MinValue;
                 // Sometimes the first result isn't the one we want, so compare the differents results and take the one with the best like/dislike ratio
                 bool isExactSearch = false;
-                var lowerSearch = search.ToLower();
+                var lowerSearch = search.ToLowerInvariant();
                 foreach (Video res in videoResponse)
                 {
                     ulong likeCount = ulong.MinValue;
@@ -185,7 +185,7 @@ namespace SanaraV3.Modules.Entertainment
                     if (likeCount > likes || result == null)
                     {
                         // We get the best ratio if possible, but if the title match then it's more important
-                        var lowerTitle = res.Snippet.Title.ToLower();
+                        var lowerTitle = res.Snippet.Title.ToLowerInvariant();
                         if (isExactSearch && !lowerTitle.Contains(lowerSearch))
                             continue;
                         likes = likeCount;
@@ -207,8 +207,7 @@ namespace SanaraV3.Modules.Entertainment
             max = json["num"].Value<int>();
             if (nb.HasValue && nb > max)
                 throw new CommandFailed($"The latest comic available is the number {nb}.");
-            if (nb == null)
-                nb = (uint)StaticObjects.Random.Next(max) + 1;
+            nb ??= (uint)StaticObjects.Random.Next(max) + 1;
             json = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync("https://xkcd.com/" + nb.Value + "/info.0.json"));
             await ReplyAsync(embed: new EmbedBuilder
             {

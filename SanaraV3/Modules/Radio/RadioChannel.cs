@@ -18,7 +18,7 @@ namespace SanaraV3.Modules.Radio
         {
             _voiceChan = voiceChan;
             _textChan = textChan;
-            _playlist = new List<Music>();
+            Playlist = new List<Music>();
             _guildId = voiceChan.GuildId;
             _process = null;
             _audioClient = audioClient;
@@ -36,7 +36,7 @@ namespace SanaraV3.Modules.Radio
         /// </summary>
         private void DownloadDone(Uri url)
         {
-            var music = _playlist.Find(x => x.Url == url);
+            var music = Playlist.Find(x => x.Url == url);
             if (music != null)
                 music.Downloading = false;
         }
@@ -45,24 +45,24 @@ namespace SanaraV3.Modules.Radio
         /// Check if a song is already in the playlist
         /// </summary>
         public bool HaveMusic(Uri url)
-            => _playlist.Any(x => x.Url == url);
+            => Playlist.Any(x => x.Url == url);
 
         /// <summary>
         /// Add a music to the playlist
         /// </summary>
         private void AddMusic(Music m)
-            => _playlist.Add(m);
+            => Playlist.Add(m);
 
         /// <summary>
         /// Remove a music from the playlist
         /// </summary>
         public string RemoveMusic(string title)
         {
-            var music = _playlist.Find(x => x.Title == title);
+            var music = Playlist.Find(x => x.Title == title);
             if (music == null)
                 throw new CommandFailed("There is no music with this name in the playlist.");
 
-            int index = _playlist.IndexOf(music);
+            int index = Playlist.IndexOf(music);
             return RemoveMusicWithId(index);
         }
 
@@ -74,13 +74,13 @@ namespace SanaraV3.Modules.Radio
         /// <returns></returns>
         public string RemoveMusicWithId(int index)
         {
-            if (index < 0 || index >= _playlist.Count)
+            if (index < 0 || index >= Playlist.Count)
                 throw new CommandFailed("There is no music on the given index.");
             if (index == 0) // The music is the one currently being played
                 return Skip();
-            var music = _playlist[index];
-            _playlist.RemoveAt(index);
-            if (_playlist.Count == 1 && !music.IsAutoSuggestion)
+            var music = Playlist[index];
+            Playlist.RemoveAt(index);
+            if (Playlist.Count == 1 && !music.IsAutoSuggestion)
                 _ = Task.Run(AddAutosuggestionAsync);
             return music.Title;
         }
@@ -90,7 +90,7 @@ namespace SanaraV3.Modules.Radio
         /// </summary>
         public void RemoveLastMusic()
         {
-            _playlist.RemoveAt(_playlist.Count - 1);
+            Playlist.RemoveAt(Playlist.Count - 1);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SanaraV3.Modules.Radio
             if (_process == null)
                 throw new CommandFailed("There is no music currently playing");
             _process.Kill();
-            return _playlist[0].Title;
+            return Playlist[0].Title;
         }
 
         /// <summary>
@@ -110,8 +110,8 @@ namespace SanaraV3.Modules.Radio
         /// <returns></returns>
         public async Task StopAsync()
         {
-            for (int i = 1; i < _playlist.Count; i++) // We skip the first one because it'll be handled by the radio
-                File.Delete(_playlist[i].Path);
+            for (int i = 1; i < Playlist.Count; i++) // We skip the first one because it'll be handled by the radio
+                File.Delete(Playlist[i].Path);
             if (_process != null && !_process.HasExited)
                 _process.Kill();
             await _audioClient.StopAsync();
@@ -124,9 +124,9 @@ namespace SanaraV3.Modules.Radio
         {
             if (_process == null || _process.HasExited)
                 return "There is no song currently being played.";
-            string finalStr = $"🎵 Current: {_playlist[0].Title} ({_playlist[0].Duration}) requested by {_playlist[0].Requester}\n";
-            for (int i = 1; i < _playlist.Count; i++)
-                finalStr += i + $". {_playlist[i].Title} ({ _playlist[0].Duration}) " + (_playlist[i].Downloading ? "(Download...)" : "") + $" requested by {_playlist[i].Requester}\n";
+            string finalStr = $"🎵 Current: {Playlist[0].Title} ({Playlist[0].Duration}) requested by {Playlist[0].Requester}\n";
+            for (int i = 1; i < Playlist.Count; i++)
+                finalStr += i + $". {Playlist[i].Title} ({ Playlist[0].Duration}) " + (Playlist[i].Downloading ? "(Download...)" : "") + $" requested by {Playlist[i].Requester}\n";
             return finalStr;
         }
 
@@ -135,12 +135,12 @@ namespace SanaraV3.Modules.Radio
         /// </summary>
         /// <returns></returns>
         public bool CanAddMusic()
-            => _playlist.Count < MUSIC_COUNT_LIMIT;
+            => Playlist.Count < MUSIC_COUNT_LIMIT;
 
         private async Task AddAutosuggestionAsync()
         {
             var r = StaticObjects.YouTube.Search.List("snippet");
-            r.RelatedToVideoId = _playlist.Last().Id;
+            r.RelatedToVideoId = Playlist.Last().Id;
             r.Type = "video";
             r.MaxResults = 10;
             string id = null;
@@ -164,21 +164,21 @@ namespace SanaraV3.Modules.Radio
         /// <summary>
         /// Play a music
         /// </summary>
-        public async Task Play()
+        public async Task PlayAsync()
         {
             // If the playlist is empty, the current song is not finished yet or the song that need to be played is still downloading
-            if (_playlist.Count == 0 || (_process != null && !_process.HasExited) || _playlist[0].Downloading)
+            if (Playlist.Count == 0 || (_process != null && !_process.HasExited) || Playlist[0].Downloading)
                 return;
-            if (_playlist.Count == 1) // There is only one music remaining in the playlist so we add a custom suggestion based on the last one
+            if (Playlist.Count == 1) // There is only one music remaining in the playlist so we add a custom suggestion based on the last one
                 _ = Task.Run(AddAutosuggestionAsync);
-            await _textChan.SendMessageAsync(embed: _playlist[0].Embed);
+            await _textChan.SendMessageAsync(embed: Playlist[0].Embed);
             if (!File.Exists("ffmpeg.exe"))
                 throw new FileNotFoundException("ffmpeg.exe was not found near the bot executable.");
             _process = Process.Start(new ProcessStartInfo
             {
                 FileName = "ffmpeg.exe",
                 // -af volume=0.2 reduce the volume of the song since by default it's really loud
-                Arguments = $"-hide_banner -loglevel panic -i \"{_playlist[0].Path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
+                Arguments = $"-hide_banner -loglevel panic -i \"{Playlist[0].Path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
             });
@@ -194,26 +194,26 @@ namespace SanaraV3.Modules.Radio
                     // If force the GC to do his job so we can safely delete the music file
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
-                    File.Delete(_playlist[0].Path);
+                    File.Delete(Playlist[0].Path);
                 }
                 await discord.FlushAsync();
             }
-            File.Delete(_playlist[0].Path);
-            _playlist.RemoveAt(0);
-            if (_playlist.Count == 0)
+            File.Delete(Playlist[0].Path);
+            Playlist.RemoveAt(0);
+            if (Playlist.Count == 0)
             {
                 await StopAsync();
                 StaticObjects.Radios.Remove(_guildId);
             }
             else
-                await Play(); // If there are others songs in the playlist, we play the next one
+                await PlayAsync(); // If there are others songs in the playlist, we play the next one
         }
 
         /// <summary>
         /// Is the last video of the playlist a suggestion made by the bot
         /// </summary>
         public bool IsLastMusicSuggestion()
-            => _playlist.Count == 0 ? false : _playlist.Last().IsAutoSuggestion;
+            => Playlist.Count != 0 && Playlist.Last().IsAutoSuggestion;
 
         public void DownloadMusic(ulong guildId, Video video, string requester, bool isAutoSuggestion)
         {
@@ -241,7 +241,7 @@ namespace SanaraV3.Modules.Radio
 
         private readonly IVoiceChannel _voiceChan; // Voice channel where the bot is streaming music
         private readonly IMessageChannel _textChan; // Text channel where the bot was asked to join, and where she will send the next music to be played
-        private readonly List<Music> _playlist; // Next musics to be played
+        public List<Music> Playlist { private set; get; } // Next musics to be played
         private readonly ulong _guildId; // ID of this guild, used to remove the radio from the dictionary
         private Process _process; // Process of FFMPEG playing the song
         private readonly IAudioClient _audioClient; // Client streaming the song to Discord

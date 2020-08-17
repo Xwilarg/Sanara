@@ -38,14 +38,14 @@ namespace SanaraV3
         public static Dictionary<ulong, RadioChannel> Radios { get; } = new Dictionary<ulong, RadioChannel>();
 
         // ENTERTAINMENT MODULE
-        public static YouTubeService YouTube { set;  get; } = null;
+        public static YouTubeService YouTube { set;  get; }
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();
         public static TextMode ModeText { get; } = new TextMode();
         public static UrlMode ModeUrl { get; } = new UrlMode();
         public static IPreload[] Preloads { get; }
-        private static GameManager _gm { get; } = new GameManager();
+        private static GameManager GM { get; } = new GameManager();
 
         // LANGUAGE MODULE
         public static Dictionary<string, string> RomajiToHiragana { get; } = new Dictionary<string, string>();

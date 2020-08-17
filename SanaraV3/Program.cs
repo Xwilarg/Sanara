@@ -7,9 +7,7 @@ using SanaraV3.Diaporama;
 using SanaraV3.Exceptions;
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SanaraV3
@@ -23,8 +21,6 @@ namespace SanaraV3
         private readonly CommandService _commands = new CommandService();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
-
-        private Credentials _credentials;
 
         public static async Task Main()
         {
@@ -47,7 +43,7 @@ namespace SanaraV3
         {
             // Setting Logs callback
             _client.Log += Utils.Log;
-            _commands.Log += LogError;
+            _commands.Log += LogErrorAsync;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
             // If the bot takes way too much time to start, we stop the program
@@ -61,7 +57,7 @@ namespace SanaraV3
             // Load credentials
             if (!File.Exists("Keys/Credentials.json"))
                 throw new FileNotFoundException("Missing Credentials file");
-            _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
+            var _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
 
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
@@ -70,16 +66,10 @@ namespace SanaraV3
             // Initialize services
             StaticObjects.Initialize(_credentials);
 
-            // Initialize culture
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
-            CultureInfo culture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
-            culture.NumberFormat.NumberDecimalSeparator = ".";
-            Thread.CurrentThread.CurrentCulture = culture;
-
             // Discord callbacks
             _client.MessageReceived += HandleCommandAsync;
-            _client.Connected += Connected;
-            _client.ReactionAdded += ReactionManager.ReactionAdded;
+            _client.Connected += ConnectedAsync;
+            _client.ReactionAdded += ReactionManager.ReactionAddedAsync;
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
@@ -130,14 +120,14 @@ namespace SanaraV3
             }
         }
 
-        private async Task Connected()
+        private async Task ConnectedAsync()
         {
             _didStart = true;
             StaticObjects.ClientId = _client.CurrentUser.Id;
             await _client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
         }
 
-        public async Task LogError(LogMessage msg)
+        public async Task LogErrorAsync(LogMessage msg)
         {
             CommandException ce = msg.Exception as CommandException;
             if (ce != null)

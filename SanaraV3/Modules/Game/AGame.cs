@@ -100,9 +100,9 @@ namespace SanaraV3.Modules.Game
             => _textChan.Id == chanId;
 
         private GameState       _state; // Current state of the game
-        private IMessageChannel _textChan; // Textual channel where the game is happening
-        private IPostMode       _postMode; // How things should be posted
+        private readonly IMessageChannel _textChan; // Textual channel where the game is happening
+        private readonly IPostMode       _postMode; // How things should be posted
         private DateTime        _lastPost; // Used to know when the user lost because of the time
-        private GameSettings    _settings; // Contains various settings about the game
+        private readonly GameSettings    _settings; // Contains various settings about the game
     }
 }

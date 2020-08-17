@@ -32,7 +32,8 @@ namespace SanaraV3.Modules.Administration
                     new EmbedFieldBuilder
                     {
                         Name = "Radio module",
-                        Value = "YouTube API calls are heavily limited and Radio module need a lot of them so letting everyone use the radio would drastically reduce the number of music you would be able to play"
+                        Value = "YouTube API calls are heavily limited and Radio module need a lot of them so letting everyone" +
+                        " use the radio would drastically reduce the number of music you would be able to play"
                     }
                 }
             }.Build());
