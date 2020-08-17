@@ -9,8 +9,8 @@
             Meanings = meanings;
         }
 
-        public string Word; // Word in the local language
-        public string WordEnglish; // Word in latin alphabet (ex: romaji for japanese)
-        public string Meanings; // What the word mean
+        public string Word { get; } // Word in the local language
+        public string WordEnglish { get; }  // Word in latin alphabet (ex: romaji for japanese)
+        public string Meanings { get; }  // What the word mean
     }
 }

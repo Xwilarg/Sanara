@@ -54,7 +54,7 @@ namespace SanaraV3.Modules.Nsfw
                 Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
                 Url = finalUrl,
                 ImageUrl = imageUrl,
-                Footer = new EmbedFooterBuilder()
+                Footer = new EmbedFooterBuilder
                 {
                     Text = $"Do the 'Download doujinshi' command with the id '{sM.Groups[2].Value + "/" + sM.Groups[3].Value}' to download the doujinshi."
                 },

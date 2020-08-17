@@ -2,7 +2,6 @@
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
-using SanaraV3.Diaporama;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -21,38 +20,38 @@ namespace SanaraV3
     /// </summary>
     public static class StaticObjects
     {
-        public static readonly HttpClient HttpClient = new HttpClient();
-        public static readonly Random Random = new Random();
+        public static HttpClient HttpClient { get; } = new HttpClient();
+        public static Random Random { get; } = new Random();
 
         public static ulong ClientId;
 
         // NSFW MODULE
-        public static readonly Safebooru Safebooru   = new Safebooru();
-        public static readonly Gelbooru  Gelbooru    = new Gelbooru();
-        public static readonly E621      E621        = new E621();
-        public static readonly E926      E926        = new E926();
-        public static readonly Rule34    Rule34      = new Rule34();
-        public static readonly Konachan  Konachan    = new Konachan();
-        public static readonly TagsManager Tags      = new TagsManager();
+        public static Safebooru Safebooru    { get; } = new Safebooru();
+        public static Gelbooru  Gelbooru     { get; } = new Gelbooru();
+        public static E621      E621         { get; } = new E621();
+        public static E926      E926         { get; } = new E926();
+        public static Rule34    Rule34       { get; } = new Rule34();
+        public static Konachan  Konachan     { get; } = new Konachan();
+        public static TagsManager Tags       { get; } = new TagsManager();
 
         // RADIO MODULE
-        public static readonly Dictionary<ulong, RadioChannel> Radios = new Dictionary<ulong, RadioChannel>();
+        public static Dictionary<ulong, RadioChannel> Radios { get; } = new Dictionary<ulong, RadioChannel>();
 
         // ENTERTAINMENT MODULE
-        public static YouTubeService YouTube = null;
+        public static YouTubeService YouTube { set;  get; } = null;
 
         // GAME MODULE
-        public static readonly List<AGame>   Games = new List<AGame>();
-        public static readonly TextMode      ModeText = new TextMode();
-        public static readonly UrlMode ModeUrl = new UrlMode();
-        public static readonly IPreload[]    Preloads;
-        private static readonly GameManager _gm = new GameManager();
+        public static List<AGame> Games { get; } = new List<AGame>();
+        public static TextMode ModeText { get; } = new TextMode();
+        public static UrlMode ModeUrl { get; } = new UrlMode();
+        public static IPreload[] Preloads { get; }
+        private static GameManager _gm { get; } = new GameManager();
 
         // LANGUAGE MODULE
-        public static readonly Dictionary<string, string> RomajiToHiragana = new Dictionary<string, string>();
-        public static readonly Dictionary<string, string> HiraganaToRomaji = new Dictionary<string, string>();
-        public static readonly Dictionary<string, string> RomajiToKatakana = new Dictionary<string, string>();
-        public static readonly Dictionary<string, string> KatakanaToRomaji = new Dictionary<string, string>();
+        public static Dictionary<string, string> RomajiToHiragana { get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> HiraganaToRomaji { get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> RomajiToKatakana { get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> KatakanaToRomaji { get; } = new Dictionary<string, string>();
 
         // DIAPORAMA
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();

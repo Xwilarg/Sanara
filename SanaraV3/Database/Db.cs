@@ -21,7 +21,7 @@ namespace SanaraV3.Database
                 _r.Db(_dbName).TableCreate("Guilds").Run(_conn);
         }
 
-        private RethinkDB _r;
+        private readonly RethinkDB _r;
         private Connection _conn;
         private string _dbName;
     }

@@ -225,7 +225,7 @@ namespace SanaraV3.Modules.Radio
             AddMusic(new Music(video.Id, fileName, video.Snippet.Title, url, embed.Build(), requester, isAutoSuggestion, duration));
             if (!File.Exists("youtube-dl.exe"))
                 throw new FileNotFoundException("youtube-dl.exe was not found near the bot executable.");
-            ProcessStartInfo youtubeDownload = new ProcessStartInfo()
+            ProcessStartInfo youtubeDownload = new ProcessStartInfo
             {
                 FileName = "youtube-dl",
                 Arguments = $"-x --audio-format mp3 -o " + fileName + " " + url,

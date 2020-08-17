@@ -8,7 +8,7 @@
             Elements = elements;
         }
 
-        public int CurrentPage;
-        public IElement[] Elements;
+        public int CurrentPage { set; get; }
+        public IElement[] Elements { get; }
     }
 }

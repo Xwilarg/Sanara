@@ -62,14 +62,7 @@ namespace SanaraV3.Modules.Nsfw
                 { } // Just in case
             }
 
-            return new TagsSearch
-            {
-                Artists = artists,
-                Characters = characters,
-                Sources = sources,
-                Post = post.Item2,
-                Booru = post.Item1
-            };
+            return new TagsSearch(artists, characters, sources, post.Item2, post.Item1);
         }
     }
 }

@@ -62,7 +62,7 @@ namespace SanaraV3.Modules.Nsfw
                 Title = result.prettyTitle,
                 Url = result.url.AbsoluteUri,
                 ImageUrl = result.pages[0].imageUrl.AbsoluteUri,
-                Footer = new EmbedFooterBuilder()
+                Footer = new EmbedFooterBuilder
                 {
                     Text = $"Do the 'Download doujinshi' command with the id '{result.id}' to download the doujinshi."
                 }

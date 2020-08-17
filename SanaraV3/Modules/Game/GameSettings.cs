@@ -7,6 +7,6 @@
             IsMultiplayer = isMultiplayer;
         }
 
-        public bool IsMultiplayer;
+        public bool IsMultiplayer { get; }
     }
 }
