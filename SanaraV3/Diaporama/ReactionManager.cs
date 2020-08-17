@@ -33,7 +33,7 @@ namespace SanaraV3.Diaporama
                 {
                     nextPage = 0;
                 }
-                else if (emote == "▶️")
+                else if (emote == "⏩")
                 {
                     nextPage = elem.Elements.Length - 1;
                 }
@@ -58,7 +58,7 @@ namespace SanaraV3.Diaporama
             {
                 Color = reddit.IsNsfw ? Color.Red : Color.Green,
                 Title = reddit.Title,
-                ImageUrl = reddit.Image.AbsoluteUri,
+                ImageUrl = reddit.Image?.AbsoluteUri,
                 Url = reddit.Link.AbsoluteUri,
                 Description = reddit.Content,
                 Footer = new EmbedFooterBuilder

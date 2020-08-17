@@ -8,7 +8,9 @@ using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -22,7 +24,7 @@ namespace SanaraV3.Modules.Entertainment
     {
         public string ModuleName { get { return "Entertainment"; } }
 
-        [Command("Reddit hot", RunMode = RunMode.Async), Alias("Reddit"), Priority(-1)]
+        [Command("Reddit hot", RunMode = RunMode.Async)]
         public async Task RedditHotAsync([Remainder]string name)
         {
             await GetRedditEmbedAsync(name, "hot");
@@ -40,27 +42,46 @@ namespace SanaraV3.Modules.Entertainment
             await GetRedditEmbedAsync(name, "new");
         }
 
+        [Command("Reddit random", RunMode = RunMode.Async), Alias("Reddit"), Priority(-1)]
+        public async Task RedditRandomAsync([Remainder]string name)
+        {
+            name = name.ToLower();
+            JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random")).Value<JArray>();
+            if (arr.Count == 0)
+                throw new CommandFailed("There is no post available in this subreddit");
+            JToken token = arr[0]["data"]["children"][0]["data"];
+            await ReplyAsync(embed: Diaporama.ReactionManager.Post(GetRedditEmbed(token))); // TODO: Check for NSFW
+        }
+
         private async Task GetRedditEmbedAsync(string name, string filter)
         {
             name = name.ToLower();
             JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/{filter}"))["data"]["children"].Value<JArray>();
-            var isSafe = !(Context.Channel is ITextChannel) || !((ITextChannel)Context.Channel).IsNsfw;
             List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
             foreach (var e in arr)
             {
-                var elem = e["data"];
-                var elemNsfw = elem["over_18"].Value<bool>();
-                if (!isSafe && elemNsfw) // Result is NSFW and we aren't in a safe channel
-                    continue;
-                elems.Add(new Diaporama.Reddit(elem["title"].Value<string>(), new Uri(elem["thumbnail"].Value<string>()), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
-                    elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>()));
+                var data = GetRedditEmbed(e["data"]);
+                if (data != null)
+                    elems.Add(data);
             }
             if (elems.Count == 0)
                 throw new CommandFailed("There is no post available in this subreddit");
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0]));
             await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+        }
 
+        private Diaporama.Reddit GetRedditEmbed(JToken elem)
+        {
+            var isSafe = !(Context.Channel is ITextChannel) || !((ITextChannel)Context.Channel).IsNsfw;
+            var elemNsfw = elem["over_18"].Value<bool>();
+            if (isSafe && elemNsfw) // Result is NSFW and we aren't in a safe channel
+                return null;
+            string preview = elem["url"].Value<string>();
+            if (!Utils.IsImage(preview.Split('.').Last()))
+                preview = elem["thumbnail"].Value<string>();
+            return new Diaporama.Reddit(elem["title"].Value<string>(), preview == "self" ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
+                elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
 
         [Command("Youtube", RunMode = RunMode.Async)]

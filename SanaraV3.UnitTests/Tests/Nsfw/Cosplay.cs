@@ -3,6 +3,7 @@ using DiscordUtils;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,6 +18,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.NotNull(embed.Footer);
             Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
+            Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
             Assert.Single(embed.Fields);
             Assert.InRange(double.Parse(embed.Fields[0].Value, CultureInfo.InvariantCulture), 0, 5);
         }
