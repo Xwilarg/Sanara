@@ -5,10 +5,11 @@
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | ![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg) | ![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg) |
 
-[![CodeFactor](https://www.codefactor.io/repository/github/xwilarg/sanara/badge)](https://www.codefactor.io/repository/github/xwilarg/sanara)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Xwilarg/Sanara&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage)
 # Sanara
 
-Sanara is a multipurpose bot that is now in more than 300 servers (12/2019).<br/>
+Sanara is a multipurpose bot that is now in more than 500 servers (08/2020).<br/>
 Here are some of her features:
 - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), try to do a better scores than others servers
 - Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
