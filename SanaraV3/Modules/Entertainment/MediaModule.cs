@@ -48,7 +48,11 @@ namespace SanaraV3.Modules.Entertainment
             name = name.ToLower();
             var arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random"));
             if (!(arr is JArray))
-                throw new CommandFailed("There is no post available in this subreddit");
+            {
+                if (arr["data"]["children"].Value<JArray>().Count == 0)
+                    throw new CommandFailed("There is no post available in this subreddit");
+                throw new CommandFailed("This post subreddit doesn't handle random post");
+            }
             JToken token = arr[0]["data"]["children"][0]["data"];
             var post = GetRedditEmbed(token);
             if (post == null) // If the post returned is null that means we weren't able to send it because the chan is not NSFW
@@ -78,7 +82,7 @@ namespace SanaraV3.Modules.Entertainment
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
         }
 
-        private Diaporama.Reddit GetRedditEmbed(JToken elem)
+        private Diaporama.Reddit GetRedditEmbed(JToken elem) // Parse a JSON and get a Reddit object out of it
         {
             var isSafe = !Utils.CanSendNsfw(Context.Channel);
             var elemNsfw = elem["over_18"].Value<bool>();
