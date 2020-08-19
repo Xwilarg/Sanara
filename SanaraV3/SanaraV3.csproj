@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BooruSharp" Version="2.9.0" />
+    <PackageReference Include="BooruSharp" Version="2.10.0" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.47.0.2008" />
     <PackageReference Include="NHentaiSharp" Version="1.1.1" />
