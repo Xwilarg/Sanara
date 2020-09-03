@@ -2,6 +2,7 @@
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
+using SanaraV3.Database;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -24,6 +25,7 @@ namespace SanaraV3
         public static Random Random { get; } = new Random();
 
         public static ulong ClientId;
+        public static Db Db { get; } = new Db();
 
         // NSFW MODULE
         public static Safebooru Safebooru    { get; } = new Safebooru();
@@ -59,6 +61,8 @@ namespace SanaraV3
         static StaticObjects()
         {
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+
+            Db.InitAsync("Sanara").GetAwaiter().GetResult();
 
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;

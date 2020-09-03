@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
 using Newtonsoft.Json;
+using SanaraV3.Database;
 using SanaraV3.Diaporama;
 using SanaraV3.Exceptions;
 using System;
@@ -70,8 +71,12 @@ namespace SanaraV3
             _client.MessageReceived += HandleCommandAsync;
             _client.Connected += ConnectedAsync;
             _client.ReactionAdded += ReactionManager.ReactionAddedAsync;
+            _client.GuildAvailable += GuildJoined;
+            _client.JoinedGuild += GuildJoined;
 
             // Discord modules
+            await _commands.AddModuleAsync<Modules.Administration.PremiumModule>(null);
+            await _commands.AddModuleAsync<Modules.Administration.SettingModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.DoujinshiModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.CosplayModule>(null);
@@ -88,6 +93,11 @@ namespace SanaraV3
             await Task.Delay(-1);
         }
 
+        private async Task GuildJoined(SocketGuild guild)
+        {
+            await StaticObjects.Db.InitGuildAsync(guild.Id);
+        }
+
         private async Task HandleCommandAsync(SocketMessage arg)
         {
             if (arg.Author.IsBot) // We ignore messages from bots
@@ -96,7 +106,8 @@ namespace SanaraV3
             if (msg == null) return; // The message received isn't a message we can deal with
 
             int pos = 0;
-            if (msg.HasMentionPrefix(_client.CurrentUser, ref pos))
+            ITextChannel textChan = msg.Channel as ITextChannel;
+            if (msg.HasMentionPrefix(_client.CurrentUser, ref pos) || (textChan != null && msg.HasStringPrefix(StaticObjects.Db.GetGuild(textChan.GuildId).Prefix, ref pos)))
             {
                 var context = new SocketCommandContext(_client, msg);
                 var result = await _commands.ExecuteAsync(context, pos, null);
