@@ -1,4 +1,6 @@
 ﻿using BooruSharp.Booru;
+using Discord;
+using Discord.WebSocket;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
@@ -22,6 +24,10 @@ namespace SanaraV3
     /// </summary>
     public static class StaticObjects
     {
+        public static DiscordSocketClient Client { get; } = new DiscordSocketClient(new DiscordSocketConfig
+        {
+            LogLevel = LogSeverity.Verbose,
+        });
         public static HttpClient HttpClient { get; } = new HttpClient();
         public static Random Random { get; } = new Random();
 

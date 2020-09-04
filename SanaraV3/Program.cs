@@ -15,10 +15,6 @@ namespace SanaraV3
 {
     public sealed class Program
     {
-        private readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
-        {
-            LogLevel = LogSeverity.Verbose,
-        });
         private readonly CommandService _commands = new CommandService();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
@@ -43,7 +39,7 @@ namespace SanaraV3
         public async Task StartAsync()
         {
             // Setting Logs callback
-            _client.Log += Utils.Log;
+            StaticObjects.Client.Log += Utils.Log;
             _commands.Log += LogErrorAsync;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
@@ -68,11 +64,11 @@ namespace SanaraV3
             StaticObjects.Initialize(_credentials);
 
             // Discord callbacks
-            _client.MessageReceived += HandleCommandAsync;
-            _client.Connected += ConnectedAsync;
-            _client.ReactionAdded += ReactionManager.ReactionAddedAsync;
-            _client.GuildAvailable += GuildJoined;
-            _client.JoinedGuild += GuildJoined;
+            StaticObjects.Client.MessageReceived += HandleCommandAsync;
+            StaticObjects.Client.Connected += ConnectedAsync;
+            StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
+            StaticObjects.Client.GuildAvailable += GuildJoined;
+            StaticObjects.Client.JoinedGuild += GuildJoined;
 
             // Discord modules
             await _commands.AddModuleAsync<Modules.Administration.InformationModule>(null);
@@ -87,8 +83,8 @@ namespace SanaraV3
             await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Modules.Tool.LanguageModule>(null);
 
-            await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
-            await _client.StartAsync();
+            await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
+            await StaticObjects.Client.StartAsync();
 
             // We keep the bot online
             await Task.Delay(-1);
@@ -108,9 +104,9 @@ namespace SanaraV3
 
             int pos = 0;
             ITextChannel textChan = msg.Channel as ITextChannel;
-            if (msg.HasMentionPrefix(_client.CurrentUser, ref pos) || (textChan != null && msg.HasStringPrefix(StaticObjects.Db.GetGuild(textChan.GuildId).Prefix, ref pos)))
+            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || (textChan != null && msg.HasStringPrefix(StaticObjects.Db.GetGuild(textChan.GuildId).Prefix, ref pos)))
             {
-                var context = new SocketCommandContext(_client, msg);
+                var context = new SocketCommandContext(StaticObjects.Client, msg);
                 var result = await _commands.ExecuteAsync(context, pos, null);
                 if (!result.IsSuccess)
                 {
@@ -135,8 +131,8 @@ namespace SanaraV3
         private async Task ConnectedAsync()
         {
             _didStart = true;
-            StaticObjects.ClientId = _client.CurrentUser.Id;
-            await _client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
+            StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
+            await StaticObjects.Client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
         }
 
         public async Task LogErrorAsync(LogMessage msg)
