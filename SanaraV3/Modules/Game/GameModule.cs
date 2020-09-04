@@ -4,12 +4,22 @@ using SanaraV3.Attributes;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadGameHelp()
+        {
+            _help.Add(new Help("Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori") }, "Play a game. Rules will be displayed when you start it.", false));
+            _help.Add(new Help("Cancel", new Argument[0], "Cancel a game running in this channel.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Game
 {
-    public sealed class GameModule : ModuleBase, IModule
+    public sealed class GameModule : ModuleBase
     {
-        public string ModuleName { get { return "Game"; } }
-
         [Command("Play")]
         public async Task PlayAsync(string gameName)
         {

@@ -3,6 +3,7 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
 using SanaraV3.Database;
+using SanaraV3.Modules.Administration;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -26,6 +27,7 @@ namespace SanaraV3
 
         public static ulong ClientId;
         public static Db Db { get; } = new Db();
+        public static HelpPreload Help { get; } = new HelpPreload();
 
         // NSFW MODULE
         public static Safebooru Safebooru    { get; } = new Safebooru();

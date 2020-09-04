@@ -4,6 +4,14 @@ using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Administration
 {
+    public sealed partial class HelpPreload
+    {
+        public void LoadSettingHelp()
+        {
+            _help.Add(new Help("Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", false));
+        }
+    }
+
     public class SettingModule : ModuleBase
     {
 

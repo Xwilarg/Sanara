@@ -7,12 +7,21 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadCosplayHelp()
+        {
+            _help.Add(new Help("Cosplay", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random cosplay.", true));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Nsfw
 {
-    public sealed class CosplayModule : ModuleBase, IModule
+    public sealed class CosplayModule : ModuleBase
     {
-        public string ModuleName { get { return "Nsfw"; } }
-
         [Command("Cosplay", RunMode = RunMode.Async)]
         public async Task CosplayAsync()
             => await CosplayAsync("");

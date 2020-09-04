@@ -7,12 +7,21 @@ using SanaraV3.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadDoujinshiHelp()
+        {
+            _help.Add(new Help("Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", true));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Nsfw
 {
-    public sealed class DoujinshiModule : ModuleBase, IModule
+    public sealed class DoujinshiModule : ModuleBase
     {
-        public string ModuleName { get { return "Nsfw"; } }
-
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
         public async Task GetDoujinshiAsync() // Doujin search with no tags
         {

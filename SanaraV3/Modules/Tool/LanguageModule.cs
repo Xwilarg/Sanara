@@ -9,12 +9,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadJapaneseHelp()
+        {
+            _help.Add(new Help("Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Tool
 {
-    public sealed class LanguageModule : ModuleBase, IModule
+    public sealed class LanguageModule : ModuleBase
     {
-        public string ModuleName { get { return "Tool"; } }
-
         [Command("Japanese", RunMode = RunMode.Async)]
         public async Task JapaneseAsync([Remainder]string str)
         {

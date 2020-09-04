@@ -5,10 +5,16 @@ using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Administration
 {
-    public sealed class PremiumModule : ModuleBase, IModule
+    public sealed partial class HelpPreload
     {
-        public string ModuleName { get { return "Premium"; } }
+        public void LoadPremiumHelp()
+        {
+            _help.Add(new Help("Premium", new Argument[0], "Get information about premium features.", false));
+        }
+    }
 
+    public sealed class PremiumModule : ModuleBase
+    {
         [Command("Premium")]
         public async Task PremiumAsync()
         {

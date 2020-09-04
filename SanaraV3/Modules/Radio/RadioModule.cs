@@ -7,12 +7,25 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadRadioHelp()
+        {
+            _help.Add(new Help("Radio start", new Argument[0], "Make Sanara join your vocal channel.", false));
+            _help.Add(new Help("Radio add", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id/url") }, "Add a music to the radio.", false));
+            _help.Add(new Help("Radio remove", new[] { new Argument(ArgumentType.MANDATORY, "name/index") }, "Remove a radio from the playlist.", false));
+            _help.Add(new Help("Radio skip", new Argument[0], "Skip the song that is currently being played.", false));
+            _help.Add(new Help("Radio playlist", new Argument[0], "Display the current playlist.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Radio
 {
-    public sealed class RadioModule : ModuleBase, IModule
+    public sealed class RadioModule : ModuleBase
     {
-        public string ModuleName { get { return "Radio"; } }
-
         [Command("Skip radio", RunMode = RunMode.Async), Alias("Radio skip")]
         public async Task SkipAsync()
         {

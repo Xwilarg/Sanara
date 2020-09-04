@@ -4,15 +4,25 @@ using System;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadFunHelp()
+        {
+            _help.Add(new Help("Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", false));
+            _help.Add(new Help("Complete", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Complete the given sentence using machine learning.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Entertainment
 {
     /// <summary>
     /// All "Fun" commands that have no real purposes
     /// </summary>
-    public sealed class FunModule : ModuleBase, IModule
+    public sealed class FunModule : ModuleBase
     {
-        public string ModuleName { get { return "Entertainment"; } }
-
         [Command("Inspire")]
         public async Task InspireAsync()
         {

@@ -12,16 +12,27 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadMediaHelp()
+        {
+            _help.Add(new Help("Reddit", new[] { new Argument(ArgumentType.MANDATORY, "hot/top/new/random") }, "Get the latest hot/top/new posts from Reddit, or a random one.", false));
+            _help.Add(new Help("Youtube", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id") }, "Get a Youtube video given some keyword or its id.", false));
+            _help.Add(new Help("Xkcd", new[] { new Argument(ArgumentType.OPTIONAL, "id/last") }, "Get a random xkcd comic. You can also search by id or get the latest published.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Entertainment
 {
     /// <summary>
     /// Commands that are centered around a media (such as YouTube) and not a specific feature
     /// For example "Video" would be a feature, "YouTube" is a media it's not just about getting a video, it's about getting a **YouTube** video
     /// </summary>
-    public sealed class MediaModule : ModuleBase, IModule
+    public sealed class MediaModule : ModuleBase
     {
-        public string ModuleName { get { return "Entertainment"; } }
-
         [Command("Reddit hot", RunMode = RunMode.Async)]
         public async Task RedditHotAsync([Remainder]string name)
         {

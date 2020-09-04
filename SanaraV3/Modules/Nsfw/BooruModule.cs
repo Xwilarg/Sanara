@@ -10,15 +10,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Modules.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadBooruHelp()
+        {
+            _help.Add(new Help("Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", false));
+            _help.Add(new Help("E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", false));
+            _help.Add(new Help("Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", true));
+            _help.Add(new Help("E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", true));
+            _help.Add(new Help("Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", true));
+            _help.Add(new Help("Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", true));
+            _help.Add(new Help("Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", false));
+            _help.Add(new Help("Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Modules.Nsfw
 {
     /// <summary>
     /// Contains all Booru related commands (booru are websites such as Gelbooru and Rule34)
     /// </summary>
-    public sealed class BooruModule : ModuleBase, IModule
+    public sealed class BooruModule : ModuleBase
     {
-        public string ModuleName { get { return "Nsfw"; } }
-
         [Command("Safebooru", RunMode = RunMode.Async)]
         public async Task SafebooruAsync(params string[] tags)
             => await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU);

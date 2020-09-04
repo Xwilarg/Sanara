@@ -75,15 +75,16 @@ namespace SanaraV3
             _client.JoinedGuild += GuildJoined;
 
             // Discord modules
+            await _commands.AddModuleAsync<Modules.Administration.InformationModule>(null);
             await _commands.AddModuleAsync<Modules.Administration.PremiumModule>(null);
             await _commands.AddModuleAsync<Modules.Administration.SettingModule>(null);
+            await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
+            await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
+            await _commands.AddModuleAsync<Modules.Game.GameModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.DoujinshiModule>(null);
             await _commands.AddModuleAsync<Modules.Nsfw.CosplayModule>(null);
             await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
-            await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
-            await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
-            await _commands.AddModuleAsync<Modules.Game.GameModule>(null);
             await _commands.AddModuleAsync<Modules.Tool.LanguageModule>(null);
 
             await _client.LoginAsync(TokenType.Bot, _credentials.BotToken);
