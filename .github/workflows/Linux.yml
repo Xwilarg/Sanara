@@ -27,6 +27,14 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
+    - name: Install ReThinkdb
+      run: |
+      source /etc/lsb-release && echo "deb https://download.rethinkdb.com/repository/ubuntu-$DISTRIB_CODENAME $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+      wget -qO- https://download.rethinkdb.com/repository/raw/pubkey.gpg | sudo apt-key add -
+      sudo apt-get update
+      sudo apt-get install rethinkdb
+    - name: Start ReThinkdb
+      run: nohup rethinkdb &
     - name: Test
       env:
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
