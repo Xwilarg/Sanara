@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using System;
+using DiscordUtils;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -40,21 +40,21 @@ namespace SanaraV3.Modules.Entertainment
             string content = sentence;
             string oldContent = content;
 
-            var ws = new WebSocket("ws://163.172.76.10:8080");
-            ws.Origin = "http://textsynth.org";
+            var ws = new WebSocket("wss://bellard.org/textsynth/ws");
+            ws.Origin = "https://bellard.org";
 
             // Since we may receive a lot of messages from the website, we don't update the embed everytimes we get one
             // Instead we store it in "content"
             ws.OnMessage += (sender, e) =>
             {
-                // For some reasons, there are some weird spaces around punctuation, also need to escape things for Discord markdown
-                content += " " + e.Data.Replace(" .", ".").Replace(" '", "'").Replace(" ,", ",").Replace("*", "\\*").Replace("_", "\\_");
+                // We need to escape things because of Discord
+                content += e.Data.Replace("*", "\\*").Replace("_", "\\_");
             };
 
             ws.OnError += (sender, e) =>
             {
                 content = null;
-                throw new Exception(e.Message);
+                Utils.LogError(new LogMessage(LogSeverity.Error, e.Exception.Source, e.Message, e.Exception));
             };
 
             ws.OnClose += (sender, e) =>
@@ -72,7 +72,7 @@ namespace SanaraV3.Modules.Entertainment
             };
 
             ws.Connect();
-            ws.Send("g," + sentence);
+            ws.Send("g,1558M,40,0.9,1," + StaticObjects.Random.Next(0, int.MaxValue) + "," + sentence);
 
             msg = await ReplyAsync("", false, new EmbedBuilder
             {
