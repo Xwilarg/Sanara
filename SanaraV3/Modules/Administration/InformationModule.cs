@@ -43,7 +43,7 @@ namespace SanaraV3.Modules.Administration
                 Color = Color.Purple
             };
             embed.AddField("Server count", StaticObjects.Client.Guilds.Count, true);
-            embed.AddField("Total user count (may contains dupplicate)", StaticObjects.Client.Guilds.Sum(x => x.Users.Count), true);
+            embed.AddField("Total user count (may contains duplicate)", StaticObjects.Client.Guilds.Sum(x => x.Users.Count), true);
             await ReplyAsync(embed: embed.Build());
         }
     }
