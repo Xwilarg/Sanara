@@ -129,6 +129,12 @@ namespace SanaraV3.Modules.Game.Impl
         protected override int GetGameTime()
             => 15;
 
+        protected override string GetRules()
+            => "I'll give you a word in Japanese and you'll have to find another word beginning by the last syllable.\n" +
+            "For example if I say りゅう (ryuu, dragon) you have to say a word starting by う (u), for example うさぎ (usagi, rabbit).\n" +
+            "Words must be noun, must not end by a ん (n), must not have been already said an must be more than one syllabe.\n" +
+            "You'll loose if you don't answer after 15 seconds.";
+
         private readonly List<ShiritoriPreloadResult> _words;
         private bool _isFirst; // Is the first word (because we must start by saying "shiritori")
         private readonly List<string> _alreadySaid; // A word can't be said twice

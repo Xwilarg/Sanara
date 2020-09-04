@@ -14,12 +14,15 @@ namespace SanaraV3.Modules.Game
             _textChan = textChan;
             _postMode = postMode;
             _settings = settings;
+
+            textChan.SendMessageAsync(GetRules() + "\n\nIf the game break, you can use the 'Cancel' command to cancel it.");
         }
 
         protected abstract string GetPostInternal(); // Get next post
         protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
+        protected abstract string GetRules();
 
         /// <summary>
         /// Start the game, that's where lobby management is done
