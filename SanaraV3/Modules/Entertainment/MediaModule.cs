@@ -9,6 +9,7 @@ using SanaraV3.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -51,11 +52,18 @@ namespace SanaraV3.Modules.Entertainment
             await GetRedditEmbedAsync(name, "new");
         }
 
-        [Command("Reddit random", RunMode = RunMode.Async), Alias("Reddit"), Priority(-1)]
+        [Command("Reddit", RunMode = RunMode.Async), Priority(-2)]
+        public async Task RedditRandomDefaultAsync([Remainder]string name)
+            => await RedditRandomAsync(name);
+
+        [Command("Reddit random", RunMode = RunMode.Async), Priority(-1)]
         public async Task RedditRandomAsync([Remainder]string name)
         {
             name = name.ToLowerInvariant();
-            var arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/random"));
+            var http = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.reddit.com/r/" + name + "/random"));
+            if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new CommandFailed("There is no safe post available in this subreddit");
+            var arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync());
             if (!(arr is JArray))
             {
                 if (arr["data"]["children"].Value<JArray>().Count == 0)
@@ -72,7 +80,10 @@ namespace SanaraV3.Modules.Entertainment
         private async Task GetRedditEmbedAsync(string name, string filter)
         {
             name = name.ToLowerInvariant();
-            JArray arr = JsonConvert.DeserializeObject<JToken>(await StaticObjects.HttpClient.GetStringAsync($"https://api.reddit.com/r/{name}/{filter}"))["data"]["children"].Value<JArray>();
+            var http = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.reddit.com/r/" + name + "/" + filter));
+            if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new CommandFailed("There is no safe post available in this subreddit");
+            JArray arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync())["data"]["children"].Value<JArray>();
             List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
             foreach (var e in arr)
             {

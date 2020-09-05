@@ -63,13 +63,16 @@ namespace SanaraV3.Diaporama
 
         public static Embed Post(Reddit reddit, int currPage, int maxPage)
         {
+            string content = reddit.Content;
+            if (content.Length > 2048)
+                content = content.Substring(0, 2042) + "[...]";
             return new EmbedBuilder
             {
                 Color = reddit.IsNsfw ? Color.Red : Color.Green,
                 Title = reddit.Title,
                 ImageUrl = reddit.Image?.AbsoluteUri,
                 Url = reddit.Link.AbsoluteUri,
-                Description = reddit.Content,
+                Description = content,
                 Footer = new EmbedFooterBuilder
                 {
                     Text = reddit.Flairs + $"\nScore: {reddit.Ups}" + (maxPage == 1 ? "" : $"\nPage {currPage} out of {maxPage}")
