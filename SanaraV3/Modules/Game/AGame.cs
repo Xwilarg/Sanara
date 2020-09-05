@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.PostMode;
 using System;
@@ -15,7 +16,7 @@ namespace SanaraV3.Modules.Game
             _postMode = postMode;
             _settings = settings;
 
-            textChan.SendMessageAsync(GetRules() + "\n\nIf the game break, you can use the 'Cancel' command to cancel it.");
+            textChan.SendMessageAsync(GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\nIf the game break, you can use the 'Cancel' command to cancel it.");
         }
 
         protected abstract string GetPostInternal(); // Get next post
@@ -23,6 +24,7 @@ namespace SanaraV3.Modules.Game
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetRules();
+        protected abstract string GetSuccessMessage(); // Congratulation message, empty string to ignore
 
         /// <summary>
         /// Start the game, that's where lobby management is done
@@ -48,13 +50,16 @@ namespace SanaraV3.Modules.Game
         /// <summary>
         /// Check if the user answer is valid
         /// </summary>
-        public async Task CheckAnswerAsync(string userAnswer)
+        public async Task CheckAnswerAsync(SocketUserMessage msg)
         {
             if (_state != GameState.RUNNING)
                 return;
             try
             {
-                await CheckAnswerInternalAsync(userAnswer);
+                await CheckAnswerInternalAsync(msg.Content);
+                string congratulation = GetSuccessMessage();
+                if (congratulation != null)
+                    await _textChan.SendMessageAsync(congratulation);
                 await PostAsync();
             }
             catch (GameLost e)
@@ -63,8 +68,12 @@ namespace SanaraV3.Modules.Game
             }
             catch (InvalidGameAnswer e)
             {
-                await _textChan.SendMessageAsync(e.Message);
+                if (e.Message.Length == 0)
+                    await msg.AddReactionAsync(new Emoji("❌"));
+                else
+                    await _textChan.SendMessageAsync(e.Message);
             }
+
         }
 
         public async Task CancelAsync()

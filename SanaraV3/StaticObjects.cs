@@ -9,7 +9,7 @@ using SanaraV3.Modules.Administration;
 using SanaraV3.Modules.Game;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
-using SanaraV3.Modules.Game.Preload.Shiritori;
+using SanaraV3.Modules.Game.Preload.Impl;
 using SanaraV3.Modules.Nsfw;
 using SanaraV3.Modules.Radio;
 using System;
@@ -90,9 +90,10 @@ namespace SanaraV3
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
             }
 
-            Preloads = new[]
+            Preloads = new IPreload[]
             {
-                new ShiritoriPreload()
+                new ShiritoriPreload(),
+                new ArknightsPreload()
             };
         }
 

@@ -1,8 +1,10 @@
 ﻿using Discord;
+using SanaraV3.Modules.Game.Impl;
+using SanaraV3.Modules.Game.Preload.Result;
 using System.IO;
 using System.Linq;
 
-namespace SanaraV3.Modules.Game.Preload.Shiritori
+namespace SanaraV3.Modules.Game.Preload.Impl
 {
     public sealed class ShiritoriPreload : IPreload
     {
@@ -30,7 +32,7 @@ namespace SanaraV3.Modules.Game.Preload.Shiritori
             => new[] { "shiritori" };
 
         public AGame CreateGame(IMessageChannel chan, GameSettings settings)
-            => new Impl.Shiritori(chan, this, settings);
+            => new Shiritori(chan, this, settings);
 
         private readonly ShiritoriPreloadResult[] _preload;
     }
