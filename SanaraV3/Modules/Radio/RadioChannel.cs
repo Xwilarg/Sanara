@@ -126,7 +126,7 @@ namespace SanaraV3.Modules.Radio
                 return "There is no song currently being played.";
             string finalStr = $"🎵 Current: {Playlist[0].Title} ({Playlist[0].Duration}) requested by {Playlist[0].Requester}\n";
             for (int i = 1; i < Playlist.Count; i++)
-                finalStr += i + $". {Playlist[i].Title} ({ Playlist[0].Duration}) " + (Playlist[i].Downloading ? "(Download...)" : "") + $" requested by {Playlist[i].Requester}\n";
+                finalStr += i + $". {Playlist[i].Title} ({ Playlist[i].Duration}) " + (Playlist[i].Downloading ? "(Download...)" : "") + $" requested by {Playlist[i].Requester}\n";
             return finalStr;
         }
 
