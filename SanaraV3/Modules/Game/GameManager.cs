@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 
 namespace SanaraV3.Modules.Game
 {
@@ -16,6 +17,8 @@ namespace SanaraV3.Modules.Game
             {
                 foreach (var game in StaticObjects.Games)
                     game.CheckTimerAsync().GetAwaiter().GetResult();
+                foreach (var g in StaticObjects.Games.Where(x => x.AsLost()))
+                    g.Dispose();
                 StaticObjects.Games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
                 Thread.Sleep(200);
             }

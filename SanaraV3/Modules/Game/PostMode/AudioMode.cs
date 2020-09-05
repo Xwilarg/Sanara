@@ -10,10 +10,9 @@ namespace SanaraV3.Modules.Game.PostMode
 {
     public class AudioMode : IPostMode
     {
-        public async Task PostAsync(IMessageChannel chan, string text, AGame sender)
+        public Task PostAsync(IMessageChannel chan, string text, AGame sender)
         {
             var quizzAudio = (QuizzAudio)sender;
-            var stream = quizzAudio.GetVoiceSession().CreatePCMStream(AudioApplication.Voice);
             var process = quizzAudio.GetNewProcess();
             process = Process.Start(new ProcessStartInfo
             {
@@ -25,7 +24,8 @@ namespace SanaraV3.Modules.Game.PostMode
             });
             var inputTask = Task.Run(async () =>
             {
-                await (await StaticObjects.HttpClient.GetStreamAsync(text)).CopyToAsync(process.StandardInput.BaseStream);
+                var stream = await StaticObjects.HttpClient.GetStreamAsync(text);
+                await stream.CopyToAsync(process.StandardInput.BaseStream);
                 process.StandardInput.Close();
             });
             var outputTask = Task.Run(async () =>
@@ -33,7 +33,7 @@ namespace SanaraV3.Modules.Game.PostMode
                 using Stream output = process.StandardOutput.BaseStream;
                 try
                 {
-                    await output.CopyToAsync(stream);
+                    await output.CopyToAsync(quizzAudio.GetAudioOutStream());
                 }
                 catch (OperationCanceledException)
                 {
@@ -41,6 +41,7 @@ namespace SanaraV3.Modules.Game.PostMode
                 }
             });
             Task.WaitAll(inputTask, outputTask);
+            return Task.CompletedTask;
         }
     }
 }

@@ -10,8 +10,9 @@ namespace SanaraV3.Modules.Administration
     {
         public void LoadGameHelp()
         {
-            _help.Add(new Help("Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori") }, "Play a game. Rules will be displayed when you start it.", false));
+            _help.Add(new Help("Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", false));
             _help.Add(new Help("Cancel", new Argument[0], "Cancel a game running in this channel.", false));
+            _help.Add(new Help("Replay", new Argument[0], "Replay the audio for the current game.", false));
         }
     }
 }
@@ -38,11 +39,18 @@ namespace SanaraV3.Modules.Game
             }
         }
 
-        [Command("Cancel"), RequireRunningGame]
+        [Command("Cancel", RunMode = RunMode.Async), RequireRunningGame]
         public async Task CancelAsync()
         {
             var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
             await game.CancelAsync();
+        }
+
+        [Command("Replay"), RequireRunningGame]
+        public async Task ReplayAsync()
+        {
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
+            await game.ReplayAsync();
         }
 
         public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string argument)

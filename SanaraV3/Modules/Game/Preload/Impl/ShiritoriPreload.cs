@@ -1,7 +1,6 @@
 ﻿using Discord;
 using SanaraV3.Modules.Game.Impl;
 using SanaraV3.Modules.Game.Preload.Result;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;

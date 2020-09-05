@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.Audio;
-using DiscordUtils;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.Preload;
-using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace SanaraV3.Modules.Game.Impl
 {
@@ -20,17 +19,20 @@ namespace SanaraV3.Modules.Game.Impl
                 throw new CommandFailed("You must be in a vocal channel to play this game.");
             _voiceSession = _voiceChan.ConnectAsync().GetAwaiter().GetResult();
             _process = null;
+
+            while (_voiceSession.ConnectionState != ConnectionState.Connected) // We wait to be connected before starting vocal stuffs
+            { }
+            _outStream = _voiceSession.CreatePCMStream(AudioApplication.Voice);
         }
 
-        ~QuizzAudio()
+        protected override void DisposeInternal()
         {
-            try
+            if (_process != null && !_process.HasExited)
+                _process.Kill();
+            if (_voiceChan != null && _voiceSession.ConnectionState == ConnectionState.Connected)
             {
                 _voiceChan.DisconnectAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception e) // We makes sure that no exception is thrown in the dtor
-            {
-                Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                _voiceSession.Dispose();
             }
         }
 
@@ -39,6 +41,9 @@ namespace SanaraV3.Modules.Game.Impl
 
         public IAudioClient GetVoiceSession()
             => _voiceSession;
+
+        public AudioOutStream GetAudioOutStream()
+            => _outStream;
 
         /// <summary>
         /// Make sure to stop the last audio before starting a new one
@@ -53,5 +58,6 @@ namespace SanaraV3.Modules.Game.Impl
         private IVoiceChannel _voiceChan;
         private IAudioClient _voiceSession;
         private Process _process;
+        private AudioOutStream _outStream;
     }
 }
