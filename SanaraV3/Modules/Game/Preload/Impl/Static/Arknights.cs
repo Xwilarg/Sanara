@@ -41,6 +41,8 @@ namespace SanaraV3.Modules.Game.Preload.Impl.Static
             }
         }
 
+        private static string[] exclude = new[] { "Pith", "Sharp", "Touch", "Stormeye" }; // Operators from CN event that you can't have
+
         private static List<(string, List<string>)> _operators;
     }
 }

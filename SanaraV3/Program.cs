@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
 using Newtonsoft.Json;
-using SanaraV3.Database;
 using SanaraV3.Diaporama;
 using SanaraV3.Exceptions;
 using System;

@@ -3,11 +3,14 @@ using Discord.Audio;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.Preload;
 using System.Diagnostics;
-using System.IO;
+using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Game.Impl
 {
-    public sealed class QuizzAudio : Quizz
+    /// <summary>
+    /// Quizz game with audio files
+    /// </summary>
+    public class QuizzAudio : Quizz, IAudioGame
     {
         public QuizzAudio(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, settings, StaticObjects.ModeAudio)
         {
@@ -19,6 +22,7 @@ namespace SanaraV3.Modules.Game.Impl
                 throw new CommandFailed("You must be in a vocal channel to play this game.");
             _voiceSession = _voiceChan.ConnectAsync().GetAwaiter().GetResult();
             _process = null;
+            _streamTask = Task.CompletedTask;
 
             while (_voiceSession.ConnectionState != ConnectionState.Connected) // We wait to be connected before starting vocal stuffs
             { }
@@ -55,9 +59,13 @@ namespace SanaraV3.Modules.Game.Impl
             return _process;
         }
 
+        public bool CanStartNewAudio()
+            => _streamTask.IsCompleted;
+
         private IVoiceChannel _voiceChan;
         private IAudioClient _voiceSession;
         private Process _process;
         private AudioOutStream _outStream;
+        private Task _streamTask;
     }
 }

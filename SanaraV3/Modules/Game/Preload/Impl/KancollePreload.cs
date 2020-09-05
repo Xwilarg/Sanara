@@ -7,13 +7,13 @@ using System.Linq;
 
 namespace SanaraV3.Modules.Game.Preload.Impl
 {
-    public sealed class ArknightsPreload : IPreload
+    public sealed class KancollePreload : IPreload
     {
-        public ArknightsPreload()
+        public KancollePreload()
         {
-            _preload = Arknights.GetOperators().Select((x) =>
+            _preload = Kancolle.GetShips().Select((x) =>
             {
-                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/img/characters/" + x.Item1 + "_1.png", x.Item2.ToArray());
+                return new QuizzPreloadResult(null, new[] { x });
             }).ToArray();
         }
 
@@ -21,13 +21,13 @@ namespace SanaraV3.Modules.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string[] GetGameNames()
-            => new[] { "arknights", "ak" };
+            => new[] { "kancolle", "kc", "kantaicollection" };
 
         public string GetNameArg()
             => null;
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new QuizzKancolle(chan, user, this, settings);
 
         private readonly QuizzPreloadResult[] _preload;
     }

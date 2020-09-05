@@ -8,8 +8,6 @@ namespace SanaraV3.Modules.Game
     {
         public AudioOutStream GetAudioOutStream();
 
-        public void SetStreamTask(Task task);
-
         public bool CanStartNewAudio(); // Is the no audio currently playing?
 
         public Process GetNewProcess();

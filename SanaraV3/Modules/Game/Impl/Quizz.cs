@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Game.Impl
 {
+    /// <summary>
+    /// Basic quizz game
+    /// </summary>
     public class Quizz : AGame
     {
         /// <summary>
@@ -49,7 +52,7 @@ namespace SanaraV3.Modules.Game.Impl
 
         protected override string GetAnswer()
         {
-            string name = _current.Answers[0];
+            string name = _current.Answers[0].Replace("_", " "); // Clean the answer a bit for game that didn't do it
             return $"The right answer was {name}.";
         }
 
@@ -62,8 +65,8 @@ namespace SanaraV3.Modules.Game.Impl
         protected override string GetSuccessMessage()
             => "Congratulations, you found the right answer.";
 
-        private QuizzPreloadResult _current; // Word to guess
-        private List<QuizzPreloadResult> _words;
-        private readonly string[] _allValidNames;
+        protected QuizzPreloadResult _current; // Word to guess
+        protected List<QuizzPreloadResult> _words;
+        protected readonly string[] _allValidNames;
     }
 }

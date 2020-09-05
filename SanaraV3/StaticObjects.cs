@@ -95,7 +95,9 @@ namespace SanaraV3
             {
                 new ShiritoriPreload(),
                 new ArknightsPreload(),
-                new ArknightsAudioPreload()
+                new ArknightsAudioPreload(),
+                new KancollePreload(),
+                new KancolleAudioPreload()
             };
         }
 

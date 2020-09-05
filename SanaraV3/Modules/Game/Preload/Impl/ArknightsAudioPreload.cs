@@ -13,7 +13,7 @@ namespace SanaraV3.Modules.Game.Preload.Impl
         {
             _preload = Arknights.GetOperators().Select((x) =>
             {
-                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/etc/voice/" + x.Item1 + "/CN_042.mp3", x.Item2.ToArray());
+                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/etc/voice/" + x.Item1 + "/CN_001.mp3", x.Item2.ToArray());
             }).ToArray();
         }
 

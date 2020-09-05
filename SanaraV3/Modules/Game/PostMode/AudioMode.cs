@@ -12,7 +12,7 @@ namespace SanaraV3.Modules.Game.PostMode
     {
         public Task PostAsync(IMessageChannel chan, string text, AGame sender)
         {
-            var quizzAudio = (QuizzAudio)sender;
+            var quizzAudio = (IAudioGame)sender;
             var process = quizzAudio.GetNewProcess();
             process = Process.Start(new ProcessStartInfo
             {

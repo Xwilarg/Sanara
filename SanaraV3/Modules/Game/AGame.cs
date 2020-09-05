@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DiscordUtils;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -68,9 +69,36 @@ namespace SanaraV3.Modules.Game
         {
             if (_state != GameState.RUNNING)
                 return;
-            _state = GameState.POSTING; // Making sure we can't loose or validate answer while we are posting a new image
-            _current = GetPostInternal();
-            await _postMode.PostAsync(_textChan, _current, this);
+
+            _state = GameState.POSTING;
+
+            if (_postMode is AudioMode)
+            {
+                var mode = (IAudioGame)this;
+                while (!mode.CanStartNewAudio()) // Wait for the current audio to finish or that will do horrible gliches
+                { }
+            }
+
+            // If somehow an error happened, we try sending a new image (up to 3 times)
+            int nbTries = 0;
+            do
+            {
+                try
+                {
+                    _current = GetPostInternal();
+                    Task t = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); });
+                    if (!(_postMode is AudioMode)) // We don't wait for the audio to finish for audio games
+                        t.Wait();
+                } catch (Exception e)
+                {
+                    await Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    if (nbTries == 3)
+                        throw new GameLost("Failed to get something to post after 3 tries...");
+                    nbTries++;
+                    continue;
+                }
+                break;
+            } while (true);
             _lastPost = DateTime.Now; // Reset timer
             _state = GameState.RUNNING;
         }
