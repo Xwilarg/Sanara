@@ -30,12 +30,12 @@ namespace SanaraV3.Modules.Game.Preload.Impl.Static
                         if (n["name"].Value<string>() == appellation)
                         {
                             if (n["name"].Value<string>() == "Гум")
-                                names.Add("GUMMY"); // Somehow Gummy is wrote as "Gum"
-                            names.Add(n["name_en"].Value<string>().ToUpper());
+                                names.Add("Gummy"); // Somehow Gummy is wrote as "Gum"
+                            names.Add(n["name_en"].Value<string>());
                             break;
                         }
                     }
-                    names.Add(appellation.ToUpper());
+                    names.Add(appellation);
                     _operators.Add((elem.Key, names));
                 }
             }

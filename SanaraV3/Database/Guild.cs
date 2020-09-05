@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SanaraV3.Database
 {
@@ -7,6 +8,7 @@ namespace SanaraV3.Database
         public Guild(string id)
         {
             this.id = id;
+            _scores = new Dictionary<string, int>();
         }
 
         [JsonProperty]
@@ -14,5 +16,22 @@ namespace SanaraV3.Database
 
         [JsonProperty]
         public string id;
+
+        // We can't serialize scores to keep compatibility with SanaraV2 db
+        public bool DoesContainsGame(string name)
+            => _scores.ContainsKey(name);
+
+        public int GetScore(string name)
+            => _scores[name];
+
+        public void UpdateScore(string name, int score)
+        {
+            if (_scores.ContainsKey(name))
+                _scores[name] = score;
+            else
+                _scores.Add(name, score);
+        }
+
+        private Dictionary<string, int> _scores;
     }
 }

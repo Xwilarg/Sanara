@@ -2,23 +2,35 @@
 using Discord.WebSocket;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.PostMode;
+using SanaraV3.Modules.Game.Preload;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IMessageChannel textChan, IUser user, IPostMode postMode, GameSettings settings)
+        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, GameSettings settings)
         {
             _state = GameState.PREPARE;
             _textChan = textChan;
+            if (_textChan is ITextChannel)
+                _guildId = ((ITextChannel)_textChan).GuildId;
+            else
+                throw new CommandFailed("Games are not yet available in private message."); // TODO!
             _postMode = postMode;
             _settings = settings;
+
+            _gameName = preload.GetGameNames()[0];
+            _argument = preload.GetNameArg();
 
             textChan.SendMessageAsync(GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
                 "If the game break, you can use the 'Cancel' command to cancel it." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : ""));
+
+            _contributors = new List<ulong>();
+            _score = 0;
         }
 
         protected abstract string GetPostInternal(); // Get next post
@@ -76,6 +88,9 @@ namespace SanaraV3.Modules.Game
                 string congratulation = GetSuccessMessage();
                 if (congratulation != null)
                     await _textChan.SendMessageAsync(congratulation);
+                if (!_contributors.Contains(msg.Author.Id))
+                    _contributors.Add(msg.Author.Id);
+                _score++;
                 await PostAsync();
             }
             catch (GameLost e)
@@ -105,7 +120,16 @@ namespace SanaraV3.Modules.Game
         private async Task LooseAsync(string reason)
         {
             _state = GameState.LOST;
-            await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}");
+            int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
+            string scoreSentence;
+            if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
+            else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
+            else
+            {
+                await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
+                scoreSentence = $"You best your best score of {bestScore} with a new score of {_score}!";
+            }
+            await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
         }
 
         public async Task CheckTimerAsync()
@@ -126,11 +150,18 @@ namespace SanaraV3.Modules.Game
         public bool IsMyGame(ulong chanId)
             => _textChan.Id == chanId;
 
+        private string _gameName; // Name of the game
+        private string _argument; // Game option (audio, shadow, etc...)
         private GameState _state; // Current state of the game
+        private readonly ulong _guildId;
         private readonly IMessageChannel _textChan; // Textual channel where the game is happening
-        private readonly IPostMode       _postMode; // How things should be posted
+        private readonly IPostMode _postMode; // How things should be posted
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private readonly GameSettings _settings; // Contains various settings about the game
         private string _current; // Current value, used for Replay command
+
+        // SCORES
+        private List<ulong> _contributors; // Users that contributed
+        private int _score;
     }
 }

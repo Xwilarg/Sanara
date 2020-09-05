@@ -18,6 +18,7 @@ namespace SanaraV3.Modules.Administration
             LoadPremiumHelp();
             LoadRadioHelp();
             LoadSettingHelp();
+            LoadInformationHelp();
         }
 #pragma warning restore CS0649
 

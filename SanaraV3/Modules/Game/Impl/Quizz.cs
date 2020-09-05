@@ -1,4 +1,5 @@
 ﻿using Discord;
+using DiscordUtils;
 using SanaraV3.Exceptions;
 using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
@@ -14,13 +15,13 @@ namespace SanaraV3.Modules.Game.Impl
         /// <summary>
         /// Called by QuizzAudio
         /// </summary>
-        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, mode, settings)
+        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, preload, mode, settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
         }
 
-        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, StaticObjects.ModeUrl, settings)
+        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
@@ -38,9 +39,10 @@ namespace SanaraV3.Modules.Game.Impl
 
         protected override Task CheckAnswerInternalAsync(string answer)
         {
-            if (!_allValidNames.Contains(answer.ToUpper()))
+            string userAnswer = Utils.CleanWord(answer);
+            if (!_allValidNames.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer(""); // We just add a reaction to the message to not spam the text channel
-            if (!_current.Answers.Contains(answer.ToUpper()))
+            if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer("No this is not " + answer + ".");
             return Task.CompletedTask;
         }
@@ -48,7 +50,7 @@ namespace SanaraV3.Modules.Game.Impl
         protected override string GetAnswer()
         {
             string name = _current.Answers[0];
-            return $"The right answer was {name[0] + string.Join("", name.Skip(1)).ToLower()}.";
+            return $"The right answer was {name}.";
         }
 
         protected override int GetGameTime()

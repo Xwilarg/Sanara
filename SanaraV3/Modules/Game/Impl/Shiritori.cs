@@ -13,7 +13,7 @@ namespace SanaraV3.Modules.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, StaticObjects.ModeText, settings)
+        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeText, settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;

@@ -49,6 +49,28 @@ namespace SanaraV3.Database
             ).RunAsync(_conn);
         }
 
+        public async Task<int> GetGameScoreAsync(ulong guildId, string name, string argument)
+        {
+            string fullName = argument == null ? name : (name + "-" + argument);
+            Guild g = _guilds[guildId];
+            if (g.DoesContainsGame(fullName)) // Score already in cache
+                return g.GetScore(fullName);
+            if (await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(fullName).Count().Eq(0).RunAsync<bool>(_conn)) // No score for this game in the db
+                return 0;
+            var tmp = (Cursor<string>)await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(fullName).RunAsync<string>(_conn);
+            tmp.MoveNext();
+            return int.Parse(tmp.Current.Split("|")[0]);
+        }
+
+        public async Task SaveGameScoreAsync(ulong guildId, int score, List<ulong> contributors, string name, string argument)
+        {
+            string fullName = argument == null ? name : (name + "-" + argument);
+            _guilds[guildId].UpdateScore(fullName, score);
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With(fullName, score + "|" + string.Join("|", contributors))
+            ).RunAsync(_conn);
+        }
+
         private readonly RethinkDB _r;
         private Connection _conn;
         private string _dbName;
