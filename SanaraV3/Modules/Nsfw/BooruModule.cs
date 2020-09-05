@@ -149,6 +149,8 @@ namespace SanaraV3.Modules.Nsfw
             int id = int.Parse("" + (int)booruId + post.id);
             StaticObjects.Tags.AddTag(id, booru, post);
 
+            if (post.fileUrl == null)
+                throw new CommandFailed("A post was found but no image was available.");
             await ReplyAsync(embed: new EmbedBuilder
             {
                 Color = RatingToColor(post.rating),

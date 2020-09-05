@@ -1,6 +1,7 @@
 ﻿using Discord;
 using DiscordUtils;
 using NUnit.Framework;
+using SanaraV3.Exceptions;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.Linq;
@@ -96,7 +97,15 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             var mod = new Modules.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
             var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
-            await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
+            try
+            {
+                await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
+            }
+            catch (CommandFailed)
+            {
+                if (methodName != "E621") // E621 sometimes find a post with no image inside, not much we can do for that
+                    throw;
+            }
             while (!isDone)
             { }
         }
