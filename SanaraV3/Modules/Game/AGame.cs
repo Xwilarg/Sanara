@@ -9,7 +9,7 @@ namespace SanaraV3.Modules.Game
 {
     public abstract class AGame
     {
-        protected AGame(IMessageChannel textChan, IPostMode postMode, GameSettings settings)
+        protected AGame(IMessageChannel textChan, IUser user, IPostMode postMode, GameSettings settings)
         {
             _state = GameState.PREPARE;
             _textChan = textChan;
@@ -42,7 +42,7 @@ namespace SanaraV3.Modules.Game
             if (_state != GameState.RUNNING)
                 return;
             _state = GameState.POSTING; // Making sure we can't loose or validate answer while we are posting a new image
-            await _postMode.PostAsync(_textChan, GetPostInternal());
+            await _postMode.PostAsync(_textChan, GetPostInternal(), this);
             _lastPost = DateTime.Now; // Reset timer
             _state = GameState.RUNNING;
         }

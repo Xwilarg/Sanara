@@ -1,18 +1,28 @@
 ﻿using Discord;
 using SanaraV3.Exceptions;
+using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
 using SanaraV3.Modules.Game.Preload.Result;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game
+namespace SanaraV3.Modules.Game.Impl
 {
     public class Quizz : AGame
     {
-        public Quizz(IMessageChannel textChan, IPreload preload, GameSettings settings) : base(textChan, StaticObjects.ModeUrl, settings)
+        /// <summary>
+        /// Called by QuizzAudio
+        /// </summary>
+        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, mode, settings)
         {
-            _words = preload.Load().Cast<QuizzPreloadResult>().ToList();
+            _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
+            _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
+        }
+
+        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, StaticObjects.ModeUrl, settings)
+        {
+            _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
         }
 

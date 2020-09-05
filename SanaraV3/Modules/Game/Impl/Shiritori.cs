@@ -13,9 +13,9 @@ namespace SanaraV3.Modules.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IMessageChannel textChan, IPreload preload, GameSettings settings) : base(textChan, StaticObjects.ModeText, settings)
+        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, StaticObjects.ModeText, settings)
         {
-            _words = preload.Load().Cast<ShiritoriPreloadResult>().ToList();
+            _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
             _alreadySaid = new List<string>();
         }

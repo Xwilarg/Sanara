@@ -1,6 +1,8 @@
 ﻿using Discord;
 using SanaraV3.Modules.Game.Impl;
 using SanaraV3.Modules.Game.Preload.Result;
+using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -25,14 +27,17 @@ namespace SanaraV3.Modules.Game.Preload.Impl
             }
         }
 
-        public IPreloadResult[] Load()
-            => _preload.Cast<IPreloadResult>().ToArray();
+        public ReadOnlyCollection<IPreloadResult> Load()
+            => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string[] GetGameNames()
             => new[] { "shiritori" };
 
-        public AGame CreateGame(IMessageChannel chan, GameSettings settings)
-            => new Shiritori(chan, this, settings);
+        public string GetNameArg()
+            => null;
+
+        public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
+            => new Shiritori(chan, user, this, settings);
 
         private readonly ShiritoriPreloadResult[] _preload;
     }

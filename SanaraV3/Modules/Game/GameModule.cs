@@ -20,14 +20,14 @@ namespace SanaraV3.Modules.Game
 {
     public sealed class GameModule : ModuleBase
     {
-        [Command("Play")]
-        public async Task PlayAsync(string gameName)
+        [Command("Play", RunMode = RunMode.Async)]
+        public async Task PlayAsync(string gameName, string mode = null)
         {
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
             else
             {
-                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel);
+                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel, Context.User, mode);
                 if (game == null)
                     await ReplyAsync("There is no game with this name.");
                 else
@@ -45,12 +45,12 @@ namespace SanaraV3.Modules.Game
             await game.CancelAsync();
         }
 
-        public AGame LoadGame(string gameName, IMessageChannel textChan)
+        public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string argument)
         {
             foreach (var preload in StaticObjects.Preloads)
             {
-                if (preload.GetGameNames().Contains(gameName))
-                    return preload.CreateGame(textChan, new GameSettings(false));
+                if (preload.GetGameNames().Contains(gameName) && preload.GetNameArg() == argument)
+                    return preload.CreateGame(textChan, user, new GameSettings(false));
             }
             return null;
         }

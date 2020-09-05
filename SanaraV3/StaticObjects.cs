@@ -54,6 +54,7 @@ namespace SanaraV3
         public static List<AGame> Games { get; } = new List<AGame>();
         public static TextMode ModeText { get; } = new TextMode();
         public static UrlMode ModeUrl { get; } = new UrlMode();
+        public static AudioMode ModeAudio { get; } = new AudioMode();
         public static IPreload[] Preloads { get; }
         private static GameManager GM { get; } = new GameManager();
 
@@ -93,7 +94,8 @@ namespace SanaraV3
             Preloads = new IPreload[]
             {
                 new ShiritoriPreload(),
-                new ArknightsPreload()
+                new ArknightsPreload(),
+                new ArknightsAudioPreload()
             };
         }
 
