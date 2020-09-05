@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV3.Modules.Game.Preload.Impl.Static
 {
@@ -22,7 +23,7 @@ namespace SanaraV3.Modules.Game.Preload.Impl.Static
                     List<string> names = new List<string>();
                     string appellation = elem.Value["appellation"];
 
-                    if (appellation.StartsWith("Reserve")) // Event character from the CN, you can't play have them in your list
+                    if (appellation.StartsWith("Reserve") || _exclude.Contains(appellation)) // Event character from the CN, you can't play have them in your list
                         continue;
 
                     foreach (var n in jsonName)
@@ -41,7 +42,7 @@ namespace SanaraV3.Modules.Game.Preload.Impl.Static
             }
         }
 
-        private static string[] exclude = new[] { "Pith", "Sharp", "Touch", "Stormeye" }; // Operators from CN event that you can't have
+        private static string[] _exclude = new[] { "Pith", "Sharp", "Touch", "Stormeye" };
 
         private static List<(string, List<string>)> _operators;
     }

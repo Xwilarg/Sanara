@@ -6,6 +6,7 @@ using SanaraV3.Modules.Game.PostMode;
 using SanaraV3.Modules.Game.Preload;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Game
@@ -71,13 +72,6 @@ namespace SanaraV3.Modules.Game
                 return;
 
             _state = GameState.POSTING;
-
-            if (_postMode is AudioMode)
-            {
-                var mode = (IAudioGame)this;
-                while (!mode.CanStartNewAudio()) // Wait for the current audio to finish or that will do horrible gliches
-                { }
-            }
 
             // If somehow an error happened, we try sending a new image (up to 3 times)
             int nbTries = 0;

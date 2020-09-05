@@ -22,7 +22,6 @@ namespace SanaraV3.Modules.Game.Impl
                 throw new CommandFailed("You must be in a vocal channel to play this game.");
             _voiceSession = _voiceChan.ConnectAsync().GetAwaiter().GetResult();
             _process = null;
-            _streamTask = Task.CompletedTask;
 
             while (_voiceSession.ConnectionState != ConnectionState.Connected) // We wait to be connected before starting vocal stuffs
             { }
@@ -52,20 +51,26 @@ namespace SanaraV3.Modules.Game.Impl
         /// <summary>
         /// Make sure to stop the last audio before starting a new one
         /// </summary>
-        public Process GetNewProcess()
+        public void GetNewProcess()
         {
             if (_process != null && !_process.HasExited)
                 _process.Kill();
-            return _process;
+        }
+
+        public void SetCurrentProcess(Process p)
+        {
+            _process = p;
         }
 
         public bool CanStartNewAudio()
-            => _streamTask.IsCompleted;
+        {
+            if (_process == null) return true;
+            return _process.HasExited;
+        }
 
         private IVoiceChannel _voiceChan;
         private IAudioClient _voiceSession;
         private Process _process;
         private AudioOutStream _outStream;
-        private Task _streamTask;
     }
 }

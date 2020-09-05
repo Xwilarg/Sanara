@@ -1,6 +1,5 @@
 ﻿using Discord.Audio;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace SanaraV3.Modules.Game
 {
@@ -10,6 +9,8 @@ namespace SanaraV3.Modules.Game
 
         public bool CanStartNewAudio(); // Is the no audio currently playing?
 
-        public Process GetNewProcess();
+        public void GetNewProcess();
+
+        public void SetCurrentProcess(Process p);
     }
 }
