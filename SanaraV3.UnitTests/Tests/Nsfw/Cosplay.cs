@@ -20,7 +20,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
             Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
-            Assert.AreEqual(1, embed.Fields);
+            Assert.AreEqual(1, embed.Fields.Length);
             var value = double.Parse(embed.Fields[0].Value, CultureInfo.InvariantCulture);
             Assert.True(value > 0);
             Assert.True(value < 5);
