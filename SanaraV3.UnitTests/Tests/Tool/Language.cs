@@ -1,28 +1,28 @@
-﻿using SanaraV3.UnitTests.Impl;
+﻿using NUnit.Framework;
+using SanaraV3.UnitTests.Impl;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace SanaraV3.UnitTests.Tests.Tool
 {
+    [TestFixture]
     public sealed class Language
     {
-        [Theory]
-        [InlineData("power plant", "power plant, power station", "発電所 - はつでんしょ (hatsudensho)")]
-        [InlineData("妖精", "fairy, sprite, elf", "妖精 - ようせい (yousei)")]
-        [InlineData("フランス", "France", "仏蘭西 - フランス (furansu)")]
+        [TestCase("power plant", "power plant, power station", "発電所 - はつでんしょ (hatsudensho)")]
+        [TestCase("妖精", "fairy, sprite, elf", "妖精 - ようせい (yousei)")]
+        [TestCase("フランス", "France", "仏蘭西 - フランス (furansu)")]
         public async Task InspireTest(string entry, string title1, string contentLine1) // If the first line is okay, the rest should be okay too
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>((msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 var embed = msg.Embeds.ElementAt(0);
-                Assert.Equal(5, embed.Fields.Length);
+                Assert.AreEqual(5, embed.Fields.Length);
                 var firstField = embed.Fields[0];
-                Assert.Equal(title1, firstField.Name);
-                Assert.Equal(contentLine1, firstField.Value.Split('\n')[0]);
+                Assert.AreEqual(title1, firstField.Name);
+                Assert.AreEqual(contentLine1, firstField.Value.Split('\n')[0]);
                 isDone = true;
                 return Task.CompletedTask;
             });
@@ -34,17 +34,16 @@ namespace SanaraV3.UnitTests.Tests.Tool
             { }
         }
 
-        [Theory]
-        [InlineData("つき", "tsuki")]
-        [InlineData("にちじょう", "nichijou")]
-        [InlineData("がっこう", "gakkou")]
-        [InlineData("にゃんぱす", "nyanpasu")]
-        [InlineData("フランス", "furansu")]
-        [InlineData("aあアaあアaあア", "aaaaaaaaa")]
-        [InlineData("エレベーター", "erebeta")]
+        [TestCase("つき", "tsuki")]
+        [TestCase("にちじょう", "nichijou")]
+        [TestCase("がっこう", "gakkou")]
+        [TestCase("にゃんぱす", "nyanpasu")]
+        [TestCase("フランス", "furansu")]
+        [TestCase("aあアaあアaあア", "aaaaaaaaa")]
+        [TestCase("エレベーター", "erebeta")]
         public void ToRomajiTest(string entry, string result)
         {
-            Assert.Equal(result, Modules.Tool.LanguageModule.ToRomaji(entry));
+            Assert.AreEqual(result, Modules.Tool.LanguageModule.ToRomaji(entry));
         }
     }
 }

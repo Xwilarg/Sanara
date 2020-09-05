@@ -1,15 +1,16 @@
 ﻿using Discord;
 using DiscordUtils;
+using NUnit.Framework;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace SanaraV3.UnitTests.Tests.Nsfw
 {
+    [TestFixture]
     public sealed class Booru
     {
         /// <summary>
@@ -22,23 +23,22 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
             string title = Regex.Match(embed.Title, "From ([a-zA-Z0-9]+)").Groups[1].Value.ToLower();
-            Assert.Contains(title, embed.Url); // Title is for example For Gelbooru and url must be like "gelbooru.com/XXXX"
-            Assert.Contains(title, embed.Image.Value.Url);
+            Assert.True(embed.Url.Contains(title)); // Title is for example For Gelbooru and url must be like "gelbooru.com/XXXX"
+            Assert.True(embed.Image.Value.Url.Contains(title));
         }
 
-        [Theory]
-        [InlineData("E621")]
-        [InlineData("E926")]
-        [InlineData("Safebooru")]
-        [InlineData("Gelbooru")]
-        [InlineData("Rule34")]
-        [InlineData("Konachan")]
+        [TestCase("E621")]
+        [TestCase("E926")]
+        [TestCase("Safebooru")]
+        [TestCase("Gelbooru")]
+        [TestCase("Rule34")]
+        [TestCase("Konachan")]
         public async Task BooruTest(string methodName)
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 await CheckBooruAsync((Embed)msg.Embeds.ElementAt(0));
                 isDone = true;
             });
@@ -51,19 +51,18 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             { }
         }
 
-        [Theory]
-        [InlineData("E621")]
-        [InlineData("E926")]
-        [InlineData("Safebooru")]
-        [InlineData("Gelbooru")]
-        [InlineData("Rule34")]
-        [InlineData("Konachan")]
+        [TestCase("E621")]
+        [TestCase("E926")]
+        [TestCase("Safebooru")]
+        [TestCase("Gelbooru")]
+        [TestCase("Rule34")]
+        [TestCase("Konachan")]
         public async Task BooruWithTagTest(string methodName)
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 await CheckBooruAsync((Embed)msg.Embeds.ElementAt(0));
                 isDone = true;
             });
@@ -76,22 +75,21 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             { }
         }
 
-        [Theory]
-        [InlineData("E621")]
-        [InlineData("E926")]
-        [InlineData("Safebooru")]
-        [InlineData("Gelbooru")]
-        [InlineData("Rule34")]
-        [InlineData("Konachan")]
+        [TestCase("E621")]
+        [TestCase("E926")]
+        [TestCase("Safebooru")]
+        [TestCase("Gelbooru")]
+        [TestCase("Rule34")]
+        [TestCase("Konachan")]
         public async Task BooruWithTagInvalidTest(string methodName)
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 var embed = (Embed)msg.Embeds.ElementAt(0);
                 await CheckBooruAsync(embed);
-                Assert.Contains("arknights", embed.Footer.Value.Text);
+                Assert.True(embed.Footer.Value.Text.Contains("arknights"));
                 isDone = true;
             });
 

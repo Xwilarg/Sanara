@@ -1,14 +1,15 @@
 ﻿using Discord;
 using DiscordUtils;
+using NUnit.Framework;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace SanaraV3.UnitTests.Tests.Nsfw
 {
+    [TestFixture]
     public sealed class Doujinshi
     {
         private async Task CheckEmbedAsync(Embed embed)
@@ -20,15 +21,14 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
         }
 
-        [Theory]
-        [InlineData("kancolle")]
-        [InlineData("ikazuchi color")]
+        [TestCase("kancolle")]
+        [TestCase("ikazuchi color")]
         public async Task DoujinshiTest(string tags)
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 await CheckEmbedAsync((Embed)msg.Embeds.ElementAt(0));
                 isDone = true;
             });
@@ -41,13 +41,13 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
         }
 
 
-        [Fact]
+        [Test]
         public async Task DoujinshiEmptyTest()
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 await CheckEmbedAsync((Embed)msg.Embeds.ElementAt(0));
                 isDone = true;
             });

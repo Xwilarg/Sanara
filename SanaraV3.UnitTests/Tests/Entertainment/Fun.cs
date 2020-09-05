@@ -1,22 +1,23 @@
 ﻿using DiscordUtils;
+using NUnit.Framework;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace SanaraV3.UnitTests.Tests.Entertainment
 {
+    [TestFixture]
     public sealed class Fun
     {
-        [Fact]
+        [Test]
         public async Task InspireTest()
         {
             bool isDone = false;
             var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
             {
-                Assert.Single(msg.Embeds);
+                Assert.AreEqual(1, msg.Embeds.Count);
                 var embed = msg.Embeds.ElementAt(0);
                 Assert.NotNull(embed.Image);
                 Assert.True(await Utils.IsLinkValid(embed.Image.Value.Url), embed.Image.Value.Url + " is not a valid URL.");
@@ -30,6 +31,5 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
             while (!isDone)
             { }
         }
-
     }
 }
