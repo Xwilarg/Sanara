@@ -156,7 +156,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
             Assert.True(await Utils.IsLinkValid(embed.Url), embed.Url + " is not a valid URL.");
         }
 
-        [Theory]
+        [SkipIfNoEnvTheory]
         [InlineData("eq8r1ZTma08", "命に嫌われている。／まふまふ【歌ってみた】", "命に嫌われている。 /カンザキイオリ", 73000000, 724000, 14000)]
         [InlineData("https://www.youtube.com/watch?v=R1u7oCJ8dK4", "【艦これ】ドレミゴール【皐月のオリジナル曲MV】＜キネマ106＞", "この曲だけで３種類目の動画になりました∩˘ω˘∩", 1000000, 10000, 70)]
         [InlineData("https://youtu.be/59jHEoNSlA0", "[Hatsune Miku] AaAaAaAAaAaAAa あぁあぁあぁああぁあぁああぁ PV (English Subtitles)", "Great video by NashimotoP", 700000, 29000, 200)]
@@ -164,7 +164,6 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         public async Task YoutubeTest(string search, string expectedTitle, string expectedDescription, int expectedViews, int expectedLikes, int expectedDislikes)
         {
             var youtubeKey = Environment.GetEnvironmentVariable("YOUTUBE_KEY");
-            if (youtubeKey == null) youtubeKey = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json")).YouTubeKey;
             StaticObjects.YouTube = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = youtubeKey
