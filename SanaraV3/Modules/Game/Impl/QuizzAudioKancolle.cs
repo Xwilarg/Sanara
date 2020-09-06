@@ -19,14 +19,12 @@ namespace SanaraV3.Modules.Game.Impl
 
         protected override string GetPostInternal()
         {
-            System.Console.WriteLine("GET");
             base.GetPostInternal(); // Preload a character
 
             string name = _current.Answers[0];
             string shipUrl = "https://kancolle.fandom.com/wiki/" + name;
             string html = StaticObjects.HttpClient.GetStringAsync(shipUrl).GetAwaiter().GetResult();
-            System.Console.WriteLine(Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/" + name + "[^-]+-Idle\\.ogg").Value);
-            return Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/" + name + "[^-]+-Idle\\.ogg").Value;
+            return Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/[^-]*-Battle_Start\\.ogg").Value;
         }
 
         protected override async Task CheckAnswerInternalAsync(string answer)
