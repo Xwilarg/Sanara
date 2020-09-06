@@ -63,7 +63,7 @@ namespace SanaraV3.Modules.Game.Impl
             => "I'll post an image of a character, you'll have to give his name.";
 
         protected override string GetSuccessMessage()
-            => "Congratulations, you found the right answer.";
+            => "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
 
         protected QuizzPreloadResult _current; // Word to guess
         protected List<QuizzPreloadResult> _words;

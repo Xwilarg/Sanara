@@ -212,6 +212,6 @@ namespace SanaraV3.Modules.Game
 
         // SCORES
         private List<ulong> _contributors; // Users that contributed
-        private int _score;
+        protected int _score;
     }
 }
