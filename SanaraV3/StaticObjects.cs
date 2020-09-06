@@ -36,6 +36,9 @@ namespace SanaraV3
         public static HelpPreload Help { get; } = new HelpPreload();
 
         // NSFW MODULE
+        public static string UploadWebsiteUrl { set; get; }
+        public static string UploadWebsiteLocation { set;  get; }
+
         public static Safebooru Safebooru    { get; } = new Safebooru();
         public static Gelbooru  Gelbooru     { get; } = new Gelbooru();
         public static E621      E621         { get; } = new E621();
@@ -109,6 +112,15 @@ namespace SanaraV3
                 {
                     ApiKey = credentials.YouTubeKey
                 });
+            }
+
+            if (credentials.UploadWebsiteLocation != null)
+            {
+                UploadWebsiteLocation = credentials.UploadWebsiteLocation;
+                if (!UploadWebsiteLocation.EndsWith("/")) UploadWebsiteLocation += "/";
+
+                UploadWebsiteUrl = credentials.UploadWebsiteUrl;
+                if (!UploadWebsiteUrl.EndsWith("/")) UploadWebsiteUrl += "/"; // Makes sure the URL end with a /
             }
         }
     }

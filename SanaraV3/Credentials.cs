@@ -4,5 +4,7 @@
     {
         public string BotToken;
         public string YouTubeKey;
+        public string UploadWebsiteUrl;
+        public string UploadWebsiteLocation;
     }
 }
