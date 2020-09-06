@@ -122,7 +122,7 @@ namespace SanaraV3
                 var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
                 if (game != null) // If we are in a game
                 {
-                    _ = Task.Run(async () => { await game.CheckAnswerAsync(msg); });
+                    game.AddAnswer(msg);
                 }
             }
         }

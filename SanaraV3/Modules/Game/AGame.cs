@@ -31,6 +31,8 @@ namespace SanaraV3.Modules.Game
                 "If the game break, you can use the 'Cancel' command to cancel it." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : ""));
 
+            _messages = new List<SocketUserMessage>();
+
             _contributors = new List<ulong>();
             _score = 0;
         }
@@ -82,12 +84,19 @@ namespace SanaraV3.Modules.Game
                     _current = GetPostInternal();
                     Task t = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); });
                     if (!(_postMode is AudioMode)) // We don't wait for the audio to finish for audio games
-                        t.Wait();
+                        t.Wait(5000);
+                } catch (GameLost e)
+                {
+                    await LooseAsync(e.Message);
+                    return;
                 } catch (Exception e)
                 {
                     await Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     if (nbTries == 3)
-                        throw new GameLost("Failed to get something to post after 3 tries...");
+                    {
+                        await LooseAsync("Failed to get something to post after 3 tries...");
+                        return;
+                    }
                     nbTries++;
                     continue;
                 }
@@ -97,35 +106,52 @@ namespace SanaraV3.Modules.Game
             _state = GameState.RUNNING;
         }
 
+        public void AddAnswer(SocketUserMessage msg)
+        {
+            lock (_messages)
+            {
+                _messages.Add(msg);
+            }
+        }
+
         /// <summary>
         /// Check if the user answer is valid
         /// </summary>
-        public async Task CheckAnswerAsync(SocketUserMessage msg)
+        public Task CheckAnswersAsync()
         {
-            if (_state != GameState.RUNNING)
-                return;
-            try
+            lock (_messages)
             {
-                await CheckAnswerInternalAsync(msg.Content);
-                string congratulation = GetSuccessMessage();
-                if (congratulation != null)
-                    await _textChan.SendMessageAsync(congratulation);
-                if (!_contributors.Contains(msg.Author.Id))
-                    _contributors.Add(msg.Author.Id);
-                _score++;
-                await PostAsync();
+                if (_state != GameState.RUNNING)
+                    return Task.CompletedTask;
+                foreach (var msg in _messages)
+                {
+                    try
+                    {
+                        CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
+                        string congratulation = GetSuccessMessage();
+                        if (congratulation != null)
+                            _textChan.SendMessageAsync(congratulation).GetAwaiter().GetResult();
+                        if (!_contributors.Contains(msg.Author.Id))
+                            _contributors.Add(msg.Author.Id);
+                        _score++;
+                        _ = Task.Run(async () => { await PostAsync(); }); // We don't wait for the post to be sent to not block the whole world
+                        break; // Good answer found, no need to check the others ones
+                    }
+                    catch (GameLost e)
+                    {
+                        LooseAsync(e.Message).GetAwaiter().GetResult();
+                    }
+                    catch (InvalidGameAnswer e)
+                    {
+                        if (e.Message.Length == 0)
+                            msg.AddReactionAsync(new Emoji("❌")).GetAwaiter().GetResult();
+                        else
+                            _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
+                    }
+                }
+                _messages.Clear();
             }
-            catch (GameLost e)
-            {
-                await LooseAsync(e.Message);
-            }
-            catch (InvalidGameAnswer e)
-            {
-                if (e.Message.Length == 0)
-                    await msg.AddReactionAsync(new Emoji("❌"));
-                else
-                    await _textChan.SendMessageAsync(e.Message);
-            }
+            return Task.CompletedTask;
         }
 
         public async Task CancelAsync()
@@ -181,6 +207,8 @@ namespace SanaraV3.Modules.Game
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private readonly GameSettings _settings; // Contains various settings about the game
         private string _current; // Current value, used for Replay command
+
+        List<SocketUserMessage> _messages;
 
         // SCORES
         private List<ulong> _contributors; // Users that contributed
