@@ -17,6 +17,15 @@ namespace SanaraV3.Database
         [JsonProperty]
         public string id;
 
+        [JsonProperty]
+        public string animeSubscription;
+
+        [JsonProperty]
+        public string nhentaiSubscription;
+
+        [JsonProperty]
+        public string[] nhentaiSubscriptionTags;
+
         // We can't serialize scores to keep compatibility with SanaraV2 db
         public bool DoesContainsGame(string name)
             => _scores.ContainsKey(name);

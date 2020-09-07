@@ -23,8 +23,6 @@ namespace SanaraV3.Database
                 _r.Db(_dbName).TableCreate("Guilds").Run(_conn);
         }
 
-
-
         public async Task InitGuildAsync(ulong guildId)
         {
             if (_guilds.ContainsKey(guildId)) // If the guild was already added, no need to do it a second time
