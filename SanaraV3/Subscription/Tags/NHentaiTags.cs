@@ -4,6 +4,9 @@ namespace SanaraV3.Subscription.Tags
 {
     public sealed class NHentaiTags : ASubscriptionTags
     {
+        public NHentaiTags(string[] tags, bool addDefaultTags) : base(tags, addDefaultTags)
+        { }
+
         public override Dictionary<string, string[]> GetDefaultBlacklist()
         {
             return new Dictionary<string, string[]>
