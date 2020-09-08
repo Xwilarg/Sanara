@@ -12,6 +12,7 @@ using SanaraV3.Modules.Game.Preload;
 using SanaraV3.Modules.Game.Preload.Impl;
 using SanaraV3.Modules.Nsfw;
 using SanaraV3.Modules.Radio;
+using SanaraV3.Subscription;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +70,11 @@ namespace SanaraV3
 
         // DIAPORAMA
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();
+
+        // SUBSCRIPTION
+        public static SubscriptionManager SM { get; } = new SubscriptionManager();
+        public static List<SubscriptionGuild> NHentaiSubscriptions { get; } = new List<SubscriptionGuild>();
+        public static List<SubscriptionGuild> AnimeSubscriptions { get; } = new List<SubscriptionGuild>(;)
 
         static StaticObjects()
         {
