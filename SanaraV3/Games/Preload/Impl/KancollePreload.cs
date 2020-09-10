@@ -1,15 +1,15 @@
 ﻿using Discord;
-using SanaraV3.Modules.Game.Impl;
-using SanaraV3.Modules.Game.Preload.Impl.Static;
-using SanaraV3.Modules.Game.Preload.Result;
+using SanaraV3.Games.Impl;
+using SanaraV3.Games.Preload.Impl.Static;
+using SanaraV3.Games.Preload.Result;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace SanaraV3.Modules.Game.Preload.Impl
+namespace SanaraV3.Games.Preload.Impl
 {
-    public sealed class KancolleAudioPreload : IPreload
+    public sealed class KancollePreload : IPreload
     {
-        public KancolleAudioPreload()
+        public KancollePreload()
         {
             _preload = Kancolle.GetShips().Select((x) =>
             {
@@ -24,10 +24,10 @@ namespace SanaraV3.Modules.Game.Preload.Impl
             => new[] { "kancolle", "kc", "kantaicollection" };
 
         public string GetNameArg()
-            => "audio";
+            => null;
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new QuizzAudioKancolle(chan, user, this, settings);
+            => new QuizzKancolle(chan, user, this, settings);
 
         private readonly QuizzPreloadResult[] _preload;
     }

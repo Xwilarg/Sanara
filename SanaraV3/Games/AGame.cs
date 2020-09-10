@@ -2,14 +2,13 @@
 using Discord.WebSocket;
 using DiscordUtils;
 using SanaraV3.Exceptions;
-using SanaraV3.Modules.Game.PostMode;
-using SanaraV3.Modules.Game.Preload;
+using SanaraV3.Games.PostMode;
+using SanaraV3.Games.Preload;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game
+namespace SanaraV3.Games
 {
     public abstract class AGame : IDisposable
     {

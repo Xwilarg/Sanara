@@ -1,7 +1,7 @@
 ﻿using Discord;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game.PostMode
+namespace SanaraV3.Games.PostMode
 {
     public class TextMode : IPostMode
     {

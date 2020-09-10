@@ -1,19 +1,19 @@
 ﻿using Discord;
-using SanaraV3.Modules.Game.Impl;
-using SanaraV3.Modules.Game.Preload.Impl.Static;
-using SanaraV3.Modules.Game.Preload.Result;
+using SanaraV3.Games.Impl;
+using SanaraV3.Games.Preload.Impl.Static;
+using SanaraV3.Games.Preload.Result;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace SanaraV3.Modules.Game.Preload.Impl
+namespace SanaraV3.Games.Preload.Impl
 {
-    public sealed class ArknightsPreload : IPreload
+    public sealed class ArknightsAudioPreload : IPreload
     {
-        public ArknightsPreload()
+        public ArknightsAudioPreload()
         {
             _preload = Arknights.GetOperators().Select((x) =>
             {
-                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/img/characters/" + x.Item1 + "_1.png", x.Item2.ToArray());
+                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/etc/voice/" + x.Item1 + "/CN_001.mp3", x.Item2.ToArray());
             }).ToArray();
         }
 
@@ -24,10 +24,10 @@ namespace SanaraV3.Modules.Game.Preload.Impl
             => new[] { "arknights", "ak" };
 
         public string GetNameArg()
-            => null;
+            => "audio";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new QuizzAudio(chan, user, this, settings);
 
         private readonly QuizzPreloadResult[] _preload;
     }

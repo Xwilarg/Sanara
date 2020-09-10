@@ -2,14 +2,15 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
-using SanaraV3.Modules.Game.Preload;
-using SanaraV3.Modules.Game.Preload.Result;
+using SanaraV3.Games.Preload;
+using SanaraV3.Games.Preload.Result;
+using SanaraV3.Modules.Tool;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SanaraV3.Modules.Game.Impl
+namespace SanaraV3.Games.Impl
 {
     public sealed class Shiritori : AGame
     {
@@ -40,7 +41,7 @@ namespace SanaraV3.Modules.Game.Impl
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = Tool.LanguageModule.ToHiragana(answer);
+            string hiraganaAnswer = LanguageModule.ToHiragana(answer);
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
@@ -61,7 +62,7 @@ namespace SanaraV3.Modules.Game.Impl
                     var readingObj = jp["reading"];
                     if (readingObj == null)
                         continue;
-                    reading = Tool.LanguageModule.ToHiragana(readingObj.Value<string>());
+                    reading = LanguageModule.ToHiragana(readingObj.Value<string>());
                     if (reading == hiraganaAnswer)
                     {
                         isCorrect = true;
@@ -86,7 +87,7 @@ namespace SanaraV3.Modules.Game.Impl
                 throw new InvalidGameAnswer("This word doesn't exist.");
             var ending = GetWordEnding(_currWord);
             if (!hiraganaAnswer.StartsWith(ending))
-                throw new InvalidGameAnswer($"Your word must begin by {ending} ({Tool.LanguageModule.ToRomaji(ending)}).");
+                throw new InvalidGameAnswer($"Your word must begin by {ending} ({LanguageModule.ToRomaji(ending)}).");
             if (!isNoun)
                 throw new InvalidGameAnswer("Your word must be a noun.");
             if (hiraganaAnswer == GetWordEnding(hiraganaAnswer)) // We can't just check the word count since しゃ would count as only one character

@@ -1,4 +1,4 @@
-﻿namespace SanaraV3.Modules.Game.Preload.Result
+﻿namespace SanaraV3.Games.Preload.Result
 {
     public struct ShiritoriPreloadResult : IPreloadResult
     {

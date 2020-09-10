@@ -2,12 +2,12 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
-using SanaraV3.Modules.Game.Preload;
+using SanaraV3.Games.Preload;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SanaraV3.Modules.Game.Impl
+namespace SanaraV3.Games.Impl
 {
     /// <summary>
     /// Quizz game with audio files

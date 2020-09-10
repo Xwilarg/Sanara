@@ -1,12 +1,11 @@
 ﻿using Discord;
-using Discord.Audio;
-using SanaraV3.Modules.Game.Impl;
+using SanaraV3.Games.Impl;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game.PostMode
+namespace SanaraV3.Games.PostMode
 {
     public class AudioMode : IPostMode
     {

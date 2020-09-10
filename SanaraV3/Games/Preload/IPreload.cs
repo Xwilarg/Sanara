@@ -1,7 +1,7 @@
 ﻿using Discord;
 using System.Collections.ObjectModel;
 
-namespace SanaraV3.Modules.Game.Preload
+namespace SanaraV3.Games.Preload
 {
     public interface IPreload
     {

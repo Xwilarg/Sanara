@@ -1,11 +1,10 @@
 ﻿using Discord;
 using Discord.Audio;
 using SanaraV3.Exceptions;
-using SanaraV3.Modules.Game.Preload;
+using SanaraV3.Games.Preload;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game.Impl
+namespace SanaraV3.Games.Impl
 {
     /// <summary>
     /// Quizz game with audio files

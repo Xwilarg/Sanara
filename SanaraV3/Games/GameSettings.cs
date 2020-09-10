@@ -1,4 +1,4 @@
-﻿namespace SanaraV3.Modules.Game
+﻿namespace SanaraV3.Games
 {
     public struct GameSettings
     {

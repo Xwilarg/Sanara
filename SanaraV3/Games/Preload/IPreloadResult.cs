@@ -1,4 +1,4 @@
-﻿namespace SanaraV3.Modules.Game.Preload
+﻿namespace SanaraV3.Games.Preload
 {
     public interface IPreloadResult
     { }

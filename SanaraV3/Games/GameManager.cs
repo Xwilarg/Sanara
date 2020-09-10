@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Modules.Game
+namespace SanaraV3.Games
 {
     public sealed class GameManager
     {

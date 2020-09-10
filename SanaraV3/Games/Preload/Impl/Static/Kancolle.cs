@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SanaraV3.Modules.Game.Preload.Impl.Static
+namespace SanaraV3.Games.Preload.Impl.Static
 {
     public static class Kancolle
     {
