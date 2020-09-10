@@ -92,7 +92,7 @@ namespace SanaraV3
 
         private async Task GuildJoined(SocketGuild guild)
         {
-            await StaticObjects.Db.InitGuildAsync(guild.Id);
+            await StaticObjects.Db.InitGuildAsync(guild);
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
