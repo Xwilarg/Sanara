@@ -26,6 +26,13 @@ namespace SanaraV3.Modules.Nsfw
 {
     public sealed class DoujinshiModule : ModuleBase
     {
+        [Command("Subscribe doujinshi"), RequireNsfw]
+        public async Task SubscribeDoujinshi(ITextChannel chan, params string[] tags)
+        {
+            if (!chan.IsNsfw)
+                throw new CommandFailed("Destination channel must be NSFW.");
+        }
+
         [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin")]
         public async Task GetDownloadDoujinshiAsync(int id)
         {

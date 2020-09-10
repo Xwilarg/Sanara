@@ -47,12 +47,28 @@ namespace SanaraV3.Database
                 guild = await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync<Guild>(_conn);
                 var sub = await GetSubscriptionAsync(sGuild, "anime");
                 if (sub != null)
-                    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, null));
+                    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new AnimeTags(new string[0], false)));
                 sub = await GetSubscriptionAsync(sGuild, "nhentai");
                 if (sub != null)
                     _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
             }
             _guilds.Add(sGuild.Id, guild);
+        }
+
+        // SUBSCRIPTIONS
+
+        public async Task SetSubscriptionAsync(ulong guildId, string name, ITextChannel chan, ASubscriptionTags tags)
+        {
+            if (_subscriptions[name].ContainsKey(guildId))
+                _subscriptions[name][guildId] = new SubscriptionGuild(chan, tags);
+            else
+                _subscriptions[name].Add(guildId, new SubscriptionGuild(chan, tags));
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With(name + "Subscription", chan.Id)
+            ).RunAsync(_conn);
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With(name + "SubscriptionTags", chan.Id)
+            ).RunAsync(_conn);
         }
 
         private async Task<Tuple<ITextChannel, string[]>> GetSubscriptionAsync(SocketGuild sGuild, string name)
@@ -70,6 +86,8 @@ namespace SanaraV3.Database
             string[] tags = await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "SubscriptionTags").RunAsync<string[]>(_conn);
             return new Tuple<ITextChannel, string[]>(chan, tags);
         }
+
+        // PREFIX
 
         public async Task UpdatePrefixAsync(ulong guildId, string prefix)
         {

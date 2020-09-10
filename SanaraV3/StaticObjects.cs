@@ -73,8 +73,6 @@ namespace SanaraV3
 
         // SUBSCRIPTION
         public static SubscriptionManager SM { get; } = new SubscriptionManager();
-        public static List<SubscriptionGuild> NHentaiSubscriptions { get; } = new List<SubscriptionGuild>();
-        public static List<SubscriptionGuild> AnimeSubscriptions { get; } = new List<SubscriptionGuild>();
 
         static StaticObjects()
         {
