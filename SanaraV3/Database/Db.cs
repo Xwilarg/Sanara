@@ -1,11 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using SanaraV3.Subscription;
 using SanaraV3.Subscription.Tags;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Database
@@ -17,8 +19,7 @@ namespace SanaraV3.Database
             _r = RethinkDB.R;
             _guilds = new Dictionary<ulong, Guild>();
             _subscriptions = new Dictionary<string, Dictionary<ulong, SubscriptionGuild>>();
-            _subscriptions.Add("anime", new Dictionary<ulong, SubscriptionGuild>());
-            _subscriptions.Add("nhentai", new Dictionary<ulong, SubscriptionGuild>());
+            _subscriptionProgress = new Dictionary<string, int>();
         }
 
         public async Task InitAsync(string dbName)
@@ -29,6 +30,11 @@ namespace SanaraV3.Database
                 _r.DbCreate(_dbName).Run(_conn);
             if (!await _r.Db(_dbName).TableList().Contains("Guilds").RunAsync<bool>(_conn))
                 _r.Db(_dbName).TableCreate("Guilds").Run(_conn);
+            if (!await _r.Db(_dbName).TableList().Contains("Subscriptions").RunAsync<bool>(_conn))
+                _r.Db(_dbName).TableCreate("Subscriptions").Run(_conn);
+            var tmp = (Cursor<Subscription>)await _r.Db(_dbName).Table("Subscriptions").RunAsync<Subscription>(_conn);
+            while (tmp.MoveNext())
+                _subscriptionProgress.Add(tmp.Current.id, tmp.Current.value);
         }
 
         public async Task InitGuildAsync(SocketGuild sGuild)
@@ -57,6 +63,30 @@ namespace SanaraV3.Database
 
         // SUBSCRIPTIONS
 
+        public int GetCurrent(string name)
+        {
+            if (!_subscriptionProgress.ContainsKey(name))
+                return 0;
+            return _subscriptionProgress[name];
+        }
+
+        public async Task SetCurrentAsync(string name, int value)
+        {
+            if (!_subscriptionProgress.ContainsKey(name))
+                _subscriptionProgress.Add(name, value);
+            else
+                _subscriptionProgress[name] = value;
+            if (await _r.Db(_dbName).Table("Subscriptions").GetAll(name).Count().Eq(0).RunAsync<bool>(_conn))
+                await _r.Db(_dbName).Table("Subscriptions").Insert(new Subscription(name, value)).RunAsync(_conn);
+            else
+                await _r.Db(_dbName).Table("Subscriptions").Update(new Subscription(name, value)).RunAsync(_conn);
+        }
+
+        public void InitSubscription(string name)
+        {
+            _subscriptions.Add(name, new Dictionary<ulong, SubscriptionGuild>());
+        }
+
         public async Task SetSubscriptionAsync(ulong guildId, string name, ITextChannel chan, ASubscriptionTags tags)
         {
             if (_subscriptions[name].ContainsKey(guildId))
@@ -69,6 +99,25 @@ namespace SanaraV3.Database
             await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
                 .With(name + "SubscriptionTags", chan.Id)
             ).RunAsync(_conn);
+        }
+
+        public async Task RemoveSubscriptionAsync(ulong guildId, string name)
+        {
+            if (_subscriptions[name].ContainsKey(guildId))
+                _subscriptions[name].Remove(guildId);
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With(name + "Subscription", "0")
+            ).RunAsync(_conn);
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With(name + "SubscriptionTags", new string[0])
+            ).RunAsync(_conn);
+        }
+
+        public async Task<bool> HasSubscriptionExistAsync(ulong guildId, string name)
+        {
+            if (_subscriptions[name].ContainsKey(guildId))
+                return true;
+            return !await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(name + "Subscription").Count().Eq(0).RunAsync<bool>(_conn);
         }
 
         private async Task<Tuple<ITextChannel, string[]>> GetSubscriptionAsync(SocketGuild sGuild, string name)
@@ -126,7 +175,8 @@ namespace SanaraV3.Database
         private string _dbName;
 
         private Dictionary<ulong, Guild> _guilds;
-        private Dictionary<string, Dictionary<ulong, SubscriptionGuild>> _subscriptions;
+        private Dictionary<string, Dictionary<ulong, SubscriptionGuild>> _subscriptions; // All guild subscriptions
+        private Dictionary<string, int> _subscriptionProgress;
         public Guild GetGuild(ulong id) => _guilds[id];
     }
 }

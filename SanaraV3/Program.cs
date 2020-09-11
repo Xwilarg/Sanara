@@ -118,7 +118,7 @@ namespace SanaraV3
                         await context.Channel.SendMessageAsync("This command have some invalid parameters."); // TODO: Display help
                 }
             }
-            else
+            else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing // TODO: Need to check if it's not the bot prefix
             {
                 var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
                 if (game != null) // If we are in a game

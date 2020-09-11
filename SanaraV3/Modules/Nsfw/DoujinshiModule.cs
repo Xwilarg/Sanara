@@ -3,7 +3,9 @@ using Discord.Commands;
 using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
+using SanaraV3.Attributes;
 using SanaraV3.Exceptions;
+using SanaraV3.Subscription.Tags;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -18,6 +20,8 @@ namespace SanaraV3.Modules.Administration
         {
             _help.Add(new Help("Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", true));
             _help.Add(new Help("Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", true));
+            _help.Add(new Help("Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi to a channel.", true));
+            _help.Add(new Help("Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", true));
         }
     }
 }
@@ -26,11 +30,22 @@ namespace SanaraV3.Modules.Nsfw
 {
     public sealed class DoujinshiModule : ModuleBase
     {
-        [Command("Subscribe doujinshi"), RequireNsfw]
-        public async Task SubscribeDoujinshi(ITextChannel chan, params string[] tags)
+        [Command("Subscribe doujinshi"), Alias("Subscribe doujin"), RequireNsfw, RequireAdmin]
+        public async Task SubscribeDoujinshiAsync(ITextChannel chan, params string[] tags)
         {
             if (!chan.IsNsfw)
                 throw new CommandFailed("Destination channel must be NSFW.");
+            await StaticObjects.Db.SetSubscriptionAsync(Context.Guild.Id, "nhentai", chan, new NHentaiTags(tags, true));
+            await ReplyAsync($"You subscribed for doujinshi to {chan.Mention}.");
+        }
+
+        [Command("Unsubscribe doujinshi"), Alias("Unsubscribe doujin"), RequireNsfw, RequireAdmin]
+        public async Task UnsubscribeDoujinshiAsync()
+        {
+            if (!await StaticObjects.Db.HasSubscriptionExistAsync(Context.Guild.Id, "nhentai"))
+                await ReplyAsync("There is no active doujinshi subscription.");
+            else
+                await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
         }
 
         [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin")]

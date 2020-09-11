@@ -6,6 +6,6 @@ namespace SanaraV3.Subscription
     {
         public abstract Task<FeedItem[]> GetFeedAsync(); // Get the subscription feed
 
-        public void SetCurrent(int current);
+        public string GetName();
     }
 }
