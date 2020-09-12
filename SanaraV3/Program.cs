@@ -7,6 +7,7 @@ using SanaraV3.Diaporama;
 using SanaraV3.Exceptions;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -60,6 +61,9 @@ namespace SanaraV3
             if (!Directory.Exists("Saves/Radio")) Directory.CreateDirectory("Saves/Radio");
             if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
 
+            // Set culture to invarriant (so we don't use , instead of . for decimal separator)
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
             // Initialize services
             await StaticObjects.InitializeAsync(_credentials);
 
@@ -82,6 +86,7 @@ namespace SanaraV3
             await _commands.AddModuleAsync<Modules.Nsfw.CosplayModule>(null);
             await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Modules.Tool.LanguageModule>(null);
+            await _commands.AddModuleAsync<Modules.Tool.ScienceModule>(null);
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
