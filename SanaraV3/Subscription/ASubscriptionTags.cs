@@ -20,7 +20,7 @@ namespace SanaraV3.Subscription
                 else
                 {
                     foreach (var list in GetDefaultBlacklist())
-                        tagsList.AddRange(list.Value);
+                        blacklist.AddRange(list.Value);
                 }
             }
             foreach (string s in tagsList)
