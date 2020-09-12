@@ -14,14 +14,17 @@ namespace SanaraV3.Subscription
             {
                 new NHentaiSubscription()
             };
+        }
 
+        public async Task InitAsync()
+        {
             // Init all subscriptions
             foreach (var sub in _subscriptions)
                 StaticObjects.Db.InitSubscription(sub.GetName());
 
             // We set the current value on the subscription // TODO: Maybe we shouldn't reset things everytimes the bot start
             foreach (var sub in _subscriptions)
-                StaticObjects.Db.SetCurrentAsync(sub.GetName(), sub.GetFeedAsync().GetAwaiter().GetResult()[0].Id).GetAwaiter().GetResult();
+                await StaticObjects.Db.SetCurrentAsync(sub.GetName(), (await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName())))[0].Id); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
 
             // Subscription loop
             _ = Task.Run(async () =>
@@ -40,7 +43,7 @@ namespace SanaraV3.Subscription
             {
                 try
                 {
-                    var feed = await sub.GetFeedAsync();
+                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()));
                     if (feed.Length > 0) // If there is anything new in the feed compared to last time
                     {
 

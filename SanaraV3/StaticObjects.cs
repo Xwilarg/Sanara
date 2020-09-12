@@ -80,6 +80,8 @@ namespace SanaraV3
 
             Db.InitAsync("Sanara").GetAwaiter().GetResult();
 
+            SM.InitAsync().GetAwaiter().GetResult();
+
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;
             E621.HttpClient = HttpClient;

@@ -8,13 +8,13 @@ namespace SanaraV3.Subscription.Impl
 {
     public class NHentaiSubscription : ISubscription
     {
-        public async Task<FeedItem[]> GetFeedAsync()
+        public async Task<FeedItem[]> GetFeedAsync(int current)
         {
             var datas = await SearchClient.SearchAsync();
             List<FeedItem> finalDatas = new List<FeedItem>();
             foreach (var x in datas.elements)
             {
-                if (x.id == StaticObjects.Db.GetCurrent(GetName()))
+                if (x.id == current)
                     break;
                 finalDatas.Add(new FeedItem((int)x.id, new EmbedBuilder
                 {
