@@ -52,8 +52,8 @@ namespace SanaraV3.Database
             {
                 guild = await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync<Guild>(_conn);
                 var sub = await GetSubscriptionAsync(sGuild, "anime");
-                if (sub != null)
-                    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new AnimeTags(new string[0], false)));
+                //if (sub != null)
+                //    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new AnimeTags(new string[0], false)));
                 sub = await GetSubscriptionAsync(sGuild, "nhentai");
                 if (sub != null)
                     _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
@@ -132,6 +132,8 @@ namespace SanaraV3.Database
             var chan = sGuild.GetTextChannel(ulong.Parse(sub));
             if (chan == null) // Text channel not available
                 return null;
+            if (await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "SubscriptionTags").Count().Eq(0).RunAsync<bool>(_conn))
+                return new Tuple<ITextChannel, string[]>(chan, new string[0]);
             var tags = (Cursor<string[]>)await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "SubscriptionTags").RunAsync<string[]>(_conn);
             tags.MoveNext();
             return new Tuple<ITextChannel, string[]>(chan, tags.Current);

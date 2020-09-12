@@ -62,11 +62,11 @@ namespace SanaraV3.Modules.Entertainment
             name = name.ToLowerInvariant();
             var http = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.reddit.com/r/" + name + "/random"));
             if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
-                throw new CommandFailed("There is no safe post available in this subreddit");
+                throw new CommandFailed("This subreddit doesn't exist");
             var arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync());
             if (!(arr is JArray))
             {
-                if (arr["data"]["children"].Value<JArray>().Count == 0)
+                if (arr["error"] == null && arr["data"]["children"].Value<JArray>().Count == 0)
                     throw new CommandFailed("There is no post available in this subreddit");
                 throw new CommandFailed("This post subreddit doesn't handle random post");
             }
@@ -82,7 +82,7 @@ namespace SanaraV3.Modules.Entertainment
             name = name.ToLowerInvariant();
             var http = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.reddit.com/r/" + name + "/" + filter));
             if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
-                throw new CommandFailed("There is no safe post available in this subreddit");
+                throw new CommandFailed("This subreddit doesn't exist");
             JArray arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync())["data"]["children"].Value<JArray>();
             List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
             foreach (var e in arr)
@@ -114,7 +114,7 @@ namespace SanaraV3.Modules.Entertainment
             if (preview == "spoiler") // We don't want to display spoilers
                 return null;
             // TODO: Not sure about the preview == "nsfw" part
-            return new Diaporama.Reddit(elem["title"].Value<string>(), preview == "self" || preview == "nsfw" ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
+            return new Diaporama.Reddit(elem["title"].Value<string>(), !Uri.IsWellFormedUriString(preview, UriKind.Absolute) ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
                 elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
 
