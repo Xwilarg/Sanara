@@ -26,8 +26,8 @@ namespace SanaraV3.Subscription
             foreach (var sub in _subscriptions)
             {
                 var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()));
-                // if (feed.Length > 0)
-                await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed[0].Id); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
+                if (feed.Length > 0)
+                    await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed[0].Id); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
             }
 
             // Subscription loop

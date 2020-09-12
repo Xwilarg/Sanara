@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SanaraV3
 {
@@ -59,14 +60,14 @@ namespace SanaraV3
         public static TextMode ModeText { get; } = new TextMode();
         public static UrlMode ModeUrl { get; } = new UrlMode();
         public static AudioMode ModeAudio { get; } = new AudioMode();
-        public static IPreload[] Preloads { get; }
+        public static IPreload[] Preloads { set; get; }
         private static GameManager GM { get; } = new GameManager();
 
         // LANGUAGE MODULE
-        public static Dictionary<string, string> RomajiToHiragana { get; } = new Dictionary<string, string>();
-        public static Dictionary<string, string> HiraganaToRomaji { get; } = new Dictionary<string, string>();
-        public static Dictionary<string, string> RomajiToKatakana { get; } = new Dictionary<string, string>();
-        public static Dictionary<string, string> KatakanaToRomaji { get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> RomajiToHiragana { set; get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> HiraganaToRomaji { set; get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> RomajiToKatakana { set; get; } = new Dictionary<string, string>();
+        public static Dictionary<string, string> KatakanaToRomaji { set; get; } = new Dictionary<string, string>();
 
         // DIAPORAMA
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();
@@ -74,11 +75,11 @@ namespace SanaraV3
         // SUBSCRIPTION
         public static SubscriptionManager SM { get; } = new SubscriptionManager();
 
-        static StaticObjects()
+        public static async Task Initialize(Credentials credentials)
         {
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+            await Db.InitAsync("Sanara");
 
-            Db.InitAsync("Sanara").GetAwaiter().GetResult();
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
 
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;
@@ -98,8 +99,6 @@ namespace SanaraV3
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
             }
 
-            SM.InitAsync().GetAwaiter().GetResult();
-
             Preloads = new IPreload[]
             {
                 new ShiritoriPreload(),
@@ -108,11 +107,10 @@ namespace SanaraV3
                 new KancollePreload(),
                 new KancolleAudioPreload()
             };
-            GM.Init();
-        }
 
-        public static void Initialize(Credentials credentials)
-        {
+            await SM.InitAsync();
+            GM.Init();
+
             if (credentials.YouTubeKey != null)
             {
                 YouTube = new YouTubeService(new BaseClientService.Initializer
