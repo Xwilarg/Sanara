@@ -75,7 +75,7 @@ namespace SanaraV3
         // SUBSCRIPTION
         public static SubscriptionManager SM { get; } = new SubscriptionManager();
 
-        public static async Task Initialize(Credentials credentials)
+        public static async Task InitializeAsync(Credentials credentials)
         {
             await Db.InitAsync("Sanara");
 

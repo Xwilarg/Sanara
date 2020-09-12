@@ -61,7 +61,7 @@ namespace SanaraV3
             if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
 
             // Initialize services
-            await StaticObjects.Initialize(_credentials);
+            await StaticObjects.InitializeAsync(_credentials);
 
             // Discord callbacks
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
