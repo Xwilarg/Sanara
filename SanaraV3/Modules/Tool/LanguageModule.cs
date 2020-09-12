@@ -3,9 +3,11 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -16,6 +18,7 @@ namespace SanaraV3.Modules.Administration
         public void LoadJapaneseHelp()
         {
             _help.Add(new Help("Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", false));
+            _help.Add(new Help("Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", false));
         }
     }
 }
@@ -24,6 +27,98 @@ namespace SanaraV3.Modules.Tool
 {
     public sealed class LanguageModule : ModuleBase
     {
+        [Command("Kanji", RunMode = RunMode.Async)]
+        public async Task KanjiAsync(string kanji)
+        {
+            JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(kanji)));
+            if (json["data"].Value<JArray>().Count == 0 || json["data"][0]["japanese"][0]["word"] == null)
+                throw new CommandFailed("I didn't find any kanji with this query.");
+
+            char? finalKanji = null;
+
+            // If player input is a kanji
+            char playerChar = kanji[0];
+            foreach (var elem in json["data"].Value<JArray>())
+            {
+                foreach (var elem2 in elem["japanese"].Value<JArray>())
+                {
+                    if (elem2["word"] != null && elem2["word"].Value<string>() == playerChar.ToString())
+                    {
+                        finalKanji = playerChar;
+                    }
+                }
+            }
+
+            // Else we take the first result we got on our Jisho search
+            if (!finalKanji.HasValue)
+                finalKanji = json["data"][0]["japanese"][0]["word"].Value<string>()[0];
+
+            string url = "https://jisho.org/search/" + finalKanji + "%20%23kanji";
+            string html = await StaticObjects.HttpClient.GetStringAsync(url);
+
+            // Radical of the kanji
+            var radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
+
+            // Kanji meaning in english
+            var meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
+
+            // All parts composing the kanji
+            Dictionary<string, string> parts = new Dictionary<string, string>();
+            foreach (var match in Regex.Matches(html, "<a href=\"(\\/\\/jisho\\.org\\/search\\/[^k]+kanji)\">([^<]+)<\\/a>").Cast<Match>())
+            {
+                string name = match.Groups[2].Value;
+                if (name[0] == finalKanji.Value)
+                    parts.Add(name, meaning);
+                else
+                    parts.Add(name, Regex.Match(await StaticObjects.HttpClient.GetStringAsync("https:" + match.Groups[1].Value), "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim());
+            }
+
+            // Onyomi and kunyomi (ways to read the kanji)
+            Dictionary<string, string> onyomi = new Dictionary<string, string>();
+            Dictionary<string, string> kunyomi = new Dictionary<string, string>();
+            if (html.Contains("<dt>On:"))
+                foreach (var match in Regex.Matches(html.Split(new[] { "<dt>On:" }, StringSplitOptions.None)[1]
+                    .Split(new[] { "</dd>" }, StringSplitOptions.None)[0],
+                    "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                    onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+            if (html.Contains("<dt>Kun:"))
+                foreach (var match in Regex.Matches(html.Split(new[] { "<dt>Kun:" }, StringSplitOptions.None)[1]
+                    .Split(new string[] { "</dd>" }, StringSplitOptions.None)[0],
+                "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                    kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Title = finalKanji.Value.ToString(),
+                // Url = url, // TODO: https://github.com/dotnet/runtime/issues/21626 , Discord.NET said they will fix that in a next release
+                Description = meaning,
+                ImageUrl = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)finalKanji.Value + "_frames.png",
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Radical",
+                        Value = radicalMatch.Groups[2].Value.Trim() + ": " + radicalMatch.Groups[1].Value.Trim()
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Parts",
+                        Value = string.Join("\n", parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value))
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Onyomi",
+                        Value = onyomi.Count == 0 ? "None" : string.Join("\n", onyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Kunyomi",
+                        Value = kunyomi.Count == 0 ? "None" : string.Join("\n", kunyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                    },
+                }
+            }.Build());
+        }
+
         [Command("Japanese", RunMode = RunMode.Async)]
         public async Task JapaneseAsync([Remainder]string str)
         {
@@ -37,7 +132,8 @@ namespace SanaraV3.Modules.Tool
             var embed = new EmbedBuilder
             {
                 Color = Color.Blue,
-                Title = str
+                Title = str,
+                Url = "https://jisho.org/search/" + HttpUtility.UrlEncode(str)
             };
             foreach (var elem in data)
             {

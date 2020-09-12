@@ -43,7 +43,7 @@ namespace SanaraV3.Modules.Entertainment
         [Command("Reddit top", RunMode = RunMode.Async)]
         public async Task RedditTopAsync([Remainder]string name)
         {
-            await GetRedditEmbedAsync(name, "hot");
+            await GetRedditEmbedAsync(name, "top/?t=all");
         }
 
         [Command("Reddit new", RunMode = RunMode.Async)]
@@ -113,7 +113,8 @@ namespace SanaraV3.Modules.Entertainment
                 preview = elem["thumbnail"].Value<string>();
             if (preview == "spoiler") // We don't want to display spoilers
                 return null;
-            return new Diaporama.Reddit(elem["title"].Value<string>(), preview == "self" ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
+            // TODO: Not sure about the preview == "nsfw" part
+            return new Diaporama.Reddit(elem["title"].Value<string>(), preview == "self" || preview == "nsfw" ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
                 elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
 
