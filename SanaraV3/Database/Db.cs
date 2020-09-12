@@ -136,6 +136,9 @@ namespace SanaraV3.Database
             return new Tuple<ITextChannel, string[]>(chan, tags);
         }
 
+        public SubscriptionGuild[] GetAllSubscriptions(string name)
+            => _subscriptions[name].Values.ToArray();
+
         // PREFIX
 
         public async Task UpdatePrefixAsync(ulong guildId, string prefix)

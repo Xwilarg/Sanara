@@ -80,8 +80,6 @@ namespace SanaraV3
 
             Db.InitAsync("Sanara").GetAwaiter().GetResult();
 
-            SM.InitAsync().GetAwaiter().GetResult();
-
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;
             E621.HttpClient = HttpClient;
@@ -100,6 +98,8 @@ namespace SanaraV3
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
             }
 
+            SM.InitAsync().GetAwaiter().GetResult();
+
             Preloads = new IPreload[]
             {
                 new ShiritoriPreload(),
@@ -108,6 +108,7 @@ namespace SanaraV3
                 new KancollePreload(),
                 new KancolleAudioPreload()
             };
+            GM.Init();
         }
 
         public static void Initialize(Credentials credentials)

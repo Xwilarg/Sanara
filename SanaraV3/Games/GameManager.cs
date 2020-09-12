@@ -9,6 +9,10 @@ namespace SanaraV3.Games
         public GameManager()
         {
             thread = new Thread(new ThreadStart(Loop));
+        }
+
+        public void Init()
+        {
             thread.Start();
         }
 
