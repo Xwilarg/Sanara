@@ -94,10 +94,10 @@ namespace SanaraV3.Database
             else
                 _subscriptions[name].Add(guildId, new SubscriptionGuild(chan, tags));
             await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
-                .With(name + "Subscription", chan.Id)
+                .With(name + "Subscription", chan.Id.ToString())
             ).RunAsync(_conn);
             await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
-                .With(name + "SubscriptionTags", chan.Id)
+                .With(name + "SubscriptionTags", tags.ToStringArray())
             ).RunAsync(_conn);
         }
 
@@ -132,8 +132,9 @@ namespace SanaraV3.Database
             var chan = sGuild.GetTextChannel(ulong.Parse(sub));
             if (chan == null) // Text channel not available
                 return null;
-            string[] tags = await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "SubscriptionTags").RunAsync<string[]>(_conn);
-            return new Tuple<ITextChannel, string[]>(chan, tags);
+            var tags = (Cursor<string[]>)await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "SubscriptionTags").RunAsync<string[]>(_conn);
+            tags.MoveNext();
+            return new Tuple<ITextChannel, string[]>(chan, tags.Current);
         }
 
         public SubscriptionGuild[] GetAllSubscriptions(string name)
