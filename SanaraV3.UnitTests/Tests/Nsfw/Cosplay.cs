@@ -38,7 +38,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Modules.Nsfw.CosplayModule();
+            var mod = new Module.Nsfw.CosplayModule();
             Common.AddContext(mod, callback);
             await mod.CosplayAsync(tags);
             while (!isDone)
@@ -56,7 +56,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Modules.Nsfw.CosplayModule();
+            var mod = new Module.Nsfw.CosplayModule();
             Common.AddContext(mod, callback);
             await mod.CosplayAsync();
             while (!isDone)

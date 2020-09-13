@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="LanguageResources\Hiragana.json">
+    <None Update="LanguageResource\Hiragana.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="LanguageResources\Katakana.json">
+    <None Update="LanguageResource\Katakana.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

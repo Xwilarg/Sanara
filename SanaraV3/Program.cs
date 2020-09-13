@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using DiscordUtils;
 using Newtonsoft.Json;
 using SanaraV3.Diaporama;
-using SanaraV3.Exceptions;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -29,7 +28,7 @@ namespace SanaraV3
             {
                 throw;
             }
-            catch (Exception) // If an exception occur, the program exit and is relaunched
+            catch (System.Exception) // If an exception occur, the program exit and is relaunched
             {
                 if (Debugger.IsAttached)
                     throw;
@@ -74,19 +73,23 @@ namespace SanaraV3
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
 
+            // Add readers
+            _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
+
             // Discord modules
-            await _commands.AddModuleAsync<Modules.Administration.InformationModule>(null);
-            await _commands.AddModuleAsync<Modules.Administration.PremiumModule>(null);
-            await _commands.AddModuleAsync<Modules.Administration.SettingModule>(null);
-            await _commands.AddModuleAsync<Modules.Entertainment.FunModule>(null);
-            await _commands.AddModuleAsync<Modules.Entertainment.MediaModule>(null);
-            await _commands.AddModuleAsync<Modules.Game.GameModule>(null);
-            await _commands.AddModuleAsync<Modules.Nsfw.BooruModule>(null);
-            await _commands.AddModuleAsync<Modules.Nsfw.DoujinshiModule>(null);
-            await _commands.AddModuleAsync<Modules.Nsfw.CosplayModule>(null);
-            await _commands.AddModuleAsync<Modules.Radio.RadioModule>(null);
-            await _commands.AddModuleAsync<Modules.Tool.LanguageModule>(null);
-            await _commands.AddModuleAsync<Modules.Tool.ScienceModule>(null);
+            await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
+            await _commands.AddModuleAsync<Module.Administration.PremiumModule>(null);
+            await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
+            await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
+            await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
+            await _commands.AddModuleAsync<Module.Game.GameModule>(null);
+            await _commands.AddModuleAsync<Module.Nsfw.BooruModule>(null);
+            await _commands.AddModuleAsync<Module.Nsfw.DoujinshiModule>(null);
+            await _commands.AddModuleAsync<Module.Nsfw.CosplayModule>(null);
+            await _commands.AddModuleAsync<Module.Radio.RadioModule>(null);
+            await _commands.AddModuleAsync<Module.Tool.CommunicationModule>(null);
+            await _commands.AddModuleAsync<Module.Tool.LanguageModule>(null);
+            await _commands.AddModuleAsync<Module.Tool.ScienceModule>(null);
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
@@ -145,7 +148,7 @@ namespace SanaraV3
             CommandException ce = msg.Exception as CommandException;
             if (ce != null)
             {
-                if (msg.Exception.InnerException is CommandFailed) // Exception thrown from modules when a command failed
+                if (msg.Exception.InnerException is Exception.CommandFailed) // Exception thrown from modules when a command failed
                 {
                     await ce.Context.Channel.SendMessageAsync(msg.Exception.InnerException.Message);
                 }

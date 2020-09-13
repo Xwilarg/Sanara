@@ -1,4 +1,4 @@
-﻿using SanaraV3.Exceptions;
+﻿using SanaraV3.Exception;
 using System.Collections.Generic;
 using System.Linq;
 

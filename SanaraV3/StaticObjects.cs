@@ -5,13 +5,13 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
 using SanaraV3.Database;
-using SanaraV3.Modules.Administration;
-using SanaraV3.Games;
-using SanaraV3.Games.PostMode;
-using SanaraV3.Games.Preload;
-using SanaraV3.Games.Preload.Impl;
-using SanaraV3.Modules.Nsfw;
-using SanaraV3.Modules.Radio;
+using SanaraV3.Module.Administration;
+using SanaraV3.Game;
+using SanaraV3.Game.PostMode;
+using SanaraV3.Game.Preload;
+using SanaraV3.Game.Preload.Impl;
+using SanaraV3.Module.Nsfw;
+using SanaraV3.Module.Radio;
 using SanaraV3.Subscription;
 using System;
 using System.Collections.Generic;
@@ -88,12 +88,12 @@ namespace SanaraV3
             Rule34.HttpClient = HttpClient;
             Konachan.HttpClient = HttpClient;
 
-            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Hiragana.json"));
+            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Hiragana.json"));
             foreach (var elem in RomajiToHiragana)
             {
                 HiraganaToRomaji.Add(elem.Value, elem.Key);
             }
-            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Katakana.json"));
+            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Katakana.json"));
             foreach (var elem in RomajiToKatakana)
             {
                 KatakanaToRomaji.Add(elem.Value, elem.Key);

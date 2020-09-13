@@ -63,14 +63,14 @@ namespace SanaraV3.Subscription
                                     }
                                 }
                             }
-                            catch (Exception e)
+                            catch (System.Exception e)
                             {
                                 await Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                             }
                         }
                     }
                 }
-                catch (Exception e) // If somehow wrong happens while getting new subscription
+                catch (System.Exception e) // If somehow wrong happens while getting new subscription
                 {
                     await Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                 }

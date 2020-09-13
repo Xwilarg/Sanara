@@ -1,7 +1,7 @@
 ﻿using Discord;
 using DiscordUtils;
 using NUnit.Framework;
-using SanaraV3.Exceptions;
+using SanaraV3.Exception;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.Linq;
@@ -44,9 +44,9 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Modules.Nsfw.BooruModule();
+            var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new object[] { null });
             while (!isDone)
             { }
@@ -68,9 +68,9 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Modules.Nsfw.BooruModule();
+            var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
             while (!isDone)
             { }
@@ -94,9 +94,9 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Modules.Nsfw.BooruModule();
+            var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Modules.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
             try
             {
                 await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });

@@ -76,7 +76,7 @@ namespace SanaraV3.UnitTests.Tests.Tool
                 return Task.CompletedTask;
             });
 
-            var mod = new Modules.Tool.LanguageModule();
+            var mod = new Module.Tool.LanguageModule();
             Common.AddContext(mod, callback);
             await mod.KanjiAsync(entry);
             while (!isDone)
@@ -101,7 +101,7 @@ namespace SanaraV3.UnitTests.Tests.Tool
                 return Task.CompletedTask;
             });
 
-            var mod = new Modules.Tool.LanguageModule();
+            var mod = new Module.Tool.LanguageModule();
             Common.AddContext(mod, callback);
             await mod.JapaneseAsync(entry);
             while (!isDone)
@@ -117,7 +117,7 @@ namespace SanaraV3.UnitTests.Tests.Tool
         [TestCase("エレベーター", "erebeta")]
         public void ToRomajiTest(string entry, string result)
         {
-            Assert.AreEqual(result, Modules.Tool.LanguageModule.ToRomaji(entry));
+            Assert.AreEqual(result, Module.Tool.LanguageModule.ToRomaji(entry));
         }
     }
 }

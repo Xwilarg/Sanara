@@ -24,7 +24,7 @@ namespace SanaraV3.UnitTests.Tests.Tool
             });
 
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; // Some
-            var mod = new Modules.Tool.ScienceModule();
+            var mod = new Module.Tool.ScienceModule();
             Common.AddContext(mod, callback);
             await mod.CalcAsync(entry);
             while (!isDone)

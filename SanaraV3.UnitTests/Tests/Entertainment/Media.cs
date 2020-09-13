@@ -3,7 +3,7 @@ using DiscordUtils;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using NUnit.Framework;
-using SanaraV3.Exceptions;
+using SanaraV3.Exception;
 using SanaraV3.UnitTests.Impl;
 using System;
 using System.IO;
@@ -33,7 +33,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         {
             var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditRandomAsync("awawawawawawawawa"));
         }
@@ -43,7 +43,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         {
             var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditTopAsync("awawawawawawawawa"));
         }
@@ -53,7 +53,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
         {
             var callback = new Func<UnitTestUserMessage, Task>((msg) => Task.CompletedTask);
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             Assert.ThrowsAsync<CommandFailed>(async () => await mod.RedditRandomAsync("KanMusuNights"));
         }
@@ -69,7 +69,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.RedditRandomAsync("arknuts");
             while (!isDone)
@@ -87,7 +87,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.RedditHotAsync("touhou");
             while (!isDone)
@@ -105,7 +105,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.RedditNewAsync("arknights");
             while (!isDone)
@@ -123,7 +123,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.RedditHotAsync("wholesomeyuri");
             while (!isDone)
@@ -178,7 +178,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.YoutubeAsync(search);
             while (!isDone)
@@ -196,7 +196,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.XkcdAsync();
             while (!isDone)
@@ -214,7 +214,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.XkcdLastAsync();
             while (!isDone)
@@ -235,7 +235,7 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
                 isDone = true;
             });
 
-            var mod = new Modules.Entertainment.MediaModule();
+            var mod = new Module.Entertainment.MediaModule();
             Common.AddContext(mod, callback);
             await mod.XkcdAsync(1172);
             while (!isDone)
