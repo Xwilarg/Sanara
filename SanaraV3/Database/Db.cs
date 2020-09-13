@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
+using SanaraV3.Game.Preload.Result;
 using SanaraV3.Subscription;
 using SanaraV3.Subscription.Tags;
 using System;
@@ -59,6 +60,22 @@ namespace SanaraV3.Database
                     _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
             }
             _guilds.Add(sGuild.Id, guild);
+        }
+
+        // CACHES
+
+        public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
+        {
+            if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
+                return new QuizzPreloadResult[0];
+            return ((Cursor<QuizzPreloadResult>)await _r.Db(_dbName).Table("Cache_" + name).RunAsync<QuizzPreloadResult>(_conn)).ToArray();
+        }
+
+        public async Task SetCacheAsync(string name, QuizzPreloadResult value)
+        {
+            if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
+                await _r.Db(_dbName).TableCreate("Cache_" + name).RunAsync(_conn);
+            await _r.Db(_dbName).Table("Cache_" + name).Insert(value).RunAsync(_conn);
         }
 
         // SUBSCRIPTIONS

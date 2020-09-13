@@ -1,4 +1,6 @@
-﻿namespace SanaraV3.Game.Preload.Result
+﻿using Newtonsoft.Json;
+
+namespace SanaraV3.Game.Preload.Result
 {
     public struct QuizzPreloadResult : IPreloadResult
     {
@@ -6,9 +8,16 @@
         {
             ImageUrl = imageUrl;
             Answers = answers;
+            id = answers[0];
         }
 
-        public string ImageUrl { get; } // URL to the image
-        public string[] Answers { get; }  // Possible answers
+        [JsonProperty]
+        public string id;
+
+        [JsonProperty]
+        public string ImageUrl; // URL to the image
+
+        [JsonProperty]
+        public string[] Answers;  // Possible answers
     }
 }

@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DiscordUtils;
 
 namespace SanaraV3
 {
@@ -99,6 +100,7 @@ namespace SanaraV3
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
             }
 
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload"));
             Preloads = new IPreload[]
             {
                 new ShiritoriPreload(),
@@ -107,6 +109,7 @@ namespace SanaraV3
                 new KancollePreload(),
                 new KancolleAudioPreload()
             };
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 
             await SM.InitAsync();
             GM.Init();
