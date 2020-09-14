@@ -42,14 +42,6 @@ namespace SanaraV3
             _commands.Log += LogErrorAsync;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
-            // If the bot takes way too much time to start, we stop the program
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(Constants.PROGRAM_TIMEOUT);
-                if (!_didStart)
-                    Environment.Exit(1);
-            });
-
             // Load credentials
             if (!File.Exists("Keys/Credentials.json"))
                 throw new FileNotFoundException("Missing Credentials file");
@@ -65,6 +57,15 @@ namespace SanaraV3
 
             // Initialize services
             await StaticObjects.InitializeAsync(_credentials);
+
+            // If the bot takes way too much time to start, we stop the program
+            // We do that after the StaticObjects initialization because the first time we load game cache, it can takes plenty of time
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(Constants.PROGRAM_TIMEOUT);
+                if (!_didStart)
+                    Environment.Exit(1);
+            });
 
             // Discord callbacks
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
