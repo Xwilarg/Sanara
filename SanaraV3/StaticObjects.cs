@@ -55,7 +55,10 @@ namespace SanaraV3
 
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube { set; get; }
-        public static HttpRequestMessage KitsuAuth { set; get; }
+        public static HttpRequestMessage KitsuAuth { set; get; } = null;
+        public static string KitsuAccessToken { set; get; } = null;
+        public static DateTime KitsuRefreshDate { set; get; }
+        public static string KitsuRefreshToken { set; get; }
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();
