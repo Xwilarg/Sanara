@@ -54,7 +54,8 @@ namespace SanaraV3
         public static Dictionary<ulong, RadioChannel> Radios { get; } = new Dictionary<ulong, RadioChannel>();
 
         // ENTERTAINMENT MODULE
-        public static YouTubeService YouTube { set;  get; }
+        public static YouTubeService YouTube { set; get; }
+        public static HttpRequestMessage KitsuAuth { set; get; }
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();
@@ -120,6 +121,19 @@ namespace SanaraV3
                 {
                     ApiKey = credentials.YouTubeKey
                 });
+            }
+
+            if (credentials.KitsuEmail != null)
+            {
+                KitsuAuth = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token")
+                {
+                    Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                    {
+                        { "grant_type", "password" },
+                        { "username", credentials.KitsuEmail },
+                        { "password", credentials.KitsuPassword }
+                    })
+                };
             }
 
             if (credentials.UploadWebsiteLocation != null)
