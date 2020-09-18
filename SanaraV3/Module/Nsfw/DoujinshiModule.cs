@@ -20,7 +20,7 @@ namespace SanaraV3.Module.Administration
         {
             _help.Add(new Help("Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", true));
             _help.Add(new Help("Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", true));
-            _help.Add(new Help("Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi to a channel.", true));
+            _help.Add(new Help("Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", true));
             _help.Add(new Help("Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", true));
         }
     }

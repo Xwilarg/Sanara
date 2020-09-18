@@ -3,7 +3,9 @@ using Discord.Commands;
 using DiscordUtils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SanaraV3.Attribute;
 using SanaraV3.Exception;
+using SanaraV3.Subscription.Tags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,8 @@ namespace SanaraV3.Module.Administration
             _help.Add(new Help("Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", false));
             _help.Add(new Help("Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", false));
             _help.Add(new Help("Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", false));
+            _help.Add(new Help("Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new anime in to a channel.", true));
+            _help.Add(new Help("Unsubscribe anime", new Argument[0], "Remove a anime subscription.", true));
         }
     }
 }
@@ -28,6 +32,22 @@ namespace SanaraV3.Module.Entertainment
 {
     public sealed class JapaneseModule : ModuleBase
     {
+        [Command("Subscribe anime"), RequireAdmin]
+        public async Task SubscribeAnimeAsync(ITextChannel chan, params string[] tags)
+        {
+            await StaticObjects.Db.SetSubscriptionAsync(Context.Guild.Id, "anime", chan, new AnimeTags(tags, true));
+            await ReplyAsync($"You subscribed for anime to {chan.Mention}.");
+        }
+
+        [Command("Unsubscribe anime"), RequireAdmin]
+        public async Task UnsubscribeAnimeAsync()
+        {
+            if (!await StaticObjects.Db.HasSubscriptionExistAsync(Context.Guild.Id, "anime"))
+                await ReplyAsync("There is no active anime subscription.");
+            else
+                await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "anime");
+        }
+
         [Command("Manga", RunMode = RunMode.Async)]
         public async Task MangaAsync([Remainder] string name)
         {
