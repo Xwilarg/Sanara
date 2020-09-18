@@ -9,16 +9,19 @@ namespace SanaraV3.Module.Administration
         {
             _help = new List<Help>();
             LoadBooruHelp();
+            LoadCommunicationHelp();
             LoadCosplayHelp();
             LoadDoujinshiHelp();
             LoadFunHelp();
             LoadGameHelp();
+            LoadInformationHelp();
             LoadJapaneseHelp();
+            LoadLanguageHelp();
             LoadMediaHelp();
             LoadPremiumHelp();
             LoadRadioHelp();
+            LoadScienceHelp();
             LoadSettingHelp();
-            LoadInformationHelp();
         }
 #pragma warning restore CS0649
 

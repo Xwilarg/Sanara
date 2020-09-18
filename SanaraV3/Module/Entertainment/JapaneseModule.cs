@@ -11,6 +11,19 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Module.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadJapaneseHelp()
+        {
+            _help.Add(new Help("Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", false));
+            _help.Add(new Help("Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", false));
+            _help.Add(new Help("Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Module.Entertainment
 {
     public sealed class JapaneseModule : ModuleBase

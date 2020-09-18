@@ -15,7 +15,7 @@ namespace SanaraV3.Module.Administration
 {
     public sealed partial class HelpPreload
     {
-        public void LoadJapaneseHelp()
+        public void LoadLanguageHelp()
         {
             _help.Add(new Help("Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", false));
             _help.Add(new Help("Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", false));

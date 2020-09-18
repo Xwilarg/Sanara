@@ -4,6 +4,17 @@ using SanaraV3.Exception;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace SanaraV3.Module.Administration
+{
+    public sealed partial class HelpPreload
+    {
+        public void LoadCommunicationHelp()
+        {
+            _help.Add(new Help("Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", false));
+        }
+    }
+}
+
 namespace SanaraV3.Module.Tool
 {
     public sealed class CommunicationModule : ModuleBase
