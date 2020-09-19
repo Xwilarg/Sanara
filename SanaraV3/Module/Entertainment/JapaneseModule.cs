@@ -51,22 +51,22 @@ namespace SanaraV3.Module.Entertainment
         [Command("Manga", RunMode = RunMode.Async)]
         public async Task MangaAsync([Remainder] string name)
         {
-            await SearchMediaAsync(JapaneseMedia.MANGA, name);
+            await PostAnimeEmbedAsync(JapaneseMedia.MANGA, await SearchMediaAsync(JapaneseMedia.MANGA, name));
         }
         
         [Command("Anime", RunMode = RunMode.Async)]
         public async Task AnimeAsync([Remainder] string name)
         {
-            await SearchMediaAsync(JapaneseMedia.ANIME, name);
+            await PostAnimeEmbedAsync(JapaneseMedia.ANIME, await SearchMediaAsync(JapaneseMedia.ANIME, name));
         }
 
         [Command("Light novel", RunMode = RunMode.Async), Alias("LN")]
         public async Task LightNovelAsync([Remainder] string name)
         {
-            await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name);
+            await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
         }
 
-        private async Task SearchMediaAsync(JapaneseMedia media, string query)
+        public static async Task<JToken> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
         {
             // Authentification is required to see NSFW content
             if (StaticObjects.KitsuAuth != null)
@@ -121,22 +121,25 @@ namespace SanaraV3.Module.Entertainment
             string cleanName = Utils.CleanWord(query); // Cleaned word for comparaisons
 
             // If we can find an exact match, we go with that
+            string upperName = query.ToUpper();
             foreach (var elem in allData)
             {
-                if (elem["attributes"]["canonicalTitle"].Value<string>() == query ||
-                    elem["attributes"]["titles"]["en"] != null && elem["attributes"]["titles"]["en"].Value<string>() == query ||
-                    elem["attributes"]["titles"]["en_jp"] != null && elem["attributes"]["titles"]["en_jp"].Value<string>() == query ||
-                    elem["attributes"]["titles"]["en_us"] != null && elem["attributes"]["titles"]["en_us"].Value<string>() == query)
+                if (elem["attributes"]["canonicalTitle"].Value<string>().ToUpper() == upperName ||
+                    elem["attributes"]["titles"]["en"] != null && elem["attributes"]["titles"]["en"].Value<string>().ToUpper() == upperName ||
+                    elem["attributes"]["titles"]["en_jp"] != null && elem["attributes"]["titles"]["en_jp"].Value<string>().ToUpper() == upperName ||
+                    elem["attributes"]["titles"]["en_us"] != null && elem["attributes"]["titles"]["en_us"].Value<string>().ToUpper() == upperName)
                 {
-                    await PostAnimeEmbedAsync(media, elem);
-                    return;
+                    return elem;
                 }
             }
+
+            if (onlyExactMatch) // Used by subscriptions (because we want to be 100% sure to not match the wrong anime)
+                throw new CommandFailed("Nothing was found with this name");
 
             // Else we try to find something that somehow match
             foreach (var elem in allData)
             {
-                if (Utils.CleanWord(elem["attributes"]["canonicalTitle"].Value<string>()) == query ||
+                if (Utils.CleanWord(elem["attributes"]["canonicalTitle"].Value<string>()).Contains(cleanName) ||
                     elem["attributes"]["titles"]["en"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en"].Value<string>() ?? "").Contains(cleanName) ||
                     elem["attributes"]["titles"]["en_jp"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en_jp"].Value<string>() ?? "").Contains(cleanName) ||
                     elem["attributes"]["titles"]["en_us"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en_us"].Value<string>() ?? "").Contains(cleanName))
@@ -146,13 +149,12 @@ namespace SanaraV3.Module.Entertainment
                     if (media == JapaneseMedia.ANIME && elem["attributes"]["subtype"].Value<string>() != "TV")
                         continue;
 
-                    await PostAnimeEmbedAsync(media, elem);
-                    return;
+                    return elem;
                 }
             }
 
             // Otherwise, we just fall back on the first result available
-            await PostAnimeEmbedAsync(media, allData[0]);
+            return allData[0];
         }
 
         private async Task PostAnimeEmbedAsync(JapaneseMedia media, JToken token)

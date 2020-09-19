@@ -79,7 +79,6 @@ namespace SanaraV3
 
             // Discord modules
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
-            await _commands.AddModuleAsync<Module.Administration.PremiumModule>(null);
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.JapaneseModule>(null);

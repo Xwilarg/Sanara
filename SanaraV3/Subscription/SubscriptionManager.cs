@@ -10,9 +10,10 @@ namespace SanaraV3.Subscription
     {
         public SubscriptionManager()
         {
-            _subscriptions = new[]
+            _subscriptions = new ISubscription[]
             {
-                new NHentaiSubscription()
+                new NHentaiSubscription(),
+                new AnimeSubscription()
             };
         }
 
