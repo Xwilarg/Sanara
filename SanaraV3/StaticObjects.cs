@@ -19,6 +19,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DiscordUtils;
+using SharpRaven;
 
 namespace SanaraV3
 {
@@ -37,6 +38,8 @@ namespace SanaraV3
         public static ulong ClientId;
         public static Db Db { get; } = new Db();
         public static HelpPreload Help { get; } = new HelpPreload();
+        public static RavenClient RavenClient { set; get; } = null;
+        public static Dictionary<ulong, ErrorData> Errors { get; } = new Dictionary<ulong, ErrorData>(); // All errors that occured 
 
         // NSFW MODULE
         public static string UploadWebsiteUrl { set; get; }
@@ -84,6 +87,11 @@ namespace SanaraV3
         {
             await Db.InitAsync("Sanara");
 
+            if (credentials.RavenKey != null)
+            {
+                RavenClient = new RavenClient(credentials.RavenKey);
+            }
+
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
 
             Safebooru.HttpClient = HttpClient;
@@ -104,7 +112,7 @@ namespace SanaraV3
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
             }
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload"));
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
             Preloads = new IPreload[]
             {
                 new ShiritoriPreload(),

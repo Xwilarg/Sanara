@@ -40,7 +40,7 @@ namespace SanaraV3
         {
             // Setting Logs callback
             StaticObjects.Client.Log += Utils.Log;
-            _commands.Log += LogErrorAsync;
+            _commands.Log += Log.ErrorAsync;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
             // Load credentials
@@ -72,6 +72,7 @@ namespace SanaraV3
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
             StaticObjects.Client.Connected += ConnectedAsync;
             StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
+            StaticObjects.Client.ReactionAdded += Log.ReactionAddedAsync;
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
 
@@ -144,30 +145,6 @@ namespace SanaraV3
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
             await StaticObjects.Client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
-        }
-
-        public async Task LogErrorAsync(LogMessage msg)
-        {
-            CommandException ce = msg.Exception as CommandException;
-            if (ce != null)
-            {
-                if (msg.Exception.InnerException is Exception.CommandFailed) // Exception thrown from modules when a command failed
-                {
-                    await ce.Context.Channel.SendMessageAsync(msg.Exception.InnerException.Message);
-                }
-                else // Unexpected exception
-                {
-                    await Utils.Log(msg);
-                    await ce.Context.Channel.SendMessageAsync("", false, new EmbedBuilder
-                    {
-                        Color = Color.Red,
-                        Title = msg.Exception.InnerException.GetType().ToString(),
-                        Description = "An error occured while executing last command.\nHere are some details about it: " + msg.Exception.InnerException.Message
-                    }.Build());
-                }
-            }
-            else
-                await Utils.Log(msg);
         }
     }
 }

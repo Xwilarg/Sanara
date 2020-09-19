@@ -90,7 +90,7 @@ namespace SanaraV3.Game
                     return;
                 } catch (System.Exception e)
                 {
-                    await Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     if (nbTries == 3)
                     {
                         await LooseAsync("Failed to get something to post after 3 tries...");

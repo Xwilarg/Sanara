@@ -8,5 +8,6 @@
         public string UploadWebsiteLocation;
         public string KitsuEmail;
         public string KitsuPassword;
+        public string RavenKey;
     }
 }

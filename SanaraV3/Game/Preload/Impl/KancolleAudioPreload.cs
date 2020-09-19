@@ -31,7 +31,7 @@ namespace SanaraV3.Game.Preload.Impl
                     }
                     catch (System.Exception e)
                     {
-                        Utils.LogError(new LogMessage(LogSeverity.Error, e.Source, $"Error while preloading {name}:\n" + e.Message, e));
+                        _ = Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, $"Error while preloading {name}:\n" + e.Message, e));
                     }
                     Thread.Sleep(250); // We wait a bit to not spam the HTTP requests
                 }

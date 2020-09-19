@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace SanaraV3.Diaporama
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class ReactionManager
     {
-
-
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();

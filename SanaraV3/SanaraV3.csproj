@@ -11,6 +11,7 @@
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.47.0.2008" />
     <PackageReference Include="NHentaiSharp" Version="1.1.1" />
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
+    <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
   </ItemGroup>
 

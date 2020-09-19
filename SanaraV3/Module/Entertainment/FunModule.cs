@@ -54,7 +54,7 @@ namespace SanaraV3.Module.Entertainment
             ws.OnError += (sender, e) =>
             {
                 content = null;
-                Utils.LogError(new LogMessage(LogSeverity.Error, e.Exception.Source, e.Message, e.Exception));
+                _ = Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Exception.Source, e.Message, e.Exception));
             };
 
             ws.OnClose += (sender, e) =>
