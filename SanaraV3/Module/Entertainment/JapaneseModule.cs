@@ -1,16 +1,21 @@
 ﻿using Discord;
 using Discord.Commands;
 using DiscordUtils;
+using Google.Apis.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Attribute;
+using SanaraV3.CustomClass;
 using SanaraV3.Exception;
 using SanaraV3.Subscription.Tags;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Module.Administration
@@ -24,6 +29,7 @@ namespace SanaraV3.Module.Administration
             _help.Add(new Help("Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", false));
             _help.Add(new Help("Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new anime in to a channel.", true));
             _help.Add(new Help("Unsubscribe anime", new Argument[0], "Remove a anime subscription.", true));
+            _help.Add(new Help("Source", new[] { new Argument(ArgumentType.MANDATORY, "link") }, "Get the source of an image.", true));
         }
     }
 }
@@ -32,6 +38,44 @@ namespace SanaraV3.Module.Entertainment
 {
     public sealed class JapaneseModule : ModuleBase
     {
+        [Command("Source", RunMode = RunMode.Async)]
+        public async Task SourceAsync(ImageLink img)
+        {
+            await ParseSourceAsync(img.Link);
+        }
+
+        [Command("Source", RunMode = RunMode.Async)]
+        public async Task SourceAsync()
+        {
+            if (Context.Message.Attachments.Count > 0 && Utils.IsImage(Path.GetExtension(Context.Message.Attachments.First().Url)))
+                await ParseSourceAsync(Context.Message.Attachments.First().Url);
+            else
+                throw new CommandFailed("This command have some invalid parameters.");
+        }
+
+        private async Task ParseSourceAsync(string link)
+        {
+            var html = await StaticObjects.HttpClient.GetStringAsync("https://saucenao.com/search.php?db=999&url=" + Uri.EscapeDataString(link));
+            if (!html.Contains("<div id=\"middle\">"))
+                throw new CommandFailed("I didn't find the source of this image.");
+            var subHtml = html.Split(new[] { "<td class=\"resulttablecontent\">" }, StringSplitOptions.None)[1];
+
+            var compatibility = float.Parse(Regex.Match(subHtml, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value, CultureInfo.InvariantCulture);
+            var content = Utils.CleanHtml(subHtml.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]);
+            var url = Regex.Match(html, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value;
+
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                ImageUrl = url,
+                Description = content,
+                Color = Color.Green,
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Certitude: {compatibility}%"
+                }
+            }.Build());
+        }
+
         [Command("Subscribe anime"), RequireAdmin]
         public async Task SubscribeAnimeAsync(ITextChannel chan, params string[] tags)
         {

@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
 using Newtonsoft.Json;
+using SanaraV3.CustomClass;
 using SanaraV3.Diaporama;
 using System;
 using System.Diagnostics;
@@ -76,6 +77,7 @@ namespace SanaraV3
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
+            _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
 
             // Discord modules
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
