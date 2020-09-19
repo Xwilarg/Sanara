@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using SanaraV3.Exception;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace SanaraV3.Module.Administration
         {
             _help.Add(new Help("Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", false));
             _help.Add(new Help("Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", false));
+            _help.Add(new Help("Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", false));
         }
     }
 }
@@ -21,6 +23,40 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class CommunicationModule : ModuleBase
     {
+        [Command("Info")]
+        public async Task InfoAsync(IUser user = null)
+        {
+            if (user == null) // If user is null, that means we want information about the one that sent the command
+                user = Context.User;
+
+            var embed = new EmbedBuilder
+            {
+                Title = user.ToString(),
+                Color = Color.Purple,
+                ImageUrl = user.GetAvatarUrl(),
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Id",
+                        Value = user.Id,
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Account Creation",
+                        Value = user.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss"),
+                        IsInline = true
+                    }
+                }
+            };
+            if (user is IGuildUser guildUser)
+            {
+                embed.AddField("Guild Joined", guildUser.JoinedAt.Value.ToString("dd/MM/yyyy HH:mm:ss"), true);
+            }
+            await ReplyAsync(embed: embed.Build());
+        }
+
         [Command("Poll", RunMode = RunMode.Async)]
         public async Task PollAsync(string title, params string[] choices)
         {
