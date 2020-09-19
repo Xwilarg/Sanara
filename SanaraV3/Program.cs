@@ -29,9 +29,15 @@ namespace SanaraV3
             {
                 throw;
             }
-            catch (System.Exception) // If an exception occur, the program exit and is relaunched
+            catch (System.Exception e)
             {
-                if (Debugger.IsAttached)
+                if (!Debugger.IsAttached)
+                {
+                    if (!Directory.Exists("Logs"))
+                        Directory.CreateDirectory("Logs");
+                    File.WriteAllText("Logs/Crash-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-ff") + ".txt", e.ToString());
+                }
+                else // If an exception occur, the program exit and is relaunched
                     throw;
             }
         }
