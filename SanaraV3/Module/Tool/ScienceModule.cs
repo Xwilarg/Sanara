@@ -7,13 +7,15 @@ using System.Data;
 using System.Drawing;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadScienceHelp()
         {
-            _help.Add(new Help("Calc", new[] { new Argument(ArgumentType.MANDATORY, "operation") }, "Evaluate a basic math operation and return the result.", false));
+            _submoduleHelp.Add("Science", "Get information related to science");
+            _help.Add(("Tool", new Help("Science", "Calc", new[] { new Argument(ArgumentType.MANDATORY, "operation") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Calc 72 * 32")));
+            _help.Add(("Tool", new Help("Science", "Color", new[] { new Argument(ArgumentType.MANDATORY, "name/RGB/Hex") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Color 125 32 200")));
         }
     }
 }

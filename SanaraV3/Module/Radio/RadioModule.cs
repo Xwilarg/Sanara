@@ -2,22 +2,24 @@
 using Discord.Audio;
 using Discord.Commands;
 using DiscordUtils;
+using SanaraV3.Attribute;
 using SanaraV3.Exception;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadRadioHelp()
         {
-            _help.Add(new Help("Radio start", new Argument[0], "Make Sanara join your vocal channel.", false));
-            _help.Add(new Help("Radio add", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id/url") }, "Add a music to the radio.", false));
-            _help.Add(new Help("Radio remove", new[] { new Argument(ArgumentType.MANDATORY, "name/index") }, "Remove a radio from the playlist.", false));
-            _help.Add(new Help("Radio skip", new Argument[0], "Skip the song that is currently being played.", false));
-            _help.Add(new Help("Radio playlist", new Argument[0], "Display the current playlist.", false));
+            _submoduleHelp.Add("Radio", "Play musics in a vocal channel");
+            _help.Add(("Radio", new Help("Radio", "Radio start", new Argument[0], "Make Sanara join your vocal channel.", new[] { "Skip radio" }, Restriction.PremiumOnly, null)));
+            _help.Add(("Radio", new Help("Radio", "Radio add", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id/url") }, "Add a music to the radio.", new[] { "Add radio" }, Restriction.PremiumOnly, "Radio add GgF9zH3Yv1I")));
+            _help.Add(("Radio", new Help("Radio", "Radio remove", new[] { new Argument(ArgumentType.MANDATORY, "name/index") }, "Remove a radio from the playlist.", new[] { "Remove radio" }, Restriction.None, "Radio remove 1")));
+            _help.Add(("Radio", new Help("Radio", "Radio skip", new Argument[0], "Skip the song that is currently being played.", new[] { "Skip radio" }, Restriction.None, null)));
+            _help.Add(("Radio", new Help("Radio", "Radio playlist", new Argument[0], "Display the current playlist.", new[] { "Playlist radio" }, Restriction.None, null)));
         }
     }
 }
@@ -80,7 +82,7 @@ namespace SanaraV3.Module.Radio
             }
         }
 
-        [Command("Add radio", RunMode = RunMode.Async), Alias("Radio add")]
+        [Command("Add radio", RunMode = RunMode.Async), Alias("Radio add"), RequirePremium]
         public async Task AddAsync([Remainder]string search)
         {
             var radio = StaticObjects.Radios.ContainsKey(Context.Guild.Id) ? StaticObjects.Radios[Context.Guild.Id] : null;
@@ -104,7 +106,7 @@ namespace SanaraV3.Module.Radio
             await radio.PlayAsync();
         }
 
-        [Command("Start radio"), Alias("Radio start", "Launch radio", "Radio launch")]
+        [Command("Start radio"), Alias("Radio start", "Launch radio", "Radio launch"), RequirePremium]
         public async Task StartAsync()
         {
             await StartInternalAsync();

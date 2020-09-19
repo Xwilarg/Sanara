@@ -2,16 +2,20 @@
 using SanaraV3.Attribute;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadSettingHelp()
         {
-            _help.Add(new Help("Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", false));
+            _submoduleHelp.Add("Setting", "Modify the bot behavior for your server");
+            _help.Add(("Administration", new Help("Setting", "Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", new string[0], Restriction.AdminOnly, "Prefix s.")));
         }
     }
+}
 
+namespace SanaraV3.Module.Administration
+{
     public class SettingModule : ModuleBase
     {
 

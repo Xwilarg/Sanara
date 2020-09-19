@@ -5,15 +5,16 @@ using SanaraV3.Game;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadGameHelp()
         {
-            _help.Add(new Help("Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", false));
-            _help.Add(new Help("Cancel", new Argument[0], "Cancel a game running in this channel.", false));
-            _help.Add(new Help("Replay", new Argument[0], "Replay the audio for the current game.", false));
+            _submoduleHelp.Add("Game", "Play various games directly on Discord");
+            _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", new string[0], Restriction.None, "Play arknights audio")));
+            _help.Add(("Game", new Help("Game", "Cancel", new Argument[0], "Cancel a game running in this channel.", new string[0], Restriction.None, null)));
+            _help.Add(("Game", new Help("Game", "Replay", new Argument[0], "Replay the audio for the current game.", new string[0], Restriction.None, null)));
         }
     }
 }

@@ -11,14 +11,15 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadLanguageHelp()
         {
-            _help.Add(new Help("Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", false));
-            _help.Add(new Help("Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", false));
+            _submoduleHelp.Add("Language", "Get various information related to others languages");
+            _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", new string[0], Restriction.None, "Japanese submarine")));
+            _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", new string[0], Restriction.None, "Kanji 艦")));
         }
     }
 }

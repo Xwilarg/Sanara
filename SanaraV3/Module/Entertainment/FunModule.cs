@@ -1,17 +1,17 @@
 ﻿using Discord;
 using Discord.Commands;
-using DiscordUtils;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadFunHelp()
         {
-            _help.Add(new Help("Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", false));
-            _help.Add(new Help("Complete", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Complete the given sentence using machine learning.", false));
+            _submoduleHelp.Add("Fun", "Various small entertainement commands");
+            _help.Add(("Entertainment", new Help("Fun", "Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", new string[0], Restriction.None, null)));
+            _help.Add(("Entertainment", new Help("Fun", "Complete", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Complete the given sentence using machine learning.", new string[0], Restriction.None, "Complete Why can't cats just")));
         }
     }
 }

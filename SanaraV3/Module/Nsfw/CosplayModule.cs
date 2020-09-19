@@ -7,13 +7,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadCosplayHelp()
         {
-            _help.Add(new Help("Cosplay", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random cosplay.", true));
+            _submoduleHelp.Add("Cosplay", "Get cosplay of characters");
+            _help.Add(("Nsfw", new Help("Cosplay", "Cosplay", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random cosplay.", new string[0], Restriction.Nsfw, "Cosplay Ikazuchi")));
         }
     }
 }

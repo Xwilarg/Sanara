@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using DiscordUtils;
-using Google.Apis.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Attribute;
@@ -18,18 +17,19 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadJapaneseHelp()
         {
-            _help.Add(new Help("Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", false));
-            _help.Add(new Help("Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", false));
-            _help.Add(new Help("Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", false));
-            _help.Add(new Help("Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new anime in to a channel.", true));
-            _help.Add(new Help("Unsubscribe anime", new Argument[0], "Remove a anime subscription.", true));
-            _help.Add(new Help("Source", new[] { new Argument(ArgumentType.MANDATORY, "link") }, "Get the source of an image.", true));
+            _submoduleHelp.Add("Japanese", "Commands related to Japanese culture");
+            _help.Add(("Entertainment", new Help("Japanese", "Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", new string[0], Restriction.None, "Manga made in abyss")));
+            _help.Add(("Entertainment", new Help("Japanese", "Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", new string[0], Restriction.None, "Anime nichijou")));
+            _help.Add(("Entertainment", new Help("Japanese", "Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", new string[]{ "LN" }, Restriction.None, "Light novel so I'm a spider so what")));
+            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
+            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove a anime subscription.", new string[0], Restriction.AdminOnly, null)));
+            _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.MANDATORY, "link") }, "Get the source of an image.", new string[0], Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
         }
     }
 }

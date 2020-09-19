@@ -6,16 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadCommunicationHelp()
         {
-            _help.Add(new Help("Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", false));
-            _help.Add(new Help("Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", false));
-            _help.Add(new Help("Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", false));
-            _help.Add(new Help("Invite", new Argument[0], "Get the bot invitation link.", false));
+            _submoduleHelp.Add("Communication", "Commands to interact with Discord");
+            _help.Add(("Tool", new Help("Communication", "Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", new string[0], Restriction.None, "Quote Sanara#1537")));
+            _help.Add(("Tool", new Help("Communication", "Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", new string[0], Restriction.None, "Poll \"Is cereal a soup or a salad\" Soup Salad")));
+            _help.Add(("Tool", new Help("Communication", "Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", new string[0], Restriction.None, "Info Sanara#1537")));
+            _help.Add(("Tool", new Help("Communication", "Invite", new Argument[0], "Get the bot invitation link.", new string[0], Restriction.None, null)));
         }
     }
 }

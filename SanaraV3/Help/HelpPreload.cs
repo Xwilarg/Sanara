@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
 #pragma warning disable CS0649 // Because _help is in fact assigned in the other partial class
         public HelpPreload()
         {
-            _help = new List<Help>();
+            _help = new List<(string, Help)>();
+            _submoduleHelp = new Dictionary<string, string>();
             LoadBooruHelp();
             LoadCommunicationHelp();
             LoadCosplayHelp();
@@ -24,9 +25,13 @@ namespace SanaraV3.Module.Administration
         }
 #pragma warning restore CS0649
 
-        public List<Help> GetHelp()
+        public List<(string, Help)> GetHelp()
             => _help;
 
-        private List<Help> _help;
+        public string GetSubmoduleHelp(string name)
+            => _submoduleHelp[name];
+
+        private List<(string, Help)> _help; // Module name, associate all help with it
+        private Dictionary<string, string> _submoduleHelp;
     }
 }

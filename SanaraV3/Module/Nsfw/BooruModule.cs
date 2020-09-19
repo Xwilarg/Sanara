@@ -10,20 +10,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Administration
+namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadBooruHelp()
         {
-            _help.Add(new Help("Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", false));
-            _help.Add(new Help("E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", false));
-            _help.Add(new Help("Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", true));
-            _help.Add(new Help("E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", true));
-            _help.Add(new Help("Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", true));
-            _help.Add(new Help("Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", true));
-            _help.Add(new Help("Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", false));
-            _help.Add(new Help("Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", false));
+            _submoduleHelp.Add("Booru", "Get anime images given some tags");
+            _help.Add(("Nsfw", new Help("Booru", "Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", new string[0], Restriction.None, "Safebooru kantai_collection")));
+            _help.Add(("Nsfw", new Help("Booru", "E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", new string[0], Restriction.None, "E926 short_hair")));
+            _help.Add(("Nsfw", new Help("Booru", "Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", new string[0], Restriction.Nsfw, "Gelbooru cirno")));
+            _help.Add(("Nsfw", new Help("Booru", "E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", new string[0], Restriction.Nsfw, "E621 swimsuit")));
+            _help.Add(("Nsfw", new Help("Booru", "Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", new string[0], Restriction.Nsfw, "Rule34 cat_ears")));
+            _help.Add(("Nsfw", new Help("Booru", "Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", new string[0], Restriction.Nsfw, "Konachan landscape")));
+            _help.Add(("Nsfw", new Help("Booru", "Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", new [] { "Image" }, Restriction.None, "Booru arknights")));
+            _help.Add(("Nsfw", new Help("Booru", "Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", new string[0], Restriction.None, null)));
         }
     }
 }
