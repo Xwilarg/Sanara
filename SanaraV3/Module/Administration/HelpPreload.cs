@@ -18,7 +18,6 @@ namespace SanaraV3.Module.Administration
             LoadJapaneseHelp();
             LoadLanguageHelp();
             LoadMediaHelp();
-            LoadPremiumHelp();
             LoadRadioHelp();
             LoadScienceHelp();
             LoadSettingHelp();

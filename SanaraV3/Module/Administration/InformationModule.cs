@@ -13,11 +13,41 @@ namespace SanaraV3.Module.Administration
         {
             _help.Add(new Help("Help", new Argument[0], "Display this help.", false));
             _help.Add(new Help("Status", new Argument[0], "Display various information about the bot.", false));
+            _help.Add(new Help("Premium", new Argument[0], "Get information about premium features.", false));
         }
     }
 
     public class InformationModule : ModuleBase
     {
+        [Command("Premium")]
+        public async Task PremiumAsync()
+        {
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Title = "Premium",
+                Color = Color.Blue,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "What is the premium feature?",
+                        Value = "While I'm trying to keeping Sanara as open as possible, storage and API calls aren't free\n" +
+                            "Therefor some features are now restricted to 'premium' users."
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "How can I apply?",
+                        Value = "For now users must be manually whitelisted"
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Radio module",
+                        Value = "YouTube API calls are heavily limited and Radio module need a lot of them, letting everyone use this module would result at reaching the maximum limit of call really quickly"
+                    }
+                }
+            }.Build());
+        }
+
         [Command("Help")]
         public async Task Help()
         {
