@@ -15,6 +15,7 @@ namespace SanaraV3.Module.Administration
             _help.Add(new Help("Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", false));
             _help.Add(new Help("Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", false));
             _help.Add(new Help("Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", false));
+            _help.Add(new Help("Invite", new Argument[0], "Get the bot invitation link.", false));
         }
     }
 }
@@ -23,6 +24,15 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class CommunicationModule : ModuleBase
     {
+        [Command("Invite")]
+        public async Task InviteAsync()
+        {
+            // Permissions:
+            // Send Messages, Embed Links, Attach Files - Basic Usage
+            // Connect, Speak - Radio and audio games
+            await ReplyAsync("https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot");
+        }
+
         [Command("Info")]
         public async Task InfoAsync(IUser user = null)
         {
