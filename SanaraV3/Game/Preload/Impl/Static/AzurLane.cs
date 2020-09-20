@@ -15,12 +15,12 @@ namespace SanaraV3.Game.Preload.Impl.Static
             {
                 if (s.Contains("Unreleased") || s.Contains("Plan")) // We skip ships that weren't released and were found by data mining
                     continue;
-                Match match = Regex.Match(s, "\"><a href=\"\\/[^\"]+\" title=\"[^\"]+\">(Collab|Plan)?[0-9]+<\\/a><\\/td><td><a href=\"\\/([^\"]+)\"");
+                Match match = Regex.Match(s, "\"><a href=\"\\/[^\"]+\" title=\"([^\"]+)\">(Collab|Plan)?[0-9]+<\\/a><\\/td><td><a href=\"\\/([^\"]+)\"");
                 if (match.Success)
                 {
-                    string str = match.Groups[2].Value;
-                   // if (!ships.Contains(str)) // Some ships may appear twice because of retrofits
-                   //     ships.Add(str);
+                    string href = match.Groups[3].Value;
+                    if (!_ships.Any(x => x.Item1 == href)) // Some ships may appear twice because of retrofits
+                        _ships.Add((href, match.Groups[1].Value));
                 }
             }
         }
