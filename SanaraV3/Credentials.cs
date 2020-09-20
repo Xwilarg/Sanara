@@ -9,5 +9,6 @@
         public string KitsuEmail;
         public string KitsuPassword;
         public string RavenKey;
+        public string OwnerId;
     }
 }

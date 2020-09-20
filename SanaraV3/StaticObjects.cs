@@ -39,7 +39,7 @@ namespace SanaraV3
         public static Db Db { get; } = new Db();
         public static HelpPreload Help { get; } = new HelpPreload();
         public static RavenClient RavenClient { set; get; } = null;
-        public static Dictionary<ulong, ErrorData> Errors { get; } = new Dictionary<ulong, ErrorData>(); // All errors that occured 
+        public static Dictionary<ulong, ErrorData> Errors { get; } = new Dictionary<ulong, ErrorData>(); // All errors that occured
 
         // NSFW MODULE
         public static string UploadWebsiteUrl { set; get; }

@@ -77,6 +77,15 @@ namespace SanaraV3.Database
             await _r.Db(_dbName).Table("Cache_" + name).Insert(value).RunAsync(_conn);
         }
 
+        public async Task<bool> DeleteCacheAsync(string name)
+        {
+            name = name.ToLower();
+            if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
+                return false;
+            await _r.Db(_dbName).Table("Cache_" + name).Delete().RunAsync(_conn);
+            return true;
+        }
+
         // SUBSCRIPTIONS
 
         public int GetCurrent(string name)
