@@ -13,17 +13,14 @@ namespace SanaraV3.Game.Preload.Impl
         public ShiritoriPreload()
         {
             if (!File.Exists("Saves/Game/ShiritoriJapanese.txt"))
-                _preload = null;
-            else
+                File.WriteAllBytes("Saves/Game/ShiritoriJapanese.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/shiritoriJapanese.txt").GetAwaiter().GetResult());
+            string[] lines = File.ReadAllLines("Saves/Game/ShiritoriJapanese.txt");
+            _preload = new ShiritoriPreloadResult[lines.Length];
+            for (int i = 0; i < lines.Length; i++)
             {
-                string[] lines = File.ReadAllLines("Saves/Game/ShiritoriJapanese.txt");
-                _preload = new ShiritoriPreloadResult[lines.Length];
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    string[] curr = lines[i].Split('$');
-                    string word = curr[0];
-                    _preload[i] = new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]);
-                }
+                string[] curr = lines[i].Split('$');
+                string word = curr[0];
+                _preload[i] = new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]);
             }
         }
 
