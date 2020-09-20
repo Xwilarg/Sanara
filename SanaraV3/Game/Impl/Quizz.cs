@@ -53,7 +53,12 @@ namespace SanaraV3.Game.Impl
         protected override string GetAnswer()
         {
             string name = _current.Answers[0].Replace("_", " "); // Clean the answer a bit for game that didn't do it
-            return $"The right answer was {name}.";
+
+            // Lot of games have "alternative" answers
+            // Like in Arknights, Gummy is also called Gum and Гум
+            // In Azur Lane, there are ships such as Le Téméraire so we also accept Le Temeraire
+            // So the user isn't frustrated when he loose, we give him all the possible answers
+            return $"The right answer was {name}." + (_current.Answers.Length > 1 ? $"\n*Alternative answers: {string.Join(", ", _current.Answers.Skip(1))}*" : "");
         }
 
         protected override int GetGameTime()
