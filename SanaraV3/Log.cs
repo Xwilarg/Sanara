@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordUtils;
+using SanaraV3.Exception;
 using SharpRaven.Data;
 using System.Threading.Tasks;
 
@@ -14,8 +15,14 @@ namespace SanaraV3
             // TODO: Manage availability
 
             await Utils.Log(msg); // First thing, we log the error in the console
-            if (msg.Exception is CommandException ce) // exception thrown in a Discord channel
+            if (msg.Exception is CommandException ce) //Eexception thrown in a Discord channel
             {
+                if (msg.Exception.InnerException is CommandFailed || msg.Exception.InnerException is NotYetAvailable)
+                {
+                    await ce.Context.Channel.SendMessageAsync(msg.Exception.InnerException.Message);
+                    return;
+                }
+
                 if (StaticObjects.RavenClient != null) // If we can log the error to Sentry
                     StaticObjects.RavenClient.Capture(new SentryEvent(new System.Exception(ce.Context.Message.ToString(), msg.Exception)));
 

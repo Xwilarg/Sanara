@@ -17,7 +17,7 @@ namespace SanaraV3.Game.Preload.Impl
             var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
             foreach (var elem in AzurLane.GetShips())
             {
-                if (!cache.Any(x => x.id == elem.Item1))
+                if (!cache.Any(x => x.id == elem.Item2))
                 {
                     try
                     {
