@@ -25,6 +25,6 @@ namespace SanaraV3.Game.Preload.Impl.Static
         public static List<string> GetShips()
             => _ships;
 
-        public static List<string> _ships;
+        private static List<string> _ships;
     }
 }

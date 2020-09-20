@@ -119,7 +119,8 @@ namespace SanaraV3
                 new ArknightsPreload(),
                 new ArknightsAudioPreload(),
                 new KancollePreload(),
-                new KancolleAudioPreload()
+                new KancolleAudioPreload(),
+                new GirlsFrontlinePreload()
             };
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 
