@@ -20,6 +20,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Language", "Get various information related to others languages");
             _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", new string[0], Restriction.None, "Japanese submarine")));
             _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", new string[0], Restriction.None, "Kanji 艦")));
+            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "work") }, "Get rhe urban definition of a word.", new string[0], Restriction.None, "Urban bunny hop")));
         }
     }
 }
@@ -28,6 +29,39 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class LanguageModule : ModuleBase
     {
+        [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
+        public async Task UrbanAsync([Remainder]string query)
+        {
+            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + query));
+            if (json["list"].Value<JArray>().Count == 0)
+                throw new CommandFailed("There is no definition for this query.");
+            string definition = json["list"][0]["definition"].Value<string>();
+            if (definition.Length > 1000)
+                definition = definition.Substring(0, 1000) + " [...]";
+            string example = json["list"][0]["example"].Value<string>();
+            if (example.Length > 1000)
+                example = example.Substring(0, 1000) + " [...]";
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = char.ToUpper(query[0]) + string.Concat(query.ToLower().Skip(1)),
+                Url = json["list"][0]["permalink"].Value<string>(),
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Definition",
+                        Value = definition
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Example",
+                        Value = example
+                    }
+                }
+            }.Build());
+        }
+
         [Command("Kanji", RunMode = RunMode.Async)]
         public async Task KanjiAsync(string kanji)
         {
