@@ -177,6 +177,19 @@ namespace SanaraV3.Database
             ).RunAsync(_conn);
         }
 
+        public async Task UpdateAnonymizeAsync(ulong guildId, bool value)
+        {
+            _guilds[guildId].Anonymize = value;
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With("Anonymize", value)
+            ).RunAsync(_conn);
+        }
+
+        public async Task<string> DumpAsync(ulong guildId)
+        {
+            return ((object)await _r.Db(_dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(_conn)).ToString();
+        }
+
         // SCORES
 
         public async Task<int> GetGameScoreAsync(ulong guildId, string name, string argument)

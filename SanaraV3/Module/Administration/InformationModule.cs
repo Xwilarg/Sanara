@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
+using SanaraV3.Attribute;
 using SanaraV3.Help;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +18,7 @@ namespace SanaraV3.Help
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Gdpr", new Argument[0], "Display all the data saved about your guild.", new string[0], Restriction.AdminOnly, null)));
         }
     }
 }
@@ -146,6 +149,12 @@ namespace SanaraV3.Module.Administration
             }
             embed.AddField("Games", str.ToString());
             await ReplyAsync(embed: embed.Build());
+        }
+
+        [Command("Gdpr"), RequireAdmin]
+        public async Task Gdpr()
+        {
+            await ReplyAsync("```json\n" + (await StaticObjects.Db.DumpAsync(Context.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
         }
     }
 }
