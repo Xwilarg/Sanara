@@ -48,6 +48,7 @@ namespace SanaraV3.Module.Tool
                 " - [Website](https://sanara.zirk.eu/)\n" +
                 " - [Invitation Link](https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot)\n" +
                 " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
+                " - [Upcoming Features](https://trello.com/b/dVoVeadz/sanara)\n" +
                 " - [Top.gg](https://discordbots.org/bot/329664361016721408)\n\n" +
                 "**Credits:**\n" +
                 "Programming: [Zirk#0001](https://zirk.eu/)\n" +
@@ -72,10 +73,6 @@ namespace SanaraV3.Module.Tool
                         Value = (await Context.Guild.GetCurrentUserAsync()).JoinedAt.Value.ToString("dd/MM/yyyy HH:mm:ss"),
                         IsInline = true
                     }
-                },
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "[Google](https://google.com)"
                 }
             }.Build());
         }
