@@ -1,8 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using SanaraV3.Exception;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,6 +27,90 @@ namespace SanaraV3.Module.Nsfw
 {
     public sealed class CosplayModule : ModuleBase
     {
+        // TODO: We can probably centralize downloads somewhere
+        [Command("Download cosplay", RunMode = RunMode.Async)]
+        public async Task DownloadCosplayAsync(string id)
+        {
+            var splitId = id.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (splitId.Length != 2)
+                throw new CommandFailed("The format of the given id is incorrect.");
+
+            string idFirst = splitId[0];
+            string idSecond = splitId[1];
+            if (!idFirst.All(x => char.IsLetterOrDigit(x)) || !idSecond.All(x => char.IsLetterOrDigit(x)))
+                throw new CommandFailed("The format of the given id is incorrect.");
+
+            string html;
+            int nbPages;
+            int limitPages;
+            try
+            {
+                html = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond);
+                var m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of ([0-9]+) images");
+                if (!m.Success)
+                    throw new CommandFailed("There is no cosplay with this id.");
+                limitPages = int.Parse(m.Groups[1].Value);
+                nbPages = int.Parse(m.Groups[2].Value);
+
+                await ReplyAsync("Preparing download... This might take some time.");
+            }
+            catch (HttpException)
+            {
+                throw new CommandFailed("There is no cosplay with this id.");
+            }
+
+            string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
+
+            string idStr = string.Join("-", splitId);
+
+            Directory.CreateDirectory("Saves/Download/" + path);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + idStr);
+            int nextPage = 1;
+            for (int i = 1; i <= nbPages; i++)
+            {
+                var imageMatch = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/" + idFirst + "-" + i + "\">");
+                string html2 = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/s/" + imageMatch.Groups[1].Value + "/" + idFirst + "-" + i);
+                Match m = Regex.Match(html2, "<img id=\"img\" src=\"([^\"]+)\"");
+                string url = m.Groups[1].Value;
+                string extension = "." + url.Split('.').Last();
+                File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + DoujinshiModule.Get3DigitNumber(i.ToString()) + extension,
+                await StaticObjects.HttpClient.GetByteArrayAsync(url));
+                if (i == limitPages)
+                {
+                    html = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond + "/?p=" + nextPage);
+                    m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of [0-9]+ images");
+                    limitPages = int.Parse(m.Groups[1].Value);
+                    nextPage++;
+                }
+            }
+
+            string finalPath = "Saves/Download/" + path + "/" + idStr + ".zip";
+            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + idStr, finalPath);
+            for (int i = Directory.GetFiles("Saves/Download/" + path + "/" + idStr).Length - 1; i >= 0; i--)
+                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + idStr)[i]);
+            Directory.Delete("Saves/Download/" + path + "/" + idStr);
+
+            FileInfo fi = new FileInfo(finalPath);
+            if (fi.Length < 8000000) // 8MB
+            {
+                await Context.Channel.SendFileAsync(finalPath);
+            }
+            else
+            {
+                Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
+                File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                await ReplyAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(600000); // 10 minutes
+                    File.Delete(StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                    Directory.Delete(StaticObjects.UploadWebsiteLocation + path);
+                });
+            }
+            File.Delete(finalPath);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
+        }
+
         [Command("Cosplay", RunMode = RunMode.Async)]
         public async Task CosplayAsync()
             => await CosplayAsync("");
@@ -66,7 +154,7 @@ namespace SanaraV3.Module.Nsfw
                 ImageUrl = imageUrl,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Do the 'Download doujinshi' command with the id '{sM.Groups[2].Value + "/" + sM.Groups[3].Value}' to download the doujinshi."
+                    Text = $"Do the 'Download cosplay' command with the id '{sM.Groups[2].Value + "/" + sM.Groups[3].Value}' to download the doujinshi."
                 },
                 Fields = new List<EmbedFieldBuilder>
                 {

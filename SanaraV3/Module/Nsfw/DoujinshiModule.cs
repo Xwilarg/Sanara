@@ -64,6 +64,9 @@ namespace SanaraV3.Module.Nsfw
             {
                 throw new CommandFailed("There is no doujinshi with this id.");
             }
+
+            await ReplyAsync("Preparing download... This might take some time.");
+
             int i = 1;
             foreach (var page in elem.pages)
             {
@@ -107,7 +110,7 @@ namespace SanaraV3.Module.Nsfw
         /// <summary>
         /// Return a number on a 3 character string (pad with 0)
         /// </summary>
-        private static string Get3DigitNumber(string nb)
+        public static string Get3DigitNumber(string nb) // TODO: Move this function elsewhere since it's also used by CosplayModule
         {
             if (nb.Length == 3)
                 return nb;

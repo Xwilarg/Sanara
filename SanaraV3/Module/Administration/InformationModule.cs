@@ -100,12 +100,12 @@ namespace SanaraV3.Module.Administration
                     new EmbedFieldBuilder
                     {
                         Name = "What is the difference with the V2",
-                        Value = "The whole code was redesigned. For you, that means a better bot response time, less crashes and some improvements on current features"
+                        Value = "The whole code was redesigned.\nFor me, that means implementing new feature is now easier.\nFor you, that means a better bot response time, less crashes and some improvements on current features."
                     },
                     new EmbedFieldBuilder
                     {
                         Name = "Sanara tells me my feature is not available",
-                        Value = "Most of the features from the V2 were reimplemented, however some of them are a bit harder to do.\nI'm planning to add them back but that may take a bit more of time"
+                        Value = "Most of the features from the V2 were reimplemented, however some of them are a bit harder to do.\nI'm planning to add them back but that may take a bit more of time."
                     }
                 }
             }.Build());
