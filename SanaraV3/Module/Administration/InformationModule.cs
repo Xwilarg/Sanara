@@ -22,6 +22,7 @@ namespace SanaraV3.Help
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "V3", new Argument[0], "Get information about the transition from the V2 to the V3.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Logs", new Argument[0], "Get the latest commits made to the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Gdpr", new Argument[0], "Display all the data saved about your guild.", new string[0], Restriction.AdminOnly, null)));
         }
@@ -77,6 +78,34 @@ namespace SanaraV3.Module.Administration
                     {
                         Name = "Radio module",
                         Value = "YouTube API calls are heavily limited and Radio module need a lot of them, letting everyone use this module would result at reaching the maximum limit of call really quickly"
+                    }
+                }
+            }.Build());
+        }
+
+        [Command("V3")]
+        public async Task V3Async()
+        {
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Title = "Sanara V3",
+                Color = Color.Blue,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "What is Sanara V3",
+                        Value = "Sanara V3 is the current version, released at the end of september of 2020."
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "What is the difference with the V2",
+                        Value = "The whole code was redesigned. For you, that means a better bot response time, less crashes and some improvements on current features"
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Sanara tells me my feature is not available",
+                        Value = "Most of the features from the V2 were reimplemented, however some of them are a bit harder to do.\nI'm planning to add them back but that may take a bit more of time"
                     }
                 }
             }.Build());
