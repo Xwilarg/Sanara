@@ -180,7 +180,8 @@ namespace SanaraV3.Module.Administration
         [Command("Gdpr"), RequireAdmin]
         public async Task Gdpr()
         {
-            await ReplyAsync("```json\n" + (await StaticObjects.Db.DumpAsync(Context.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
+            await ReplyAsync("Please check your private messages.");
+            await Context.User.SendMessageAsync("```json\n" + (await StaticObjects.Db.DumpAsync(Context.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
         }
     }
 }
