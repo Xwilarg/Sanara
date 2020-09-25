@@ -1,5 +1,8 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using SanaraV3.Attribute;
+using SanaraV3.Exception;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Help
@@ -11,6 +14,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Setting", "Modify the bot behavior for your server");
             _help.Add(("Administration", new Help("Setting", "Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", new string[0], Restriction.AdminOnly, "Prefix s.")));
             _help.Add(("Administration", new Help("Setting", "Anonymize", new[] { new Argument(ArgumentType.OPTIONAL, "value") }, "Set if your guild name can be displayed on Sanara stats page. Is no information is provided, display the current value.", new string[0], Restriction.AdminOnly, "Anonymize true")));
+            _help.Add(("Administration", new Help("Setting", "Exit", new[] { new Argument(ArgumentType.MANDATORY, "server name") }, "Leave the server given in parameter", new string[0], Restriction.ServerOwnerOnly, null)));
         }
     }
 }
@@ -19,6 +23,16 @@ namespace SanaraV3.Module.Administration
 {
     public class SettingModule : ModuleBase
     {
+        [Command("Exit"), RequireOwner]
+        public async Task ExitAsync([Remainder]string guildName)
+        {
+            IGuild g = StaticObjects.Client.Guilds.ToList().Find(x => x.Name.ToUpper() == guildName.ToUpper() || x.Id.ToString() == guildName);
+            if (g == null)
+                throw new CommandFailed("I don't know any server with this name.");
+            await g.LeaveAsync();
+            await ReplyAsync("Done");
+        }
+
 
         [Command("Prefix"), RequireAdmin]
         public async Task Prefix()
