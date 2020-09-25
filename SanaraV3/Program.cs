@@ -82,6 +82,8 @@ namespace SanaraV3
             StaticObjects.Client.ReactionAdded += Log.ReactionAddedAsync;
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
+            StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
+            StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
@@ -108,6 +110,11 @@ namespace SanaraV3
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private async Task ChangeGuildCountAsync(SocketGuild _)
+        {
+            await StaticObjects.UpdateTopGgAsync();
         }
 
         private async Task GuildJoined(SocketGuild guild)
@@ -153,6 +160,7 @@ namespace SanaraV3
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
             await StaticObjects.Client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
+            await StaticObjects.UpdateTopGgAsync();
         }
     }
 }

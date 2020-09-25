@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using DiscordUtils;
 using SharpRaven;
 using SanaraV3.Help;
+using DiscordBotsList.Api;
 
 namespace SanaraV3
 {
@@ -40,6 +41,9 @@ namespace SanaraV3
         public static HelpPreload Help { get; } = new HelpPreload();
         public static RavenClient RavenClient { set; get; } = null;
         public static Dictionary<ulong, ErrorData> Errors { get; } = new Dictionary<ulong, ErrorData>(); // All errors that occured
+        private static string DblToken { set; get; }
+        private static AuthDiscordBotListApi DblApi { set; get; } = null;
+        private static DateTime DblLastSend { set; get; } = DateTime.Now;
 
         // NSFW MODULE
         public static string UploadWebsiteUrl { set; get; }
@@ -156,6 +160,25 @@ namespace SanaraV3
 
                 UploadWebsiteUrl = credentials.UploadWebsiteUrl;
                 if (!UploadWebsiteUrl.EndsWith("/")) UploadWebsiteUrl += "/"; // Makes sure the URL end with a /
+            }
+
+            if (credentials.TopGgToken != null)
+            {
+                DblToken = credentials.TopGgToken;
+            }
+        }
+
+        public static async Task UpdateTopGgAsync()
+        {
+            if (DblToken != null)
+            {
+                if (DblApi == null)
+                    DblApi = new AuthDiscordBotListApi(ClientId, DblToken);
+                if (DblLastSend.AddMinutes(10).CompareTo(DateTime.Now) < 0) // Make sure to not spam the API
+                {
+                    DblLastSend = DateTime.Now;
+                    await DblApi.UpdateStats(Client.Guilds.Count);
+                }
             }
         }
     }
