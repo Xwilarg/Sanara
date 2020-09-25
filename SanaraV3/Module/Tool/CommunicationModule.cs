@@ -16,6 +16,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Communication", "Quote", new[] { new Argument(ArgumentType.OPTIONAL, "user/message") }, "Quote the message if an user.", new string[0], Restriction.None, "Quote Sanara#1537")));
             _help.Add(("Tool", new Help("Communication", "Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", new string[0], Restriction.None, "Poll \"Is cereal a soup or a salad\" Soup Salad")));
             _help.Add(("Tool", new Help("Communication", "Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", new string[0], Restriction.None, "Info Sanara#1537")));
+            _help.Add(("Tool", new Help("Communication", "BotInfo", new Argument[0], "Get information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "Invite", new Argument[0], "Get the bot invitation link.", new string[0], Restriction.None, null)));
         }
     }
@@ -32,6 +33,51 @@ namespace SanaraV3.Module.Tool
             // Send Messages, Embed Links, Attach Files - Basic Usage
             // Connect, Speak - Radio and audio games
             await ReplyAsync("https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot");
+        }
+
+        [Command("Botinfo")]
+        public async Task BotinfoAsync() // TODO: Combine command with next one
+        {
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Title = StaticObjects.Client.CurrentUser.ToString(),
+                Color = Color.Purple,
+                ImageUrl = StaticObjects.Client.CurrentUser.GetAvatarUrl(),
+                Description = "**List of useful links:**\n" +
+                " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
+                " - [Website](https://sanara.zirk.eu/)\n" +
+                " - [Invitation Link](https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot)\n" +
+                " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
+                " - [Top.gg](https://discordbots.org/bot/329664361016721408)\n\n" +
+                "**Credits:**\n" +
+                "Programming: [Zirk#0001](https://zirk.eu/)\n" +
+                "Picture Profile: [BlankSensei](https://www.pixiv.net/en/users/23961764)",
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Id",
+                        Value = StaticObjects.ClientId,
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Account Creation",
+                        Value = StaticObjects.Client.CurrentUser.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss"),
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Guild Joined",
+                        Value = (await Context.Guild.GetCurrentUserAsync()).JoinedAt.Value.ToString("dd/MM/yyyy HH:mm:ss"),
+                        IsInline = true
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "[Google](https://google.com)"
+                }
+            }.Build());
         }
 
         [Command("Info")]
