@@ -1,9 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SanaraV3.Attribute;
+using SanaraV3.Exception;
 using SanaraV3.Help;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +22,7 @@ namespace SanaraV3.Help
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Logs", new Argument[0], "Get the latest commits made to the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Gdpr", new Argument[0], "Display all the data saved about your guild.", new string[0], Restriction.AdminOnly, null)));
         }
     }
@@ -27,6 +32,27 @@ namespace SanaraV3.Module.Administration
 {
     public class InformationModule : ModuleBase
     {
+        [Command("Logs")]
+        public async Task LogsAsync()
+        {
+            if (StaticObjects.GithubKey == null)
+                throw new CommandFailed("This command is not available.");
+
+            var embed = new EmbedBuilder
+            {
+                Title = "Latest changes",
+                Url = "https://github.com/Xwilarg/Sanara/commits/master",
+                Color = Color.Purple
+            };
+            var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5&access_token=" + StaticObjects.GithubKey));
+            foreach (var elem in json)
+            {
+                embed.AddField(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture).ToString("dd/MM/yyyy HH:mm:ss") +
+                    " by " + elem["commit"]["author"]["name"].Value<string>(), elem["commit"]["message"].Value<string>());
+            }
+            await ReplyAsync(embed: embed.Build());
+        }
+
         [Command("Premium")]
         public async Task PremiumAsync()
         {

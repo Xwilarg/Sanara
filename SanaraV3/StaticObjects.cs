@@ -45,6 +45,9 @@ namespace SanaraV3
         private static AuthDiscordBotListApi DblApi { set; get; } = null;
         private static DateTime DblLastSend { set; get; } = DateTime.Now;
 
+        // INFORMATION MODULE
+        public static string GithubKey { set; get; }
+
         // NSFW MODULE
         public static string UploadWebsiteUrl { set; get; }
         public static string UploadWebsiteLocation { set;  get; }
@@ -165,6 +168,11 @@ namespace SanaraV3
             if (credentials.TopGgToken != null)
             {
                 DblToken = credentials.TopGgToken;
+            }
+
+            if (credentials.GithubKey != null)
+            {
+                GithubKey = credentials.GithubKey;
             }
         }
 

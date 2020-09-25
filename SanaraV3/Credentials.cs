@@ -11,5 +11,6 @@
         public string RavenKey;
         public string OwnerId;
         public string TopGgToken;
+        public string GithubKey;
     }
 }
