@@ -1,10 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
+using Google;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,7 +22,8 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Language", "Get various information related to others languages");
             _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", new string[0], Restriction.None, "Japanese submarine")));
             _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", new string[0], Restriction.None, "Kanji 艦")));
-            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "work") }, "Get rhe urban definition of a word.", new string[0], Restriction.None, "Urban bunny hop")));
+            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "work") }, "Get the urban definition of a word.", new string[0], Restriction.Nsfw, "Urban bunny hop")));
+            _help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.MANDATORY, "language"), new Argument(ArgumentType.MANDATORY, "sentence") }, "Translate a sentence to the given language.", new string[0], Restriction.None, "Translate en 空は青いです")));
         }
     }
 }
@@ -29,6 +32,31 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class LanguageModule : ModuleBase
     {
+        [Command("Translate", RunMode = RunMode.Async)]
+        public async Task TranslateAsync(string language, [Remainder]string sentence)
+        {
+            if (StaticObjects.ISO639Reverse.ContainsKey(language))
+                language = StaticObjects.ISO639Reverse[language];
+
+            if (language.Length != 2)
+                throw new CommandFailed("The language given must be in format ISO 639-1.");
+
+            try
+            {
+                var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
+                await ReplyAsync(embed: new EmbedBuilder
+                {
+                    Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                    Description = translation.TranslatedText,
+                    Color = Color.Blue
+                }.Build());
+            }
+            catch (GoogleApiException)
+            {
+                throw new CommandFailed("The language you provided is invalid.");
+            }
+        }
+
         [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
         public async Task UrbanAsync([Remainder]string query)
         {

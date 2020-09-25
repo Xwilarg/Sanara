@@ -21,6 +21,9 @@ using DiscordUtils;
 using SharpRaven;
 using SanaraV3.Help;
 using DiscordBotsList.Api;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Vision.V1;
+using Google.Cloud.Translation.V2;
 
 namespace SanaraV3
 {
@@ -84,6 +87,22 @@ namespace SanaraV3
         public static Dictionary<string, string> RomajiToKatakana { set; get; } = new Dictionary<string, string>();
         public static Dictionary<string, string> KatakanaToRomaji { set; get; } = new Dictionary<string, string>();
 
+        public static TranslationClient TranslationClient { set; get; } = null;
+        public static ImageAnnotatorClient VisionClient { set; get; } = null;
+        public static Dictionary<string, string> ISO639 { set; get; } = new Dictionary<string, string>
+        {
+            { "fr", "french" },
+            { "en", "english" },
+            { "ja", "japanese" },
+            { "ru", "russian" },
+            { "zh", "chinese" },
+            { "ko", "korean" },
+            { "ge", "german" },
+            { "es", "spanish" },
+            { "nl", "dutch" },
+        };
+        public static Dictionary<string, string> ISO639Reverse { set; get; } = new Dictionary<string, string>();
+
         // DIAPORAMA
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();
 
@@ -93,6 +112,7 @@ namespace SanaraV3
         public static async Task InitializeAsync(Credentials credentials)
         {
             await Db.InitAsync("Sanara");
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 
             if (credentials.RavenKey != null)
             {
@@ -117,6 +137,10 @@ namespace SanaraV3
             foreach (var elem in RomajiToKatakana)
             {
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
+            }
+            foreach (var elem in ISO639)
+            {
+                ISO639Reverse.Add(elem.Value, elem.Key);
             }
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
@@ -173,6 +197,13 @@ namespace SanaraV3
             if (credentials.GithubKey != null)
             {
                 GithubKey = credentials.GithubKey;
+            }
+
+            if (File.Exists("Keys/GoogleAPI.json"))
+            {
+                GoogleCredential googleCredentials = GoogleCredential.FromFile("Keys/GoogleAPI.json");
+                TranslationClient = TranslationClient.Create();
+                VisionClient = ImageAnnotatorClient.Create();
             }
         }
 
