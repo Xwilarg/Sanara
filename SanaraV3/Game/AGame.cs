@@ -27,7 +27,8 @@ namespace SanaraV3.Game
             _argument = preload.GetNameArg();
 
             textChan.SendMessageAsync(GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
-                "If the game break, you can use the 'Cancel' command to cancel it." +
+                "If the game break, you can use the 'Cancel' command to cancel it.\n" +
+                "You can cooperate with other players to find the answers." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : ""));
 
             _messages = new List<SocketUserMessage>();
