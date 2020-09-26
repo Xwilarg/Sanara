@@ -133,6 +133,11 @@ namespace SanaraV3
             ITextChannel textChan = msg.Channel as ITextChannel;
             if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || (textChan != null && msg.HasStringPrefix(StaticObjects.Db.GetGuild(textChan.GuildId).Prefix, ref pos)))
             {
+                if (textChan != null && !StaticObjects.Help.IsModuleAvailable(textChan.GuildId, msg.Content.Substring(pos).ToLower()))
+                {
+                    await textChan.SendMessageAsync("This module was disabled by on your server.");
+                    return;
+                }
                 var context = new SocketCommandContext(StaticObjects.Client, msg);
                 var result = await _commands.ExecuteAsync(context, pos, null);
                 if (!result.IsSuccess)

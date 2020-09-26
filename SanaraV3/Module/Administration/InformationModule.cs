@@ -129,7 +129,7 @@ namespace SanaraV3.Module.Administration
         private Embed GetHelpEmbed()
         {
             Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()))
+            foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()))
             {
                 if (!modules.ContainsKey(help.Item1))
                     modules.Add(help.Item1, new List<string>());
@@ -166,21 +166,21 @@ namespace SanaraV3.Module.Administration
                     Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
                 }
             };
-            if (StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item2.SubmoduleName.ToUpper() == name))
+            if (StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item2.SubmoduleName.ToUpper() == name))
             {
                 StringBuilder str = new StringBuilder();
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item2.SubmoduleName.ToUpper() == name))
+                foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item2.SubmoduleName.ToUpper() == name))
                 {
                     str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
                         (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : "") + "\n");
                 }
                 embed.Description = str.ToString();
             }
-            else if (StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item1.ToUpper() == name))
+            else if (StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item1.ToUpper() == name))
             {
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item1.ToUpper() == name))
+                foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item1.ToUpper() == name))
                 {
                     if (!modules.ContainsKey(help.Item2.SubmoduleName))
                         modules.Add(help.Item2.SubmoduleName, new List<string>());
@@ -192,7 +192,7 @@ namespace SanaraV3.Module.Administration
                 }
             }
             else
-                await ReplyAsync(embed: GetHelpEmbed());
+                throw new CommandFailed("This module does not exist");
             await ReplyAsync(embed: embed.Build());
         }
 

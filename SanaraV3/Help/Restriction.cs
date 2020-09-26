@@ -8,7 +8,7 @@ namespace SanaraV3.Help
         None = 0,
         Nsfw = 1,
         AdminOnly = 2,
-        ServerOwnerOnly = 4,
+        OwnerOnly = 4,
         PremiumOnly
     }
 }

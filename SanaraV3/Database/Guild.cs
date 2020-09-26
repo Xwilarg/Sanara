@@ -20,6 +20,9 @@ namespace SanaraV3.Database
         [JsonProperty]
         public bool Anonymize = false;
 
+        [JsonProperty]
+        public string[] Availability = new string[0];
+
         // We can't serialize scores to keep compatibility with SanaraV2 db
         public bool DoesContainsGame(string name)
             => _scores.ContainsKey(name);

@@ -15,7 +15,7 @@ namespace SanaraV3.Help
             _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights/kancolle/girlsfrontline"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", new string[0], Restriction.None, "Play arknights audio")));
             _help.Add(("Game", new Help("Game", "Cancel", new Argument[0], "Cancel a game running in this channel.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Replay", new Argument[0], "Replay the audio for the current game.", new string[0], Restriction.None, null)));
-            _help.Add(("Game", new Help("Game", "Delete cache", new Argument[0], "Delete the cache of a game.", new string[0], Restriction.ServerOwnerOnly, null)));
+            _help.Add(("Game", new Help("Game", "Delete cache", new Argument[0], "Delete the cache of a game.", new string[0], Restriction.OwnerOnly, null)));
         }
     }
 }

@@ -61,6 +61,36 @@ namespace SanaraV3.Database
             _guilds.Add(sGuild.Id, guild);
         }
 
+        // AVAILABILITY
+
+        public async Task AddAvailabilityAsync(ulong guildId, string name)
+        {
+            var g = _guilds[guildId];
+            var tmp = g.Availability.ToList();
+            tmp.Remove(name);
+            g.Availability = tmp.ToArray();
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With("Availability", tmp.ToArray())
+            ).RunAsync(_conn);
+        }
+
+        public async Task RemoveAvailabilityAsync(ulong guildId, string name)
+        {
+            var g = _guilds[guildId];
+            var tmp = g.Availability.ToList();
+            tmp.Add(name);
+            g.Availability = tmp.ToArray();
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With("Availability", tmp.ToArray())
+            ).RunAsync(_conn);
+        }
+
+        public bool IsAvailable(ulong guildId, string name)
+        {
+            var g = _guilds[guildId];
+            return !g.Availability.Contains(name);
+        }
+
         // CACHES
 
         public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
