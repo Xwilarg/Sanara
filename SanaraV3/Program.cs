@@ -84,6 +84,7 @@ namespace SanaraV3
             StaticObjects.Client.JoinedGuild += GuildJoined;
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
             StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
+            StaticObjects.Client.Disconnected += Disconnected;
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
@@ -110,6 +111,14 @@ namespace SanaraV3
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private Task Disconnected(System.Exception e)
+        {
+            if (!File.Exists("Saves/Logs"))
+                Directory.CreateDirectory("Saves/Logs");
+            File.WriteAllText("Saves/Logs/" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", "Bot disconnected. Exception:\n" + e.ToString());
+            return Task.CompletedTask;
         }
 
         private async Task ChangeGuildCountAsync(SocketGuild _)
