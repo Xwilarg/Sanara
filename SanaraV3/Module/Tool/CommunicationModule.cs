@@ -19,6 +19,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Communication", "Poll", new[] { new Argument(ArgumentType.MANDATORY, "name"), new Argument(ArgumentType.MANDATORY, "choices - 1 to 9") }, "Create a poll for users to choose between various choices.", new string[0], Restriction.None, "Poll \"Is cereal a soup or a salad\" Soup Salad")));
             _help.Add(("Tool", new Help("Communication", "Info", new[] { new Argument(ArgumentType.OPTIONAL, "user") }, "Get information about an user from this server.", new string[0], Restriction.None, "Info Sanara#1537")));
             _help.Add(("Tool", new Help("Communication", "BotInfo", new Argument[0], "Get information about the bot.", new string[0], Restriction.None, null)));
+            _help.Add(("Tool", new Help("Communication", "ServerInfo", new Argument[0], "Get information about the server.", new[] { "GuildInfo" }, Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "Invite", new Argument[0], "Get the bot invitation link.", new string[0], Restriction.None, null)));
         }
     }
@@ -35,6 +36,24 @@ namespace SanaraV3.Module.Tool
             // Send Messages, Embed Links, Attach Files - Basic Usage
             // Connect, Speak - Radio and audio games
             await ReplyAsync("https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot");
+        }
+
+        [Command("Serverinfo"), Alias("Guildinfo")]
+        public async Task ServerinfoAsync()
+        {
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Title = Context.Guild.ToString(),
+                Color = Color.Purple,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Subscriptions",
+                        Value = string.Join("\n", (await StaticObjects.SM.GetSubscriptionsAsync(Context.Guild.Id)).Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention)))
+                    }
+                }
+            }.Build());
         }
 
         [Command("Botinfo")]

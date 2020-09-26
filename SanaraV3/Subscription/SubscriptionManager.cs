@@ -43,6 +43,17 @@ namespace SanaraV3.Subscription
             });
         }
 
+        public async Task<Dictionary<string, ITextChannel>> GetSubscriptionsAsync(ulong guildId)
+        {
+            var d = new Dictionary<string, ITextChannel>();
+            foreach (var sub in _subscriptions)
+            {
+                string name = sub.GetName();
+                d.Add(name, await StaticObjects.Db.HasSubscriptionExistAsync(guildId, name) ? StaticObjects.Db.GetAllSubscriptions(name).Where(x => x.TextChan.GuildId == guildId).First().TextChan : null);
+            }
+            return d;
+        }
+
         public Dictionary<string, int> GetSubscriptionCount()
         {
             var d = new Dictionary<string, int>();
