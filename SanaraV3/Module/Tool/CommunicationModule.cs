@@ -2,7 +2,9 @@
 using Discord.Commands;
 using SanaraV3.Exception;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,6 +73,18 @@ namespace SanaraV3.Module.Tool
                     {
                         Name = "Guild Joined",
                         Value = (await Context.Guild.GetCurrentUserAsync()).JoinedAt.Value.ToString("dd/MM/yyyy HH:mm:ss"),
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Latest Version",
+                        Value = new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString("dd/MM/yyyy HH:mm:ss"),
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Guild Count",
+                        Value = StaticObjects.Client.Guilds.Count,
                         IsInline = true
                     }
                 }

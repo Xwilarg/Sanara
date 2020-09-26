@@ -18,7 +18,7 @@ namespace SanaraV3.Help
     {
         public void LoadInformationHelp()
         {
-            _submoduleHelp.Add("Information", "Get various information about the bot");
+            _submoduleHelp.Add("Information", "Get important information about the bot");
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
