@@ -31,7 +31,7 @@ namespace SanaraV3.Game.Preload.Impl
                         List<string> names = new List<string> { elem.Item2 };
                         if (elem.Item2 == "HMS_Neptune" || elem.Item2 == "HDN_Neptune")
                             names.Add("Neptune"); // Both ship are named "Neptune" ingame
-                        var escapeName = elem.Item2.Replace("µ", "mu").Replace('ö', 'o').Replace('Ö', 'O').Replace('é', 'e').Replace('É', 'E').Replace('â', 'a').Replace('Â', 'A').Replace('è', 'e');
+                        var escapeName = Common.RemoveAccents(elem.Item2);
                         if (escapeName != elem.Item2)
                             names.Add(escapeName);
 

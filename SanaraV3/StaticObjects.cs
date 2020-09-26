@@ -152,7 +152,8 @@ namespace SanaraV3
                 new KancollePreload(),
                 new KancolleAudioPreload(),
                 new GirlsFrontlinePreload(),
-                new AzurLanePreload()
+                new AzurLanePreload(),
+                new FateGOPreload()
             };
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 
