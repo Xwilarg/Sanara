@@ -143,7 +143,9 @@ namespace SanaraV3.Module.Administration
                 Footer = new EmbedFooterBuilder
                 {
                     Text = "Do help module/submodule for more information.\nExample: help information\n\n" +
-                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
+                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
+                        "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
                 }
             };
             foreach (var m in modules.OrderBy(x => x.Key))
@@ -166,21 +168,22 @@ namespace SanaraV3.Module.Administration
                     Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
                 }
             };
-            if (StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item2.SubmoduleName.ToUpper() == name))
+            var fullHelp = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner());
+            if (fullHelp.Any(x => x.Item2.SubmoduleName.ToUpper() == name))
             {
                 StringBuilder str = new StringBuilder();
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item2.SubmoduleName.ToUpper() == name))
+                foreach (var help in fullHelp.Where(x => x.Item2.SubmoduleName.ToUpper() == name))
                 {
                     str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
                         (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : "") + "\n");
                 }
                 embed.Description = str.ToString();
             }
-            else if (StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item1.ToUpper() == name))
+            else if (fullHelp.Any(x => x.Item1.ToUpper() == name))
             {
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item1.ToUpper() == name))
+                foreach (var help in fullHelp.Where(x => x.Item1.ToUpper() == name))
                 {
                     if (!modules.ContainsKey(help.Item2.SubmoduleName))
                         modules.Add(help.Item2.SubmoduleName, new List<string>());
@@ -191,9 +194,46 @@ namespace SanaraV3.Module.Administration
                     embed.AddField(m.Key, string.Join("\n", m.Value));
                 }
             }
+            else if (fullHelp.Any(x => x.Item2.CommandName.ToUpper() == name || x.Item2.Aliases.Contains(name)))
+            {
+                StringBuilder str = new StringBuilder();
+                Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+                foreach (var help in fullHelp.Where(x => x.Item2.CommandName.ToUpper() == name || x.Item2.Aliases.Contains(name)))
+                {
+                    str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                        (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
+                }
+                embed.Description = str.ToString();
+            }
             else
-                throw new CommandFailed("This module does not exist");
+                throw new CommandFailed("There is no command or module available with this name");
             await ReplyAsync(embed: embed.Build());
+        }
+
+        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
+        {
+            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
+            name = name.ToUpper();
+            var embed = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x))),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
+                        "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
+                }
+            };
+            StringBuilder str = new StringBuilder();
+            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            foreach (var help in fullHelp.Where(x => x.Item2.CommandName.ToUpper() == name || x.Item2.Aliases.Contains(name)))
+            {
+                str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
+            }
+            embed.Description = str.ToString();
+            return embed.Build();
         }
 
         [Command("Status")]

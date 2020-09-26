@@ -156,7 +156,7 @@ namespace SanaraV3
                     if (error == CommandError.UnmetPrecondition)
                         await context.Channel.SendMessageAsync(result.ErrorReason);
                     else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)
-                        await context.Channel.SendMessageAsync("This command have some invalid parameters."); // TODO: Display help
+                        await context.Channel.SendMessageAsync(embed: Module.Administration.InformationModule.GetSingleHelpEmbed(context.Message.Content.Substring(pos), context));
                 }
             }
             else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing // TODO: Need to check if it's not the bot prefix
