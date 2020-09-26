@@ -96,6 +96,11 @@ namespace SanaraV3.Module.Tool
         {
             if (user == null) // If user is null, that means we want information about the one that sent the command
                 user = Context.User;
+            else if (user.Id == StaticObjects.ClientId)
+            {
+                await BotinfoAsync();
+                return;
+            }
 
             var embed = new EmbedBuilder
             {

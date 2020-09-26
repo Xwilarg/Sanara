@@ -117,10 +117,19 @@ namespace SanaraV3.Module.Administration
             await ReplyAsync(embed: GetHelpEmbed());
         }
 
+        private bool IsNsfw()
+            => Context.Channel is ITextChannel chan ? chan.IsNsfw : true;
+
+        private bool IsAdmin()
+            => Context.User is IGuildUser user ? Context.Guild.OwnerId == user.Id || user.GuildPermissions.ManageGuild : true;
+
+        private bool IsOwner()
+            => Context.User.Id == 144851584478740481; // TODO: Don't hardcode this
+
         private Embed GetHelpEmbed()
         {
             Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in StaticObjects.Help.GetHelp())
+            foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()))
             {
                 if (!modules.ContainsKey(help.Item1))
                     modules.Add(help.Item1, new List<string>());
@@ -133,7 +142,8 @@ namespace SanaraV3.Module.Administration
                 Title = "Help",
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = "Do help module/submodule for more information.\nExample: help information"
+                    Text = "Do help module/submodule for more information.\nExample: help information\n\n" +
+                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
                 }
             };
             foreach (var m in modules.OrderBy(x => x.Key))
@@ -150,23 +160,27 @@ namespace SanaraV3.Module.Administration
             var embed = new EmbedBuilder
             {
                 Color = Color.Blue,
-                Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x)))
+                Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x))),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
+                }
             };
-            if (StaticObjects.Help.GetHelp().Any(x => x.Item2.SubmoduleName.ToUpper() == name))
+            if (StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item2.SubmoduleName.ToUpper() == name))
             {
                 StringBuilder str = new StringBuilder();
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp().Where(x => x.Item2.SubmoduleName.ToUpper() == name))
+                foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item2.SubmoduleName.ToUpper() == name))
                 {
                     str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
                         (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : "") + "\n");
                 }
                 embed.Description = str.ToString();
             }
-            else if (StaticObjects.Help.GetHelp().Any(x => x.Item1.ToUpper() == name))
+            else if (StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Any(x => x.Item1.ToUpper() == name))
             {
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in StaticObjects.Help.GetHelp().Where(x => x.Item1.ToUpper() == name))
+                foreach (var help in StaticObjects.Help.GetHelp(IsNsfw(), IsAdmin(), IsOwner()).Where(x => x.Item1.ToUpper() == name))
                 {
                     if (!modules.ContainsKey(help.Item2.SubmoduleName))
                         modules.Add(help.Item2.SubmoduleName, new List<string>());

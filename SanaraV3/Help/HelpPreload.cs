@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV3.Help
 {
@@ -25,8 +26,17 @@ namespace SanaraV3.Help
         }
 #pragma warning restore CS0649
 
-        public List<(string, Help)> GetHelp()
-            => _help;
+        public List<(string, Help)> GetHelp(bool isNsfw, bool isAdmin, bool isOwner)
+        {
+            var help = _help;
+            if (!isNsfw)
+                help = help.Where(x => !x.Item2.Restriction.HasFlag(Restriction.Nsfw)).ToList();
+            if (!isAdmin)
+                help = help.Where(x => !x.Item2.Restriction.HasFlag(Restriction.AdminOnly)).ToList();
+            if (!isOwner)
+                help = help.Where(x => !x.Item2.Restriction.HasFlag(Restriction.ServerOwnerOnly)).ToList();
+            return help;
+        }
 
         public string GetSubmoduleHelp(string name)
             => _submoduleHelp[name];

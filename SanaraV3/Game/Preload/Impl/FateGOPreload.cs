@@ -20,11 +20,11 @@ namespace SanaraV3.Game.Preload.Impl
             foreach (var tmp in FateGO.GetCharacters())
             {
                 string elem = tmp;
+                elem = HttpUtility.UrlDecode(elem).Replace("&amp;", "&").Replace("&#39;", "'");
                 if (!cache.Any(x => x.id == elem))
                 {
                     try
                     {
-                        elem = HttpUtility.UrlDecode(elem).Replace("&amp;", "&").Replace("&#39;", "'");
                         string html = StaticObjects.HttpClient.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + elem).GetAwaiter().GetResult();
 
                         List<string> allAnswer = new List<string>();
