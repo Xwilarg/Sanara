@@ -21,8 +21,8 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Doujinshi", "Get self published manga");
             _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
             _help.Add(("Nsfw", new Help("Doujinshi", "Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", new[] { "Download doujin" }, Restriction.Nsfw, "Download doujin 321633")));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
+            _help.Add(("Nsfw", new Help("Doujinshi", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin", "Subscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
+            _help.Add(("Nsfw", new Help("Doujinshi", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin", "Unsubscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
         }
     }
 }
@@ -31,7 +31,7 @@ namespace SanaraV3.Module.Nsfw
 {
     public sealed class DoujinshiModule : ModuleBase
     {
-        [Command("Subscribe doujinshi"), Alias("Subscribe doujin"), RequireNsfw, RequireAdmin]
+        [Command("Subscribe doujinshi"), Alias("Subscribe doujin", "Subscribe nhentai"), RequireNsfw, RequireAdmin]
         public async Task SubscribeDoujinshiAsync(ITextChannel chan, params string[] tags)
         {
             if (!chan.IsNsfw)
@@ -40,7 +40,7 @@ namespace SanaraV3.Module.Nsfw
             await ReplyAsync($"You subscribed for doujinshi to {chan.Mention}.");
         }
 
-        [Command("Unsubscribe doujinshi"), Alias("Unsubscribe doujin"), RequireNsfw, RequireAdmin]
+        [Command("Unsubscribe doujinshi"), Alias("Unsubscribe doujin", "Unsubscribe nhentai"), RequireNsfw, RequireAdmin]
         public async Task UnsubscribeDoujinshiAsync()
         {
             if (!await StaticObjects.Db.HasSubscriptionExistAsync(Context.Guild.Id, "nhentai"))

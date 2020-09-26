@@ -1,7 +1,8 @@
 ﻿using Discord;
 using DiscordUtils;
 using SanaraV3.Subscription.Impl;
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Subscription
@@ -40,6 +41,17 @@ namespace SanaraV3.Subscription
                     await Update();
                 }
             });
+        }
+
+        public Dictionary<string, int> GetSubscriptionCount()
+        {
+            var d = new Dictionary<string, int>();
+            foreach (var sub in _subscriptions)
+            {
+                string name = sub.GetName();
+                d.Add(name, StaticObjects.Db.GetAllSubscriptions(name).Length);
+            }
+            return d;
         }
 
         private async Task Update()
