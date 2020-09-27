@@ -14,9 +14,9 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Setting", "Modify the bot behavior for your server");
             _help.Add(("Administration", new Help("Setting", "Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", new string[0], Restriction.AdminOnly, "Prefix s.")));
             _help.Add(("Administration", new Help("Setting", "Anonymize", new[] { new Argument(ArgumentType.OPTIONAL, "value") }, "Set if your guild name can be displayed on Sanara stats page. Is no information is provided, display the current value.", new string[0], Restriction.AdminOnly, "Anonymize true")));
-            _help.Add(("Administration", new Help("Setting", "Exit", new[] { new Argument(ArgumentType.MANDATORY, "server name") }, "Leave the server given in parameter", new string[0], Restriction.OwnerOnly, null)));
-            _help.Add(("Administration", new Help("Setting", "Disable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Disable a module for this server", new string[0], Restriction.AdminOnly, "Disable nsfw")));
-            _help.Add(("Administration", new Help("Setting", "Enable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Enable a module for this server", new string[0], Restriction.AdminOnly, "Enable media")));
+            _help.Add(("Administration", new Help("Setting", "Exit", new[] { new Argument(ArgumentType.MANDATORY, "server name") }, "Leave the server given in parameter.", new string[0], Restriction.OwnerOnly, null)));
+            _help.Add(("Administration", new Help("Setting", "Disable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Disable a module for this server.", new string[0], Restriction.AdminOnly, "Disable nsfw")));
+            _help.Add(("Administration", new Help("Setting", "Enable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Enable a module for this server.", new string[0], Restriction.AdminOnly, "Enable media")));
         }
     }
 }

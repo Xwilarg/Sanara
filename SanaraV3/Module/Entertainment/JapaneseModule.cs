@@ -27,8 +27,8 @@ namespace SanaraV3.Help
             _help.Add(("Entertainment", new Help("Japanese", "Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", new string[0], Restriction.None, "Manga made in abyss")));
             _help.Add(("Entertainment", new Help("Japanese", "Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", new string[0], Restriction.None, "Anime nichijou")));
             _help.Add(("Entertainment", new Help("Japanese", "Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", new string[]{ "LN" }, Restriction.None, "Light novel so I'm a spider so what")));
-            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
-            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove a anime subscription.", new string[0], Restriction.AdminOnly, null)));
+            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
+            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove an anime subscription.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.MANDATORY, "image") }, "Get the source of an image.", new string[0], Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
         }
     }

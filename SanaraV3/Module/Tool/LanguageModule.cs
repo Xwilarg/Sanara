@@ -24,7 +24,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Language", "Get various information related to others languages");
             _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", new string[0], Restriction.None, "Japanese submarine")));
             _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", new string[0], Restriction.None, "Kanji 艦")));
-            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "work") }, "Get the urban definition of a word.", new string[0], Restriction.Nsfw, "Urban bunny hop")));
+            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the urban definition of a word.", new string[0], Restriction.Nsfw, "Urban bunny hop")));
             _help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.MANDATORY, "language"), new Argument(ArgumentType.MANDATORY, "sentence/image") }, "Translate a sentence to the given language.", new string[0], Restriction.None, "Translate en 空は青いです")));
         }
     }
