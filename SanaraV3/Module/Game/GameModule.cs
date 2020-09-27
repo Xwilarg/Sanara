@@ -34,6 +34,12 @@ namespace SanaraV3.Module.Game
                 await ReplyAsync("There is no cache loaded for this name.");
         }
 
+        [Command("Score")]
+        public Task ScoreAsync()
+        {
+            throw new NotYetAvailable();
+        }
+
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync(string gameName, string mode = null)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SanaraV3.Diaporama
+namespace SanaraV3.Diaporama.Impl
 {
     public sealed class Reddit : IElement
     {

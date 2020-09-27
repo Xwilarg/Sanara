@@ -85,7 +85,7 @@ namespace SanaraV3.Module.Entertainment
             if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
                 throw new CommandFailed("This subreddit doesn't exist");
             JArray arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync())["data"]["children"].Value<JArray>();
-            List<Diaporama.Reddit> elems = new List<Diaporama.Reddit>();
+            List<Diaporama.Impl.Reddit> elems = new List<Diaporama.Impl.Reddit>();
             foreach (var e in arr)
             {
                 var data = GetRedditEmbed(e["data"]);
@@ -103,7 +103,7 @@ namespace SanaraV3.Module.Entertainment
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
         }
 
-        private Diaporama.Reddit GetRedditEmbed(JToken elem) // Parse a JSON and get a Reddit object out of it
+        private Diaporama.Impl.Reddit GetRedditEmbed(JToken elem) // Parse a JSON and get a Reddit object out of it
         {
             var isSafe = !Utils.CanSendNsfw(Context.Channel);
             var elemNsfw = elem["over_18"].Value<bool>();
@@ -115,7 +115,7 @@ namespace SanaraV3.Module.Entertainment
             if (preview == "spoiler") // We don't want to display spoilers
                 return null;
             // TODO: Not sure about the preview == "nsfw" part
-            return new Diaporama.Reddit(elem["title"].Value<string>(), !Uri.IsWellFormedUriString(preview, UriKind.Absolute) ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
+            return new Diaporama.Impl.Reddit(elem["title"].Value<string>(), !Uri.IsWellFormedUriString(preview, UriKind.Absolute) ? null : new Uri(preview), new Uri("https://reddit.com" + elem["permalink"].Value<string>()),
                 elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
 
