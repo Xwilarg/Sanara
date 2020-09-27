@@ -38,6 +38,12 @@ namespace SanaraV3.Module.Entertainment
 {
     public sealed class JapaneseModule : ModuleBase
     {
+        [Command("VN"), Alias("Visual Novel")]
+        public Task Community(params string[] _)
+        {
+            throw new NotYetAvailable();
+        }
+
         [Command("Source", RunMode = RunMode.Async)]
         public async Task SourceAsync(ImageLink img)
         {
