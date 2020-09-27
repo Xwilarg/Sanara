@@ -165,7 +165,9 @@ namespace SanaraV3.Module.Administration
                 Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x))),
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel"
+                    Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
+                        "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
                 }
             };
             var fullHelp = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner());
@@ -175,7 +177,7 @@ namespace SanaraV3.Module.Administration
                 Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
                 foreach (var help in fullHelp.Where(x => x.Item2.SubmoduleName.ToUpper() == name))
                 {
-                    str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                    str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
                         (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : "") + "\n");
                 }
                 embed.Description = str.ToString();
@@ -187,7 +189,7 @@ namespace SanaraV3.Module.Administration
                 {
                     if (!modules.ContainsKey(help.Item2.SubmoduleName))
                         modules.Add(help.Item2.SubmoduleName, new List<string>());
-                    modules[help.Item2.SubmoduleName].Add("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}");
+                    modules[help.Item2.SubmoduleName].Add("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}");
                 }
                 foreach (var m in modules.OrderBy(x => x.Key))
                 {
