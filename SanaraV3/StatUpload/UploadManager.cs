@@ -58,6 +58,11 @@ namespace SanaraV3.StatUpload
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", "OK") });
         }
 
+        public async Task AddNewCommand(string name)
+        {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commands", name) });
+        }
+
         public async Task AddError(System.Exception e)
         {
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", e.GetType().ToString()) });

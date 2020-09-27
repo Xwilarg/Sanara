@@ -21,10 +21,11 @@ namespace SanaraV3.Help
         public void LoadDoujinshiHelp()
         {
             _submoduleHelp.Add("Doujinshi", "Get self published manga");
-            _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
+            _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin", "Nhentai" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
             _help.Add(("Nsfw", new Help("Doujinshi", "Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", new[] { "Download doujin" }, Restriction.Nsfw, "Download doujin 321633")));
             _help.Add(("Nsfw", new Help("Doujinshi", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin", "Subscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
             _help.Add(("Nsfw", new Help("Doujinshi", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin", "Unsubscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
+            _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi popularity", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get the most popular doujinshi given some tags. If none are provided, give the trending ones.", new[] { "Doujinshi popularity", "Doujinshi p", "Doujin p", "Doujin popularity", "Nhentai p", "Nhentai popularity" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
         }
     }
 }
@@ -51,7 +52,7 @@ namespace SanaraV3.Module.Nsfw
                 await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
         }
 
-        [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin")]
+        [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin", "Download nhentai")]
         public async Task GetDownloadDoujinshiAsync(int id)
         {
             string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
@@ -121,7 +122,7 @@ namespace SanaraV3.Module.Nsfw
             return "00" + nb;
         }
 
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
+        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin", "NHentai")]
         public async Task GetDoujinshiAsync() // Doujin search with no tags
         {
             var result = await SearchClient.SearchAsync();
@@ -130,7 +131,7 @@ namespace SanaraV3.Module.Nsfw
             await ReplyAsync(embed: FormatDoujinshi(result.elements[StaticObjects.Random.Next(0, result.elements.Length)]));
         }
 
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin")]
+        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin", "NHentai")]
         public async Task GetDoujinshiAsync([Remainder]string tags) // Doujin search with tags given
         {
             NHentaiSharp.Search.SearchResult result;
@@ -147,7 +148,7 @@ namespace SanaraV3.Module.Nsfw
             await ReplyAsync(embed: FormatDoujinshi(result.elements[StaticObjects.Random.Next(0, result.elements.Length)]));
         }
 
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Priority(1), Alias("Doujin")]
+        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Priority(1), Alias("Doujin", "NHentai")]
         public async Task GetDoujinshiAsync(int id)
         {
             try

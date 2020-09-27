@@ -119,6 +119,8 @@ namespace SanaraV3
             if (StaticObjects.Website != null)
             {
                 await StaticObjects.Website.AddNewMessage();
+                if (cmd.IsSpecified)
+                    await StaticObjects.Website.AddNewCommand(cmd.Value.Name);
             }
         }
 
