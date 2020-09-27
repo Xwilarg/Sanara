@@ -19,35 +19,38 @@ namespace SanaraV3.StatUpload
         {
             _ = Task.Run(async () =>
             {
-                await Task.Delay(60000); // 1 minute
-
-                // Biggest servers
-                List<Tuple<string, int>> guilds = new List<Tuple<string, int>>();
-                foreach (IGuild g in StaticObjects.Client.Guilds)
+                while (true)
                 {
-                    guilds.Add(new Tuple<string, int>(g.Name, ((SocketGuild)g).MemberCount));
-                }
+                    await Task.Delay(60000); // 1 minute
 
-                Tuple<string, int> biggest = null;
-                string finalStr = "";
-                for (int i = 0; i < 10; i++)
-                {
-                    foreach (var tuple in guilds)
+                    // Biggest servers
+                    List<Tuple<string, int>> guilds = new List<Tuple<string, int>>();
+                    foreach (IGuild g in StaticObjects.Client.Guilds)
                     {
-                        if (biggest == null || tuple.Item2 > biggest.Item2)
-                            biggest = tuple;
+                        guilds.Add(new Tuple<string, int>(g.Name, ((SocketGuild)g).MemberCount));
                     }
-                    if (biggest == null)
-                        break;
-                    finalStr += GetName(biggest.Item1) + "|" + biggest.Item2 + "$";
-                    guilds.Remove(biggest);
-                    biggest = null;
-                }
 
-                await UpdateElement(new Tuple<string, string>[] {
-                    new Tuple<string, string>("serverCount", StaticObjects.Client.Guilds.Count.ToString()),
-                    new Tuple<string, string>("serversBiggest", finalStr)
-                });
+                    Tuple<string, int> biggest = null;
+                    string finalStr = "";
+                    for (int i = 0; i < 10; i++)
+                    {
+                        foreach (var tuple in guilds)
+                        {
+                            if (biggest == null || tuple.Item2 > biggest.Item2)
+                                biggest = tuple;
+                        }
+                        if (biggest == null)
+                            break;
+                        finalStr += GetName(biggest.Item1) + "|" + biggest.Item2 + "$";
+                        guilds.Remove(biggest);
+                        biggest = null;
+                    }
+
+                    await UpdateElement(new Tuple<string, string>[] {
+                        new Tuple<string, string>("serverCount", StaticObjects.Client.Guilds.Count.ToString()),
+                        new Tuple<string, string>("serversBiggest", finalStr)
+                    });
+                }
             });
         }
 
