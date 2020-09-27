@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using SanaraV3.Attribute;
+using SanaraV3.Exception;
 using SanaraV3.Game;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,6 +37,8 @@ namespace SanaraV3.Module.Game
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync(string gameName, string mode = null)
         {
+            if (mode == "multi" || mode == "multiplayer" || gameName == "booru" || gameName == "anime")
+                throw new NotYetAvailable();
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
             else
