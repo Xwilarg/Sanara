@@ -5,7 +5,6 @@
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | ![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg) | ![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg) |
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Xwilarg/Sanara&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage)
 # Sanara
 
@@ -45,5 +44,5 @@ If you have any wonder about what the bot collect on you and how you can get/del
 You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
 
 Preview:<br/>
-![Preview](https://files.zirk.eu/Sanara/Preview.gif)
+![Preview](https://files.zirk.eu/Sanara/Preview.gif)<br/>
 <sup>This GIF is from an old version of the bot</sup>
