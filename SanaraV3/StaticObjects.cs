@@ -24,6 +24,7 @@ using DiscordBotsList.Api;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Vision.V1;
 using Google.Cloud.Translation.V2;
+using SanaraV3.StatUpload;
 
 namespace SanaraV3
 {
@@ -47,6 +48,7 @@ namespace SanaraV3
         private static string DblToken { set; get; }
         private static AuthDiscordBotListApi DblApi { set; get; } = null;
         private static DateTime DblLastSend { set; get; } = DateTime.Now;
+        public static UploadManager Website { set; get; } = null;
 
         // INFORMATION MODULE
         public static string GithubKey { set; get; }
@@ -206,6 +208,11 @@ namespace SanaraV3
                 GoogleCredential googleCredentials = GoogleCredential.FromFile("Keys/GoogleAPI.json");
                 TranslationClient = TranslationClient.Create();
                 VisionClient = ImageAnnotatorClient.Create();
+            }
+
+            if (credentials.StatsWebsiteUrl != null)
+            {
+                Website = new UploadManager(credentials.StatsWebsiteUrl, credentials.StatsWebsiteToken);
             }
         }
 

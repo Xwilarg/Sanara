@@ -12,5 +12,7 @@
         public string OwnerId;
         public string TopGgToken;
         public string GithubKey;
+        public string StatsWebsiteUrl;
+        public string StatsWebsiteToken;
     }
 }

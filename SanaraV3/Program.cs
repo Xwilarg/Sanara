@@ -85,6 +85,7 @@ namespace SanaraV3
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
             StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
             StaticObjects.Client.Disconnected += Disconnected;
+            _commands.CommandExecuted += CommandExecuted;
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
@@ -111,6 +112,14 @@ namespace SanaraV3
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private async Task CommandExecuted(Optional<CommandInfo> cmd, ICommandContext context, IResult result)
+        {
+            if (StaticObjects.Website != null)
+            {
+                await StaticObjects.Website.AddNewMessage();
+            }
         }
 
         private Task Disconnected(System.Exception e)
@@ -173,8 +182,10 @@ namespace SanaraV3
         {
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
-            await StaticObjects.Client.SetGameAsync("Sanara V3 coming soon!", null, ActivityType.CustomStatus);
+            await StaticObjects.Client.SetGameAsync("https://sanara.zirk.eu Sanara V3 is out!", null, ActivityType.CustomStatus);
             await StaticObjects.UpdateTopGgAsync();
+
+            StaticObjects.Website?.KeepSendStats();
         }
     }
 }
