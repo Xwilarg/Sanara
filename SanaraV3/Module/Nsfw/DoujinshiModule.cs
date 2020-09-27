@@ -7,9 +7,11 @@ using SanaraV3.Attribute;
 using SanaraV3.Exception;
 using SanaraV3.Subscription.Tags;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Help
@@ -157,6 +159,45 @@ namespace SanaraV3.Module.Nsfw
             {
                 throw new CommandFailed("These is no doujin with this id");
             }
+        }
+
+        [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
+        public async Task PopularityAsync()
+        {
+            string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/");
+            html = html.Split(new[] { "<div class=\"container index-container index-popular\">" }, StringSplitOptions.None)[1]
+                .Split(new[] { "<div class=\"container index-container\">" }, StringSplitOptions.None)[0];
+            var elems = new List<Diaporama.Impl.Doujinshi>();
+            foreach (var match in Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>())
+            {
+                var doujinshi = await SearchClient.SearchByIdAsync(int.Parse(match.Groups[1].Value));
+                elems.Add(new Diaporama.Impl.Doujinshi(doujinshi.url.AbsoluteUri, doujinshi.pages[0].imageUrl.AbsoluteUri, doujinshi.prettyTitle, doujinshi.tags.Select(x => x.name).ToArray(), doujinshi.id));
+            }
+            var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
+            StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+        }
+
+        [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
+        public async Task PopularityAsync([Remainder]string tags)
+        {
+            NHentaiSharp.Search.SearchResult result;
+            try
+            {
+                result = await SearchClient.SearchWithTagsAsync(tags.Split(' '), 1, PopularitySort.AllTime);
+            }
+            catch (InvalidArgumentException)
+            {
+                throw new CommandFailed("There is no doujin with these tags");
+            }
+            var elems = new List<Diaporama.Impl.Doujinshi>();
+            foreach (var doujinshi in result.elements.Take(5))
+            {
+                elems.Add(new Diaporama.Impl.Doujinshi(doujinshi.url.AbsoluteUri, doujinshi.pages[0].imageUrl.AbsoluteUri, doujinshi.prettyTitle, doujinshi.tags.Select(x => x.name).ToArray(), doujinshi.id));
+            }
+            var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
+            StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
         }
 
         private Embed FormatDoujinshi(GalleryElement result)

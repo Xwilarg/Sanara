@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using SanaraV3.Diaporama.Impl;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace SanaraV3.Diaporama
                     var next = elem.Elements[nextPage];
                     if (next is Reddit)
                         await dMsg.ModifyAsync(x => x.Embed = Post((Reddit)next, nextPage + 1, elem.Elements.Length));
+                    else if (next is Doujinshi)
+                        await dMsg.ModifyAsync(x => x.Embed = Post((Doujinshi)next, nextPage + 1, elem.Elements.Length));
                     else
                         throw new ArgumentException("Unknown type for next");
                     StaticObjects.Diaporamas[msg.Id].CurrentPage = nextPage;
@@ -71,6 +74,22 @@ namespace SanaraV3.Diaporama
                 Footer = new EmbedFooterBuilder
                 {
                     Text = reddit.Flairs + $"\nScore: {reddit.Ups}" + (maxPage == 1 ? "" : $"\nPage {currPage} out of {maxPage}")
+                }
+            }.Build();
+        }
+
+        public static Embed Post(Doujinshi doujin, int currPage, int maxPage)
+        {
+            return new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Description = string.Join(", ", doujin.Tags),
+                Title = doujin.Title,
+                Url = doujin.Url,
+                ImageUrl = doujin.ImageUrl,
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Do the 'Download doujinshi' command with the id '{doujin.Id}' to download the doujinshi.\nPage {currPage} out of {maxPage}"
                 }
             }.Build();
         }
