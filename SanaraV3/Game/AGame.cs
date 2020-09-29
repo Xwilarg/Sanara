@@ -143,10 +143,13 @@ namespace SanaraV3.Game
                     }
                     catch (InvalidGameAnswer e)
                     {
-                        if (e.Message.Length == 0)
-                            msg.AddReactionAsync(new Emoji("❌")).GetAwaiter().GetResult();
-                        else
-                            _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
+                        _ = Task.Run(async () =>
+                        {
+                            if (e.Message.Length == 0)
+                                await msg.AddReactionAsync(new Emoji("❌"));
+                            else
+                                _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
+                        });
                     }
                 }
                 _messages.Clear();
@@ -167,7 +170,10 @@ namespace SanaraV3.Game
 
         private async Task LooseAsync(string reason)
         {
+            await CheckAnswersAsync(); // We check the answers that were sent to be sure to not loose a game while we are still supposed to treat an answer
+
             _state = GameState.LOST;
+
             int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
             string scoreSentence;
             if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
