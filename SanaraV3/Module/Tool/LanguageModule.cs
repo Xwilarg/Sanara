@@ -104,7 +104,7 @@ namespace SanaraV3.Module.Tool
         [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
         public async Task UrbanAsync([Remainder]string query)
         {
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + query));
+            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(query)));
             if (json["list"].Value<JArray>().Count == 0)
                 throw new CommandFailed("There is no definition for this query.");
             string definition = json["list"][0]["definition"].Value<string>();

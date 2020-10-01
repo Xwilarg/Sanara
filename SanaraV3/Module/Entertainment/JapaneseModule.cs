@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using VndbSharp;
 using VndbSharp.Models;
 using VndbSharp.Models.VisualNovel;
@@ -31,7 +32,7 @@ namespace SanaraV3.Help
             _help.Add(("Entertainment", new Help("Japanese", "Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", new string[0], Restriction.None, "Manga made in abyss")));
             _help.Add(("Entertainment", new Help("Japanese", "Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", new string[0], Restriction.None, "Anime nichijou")));
             _help.Add(("Entertainment", new Help("Japanese", "Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", new string[]{ "LN" }, Restriction.None, "Light novel so I'm a spider so what")));
-            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel sanoba witch")));
+            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
             _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove an anime subscription.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.MANDATORY, "image") }, "Get the source of an image.", new string[0], Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
@@ -117,7 +118,7 @@ namespace SanaraV3.Module.Entertainment
         {
             string originalName = name;
             name = Utils.CleanWord(name);
-            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + name);
+            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + HttpUtility.UrlEncode(originalName).Replace("%20", "+"));
             http.AllowAutoRedirect = false;
 
             string html;
@@ -247,7 +248,7 @@ namespace SanaraV3.Module.Entertainment
             StaticObjects.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", StaticObjects.KitsuAccessToken); // TODO: Check if this can cause an issue with threads
             // For anime we need to contact the anime endpoint, manga and light novels are on the manga endpoint
             // The limit=5 is because we only take the 5 firsts results to not end up with things that are totally unrelated
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://kitsu.io/api/edge/" + (media == JapaneseMedia.ANIME ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + query));
+            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://kitsu.io/api/edge/" + (media == JapaneseMedia.ANIME ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)));
 
             StaticObjects.HttpClient.DefaultRequestHeaders.Authorization = null;
 
