@@ -21,7 +21,7 @@ namespace SanaraV3.Help
         {
             _submoduleHelp.Add("Media", "Commands related directly related to various websites");
             _help.Add(("Entertainment", new Help("Media", "Reddit", new[] { new Argument(ArgumentType.OPTIONAL, "hot/top/new/random") }, "Get the latest hot/top/new posts from Reddit, or a random one.", new string[0], Restriction.None, "Reddit hot artknights")));
-            _help.Add(("Entertainment", new Help("Media", "Youtube", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id") }, "Get a Youtube video given some keyword or its id.", new string[0], Restriction.None, "Youtube kinema106")));
+            _help.Add(("Entertainment", new Help("Media", "Youtube", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id") }, "Get a Youtube video given some keyword or its id.", new[] { "YT" }, Restriction.None, "Youtube kinema106")));
             _help.Add(("Entertainment", new Help("Media", "Xkcd", new[] { new Argument(ArgumentType.OPTIONAL, "id/last") }, "Get a random xkcd comic. You can also search by id or get the latest published.", new string[0], Restriction.None, "Xkcd 1172")));
         }
     }
@@ -119,7 +119,7 @@ namespace SanaraV3.Module.Entertainment
                 elem["ups"].Value<int>(), elem["link_flair_text"].Value<string>(), elemNsfw, elem["selftext"].Value<string>());
         }
 
-        [Command("Youtube", RunMode = RunMode.Async)]
+        [Command("Youtube", RunMode = RunMode.Async), Alias("YT")]
         public async Task YoutubeAsync([Remainder]string search)
         {
             await ReplyAsync(embed: GetEmbedFromVideo(await GetYoutubeVideoAsync(search), out _).Build());
@@ -139,7 +139,7 @@ namespace SanaraV3.Module.Entertainment
                 ImageUrl = video.Snippet.Thumbnails.High.Url,
                 Title = video.Snippet.Title,
                 Url = "https://youtu.be/" + video.Id,
-                Description = description.Length > Constants.YOUTUBE_DESC_MAX_SIZE ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(Constants.YOUTUBE_DESC_MAX_SIZE)) + "\n[...]") : video.Snippet.Description,
+                //Description = description.Length > Constants.YOUTUBE_DESC_MAX_SIZE ? (string.Join("\n", video.Snippet.Description.Split('\n').Take(Constants.YOUTUBE_DESC_MAX_SIZE)) + "\n[...]") : video.Snippet.Description,
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
@@ -176,11 +176,10 @@ namespace SanaraV3.Module.Entertainment
                 VideosResource.ListRequest r = StaticObjects.YouTube.Videos.List("snippet,statistics,contentDetails");
                 r.Id = id;
                 var resp = (await r.ExecuteAsync()).Items;
-                if (resp.Count == 0)
-                    throw new CommandFailed($"There is no video with the ID {id}.");
-                result = resp[0];
+                if (resp.Count != 0)
+                    result = resp[0];
             }
-            else
+            if (result == null)
             {
                 SearchResource.ListRequest listRequest = StaticObjects.YouTube.Search.List("snippet");
                 listRequest.Q = search;
