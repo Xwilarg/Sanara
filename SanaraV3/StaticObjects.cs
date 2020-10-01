@@ -25,6 +25,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Vision.V1;
 using Google.Cloud.Translation.V2;
 using SanaraV3.StatUpload;
+using VndbSharp;
 
 namespace SanaraV3
 {
@@ -74,6 +75,7 @@ namespace SanaraV3
         public static string KitsuAccessToken { set; get; } = null;
         public static DateTime KitsuRefreshDate { set; get; }
         public static string KitsuRefreshToken { set; get; }
+        public static Vndb VnClient { get; } = new Vndb();
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();

@@ -12,10 +12,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using VndbSharp;
+using VndbSharp.Models;
+using VndbSharp.Models.VisualNovel;
 
 namespace SanaraV3.Help
 {
@@ -27,6 +31,7 @@ namespace SanaraV3.Help
             _help.Add(("Entertainment", new Help("Japanese", "Manga", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a manga.", new string[0], Restriction.None, "Manga made in abyss")));
             _help.Add(("Entertainment", new Help("Japanese", "Anime", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an anime.", new string[0], Restriction.None, "Anime nichijou")));
             _help.Add(("Entertainment", new Help("Japanese", "Light Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a light novel.", new string[]{ "LN" }, Restriction.None, "Light novel so I'm a spider so what")));
+            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel sanoba witch")));
             _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove an anime subscription.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.MANDATORY, "image") }, "Get the source of an image.", new string[0], Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
@@ -38,12 +43,6 @@ namespace SanaraV3.Module.Entertainment
 {
     public sealed class JapaneseModule : ModuleBase
     {
-        [Command("VN"), Alias("Visual Novel")]
-        public Task Community(params string[] _)
-        {
-            throw new NotYetAvailable();
-        }
-
         [Command("Source", RunMode = RunMode.Async)]
         public async Task SourceAsync(ImageLink img)
         {
@@ -97,6 +96,104 @@ namespace SanaraV3.Module.Entertainment
             else
                 await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "anime");
         }
+
+        private HttpWebResponse GetHttpResponse(HttpWebRequest request)
+        {
+            try
+            {
+                return (HttpWebResponse)request.GetResponse();
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError)
+                    throw;
+
+                return (HttpWebResponse)ex.Response;
+            }
+        }
+
+        [Command("Visual Novel"), Alias("VN")]
+        public async Task VisualNovel([Remainder] string name)
+        {
+            string originalName = name;
+            name = Utils.CleanWord(name);
+            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + name);
+            http.AllowAutoRedirect = false;
+
+            string html;
+            // HttpClient doesn't really look likes to handle redirection properly
+            using (HttpWebResponse response = GetHttpResponse(http))
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                html = reader.ReadToEnd();
+            }
+
+            // Parse HTML and go though every VN, check the original name and translated name to get the VN id
+            // TODO: Use string length for comparison
+            uint id = 0;
+            MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
+            foreach (Match match in matches)
+            {
+                string titleName = Utils.CleanWord(match.Groups[3].Value);
+                string titleNameBase = match.Groups[2].Value;
+                Console.WriteLine(name + " ; " + titleName + " ; " + titleNameBase);
+                if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
+                    id = uint.Parse(match.Groups[1].Value);
+                if (titleName == name || titleNameBase == name)
+                {
+                    id = uint.Parse(match.Groups[1].Value);
+                    break;
+                }
+            }
+
+            // If no matching name, we take the first one in the search list, if none these NotFound
+            if (id == 0)
+            {
+                if (matches.Count == 0)
+                    throw new CommandFailed("Nothing was found with this name.");
+                id = uint.Parse(matches[0].Groups[1].Value);
+            }
+            var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
+            
+            var embed = new EmbedBuilder()
+            {
+                Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
+                Url = "https://vndb.org/v" + vn.Id,
+                ImageUrl = Context.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg > 1 || vn.ImageRating.ViolenceAvg > 1) ? null : vn.Image,
+                Description = Regex.Replace(vn.Description.Length > 1000 ? vn.Description  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
+                Color = Color.Blue
+            };
+            embed.AddField("Available in english?", vn.Languages.Contains("en") ? "Yes" : "No", true);
+            embed.AddField("Available on Windows?", vn.Platforms.Contains("win") ? "Yes" : "No", true);
+            string length = "???";
+            switch (vn.Length)
+            {
+                case VisualNovelLength.VeryShort: length = "<2 Hours"; break;
+                case VisualNovelLength.Short: length = "2 - 10  Hours"; break;
+                case VisualNovelLength.Medium: length = "10 - 30 Hours"; break;
+                case VisualNovelLength.Long: length = "30 - 50 Hours"; break;
+                case VisualNovelLength.VeryLong: length = "> 50 Hours"; break;
+            }
+            embed.AddField("Length", length, true);
+            embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
+            string releaseDate;
+            if (vn.Released?.Year == null)
+                releaseDate = "TBA";
+            else
+            {
+                releaseDate = vn.Released.Year.Value.ToString();
+                if (!vn.Released.Month.HasValue)
+                    releaseDate = AddZero(vn.Released.Month.Value) + "/" + releaseDate;
+                if (!vn.Released.Day.HasValue)
+                    releaseDate = AddZero(vn.Released.Day.Value) + "/" + releaseDate;
+            }
+            embed.AddField("Release Date", releaseDate, true);
+            await ReplyAsync(embed: embed.Build());
+        }
+
+        private string AddZero(uint val)
+            => val < 10 ? "0" + val : val.ToString();
 
         [Command("Manga", RunMode = RunMode.Async)]
         public async Task MangaAsync([Remainder] string name)

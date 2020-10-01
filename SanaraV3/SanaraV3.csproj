@@ -7,15 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BooruSharp" Version="2.9.0" />
+    <PackageReference Include="BooruSharp" Version="2.11.0" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.47.0.2008" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.49.0.2098" />
     <PackageReference Include="Google.Cloud.Translation.V2" Version="2.0.0" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="2.0.0" />
     <PackageReference Include="NHentaiSharp" Version="1.1.1" />
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
+    <PackageReference Include="VndbSharp" Version="1.1.0" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
   </ItemGroup>
 
