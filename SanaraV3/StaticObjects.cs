@@ -56,18 +56,19 @@ namespace SanaraV3
 
         // NSFW MODULE
         public static string UploadWebsiteUrl { set; get; }
-        public static string UploadWebsiteLocation { set;  get; }
+        public static string UploadWebsiteLocation { set; get; }
 
-        public static Safebooru Safebooru    { get; } = new Safebooru();
-        public static Gelbooru  Gelbooru     { get; } = new Gelbooru();
-        public static E621      E621         { get; } = new E621();
-        public static E926      E926         { get; } = new E926();
-        public static Rule34    Rule34       { get; } = new Rule34();
-        public static Konachan  Konachan     { get; } = new Konachan();
-        public static TagsManager Tags       { get; } = new TagsManager();
+        public static Safebooru Safebooru { get; } = new Safebooru();
+        public static Gelbooru Gelbooru { get; } = new Gelbooru();
+        public static E621 E621 { get; } = new E621();
+        public static E926 E926 { get; } = new E926();
+        public static Rule34 Rule34 { get; } = new Rule34();
+        public static Konachan Konachan { get; } = new Konachan();
+        public static TagsManager Tags { get; } = new TagsManager();
 
         // RADIO MODULE
         public static Dictionary<ulong, RadioChannel> Radios { get; } = new Dictionary<ulong, RadioChannel>();
+        public static string[] AllowedPremium { set; get; } = new string[0];
 
         // ENTERTAINMENT MODULE
         public static YouTubeService YouTube { set; get; }
@@ -164,6 +165,9 @@ namespace SanaraV3
 
             await SM.InitAsync();
             GM.Init();
+
+            if (File.Exists("Saves/Premium.txt"))
+                AllowedPremium = File.ReadAllLines("Saves/Premium.txt");
 
             if (credentials.YouTubeKey != null)
             {
