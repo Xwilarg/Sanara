@@ -138,7 +138,6 @@ namespace SanaraV3.Module.Entertainment
             {
                 string titleName = Utils.CleanWord(match.Groups[3].Value);
                 string titleNameBase = match.Groups[2].Value;
-                Console.WriteLine(name + " ; " + titleName + " ; " + titleNameBase);
                 if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
                     id = uint.Parse(match.Groups[1].Value);
                 if (titleName == name || titleNameBase == name)
@@ -156,13 +155,13 @@ namespace SanaraV3.Module.Entertainment
                 id = uint.Parse(matches[0].Groups[1].Value);
             }
             var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
-            
+
             var embed = new EmbedBuilder()
             {
                 Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
                 Url = "https://vndb.org/v" + vn.Id,
                 ImageUrl = Context.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg > 1 || vn.ImageRating.ViolenceAvg > 1) ? null : vn.Image,
-                Description = Regex.Replace(vn.Description.Length > 1000 ? vn.Description  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
+                Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
                 Color = Color.Blue
             };
             embed.AddField("Available in english?", vn.Languages.Contains("en") ? "Yes" : "No", true);
