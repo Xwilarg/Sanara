@@ -2,6 +2,7 @@
 using Discord.Commands;
 using SanaraV3.Attribute;
 using SanaraV3.Exception;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,8 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Setting", "Modify the bot behavior for your server");
             _help.Add(("Administration", new Help("Setting", "Prefix", new[] { new Argument(ArgumentType.OPTIONAL, "prefix") }, "Change the bot prefix. Is no information is provided, display the current one.", new string[0], Restriction.AdminOnly, "Prefix s.")));
             _help.Add(("Administration", new Help("Setting", "Anonymize", new[] { new Argument(ArgumentType.OPTIONAL, "value") }, "Set if your guild name can be displayed on Sanara stats page. Is no information is provided, display the current value.", new string[0], Restriction.AdminOnly, "Anonymize true")));
-            _help.Add(("Administration", new Help("Setting", "Exit", new[] { new Argument(ArgumentType.MANDATORY, "server name") }, "Leave the server given in parameter.", new string[0], Restriction.OwnerOnly, null)));
+            _help.Add(("Administration", new Help("Setting", "Leave", new[] { new Argument(ArgumentType.MANDATORY, "server name") }, "Leave the server given in parameter.", new string[0], Restriction.OwnerOnly, null)));
+            _help.Add(("Administration", new Help("Setting", "Exit", new Argument[0], "Stop the bot executable.", new string[0], Restriction.OwnerOnly, null)));
             _help.Add(("Administration", new Help("Setting", "Disable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Disable a module for this server.", new string[0], Restriction.AdminOnly, "Disable nsfw")));
             _help.Add(("Administration", new Help("Setting", "Enable", new[] { new Argument(ArgumentType.MANDATORY, "module name") }, "Enable a module for this server.", new string[0], Restriction.AdminOnly, "Enable media")));
         }
@@ -47,8 +49,8 @@ namespace SanaraV3.Module.Administration
             await ReplyAsync("Your availability was updated.");
         }
 
-        [Command("Exit"), RequireOwner]
-        public async Task ExitAsync([Remainder]string guildName)
+        [Command("Leave"), RequireOwner]
+        public async Task LeaveAsync([Remainder]string guildName)
         {
             IGuild g = StaticObjects.Client.Guilds.ToList().Find(x => x.Name.ToUpper() == guildName.ToUpper() || x.Id.ToString() == guildName);
             if (g == null)
@@ -57,6 +59,12 @@ namespace SanaraV3.Module.Administration
             await ReplyAsync("Done");
         }
 
+        [Command("Exit"), RequireOwner]
+        public async Task ExitAsync()
+        {
+            await ReplyAsync("Done");
+            Environment.Exit(1);
+        }
 
         [Command("Prefix"), RequireAdmin]
         public async Task Prefix()
