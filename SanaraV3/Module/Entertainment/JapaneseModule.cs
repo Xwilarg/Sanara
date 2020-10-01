@@ -173,7 +173,7 @@ namespace SanaraV3.Module.Entertainment
                 case VisualNovelLength.Short: length = "2 - 10  Hours"; break;
                 case VisualNovelLength.Medium: length = "10 - 30 Hours"; break;
                 case VisualNovelLength.Long: length = "30 - 50 Hours"; break;
-                case VisualNovelLength.VeryLong: length = "> 50 Hours"; break;
+                case VisualNovelLength.VeryLong: length = "\\> 50 Hours"; break;
             }
             embed.AddField("Length", length, true);
             embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
