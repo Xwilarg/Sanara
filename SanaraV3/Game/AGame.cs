@@ -35,6 +35,8 @@ namespace SanaraV3.Game
 
             _contributors = new List<ulong>();
             _score = 0;
+
+            StaticObjects.Website?.AddGameAsync(_gameName, _argument);
         }
 
         protected abstract string GetPostInternal(); // Get next post

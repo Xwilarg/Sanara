@@ -41,14 +41,14 @@ namespace SanaraV3
 
                 await sentMsg.AddReactionAsync(new Emoji("🕷"));
 
-                StaticObjects.Website?.AddError(ce.InnerException);
+                StaticObjects.Website?.AddErrorAsync(ce.InnerException);
             }
             else
             {
                 if (StaticObjects.RavenClient != null)
                     StaticObjects.RavenClient.Capture(new SentryEvent(msg.Exception));
 
-                StaticObjects.Website?.AddError(msg.Exception);
+                StaticObjects.Website?.AddErrorAsync(msg.Exception);
             }
         }
 

@@ -55,20 +55,25 @@ namespace SanaraV3.StatUpload
         }
 
         // An user did a command
-        public async Task AddNewMessage()
+        public async Task AddNewMessageAsync()
         {
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", "OK") });
         }
 
-        public async Task AddNewCommand(string name)
+        public async Task AddNewCommandAsync(string name)
         {
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commands", name) });
         }
 
-        public async Task AddError(System.Exception e)
+        public async Task AddErrorAsync(System.Exception e)
         {
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", e.GetType().ToString()) });
+        }
+
+        public async Task AddGameAsync(string name, string option)
+        {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", name + (option == null ? "" : "-" + option)) });
         }
 
         // Clean name before sending it to the website for stats (| and $ are delimitators so we remove them)
