@@ -64,6 +64,7 @@ namespace SanaraV3
         public static E926 E926 { get; } = new E926();
         public static Rule34 Rule34 { get; } = new Rule34();
         public static Konachan Konachan { get; } = new Konachan();
+        public static Sakugabooru Sakugabooru { get; } = new Sakugabooru();
         public static TagsManager Tags { get; } = new TagsManager();
 
         // RADIO MODULE
@@ -85,6 +86,7 @@ namespace SanaraV3
         public static AudioMode ModeAudio { get; } = new AudioMode();
         public static IPreload[] Preloads { set; get; }
         private static GameManager GM { get; } = new GameManager();
+        public static Dictionary<string, BooruSharp.Search.Tag.TagType> QuizzTagsCache { get; } = new Dictionary<string, BooruSharp.Search.Tag.TagType>();
 
         // LANGUAGE MODULE
         public static Dictionary<string, string> RomajiToHiragana { set; get; } = new Dictionary<string, string>();
@@ -159,7 +161,8 @@ namespace SanaraV3
                 new GirlsFrontlinePreload(),
                 new AzurLanePreload(),
                 new FateGOPreload(),
-                new PokemonPreload()
+                new PokemonPreload(),
+                new AnimePreload()
             };
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 

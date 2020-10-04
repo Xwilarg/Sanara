@@ -2,7 +2,7 @@
 
 namespace SanaraV3.Game.Preload.Result
 {
-    public struct QuizzPreloadResult : IPreloadResult
+    public class QuizzPreloadResult : IPreloadResult
     {
         public QuizzPreloadResult(string imageUrl, string[] answers)
         {

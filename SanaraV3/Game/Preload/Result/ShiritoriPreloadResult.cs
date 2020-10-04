@@ -1,6 +1,6 @@
 ﻿namespace SanaraV3.Game.Preload.Result
 {
-    public struct ShiritoriPreloadResult : IPreloadResult
+    public sealed class ShiritoriPreloadResult : IPreloadResult
     {
         public ShiritoriPreloadResult(string word, string wordEnglish, string meanings)
         {
