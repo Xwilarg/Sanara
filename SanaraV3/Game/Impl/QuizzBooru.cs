@@ -60,6 +60,9 @@ namespace SanaraV3.Game.Impl
         protected override int GetGameTime()
             => 30;
 
+        protected override bool DisplayHelp()
+            => true;
+
         private ABooru _booru;
         private string[] _allowedFormats;
     }

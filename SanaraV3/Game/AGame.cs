@@ -6,6 +6,7 @@ using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Game
@@ -47,6 +48,8 @@ namespace SanaraV3.Game
         protected abstract string GetSuccessMessage(); // Congratulation message, empty string to ignore
         protected virtual void DisposeInternal() // By default there isn't much to dispose but some child class might need it
         { }
+        protected virtual bool DisplayHelp() // Does display help in format X*****
+            => false;
         public void Dispose()
         {
             DisposeInternal();
@@ -87,6 +90,19 @@ namespace SanaraV3.Game
                     Task t = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); });
                     if (!(_postMode is AudioMode)) // We don't wait for the audio to finish for audio games
                         t.Wait(5000);
+                    if (DisplayHelp())
+                    {
+                        var answer = GetAnswer(); // TODO: Fix
+                        string answerHelp = char.ToUpper(answer[0]).ToString();
+                        foreach (var c in answer.Skip(1))
+                        {
+                            if (c == ' ')
+                                answer += c;
+                            else
+                                answer += "\\*";
+                        }
+                        await _textChan.SendMessageAsync(answerHelp);
+                    }
                 } catch (GameLost e)
                 {
                     await LooseAsync(e.Message);
