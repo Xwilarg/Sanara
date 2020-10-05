@@ -48,8 +48,8 @@ namespace SanaraV3.Game
         protected abstract string GetSuccessMessage(); // Congratulation message, empty string to ignore
         protected virtual void DisposeInternal() // By default there isn't much to dispose but some child class might need it
         { }
-        protected virtual bool DisplayHelp() // Does display help in format X*****
-            => false;
+        protected virtual string GetHelp() // Does display help in format X*****
+            => null;
         public void Dispose()
         {
             DisposeInternal();
@@ -90,16 +90,16 @@ namespace SanaraV3.Game
                     Task t = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); });
                     if (!(_postMode is AudioMode)) // We don't wait for the audio to finish for audio games
                         t.Wait(5000);
-                    if (DisplayHelp())
+                    if (GetHelp() != null)
                     {
-                        var answer = GetAnswer(); // TODO: Fix
+                        var answer = GetHelp();
                         string answerHelp = char.ToUpper(answer[0]).ToString();
                         foreach (var c in answer.Skip(1))
                         {
                             if (c == ' ')
-                                answer += c;
+                                answerHelp += c;
                             else
-                                answer += "\\*";
+                                answerHelp += "\\*";
                         }
                         await _textChan.SendMessageAsync(answerHelp);
                     }
