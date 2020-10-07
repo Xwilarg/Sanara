@@ -87,9 +87,10 @@ namespace SanaraV3.Game
                 try
                 {
                     _current = GetPostInternal();
-                    Task t = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); });
-                    if (!(_postMode is AudioMode)) // We don't wait for the audio to finish for audio games
-                        t.Wait(5000);
+                    if (!(_postMode is AudioMode))
+                        await _postMode.PostAsync(_textChan, _current, this);
+                    else
+                        _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
                     if (GetHelp() != null)
                     {
                         var answer = GetHelp();

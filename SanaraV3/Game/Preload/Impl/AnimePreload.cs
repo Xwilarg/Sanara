@@ -20,7 +20,7 @@ namespace SanaraV3.Game.Preload.Impl
             {
                 string[] curr = lines[i].Split(' ');
                 if (int.Parse(curr[1]) > 10)
-                    preload.Add(new BooruQuizzPreloadResult(StaticObjects.Sakugabooru, new[] { ".mp4" }, curr[0], new[] { curr[0] }));
+                    preload.Add(new BooruQuizzPreloadResult(StaticObjects.Sakugabooru, new[] { ".mp4", ".webm" }, curr[0], new[] { curr[0] }));
             }
             _preload = preload.ToArray();
         }
