@@ -51,6 +51,9 @@ namespace SanaraV3.Game.Preload.Impl
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);
 
+        public string GetRules()
+            => "I'll post an image of a shipgirl, you'll have to give his name.";
+
         private readonly QuizzPreloadResult[] _preload;
     }
 }

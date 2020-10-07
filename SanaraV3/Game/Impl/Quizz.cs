@@ -64,9 +64,6 @@ namespace SanaraV3.Game.Impl
         protected override int GetGameTime()
             => 15;
 
-        protected override string GetRules()
-            => "I'll post an image of a character, you'll have to give his name.";
-
         protected override string GetSuccessMessage()
             => "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
 

@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using DiscordUtils;
 using SanaraV3.Exception;
 using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
@@ -27,7 +26,7 @@ namespace SanaraV3.Game
             _gameName = preload.GetGameNames()[0];
             _argument = preload.GetNameArg();
 
-            textChan.SendMessageAsync(GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
+            textChan.SendMessageAsync(preload.GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
                 "If the game break, you can use the 'Cancel' command to cancel it.\n" +
                 "You can cooperate with other players to find the answers." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : ""));
@@ -44,7 +43,6 @@ namespace SanaraV3.Game
         protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
-        protected abstract string GetRules();
         protected abstract string GetSuccessMessage(); // Congratulation message, empty string to ignore
         protected virtual void DisposeInternal() // By default there isn't much to dispose but some child class might need it
         { }

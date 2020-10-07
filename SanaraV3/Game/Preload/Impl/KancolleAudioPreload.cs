@@ -51,6 +51,9 @@ namespace SanaraV3.Game.Preload.Impl
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new QuizzAudio(chan, user, this, settings);
 
+        public string GetRules()
+            => "I'll play a vocal line of a shipgirl, you'll have to give her name.";
+
         private readonly QuizzPreloadResult[] _preload;
     }
 }

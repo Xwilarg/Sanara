@@ -37,6 +37,9 @@ namespace SanaraV3.Game.Preload.Impl
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new QuizzBooru(chan, user, this, settings);
 
+        public string GetRules()
+            => "I'll post an extract from an anime, you'll have to give its name.";
+
         private readonly BooruQuizzPreloadResult[] _preload;
     }
 }

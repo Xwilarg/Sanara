@@ -38,9 +38,6 @@ namespace SanaraV3.Game.Impl
             }
         }
 
-        protected override string GetRules()
-            => "I'll play a vocal line of a character, you'll have to give his name.";
-
         public IAudioClient GetVoiceSession()
             => _voiceSession;
 
