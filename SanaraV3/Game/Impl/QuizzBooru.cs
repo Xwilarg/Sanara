@@ -1,11 +1,14 @@
 ﻿using BooruSharp.Booru;
 using Discord;
+using DiscordUtils;
+using SanaraV3.Exception;
 using SanaraV3.Game.Preload;
 using SanaraV3.Game.Preload.Result;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SanaraV3.Game.Impl
 {
@@ -55,6 +58,14 @@ namespace SanaraV3.Game.Impl
             _current = new QuizzPreloadResult(_current.ImageUrl, answers.ToArray());
 
             return result.fileUrl.AbsoluteUri;
+        }
+
+        protected override Task CheckAnswerInternalAsync(string answer)
+        {
+            string userAnswer = Utils.CleanWord(answer);
+            if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
+                throw new InvalidGameAnswer("");
+            return Task.CompletedTask;
         }
 
         protected override int GetGameTime()
