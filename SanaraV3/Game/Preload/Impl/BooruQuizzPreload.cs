@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace SanaraV3.Game.Preload.Impl
 {
-    public sealed class BooruPreload : IPreload
+    public sealed class BooruQuizzPreload : IPreload
     {
-        public BooruPreload()
+        public BooruQuizzPreload()
         {
             if (!File.Exists("Saves/Game/QuizzTags.txt"))
                 File.WriteAllBytes("Saves/Game/QuizzTags.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
@@ -29,7 +29,7 @@ namespace SanaraV3.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string[] GetGameNames()
-            => new[] { "booru" };
+            => new[] { "booruquizz", "booru" };
 
         public string GetNameArg()
             => null;

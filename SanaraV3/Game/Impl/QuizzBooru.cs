@@ -31,7 +31,18 @@ namespace SanaraV3.Game.Impl
             => 30;
 
         protected override string GetHelp()
-            => _current.Answers[0];
+        {
+            var answer = _current.Answers[0].Replace('_', ' ');
+            string answerHelp = char.ToUpper(answer[0]).ToString();
+            foreach (var c in answer.Skip(1))
+            {
+                if (c == ' ')
+                    answerHelp += c;
+                else
+                    answerHelp += "\\*";
+            }
+            return answerHelp;
+        }
 
         protected ABooru _booru;
         protected string[] _allowedFormats;
