@@ -13,7 +13,7 @@ namespace SanaraV3.Help
         public void LoadGameHelp()
         {
             _submoduleHelp.Add("Game", "Play various games directly on Discord");
-            _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights/kancolle/girlsfrontline/fatego/pokemon/anime"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", new string[0], Restriction.None, "Play arknights audio")));
+            _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori/arknights/kancolle/girlsfrontline/fatego/pokemon/anime/booru"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it.", new string[0], Restriction.None, "Play arknights audio")));
             _help.Add(("Game", new Help("Game", "Cancel", new Argument[0], "Cancel a game running in this channel.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Replay", new Argument[0], "Replay the audio for the current game.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Delete cache", new Argument[0], "Delete the cache of a game.", new string[0], Restriction.OwnerOnly, null)));
@@ -43,7 +43,7 @@ namespace SanaraV3.Module.Game
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync(string gameName, string mode = null)
         {
-            if (mode == "multi" || mode == "multiplayer" || gameName == "booru")
+            if (mode == "multi" || mode == "multiplayer")
                 throw new NotYetAvailable();
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
@@ -79,7 +79,11 @@ namespace SanaraV3.Module.Game
             foreach (var preload in StaticObjects.Preloads)
             {
                 if (preload.GetGameNames().Contains(gameName) && preload.GetNameArg() == argument)
+                {
+                    if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
+                        throw new CommandFailed("This game can only be launched in a NSFW channel.");
                     return preload.CreateGame(textChan, user, new GameSettings(false));
+                }
             }
             return null;
         }

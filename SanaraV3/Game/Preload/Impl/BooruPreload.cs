@@ -8,19 +8,19 @@ using System.Linq;
 
 namespace SanaraV3.Game.Preload.Impl
 {
-    public sealed class AnimePreload : IPreload
+    public sealed class BooruPreload : IPreload
     {
-        public AnimePreload()
+        public BooruPreload()
         {
-            if (!File.Exists("Saves/Game/QuizzAnime.txt"))
-                File.WriteAllBytes("Saves/Game/QuizzAnime.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzAnime.txt").GetAwaiter().GetResult());
-            string[] lines = File.ReadAllLines("Saves/Game/QuizzAnime.txt");
+            if (!File.Exists("Saves/Game/QuizzTags.txt"))
+                File.WriteAllBytes("Saves/Game/QuizzTags.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
+            string[] lines = File.ReadAllLines("Saves/Game/QuizzTags.txt");
             var preload = new List<BooruQuizzPreloadResult>();
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] curr = lines[i].Split(' ');
-                if (int.Parse(curr[1]) > 10)
-                    preload.Add(new BooruQuizzPreloadResult(StaticObjects.Sakugabooru, new[] { ".mp4", ".webm" }, curr[0], new[] { curr[0] }));
+                if (int.Parse(curr[1]) > 3)
+                    preload.Add(new BooruQuizzPreloadResult(StaticObjects.Gelbooru, new[] { ".gif", ".png", ".jpg", ".jpeg" }, curr[0], new[] { curr[0] }));
             }
             _preload = preload.ToArray();
         }
@@ -29,19 +29,19 @@ namespace SanaraV3.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string[] GetGameNames()
-            => new[] { "anime" };
+            => new[] { "booru" };
 
         public string GetNameArg()
             => null;
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new QuizzBooruAnime(chan, user, this, settings);
+            => new QuizzBooruTags(chan, user, this, settings);
 
         public string GetRules()
-            => "I'll post an extract from an anime, you'll have to give its name.";
+            => "I'll post 3 images, you'll have to give the tag they have in common.";
 
         public bool IsSafe()
-            => true;
+            => false;
 
         private readonly BooruQuizzPreloadResult[] _preload;
     }

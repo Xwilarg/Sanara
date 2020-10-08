@@ -64,6 +64,9 @@ namespace SanaraV3.Game.Preload.Impl
         public string GetRules()
             => "I'll post an image of a shipgirl, you'll have to give her name.";
 
+        public bool IsSafe()
+            => true;
+
         private readonly QuizzPreloadResult[] _preload;
     }
 }

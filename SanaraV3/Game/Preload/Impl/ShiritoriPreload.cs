@@ -41,6 +41,9 @@ namespace SanaraV3.Game.Preload.Impl
             "For example if I say りゅう (ryuu, dragon) you have to say a word starting by う (u), for example うさぎ (usagi, rabbit).\n" +
             "Words must be noun, must not end by a ん (n), must not have been already said an must be more than one syllabe.";
 
+        public bool IsSafe()
+            => true;
+
         private readonly ShiritoriPreloadResult[] _preload;
     }
 }

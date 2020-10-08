@@ -162,7 +162,8 @@ namespace SanaraV3
                 new AzurLanePreload(),
                 new FateGOPreload(),
                 new PokemonPreload(),
-                new AnimePreload()
+                new AnimePreload(),
+                new BooruPreload()
             };
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 

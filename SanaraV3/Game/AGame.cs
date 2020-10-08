@@ -39,7 +39,7 @@ namespace SanaraV3.Game
             StaticObjects.Website?.AddGameAsync(_gameName, _argument);
         }
 
-        protected abstract string GetPostInternal(); // Get next post
+        protected abstract string[] GetPostInternal(); // Get next post
         protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
@@ -84,14 +84,17 @@ namespace SanaraV3.Game
             {
                 try
                 {
-                    _current = GetPostInternal();
-                    if (!(_postMode is AudioMode))
-                        await _postMode.PostAsync(_textChan, _current, this);
-                    else
-                        _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
+                    foreach (var tmp in GetPostInternal())
+                    {
+                        _current = tmp;
+                        if (!(_postMode is AudioMode))
+                            await _postMode.PostAsync(_textChan, _current, this);
+                        else
+                            _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
+                    }
                     if (GetHelp() != null)
                     {
-                        var answer = GetHelp();
+                        var answer = GetHelp().Replace('_', ' ');
                         string answerHelp = char.ToUpper(answer[0]).ToString();
                         foreach (var c in answer.Skip(1))
                         {

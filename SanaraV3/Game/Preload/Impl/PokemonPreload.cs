@@ -55,6 +55,9 @@ namespace SanaraV3.Game.Preload.Impl
         public string GetRules()
             => "I'll post an image of a pokemon, you'll have to give its name.";
 
+        public bool IsSafe()
+            => true;
+
         private readonly QuizzPreloadResult[] _preload;
     }
 }

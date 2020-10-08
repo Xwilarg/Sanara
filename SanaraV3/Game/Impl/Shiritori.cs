@@ -21,20 +21,20 @@ namespace SanaraV3.Game.Impl
             _alreadySaid = new List<string>();
         }
 
-        protected override string GetPostInternal()
+        protected override string[] GetPostInternal()
         {
             if (_isFirst)
             {
                 _isFirst = false;
                 _alreadySaid.Add("しりとり");
                 _currWord = "しりとり";
-                return "しりとり (shiritori)";
+                return new[] { "しりとり (shiritori)" };
             }
             var randomWord = GetRandomValidWord(GetWordEnding(_currWord));  
             _words.Remove(randomWord);
             _alreadySaid.Add(randomWord.Word);
             _currWord = randomWord.Word;
-            return randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings})";
+            return new[] { randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings})" };
         }
 
         protected override async Task CheckAnswerInternalAsync(string answer)
