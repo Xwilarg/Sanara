@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Science", "Calc", new[] { new Argument(ArgumentType.MANDATORY, "operation") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Calc 72 * 32")));
             _help.Add(("Tool", new Help("Science", "Color", new[] { new Argument(ArgumentType.MANDATORY, "name/RGB/Hex") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Color 125 32 200")));
             _help.Add(("Tool", new Help("Science", "Qrcode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Create a QR code with the text as a content", new[] { "qr" }, Restriction.None, "Qrcode https://nyanpass.com/")));
+            _help.Add(("Tool", new Help("Science", "Encode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Encode a text", new string[0], Restriction.None, "Encode https://github.com/Xwilarg/")));
+            _help.Add(("Tool", new Help("Science", "Decode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Decode a text", new string[0], Restriction.None, "Decode (%e2%95%af%c2%b0%e2%96%a1%c2%b0%ef%bc%89%e2%95%af%ef%b8%b5+%e2%94%bb%e2%94%81%e2%94%bb")));
         }
     }
 }
@@ -26,6 +29,56 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
+        [Command("Encode")]
+        public async Task EncodeAsync([Remainder]string content)
+        {
+            await ReplyAsync(embed: new Discord.EmbedBuilder
+            {
+                Color = Discord.Color.Blue,
+                Fields = new List<Discord.EmbedFieldBuilder>
+                {
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "URL",
+                        Value = HttpUtility.UrlEncode(content)
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "HTML",
+                        Value = HttpUtility.HtmlEncode(content)
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "JavaScript",
+                        Value = HttpUtility.JavaScriptStringEncode(content)
+                    }
+                }
+            }.Build());
+        }
+
+
+        [Command("Decode")]
+        public async Task DecodeAsync([Remainder]string content)
+        {
+            await ReplyAsync(embed: new Discord.EmbedBuilder
+            {
+                Color = Discord.Color.Blue,
+                Fields = new List<Discord.EmbedFieldBuilder>
+                {
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "URL",
+                        Value = HttpUtility.UrlDecode(content)
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "HTML",
+                        Value = HttpUtility.HtmlDecode(content)
+                    }
+                }
+            }.Build());
+        }
+
         [Command("Qrcode"), Alias("Qr")]
         public async Task QrcodeAsync([Remainder]string content)
         {
