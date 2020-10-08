@@ -2,10 +2,13 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
+using SimpleCrypto;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -21,6 +24,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Science", "Qrcode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Create a QR code with the text as a content", new[] { "qr" }, Restriction.None, "Qrcode https://nyanpass.com/")));
             _help.Add(("Tool", new Help("Science", "Encode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Encode a text", new string[0], Restriction.None, "Encode https://github.com/Xwilarg/")));
             _help.Add(("Tool", new Help("Science", "Decode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Decode a text", new string[0], Restriction.None, "Decode (%e2%95%af%c2%b0%e2%96%a1%c2%b0%ef%bc%89%e2%95%af%ef%b8%b5+%e2%94%bb%e2%94%81%e2%94%bb")));
+            _help.Add(("Tool", new Help("Science", "Hash", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Hash a text", new string[0], Restriction.None, "Hash hello")));
         }
     }
 }
@@ -29,6 +33,76 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
+        [Command("Hash")]
+        public async Task HashAsync([Remainder]string content)
+        {
+            // SHA256
+            var crypt256 = new SHA256Managed();
+            var hash256 = new StringBuilder();
+            byte[] compute = crypt256.ComputeHash(Encoding.UTF8.GetBytes(content));
+            foreach (byte b in compute)
+            {
+                hash256.Append(b.ToString("x2"));
+            }
+
+            var crypt1 = new SHA1Managed();
+            var hash1 = new StringBuilder();
+            compute = crypt1.ComputeHash(Encoding.UTF8.GetBytes(content));
+            foreach (byte b in compute)
+            {
+                hash1.Append(b.ToString("x2"));
+            }
+
+            StringBuilder crypt5 = new StringBuilder();
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(content);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    crypt5.Append(hashBytes[i].ToString("X2"));
+                }
+            }
+
+            await ReplyAsync(embed: new Discord.EmbedBuilder
+            {
+                Color = Discord.Color.Blue,
+                Fields = new List<Discord.EmbedFieldBuilder>
+                {
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "SHA256",
+                        Value = hash256.ToString()
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "SHA1",
+                        Value = hash1.ToString()
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "MD5",
+                        Value = crypt5.ToString()
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "BCrypt",
+                        Value =  BCrypt.Net.BCrypt.HashPassword(content)
+                    },
+                    new Discord.EmbedFieldBuilder
+                    {
+                        Name = "PBKDF2",
+                        Value = new PBKDF2().Compute(content)
+                    }
+                },
+                Footer = new Discord.EmbedFooterBuilder
+                {
+                    Text = "Never send your password or any sensitive information on Discord"
+                }
+            }.Build());
+        }
+
         [Command("Encode")]
         public async Task EncodeAsync([Remainder]string content)
         {
