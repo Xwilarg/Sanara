@@ -6,6 +6,7 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV3.Help
 {
@@ -16,6 +17,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Science", "Get information related to science");
             _help.Add(("Tool", new Help("Science", "Calc", new[] { new Argument(ArgumentType.MANDATORY, "operation") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Calc 72 * 32")));
             _help.Add(("Tool", new Help("Science", "Color", new[] { new Argument(ArgumentType.MANDATORY, "name/RGB/Hex") }, "Evaluate a basic math operation and return the result.", new string[0], Restriction.None, "Color 125 32 200")));
+            _help.Add(("Tool", new Help("Science", "Qrcode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Create a QR code with the text as a content", new[] { "qr" }, Restriction.None, "Qrcode https://nyanpass.com/")));
         }
     }
 }
@@ -24,6 +26,12 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
+        [Command("Qrcode"), Alias("Qr")]
+        public async Task QrcodeAsync([Remainder]string content)
+        {
+            await Context.Channel.SendFileAsync(await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(content)), "qrcode.png");
+        }
+
         [Command("Color"), Priority(-1)]
         public async Task ColorAsync([Remainder]string color)
         {
