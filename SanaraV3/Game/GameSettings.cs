@@ -2,11 +2,11 @@
 {
     public struct GameSettings
     {
-        public GameSettings(bool isMultiplayer)
+        public GameSettings(MultiplayerLobby lobby)
         {
-            IsMultiplayer = isMultiplayer;
+            Lobby = lobby;
         }
 
-        public bool IsMultiplayer { get; }
+        public MultiplayerLobby Lobby { get; }
     }
 }

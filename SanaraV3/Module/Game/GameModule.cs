@@ -41,22 +41,17 @@ namespace SanaraV3.Module.Game
         }
 
         [Command("Play", RunMode = RunMode.Async)]
-        public async Task PlayAsync(string gameName, string mode = null)
+        public async Task PlayAsync(string gameName, params string[] modes)
         {
-            if (mode == "multi" || mode == "multiplayer")
-                throw new NotYetAvailable();
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
             else
             {
-                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel, Context.User, mode);
+                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel, Context.User, modes);
                 if (game == null)
                     await ReplyAsync("There is no game with this name.");
                 else
-                {
                     StaticObjects.Games.Add(game);
-                    await game.StartAsync();
-                }
             }
         }
 
@@ -74,15 +69,17 @@ namespace SanaraV3.Module.Game
             await game.ReplayAsync();
         }
 
-        public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string argument)
+        public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string[] arguments)
         {
             foreach (var preload in StaticObjects.Preloads)
             {
-                if (preload.GetGameNames().Contains(gameName) && preload.GetNameArg() == argument)
+                if (preload.GetGameNames().Contains(gameName) && arguments.Contains(preload.GetNameArg()))
                 {
                     if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                         throw new CommandFailed("This game can only be launched in a NSFW channel.");
-                    return preload.CreateGame(textChan, user, new GameSettings(false));
+                    var lobby = arguments.Contains("multi") || arguments.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
+                    var game = preload.CreateGame(textChan, user, new GameSettings(lobby));
+                    return game;
                 }
             }
             return null;

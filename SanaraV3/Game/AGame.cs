@@ -5,7 +5,6 @@ using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Game
@@ -21,7 +20,7 @@ namespace SanaraV3.Game
             else
                 throw new CommandFailed("Games are not yet available in private message."); // TODO!
             _postMode = postMode;
-            _settings = settings;
+            _lobby = settings.Lobby;
 
             _gameName = preload.GetGameNames()[0];
             _argument = preload.GetNameArg();
@@ -29,12 +28,22 @@ namespace SanaraV3.Game
             textChan.SendMessageAsync(preload.GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
                 "If the game break, you can use the 'Cancel' command to cancel it.\n" +
                 "You can cooperate with other players to find the answers." +
-                (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : ""));
+                (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : "") +
+                (_lobby != null ? "\n\n**You can join the lobby for the game by doing the 'Join' command**\nThe game will automatically start in " + _lobbyTimer + " seconds, you can start it right away using the 'Start' command" : ""));
 
             _messages = new List<SocketUserMessage>();
 
             _contributors = new List<ulong>();
             _score = 0;
+
+            var task = Task.Run(async () =>
+            {
+                if (_lobby != null)
+                    await Task.Delay(_lobbyTimer);
+
+                await StartAsync();
+            });
+            task.Wait();
 
             StaticObjects.Website?.AddGameAsync(_gameName, _argument);
         }
@@ -67,6 +76,16 @@ namespace SanaraV3.Game
         {
             if (_state != GameState.PREPARE)
                 return;
+
+            if (_lobby != null) // Multiplayer game
+            {
+                if (_lobby.GetUserCount() < 2)
+                {
+                    _state = GameState.LOST;
+                    await _textChan.SendMessageAsync("The game was cancelled because there wasn't enough players (at least 2 are required)");
+                }
+            }
+
             _state = GameState.RUNNING;
             await PostAsync();
         }
@@ -184,14 +203,19 @@ namespace SanaraV3.Game
             _state = GameState.LOST;
 
             int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
-            string scoreSentence;
-            if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
-            else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
-            else
+
+            string scoreSentence = "";
+            if (_lobby == null) // Score aren't saved in multiplayer games
             {
-                await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
-                scoreSentence = $"You best your best score of {bestScore} with a new score of {_score}!";
+                if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
+                else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
+                else
+                {
+                    await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
+                    scoreSentence = $"You best your best score of {bestScore} with a new score of {_score}!";
+                }
             }
+
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
         }
 
@@ -220,7 +244,6 @@ namespace SanaraV3.Game
         private readonly IMessageChannel _textChan; // Textual channel where the game is happening
         private readonly IPostMode _postMode; // How things should be posted
         private DateTime _lastPost; // Used to know when the user lost because of the time
-        private readonly GameSettings _settings; // Contains various settings about the game
         private string _current; // Current value, used for Replay command
 
         List<SocketUserMessage> _messages;
@@ -228,5 +251,9 @@ namespace SanaraV3.Game
         // SCORES
         private List<ulong> _contributors; // Users that contributed
         protected int _score;
+
+        // MULTIPLAYER
+        private MultiplayerLobby _lobby;
+        private const int _lobbyTimer = 30;
     }
 }
