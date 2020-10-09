@@ -29,21 +29,12 @@ namespace SanaraV3.Game
                 "If the game break, you can use the 'Cancel' command to cancel it.\n" +
                 "You can cooperate with other players to find the answers." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : "") +
-                (_lobby != null ? "\n\n**You can join the lobby for the game by doing the 'Join' command**\nThe game will automatically start in " + _lobbyTimer + " seconds, you can start it right away using the 'Start' command" : ""));
+                (_lobby != null ? "\n\n**You can join the lobby for the game by doing the 'Join' command**\nThe game will automatically start in " + _lobbyTimer + " seconds, you can start it right away using the 'Start' command" : "")).GetAwaiter().GetResult();
 
             _messages = new List<SocketUserMessage>();
 
             _contributors = new List<ulong>();
             _score = 0;
-
-            var task = Task.Run(async () =>
-            {
-                if (_lobby != null)
-                    await Task.Delay(_lobbyTimer);
-
-                await StartAsync();
-            });
-            task.Wait();
 
             StaticObjects.Website?.AddGameAsync(_gameName, _argument);
         }
@@ -69,6 +60,23 @@ namespace SanaraV3.Game
             await _postMode.PostAsync(_textChan, _current, this);
         }
 
+        public GameState GetState()
+            => _state;
+
+        public async Task StartWhenReadyAsync()
+        {
+            if (_lobby != null) // Multiplayer game
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(_lobbyTimer * 1000);
+                    await StartAsync();
+                });
+            }
+            else
+                await StartAsync();
+        }
+
         /// <summary>
         /// Start the game, that's where lobby management is done
         /// </summary>
@@ -83,6 +91,7 @@ namespace SanaraV3.Game
                 {
                     _state = GameState.LOST;
                     await _textChan.SendMessageAsync("The game was cancelled because there wasn't enough players (at least 2 are required)");
+                    return;
                 }
             }
 
@@ -115,6 +124,7 @@ namespace SanaraV3.Game
                         await _textChan.SendMessageAsync(GetHelp());
                 } catch (GameLost e)
                 {
+                    _state = GameState.RUNNING;
                     await LooseAsync(e.Message);
                     return;
                 } catch (System.Exception e)
@@ -149,7 +159,7 @@ namespace SanaraV3.Game
         {
             lock (_messages)
             {
-                if (_state != GameState.RUNNING)
+                if (_state != GameState.RUNNING && _state != GameState.LOST)
                     return Task.CompletedTask;
                 foreach (var msg in _messages)
                 {
@@ -162,12 +172,16 @@ namespace SanaraV3.Game
                         if (!_contributors.Contains(msg.Author.Id))
                             _contributors.Add(msg.Author.Id);
                         _score++;
+                        if (_state == GameState.LOST)
+                            _state = GameState.RUNNING;
                         _ = Task.Run(async () => { await PostAsync(); }); // We don't wait for the post to be sent to not block the whole world
                         break; // Good answer found, no need to check the others ones
                     }
                     catch (GameLost e)
                     {
-                        LooseAsync(e.Message).GetAwaiter().GetResult();
+                        if (_state == GameState.RUNNING)
+                            LooseAsync(e.Message).GetAwaiter().GetResult();
+                        return Task.CompletedTask;
                     }
                     catch (InvalidGameAnswer e)
                     {
@@ -198,9 +212,12 @@ namespace SanaraV3.Game
 
         private async Task LooseAsync(string reason)
         {
+            _state = GameState.LOST;
+
             await CheckAnswersAsync(); // We check the answers that were sent to be sure to not loose a game while we are still supposed to treat an answer
 
-            _state = GameState.LOST;
+            if (_state != GameState.LOST)
+                return;
 
             int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
 
@@ -215,7 +232,6 @@ namespace SanaraV3.Game
                     scoreSentence = $"You best your best score of {bestScore} with a new score of {_score}!";
                 }
             }
-
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
         }
 

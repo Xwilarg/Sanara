@@ -51,7 +51,10 @@ namespace SanaraV3.Module.Game
                 if (game == null)
                     await ReplyAsync("There is no game with this name.");
                 else
+                {
                     StaticObjects.Games.Add(game);
+                    await game.StartWhenReadyAsync();
+                }
             }
         }
 
@@ -69,17 +72,25 @@ namespace SanaraV3.Module.Game
             await game.ReplayAsync();
         }
 
+        [Command("Start"), RequireRunningGame]
+        public async Task StartGameAsync()
+        {
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
+            if (game.GetState() == GameState.PREPARE)
+                await ReplyAsync("The game in this channel is already running.");
+            await StartGameAsync();
+        }
+
         public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string[] arguments)
         {
             foreach (var preload in StaticObjects.Preloads)
             {
-                if (preload.GetGameNames().Contains(gameName) && arguments.Contains(preload.GetNameArg()))
+                if (preload.GetGameNames().Contains(gameName) && (preload.GetNameArg() == null || arguments.Contains(preload.GetNameArg())))
                 {
                     if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                         throw new CommandFailed("This game can only be launched in a NSFW channel.");
                     var lobby = arguments.Contains("multi") || arguments.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                    var game = preload.CreateGame(textChan, user, new GameSettings(lobby));
-                    return game;
+                    return preload.CreateGame(textChan, user, new GameSettings(lobby));
                 }
             }
             return null;
