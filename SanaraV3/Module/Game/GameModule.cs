@@ -76,9 +76,10 @@ namespace SanaraV3.Module.Game
         public async Task StartGameAsync()
         {
             var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
-            if (game.GetState() == GameState.PREPARE)
+            if (game.GetState() != GameState.PREPARE)
                 await ReplyAsync("The game in this channel is already running.");
-            await StartGameAsync();
+            else
+                await game.StartAsync();
         }
 
         public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string[] arguments)
