@@ -53,6 +53,9 @@ namespace SanaraV3.Game
             DisposeInternal();
         }
 
+        public bool IsMultiplayerGame()
+            => _lobby != null;
+
         public async Task ReplayAsync()
         {
             if (!(_postMode is AudioMode))
@@ -77,9 +80,14 @@ namespace SanaraV3.Game
                 await StartAsync();
         }
 
-        /// <summary>
-        /// Start the game, that's where lobby management is done
-        /// </summary>
+        public async Task<bool> JoinAsync(IUser user)
+        {
+            if (_state != GameState.PREPARE)
+                return false;
+
+            return _lobby.AddUser(user);
+        }
+
         public async Task StartAsync()
         {
             if (_state != GameState.PREPARE)

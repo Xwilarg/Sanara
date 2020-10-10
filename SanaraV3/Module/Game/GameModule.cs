@@ -73,13 +73,29 @@ namespace SanaraV3.Module.Game
         }
 
         [Command("Start"), RequireRunningGame]
-        public async Task StartGameAsync()
+        public async Task StartAsync()
         {
             var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
-            if (game.GetState() != GameState.PREPARE)
+            if (!game.IsMultiplayerGame())
+                await ReplyAsync("This command can only be done on multiplayer games");
+            else if (game.GetState() != GameState.PREPARE)
                 await ReplyAsync("The game in this channel is already running.");
             else
                 await game.StartAsync();
+        }
+
+        [Command("Join"), RequireRunningGame]
+        public async Task JoinAsync()
+        {
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
+            if (!game.IsMultiplayerGame())
+                await ReplyAsync("This command can only be done on multiplayer games");
+            else if (game.GetState() != GameState.PREPARE)
+                await ReplyAsync("The game in this channel is already running.");
+            else if (!await game.JoinAsync(Context.User))
+                await ReplyAsync("You are already in the lobby.");
+            else
+                await ReplyAsync("You joined the lobby.");
         }
 
         public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string[] arguments)
