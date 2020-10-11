@@ -1,6 +1,7 @@
 ﻿using Discord;
 using DiscordUtils;
 using SanaraV3.Exception;
+using SanaraV3.Game.MultiplayerMode;
 using SanaraV3.Game.Preload;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace SanaraV3.Game.Impl
     /// </summary>
     public class FillAllBooru : AGame
     {
-        public FillAllBooru(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, settings)
+        public FillAllBooru(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedMode(), settings)
         { }
 
         protected override string[] GetPostInternal()

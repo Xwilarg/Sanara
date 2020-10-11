@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanaraV3.Game
 {
@@ -26,8 +27,14 @@ namespace SanaraV3.Game
             return true;
         }
 
+        public string[] GetAllMentions()
+            => _users.Select(x => x.Mention).ToArray();
+
         public int GetUserCount()
             => _users.Count;
+
+        public List<IUser> GetUsers()
+            => _users;
 
         List<IUser> _users;
     }

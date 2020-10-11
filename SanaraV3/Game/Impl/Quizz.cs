@@ -1,6 +1,7 @@
 ﻿using Discord;
 using DiscordUtils;
 using SanaraV3.Exception;
+using SanaraV3.Game.MultiplayerMode;
 using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
 using SanaraV3.Game.Preload.Result;
@@ -18,13 +19,13 @@ namespace SanaraV3.Game.Impl
         /// <summary>
         /// Called by QuizzAudio
         /// </summary>
-        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, preload, mode, settings)
+        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, preload, mode, new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
         }
 
-        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, settings)
+        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();

@@ -92,7 +92,7 @@ namespace SanaraV3.Module.Game
                 await ReplyAsync("This command can only be done on multiplayer games");
             else if (game.GetState() != GameState.PREPARE)
                 await ReplyAsync("The game in this channel is already running.");
-            else if (!await game.JoinAsync(Context.User))
+            else if (!game.Join(Context.User))
                 await ReplyAsync("You are already in the lobby.");
             else
                 await ReplyAsync("You joined the lobby.");

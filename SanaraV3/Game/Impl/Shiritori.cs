@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
+using SanaraV3.Game.MultiplayerMode;
 using SanaraV3.Game.Preload;
 using SanaraV3.Game.Preload.Result;
 using SanaraV3.Module.Tool;
@@ -14,7 +15,7 @@ namespace SanaraV3.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeText, settings)
+        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeText, new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;

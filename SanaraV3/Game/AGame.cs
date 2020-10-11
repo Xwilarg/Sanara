@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using SanaraV3.Exception;
+using SanaraV3.Game.MultiplayerMode;
 using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
 using System;
@@ -11,7 +12,7 @@ namespace SanaraV3.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, GameSettings settings)
+        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode multiplayerMode, GameSettings settings)
         {
             _state = GameState.PREPARE;
             _textChan = textChan;
@@ -20,6 +21,7 @@ namespace SanaraV3.Game
             else
                 throw new CommandFailed("Games are not yet available in private message."); // TODO!
             _postMode = postMode;
+            _multiplayerMode = multiplayerMode;
             _lobby = settings.Lobby;
 
             _gameName = preload.GetGameNames()[0];
@@ -80,7 +82,7 @@ namespace SanaraV3.Game
                 await StartAsync();
         }
 
-        public async Task<bool> JoinAsync(IUser user)
+        public bool Join(IUser user)
         {
             if (_state != GameState.PREPARE)
                 return false;
@@ -101,6 +103,8 @@ namespace SanaraV3.Game
                     await _textChan.SendMessageAsync("The game was cancelled because there wasn't enough players (at least 2 are required)");
                     return;
                 }
+                _multiplayerMode.Init(_lobby.GetUsers());
+                await _textChan.SendMessageAsync(string.Join(", ", _lobby.GetAllMentions() + " the game is starting."));
             }
 
             _state = GameState.RUNNING;
@@ -130,6 +134,12 @@ namespace SanaraV3.Game
                     }
                     if (GetHelp() != null)
                         await _textChan.SendMessageAsync(GetHelp());
+                    if (_lobby != null)
+                    {
+                        var multiInfo = _multiplayerMode.PrePost();
+                        if (multiInfo != null)
+                            await _textChan.SendMessageAsync(multiInfo);
+                    }
                 } catch (GameLost e)
                 {
                     _state = GameState.RUNNING;
@@ -154,6 +164,8 @@ namespace SanaraV3.Game
 
         public void AddAnswer(SocketUserMessage msg)
         {
+            if (_lobby != null)
+                _multiplayerMode.PreAnswerCheck(msg.Author);
             lock (_messages)
             {
                 _messages.Add(msg);
@@ -279,5 +291,6 @@ namespace SanaraV3.Game
         // MULTIPLAYER
         private MultiplayerLobby _lobby;
         private const int _lobbyTimer = 30;
+        private IMultiplayerMode _multiplayerMode;
     }
 }
