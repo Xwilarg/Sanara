@@ -9,6 +9,8 @@ namespace SanaraV3.Game.MultiplayerMode
 
         public string PrePost(); // Called before a post is sent
 
-        public void PreAnswerCheck(IUser user);
+        public void PreAnswerCheck(IUser user); // Called before checking an user answer
+
+        public void AnswerIsCorrect(IUser user); // Called when an user find a good answer
     }
 }

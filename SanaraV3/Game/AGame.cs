@@ -104,7 +104,7 @@ namespace SanaraV3.Game
                     return;
                 }
                 _multiplayerMode.Init(_lobby.GetUsers());
-                await _textChan.SendMessageAsync(string.Join(", ", _lobby.GetAllMentions() + " the game is starting."));
+                await _textChan.SendMessageAsync(string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.");
             }
 
             _state = GameState.RUNNING;
@@ -164,8 +164,6 @@ namespace SanaraV3.Game
 
         public void AddAnswer(SocketUserMessage msg)
         {
-            if (_lobby != null)
-                _multiplayerMode.PreAnswerCheck(msg.Author);
             lock (_messages)
             {
                 _messages.Add(msg);
@@ -185,6 +183,8 @@ namespace SanaraV3.Game
                 {
                     try
                     {
+                        if (_lobby != null)
+                            _multiplayerMode.PreAnswerCheck(msg.Author);
                         CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
                         string congratulation = GetSuccessMessage();
                         if (congratulation != null)
@@ -195,6 +195,8 @@ namespace SanaraV3.Game
                         if (_state == GameState.LOST)
                             _state = GameState.RUNNING;
                         _ = Task.Run(async () => { await PostAsync(); }); // We don't wait for the post to be sent to not block the whole world
+                        if (_lobby != null)
+                            _multiplayerMode.AnswerIsCorrect(msg.Author);
                         break; // Good answer found, no need to check the others ones
                     }
                     catch (GameLost e)
@@ -289,7 +291,7 @@ namespace SanaraV3.Game
         protected int _score;
 
         // MULTIPLAYER
-        private MultiplayerLobby _lobby;
+        protected MultiplayerLobby _lobby;
         private const int _lobbyTimer = 30;
         private IMultiplayerMode _multiplayerMode;
     }

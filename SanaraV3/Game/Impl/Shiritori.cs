@@ -20,22 +20,33 @@ namespace SanaraV3.Game.Impl
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
             _alreadySaid = new List<string>();
+            _lastUserChoice = null;
         }
 
         protected override string[] GetPostInternal()
         {
-            if (_isFirst)
+            if (_lobby != null)
             {
-                _isFirst = false;
-                _alreadySaid.Add("しりとり");
-                _currWord = "しりとり";
-                return new[] { "しりとり (shiritori)" };
+                if (_lastUserChoice == null)
+                    return new string[0];
+                else
+                    return new[] { _lastUserChoice };
             }
-            var randomWord = GetRandomValidWord(GetWordEnding(_currWord));  
-            _words.Remove(randomWord);
-            _alreadySaid.Add(randomWord.Word);
-            _currWord = randomWord.Word;
-            return new[] { randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings})" };
+            else
+            {
+                if (_isFirst)
+                {
+                    _isFirst = false;
+                    _alreadySaid.Add("しりとり");
+                    _currWord = "しりとり";
+                    return new[] { "しりとり (shiritori)" };
+                }
+                var randomWord = GetRandomValidWord(GetWordEnding(_currWord));
+                _words.Remove(randomWord);
+                _alreadySaid.Add(randomWord.Word);
+                _currWord = randomWord.Word;
+                return new[] { randomWord.Word + $" ({randomWord.WordEnglish} - Meaning: {randomWord.Meanings})" };
+            }
         }
 
         protected override async Task CheckAnswerInternalAsync(string answer)
@@ -46,6 +57,17 @@ namespace SanaraV3.Game.Impl
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
+
+            if (_lastUserChoice == null)
+            {
+                System.Console.WriteLine("INSIDE: " + answer);
+                if (hiraganaAnswer != "しりとり")
+                    throw new InvalidGameAnswer("Your first word must be しりとり (shiritori)");
+                _alreadySaid.Add("しりとり");
+                _currWord = "しりとり";
+                _lastUserChoice = "しりとり (shiritori)";
+                return;
+            }
 
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", hiraganaAnswer))));
             var data = (JArray)json["data"];
@@ -101,10 +123,13 @@ namespace SanaraV3.Game.Impl
                 _words.Remove(_words.Where(x => x.Word == hiraganaAnswer).First());
             _alreadySaid.Add(hiraganaAnswer);
             _currWord = hiraganaAnswer;
+            _lastUserChoice = _currWord + $" ({LanguageModule.ToRomaji(_currWord)}) - Meaning: {string.Join(", ", meanings)}";
         }
 
         protected override string GetAnswer()
         {
+            if (_lobby != null && _lastUserChoice == null)
+                return "Your first word must be しりとり (shiritori)";
             var word = GetRandomValidWord(GetWordEnding(_currWord));
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
@@ -138,5 +163,8 @@ namespace SanaraV3.Game.Impl
         private bool _isFirst; // Is the first word (because we must start by saying "shiritori")
         private readonly List<string> _alreadySaid; // A word can't be said twice
         private string _currWord; // The last word that was said
+
+        // Used for multiplayer
+        private string _lastUserChoice;
     }
 }

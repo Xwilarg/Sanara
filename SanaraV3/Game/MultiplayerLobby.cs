@@ -36,6 +36,6 @@ namespace SanaraV3.Game
         public List<IUser> GetUsers()
             => _users;
 
-        List<IUser> _users;
+        private List<IUser> _users;
     }
 }
