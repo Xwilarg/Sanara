@@ -78,6 +78,7 @@ namespace SanaraV3
         public static DateTime KitsuRefreshDate { set; get; }
         public static string KitsuRefreshToken { set; get; }
         public static Vndb VnClient { get; } = new Vndb();
+        public static string MyDramaListApiKey { set; get; }
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();
@@ -224,6 +225,11 @@ namespace SanaraV3
             if (credentials.StatsWebsiteUrl != null)
             {
                 Website = new UploadManager(credentials.StatsWebsiteUrl, credentials.StatsWebsiteToken);
+            }
+
+            if(credentials.MyDramaListApiKey != null)
+            {
+                MyDramaListApiKey = credentials.MyDramaListApiKey;
             }
         }
 

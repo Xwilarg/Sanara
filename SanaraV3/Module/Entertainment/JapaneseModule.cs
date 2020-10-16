@@ -36,6 +36,7 @@ namespace SanaraV3.Help
             _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.MANDATORY, "text channel") }, "Get information on all new anime in to a channel.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", new Argument[0], "Remove an anime subscription.", new string[0], Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.MANDATORY, "image") }, "Get the source of an image.", new string[0], Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
+            _help.Add(("Entertainment", new Help("Japanese", "Drama", new[] { new Argument(ArgumentType.MANDATORY, "name") }, "Get information about an Asian drama.", new string[0], Restriction.None, "Drama my mister")));
         }
     }
 }
@@ -211,6 +212,70 @@ namespace SanaraV3.Module.Entertainment
         public async Task LightNovelAsync([Remainder] string name)
         {
             await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
+        }
+
+        [Command("drama", RunMode = RunMode.Async)]
+        public async Task DramaAsync([Remainder] string name)
+        {
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode(name)),
+                Method = HttpMethod.Post
+            };
+            request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
+
+            var response = await StaticObjects.HttpClient.SendAsync(request);
+            var searchResults = JsonConvert.DeserializeObject<JArray>(await response.Content.ReadAsStringAsync());
+
+            if (searchResults.Count == 0)
+                throw new CommandFailed("Nothing was found with this name.");
+
+            var id = searchResults.First().Value<int>("id");
+            var drama = await GetDramaAsync(id);
+
+            var embed = new EmbedBuilder()
+            {
+                Title = drama.Value<string>("original_title"),
+                Description = drama.Value<string>("synopsis"),
+                Color = new Color(0, 97, 157),
+                Url = drama.Value<string>("permalink"),
+                ImageUrl = drama["images"].Value<string>("poster")
+            };
+
+            embed.AddField("English Title", drama.Value<string>("title"));
+            embed.AddField("Episode Count", drama.Value<int>("episodes"), true);
+
+            if(drama["released"] != null)
+            {
+                embed.AddField("Released", drama.Value<string>("released"), true);
+            }
+            else
+            {
+                embed.AddField("Air date", drama.Value<string>("aired_start") + ((drama["aired_end"] != null) ? " - " + drama.Value<string>("aired_end") : ""), true);
+            }
+
+            embed.AddField("Country", drama.Value<string>("country"), true);
+            embed.AddField("Audiance Warning", drama.Value<string>("certification"), true);
+
+            if (drama["votes"] != null)
+            {
+                embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
+            }
+
+            await ReplyAsync(embed: embed.Build());
+        }
+
+        public static async Task<JObject> GetDramaAsync(int id)
+        {
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://api.mydramalist.com/v1/titles/" + id),
+                Method = HttpMethod.Get
+            };
+            request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
+
+            var response = await StaticObjects.HttpClient.SendAsync(request);
+            return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
         }
 
         public static async Task<JToken> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
