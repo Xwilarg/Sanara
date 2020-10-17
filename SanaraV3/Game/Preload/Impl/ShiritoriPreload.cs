@@ -2,6 +2,7 @@
 using SanaraV3.Game.Impl;
 using SanaraV3.Game.Preload.Result;
 using SanaraV3.Module.Tool;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -15,13 +16,27 @@ namespace SanaraV3.Game.Preload.Impl
             if (!File.Exists("Saves/Game/ShiritoriJapanese.txt"))
                 File.WriteAllBytes("Saves/Game/ShiritoriJapanese.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/ShiritoriJapanese.txt").GetAwaiter().GetResult());
             string[] lines = File.ReadAllLines("Saves/Game/ShiritoriJapanese.txt");
-            _preload = new ShiritoriPreloadResult[lines.Length];
-            for (int i = 0; i < lines.Length; i++)
+            var preload = new List<ShiritoriPreloadResult>();
+            foreach (var l in lines)
             {
-                string[] curr = lines[i].Split('$');
+                string[] curr = l.Split('$');
                 string word = curr[0];
-                _preload[i] = new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]);
+                preload.Add(new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]));
             }
+            for (int i = 5; i >= 1; i--)
+            {
+                if (!File.Exists($"Saves/Game/Jlpt{i}Vocabulary.txt"))
+                    File.WriteAllBytes($"Saves/Game/Jlpt{i}Vocabulary.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i +  "Vocabulary.txt").GetAwaiter().GetResult());
+                string[] jlptLines = File.ReadAllLines($"Saves/Game/Jlpt{i}Vocabulary.txt");
+                foreach (var l in lines)
+                {
+                    string[] curr = l.Split('$');
+                    string word = curr[0];
+                    if (!preload.Any(x => x.Word == word))
+                        preload.Add(new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]));
+                }
+            }
+            _preload = preload.ToArray();
         }
 
         public ReadOnlyCollection<IPreloadResult> Load()

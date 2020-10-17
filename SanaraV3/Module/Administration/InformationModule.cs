@@ -256,7 +256,11 @@ namespace SanaraV3.Module.Administration
                 if (gameNames.Contains(name))
                     continue;
                 gameNames.Add(name);
-                str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
+                var loadInfo = elem.Load();
+                if (loadInfo != null)
+                    str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
+                else
+                    str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: None");
             }
             embed.AddField("Games", str.ToString());
             embed.AddField("Subscriptions", string.Join("\n", StaticObjects.SM.GetSubscriptionCount().Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
