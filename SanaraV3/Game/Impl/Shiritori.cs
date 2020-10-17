@@ -58,7 +58,7 @@ namespace SanaraV3.Game.Impl
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
 
-            if (_lastUserChoice == null)
+            if (_lobby != null && _lastUserChoice == null)
             {
                 if (hiraganaAnswer != "しりとり")
                     throw new InvalidGameAnswer("Your first word must be しりとり (shiritori)");
@@ -130,7 +130,18 @@ namespace SanaraV3.Game.Impl
         {
             if (_lobby != null && _lastUserChoice == null)
                 return "Your first word must be しりとり (shiritori)";
-            var word = GetRandomValidWord(GetWordEnding(_currWord));
+            ShiritoriPreloadResult word = null;
+            var ending = GetWordEnding(_currWord);
+            for (int i = 5; i >= 1; i--)
+            {
+                var validWords = _words.Where(x => x.Word.StartsWith(ending) && x.LearningLevels.Contains(i)).ToArray();
+                if (validWords.Length == 0)
+                    continue;
+                word = validWords[StaticObjects.Random.Next(validWords.Length)];
+                break;
+            }
+            if (word == null)
+                word = GetRandomValidWord(ending);
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
 

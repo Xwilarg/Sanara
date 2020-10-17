@@ -28,15 +28,20 @@ namespace SanaraV3.Game.Preload.Impl
                 if (!File.Exists($"Saves/Game/Jlpt{i}Vocabulary.txt"))
                     File.WriteAllBytes($"Saves/Game/Jlpt{i}Vocabulary.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i +  "Vocabulary.txt").GetAwaiter().GetResult());
                 string[] jlptLines = File.ReadAllLines($"Saves/Game/Jlpt{i}Vocabulary.txt");
-                foreach (var l in lines)
+                foreach (var l in jlptLines)
                 {
                     string[] curr = l.Split('$');
                     string word = curr[0];
-                    if (!preload.Any(x => x.Word == word))
-                        preload.Add(new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]));
+                    var value = preload.Find(x => x.Word == word);
+                    if (value == null)
+                    {
+                        value = new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]);
+                        preload.Add(value);
+                    }
+                    value.LearningLevels.Add(i);
                 }
             }
-            _preload = preload.ToArray();
+            _preload = preload.Where(x => !x.Word.EndsWith("ん") && x.Word.Length > 1).ToArray();
         }
 
         public ReadOnlyCollection<IPreloadResult> Load()
