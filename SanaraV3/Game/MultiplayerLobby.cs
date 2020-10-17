@@ -9,6 +9,7 @@ namespace SanaraV3.Game
         public MultiplayerLobby(IUser host)
         {
             _users = new List<IUser> { host };
+            _lobbyOwner = host;
         }
 
         public bool AddUser(IUser user)
@@ -36,6 +37,10 @@ namespace SanaraV3.Game
         public List<IUser> GetUsers()
             => _users;
 
+        public bool IsHost(IUser user)
+            => user == _lobbyOwner;
+
         private List<IUser> _users;
+        private IUser _lobbyOwner;
     }
 }

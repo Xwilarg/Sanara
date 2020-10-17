@@ -90,10 +90,15 @@ namespace SanaraV3.Game
             return _lobby.AddUser(user);
         }
 
+        public bool IsLobbyOwner(IUser user)
+            => _lobby.IsHost(user);
+
         public async Task StartAsync()
         {
             if (_state != GameState.PREPARE)
                 return;
+
+            string introMsg = null;
 
             if (_lobby != null) // Multiplayer game
             {
@@ -104,14 +109,32 @@ namespace SanaraV3.Game
                     return;
                 }
                 _multiplayerMode.Init(_lobby.GetUsers());
-                await _textChan.SendMessageAsync(string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.");
+                introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
             }
 
             _state = GameState.RUNNING;
-            await PostAsync();
+            await PostAsync(introMsg);
         }
 
-        private async Task PostAsync()
+        private string GetPostContent()
+        {
+            string str = "";
+            if (GetHelp() != null)
+               str += "\n" + GetHelp();
+            if (_lobby != null)
+            {
+                var multiInfo = _multiplayerMode.PrePost();
+                if (multiInfo != null)
+                    str += "\n" + multiInfo;
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// Post a new image/text/other for the game
+        /// </summary>
+        /// <param name="introMsg">Message to be sent before the game content, null if none</param>
+        private async Task PostAsync(string introMsg)
         {
             if (_state != GameState.RUNNING)
                 return;
@@ -124,21 +147,35 @@ namespace SanaraV3.Game
             {
                 try
                 {
-                    foreach (var tmp in GetPostInternal())
+                    _messages.Clear();
+                    var post = GetPostInternal();
+                    if (post.Length == 0 && _postMode is TextMode)
                     {
-                        _current = tmp;
-                        if (!(_postMode is AudioMode))
-                            await _postMode.PostAsync(_textChan, _current, this);
-                        else
-                            _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
+                        var output = (introMsg == null ? "" : introMsg) + GetPostContent();
+                        if (output != "")
+                            await _textChan.SendMessageAsync(output);
                     }
-                    if (GetHelp() != null)
-                        await _textChan.SendMessageAsync(GetHelp());
-                    if (_lobby != null)
+                    else
                     {
-                        var multiInfo = _multiplayerMode.PrePost();
-                        if (multiInfo != null)
-                            await _textChan.SendMessageAsync(multiInfo);
+                        foreach (var tmp in post)
+                        {
+                            _current = tmp;
+                            if (_postMode is AudioMode)
+                                _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
+                            else if (_postMode is TextMode)
+                            {
+                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + GetPostContent(), this);
+                                introMsg = null;
+                            }
+                            else
+                                await _postMode.PostAsync(_textChan, _current, this);
+                        }
+                    }
+                    if (!(_postMode is TextMode))
+                    {
+                        string str = GetPostContent();
+                        if (str != null)
+                            await _textChan.SendMessageAsync(str);
                     }
                 } catch (GameLost e)
                 {
@@ -186,15 +223,13 @@ namespace SanaraV3.Game
                         if (_lobby != null)
                             _multiplayerMode.PreAnswerCheck(msg.Author);
                         CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
-                        string congratulation = GetSuccessMessage();
-                        if (congratulation != null)
-                            _textChan.SendMessageAsync(congratulation).GetAwaiter().GetResult();
+                        string introMsg = GetSuccessMessage();
                         if (!_contributors.Contains(msg.Author.Id))
                             _contributors.Add(msg.Author.Id);
                         _score++;
                         if (_state == GameState.LOST)
                             _state = GameState.RUNNING;
-                        _ = Task.Run(async () => { await PostAsync(); }); // We don't wait for the post to be sent to not block the whole world
+                        _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
                         if (_lobby != null)
                             _multiplayerMode.AnswerIsCorrect(msg.Author);
                         break; // Good answer found, no need to check the others ones
@@ -242,12 +277,12 @@ namespace SanaraV3.Game
         {
             if (_lobby != null) // Multiplayer games
             {
-                await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}");
+                string msg = $"You lost: {reason}\n{GetAnswer()}\n";
                 if (_multiplayerMode.Loose() && !bypassMultiplayerCheck)
-                    await PostAsync();
+                    await PostAsync(msg);
                 else
                 {
-                    await _textChan.SendMessageAsync($"{_multiplayerMode.GetWinner()} won");
+                    await _textChan.SendMessageAsync(msg + $"{_multiplayerMode.GetWinner()} won");
                     _state = GameState.LOST;
                 }
                 return;

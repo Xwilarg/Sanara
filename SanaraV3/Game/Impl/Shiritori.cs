@@ -68,6 +68,9 @@ namespace SanaraV3.Game.Impl
                 return;
             }
 
+            if (_alreadySaid.Contains(hiraganaAnswer))
+                throw new GameLost("This word was already said.");
+
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", hiraganaAnswer))));
             var data = (JArray)json["data"];
             if (data.Count == 0)
@@ -114,8 +117,6 @@ namespace SanaraV3.Game.Impl
                 throw new InvalidGameAnswer("Your word must be a noun.");
             if (hiraganaAnswer == GetWordEnding(hiraganaAnswer)) // We can't just check the word count since しゃ would count as only one character
                 throw new InvalidGameAnswer("Your word must be at least 2 characters.");
-            if (_alreadySaid.Contains(hiraganaAnswer))
-                throw new GameLost("This word was already said.");
             if (hiraganaAnswer.Last() == 'ん')
                 throw new GameLost("Your word is finishing with a ん (n).");
             if (_words.Any(x => x.Word == hiraganaAnswer))

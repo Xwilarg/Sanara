@@ -13,7 +13,7 @@ namespace SanaraV3.Help
         public void LoadGameHelp()
         {
             _submoduleHelp.Add("Game", "Play various games directly on Discord");
-            _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori / arknights / kancolle / girlsfrontline / fatego / pokemon / anime / booruquizz / boorufill"), new Argument(ArgumentType.OPTIONAL, "audio") }, "Play a game. Rules will be displayed when you start it. Audio parameter is only available for Arknights and KanColle quizzes.", new string[0], Restriction.None, "Play arknights audio")));
+            _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori / arknights / kancolle / girlsfrontline / fatego / pokemon / anime / booruquizz / boorufill"), new Argument(ArgumentType.OPTIONAL, "audio / multiplayer") }, "Play a game. Rules will be displayed when you start it. Audio parameter is only available for Arknights and KanColle quizzes.", new string[0], Restriction.None, "Play arknights audio")));
             _help.Add(("Game", new Help("Game", "Cancel", new Argument[0], "Cancel a game running in this channel.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Replay", new Argument[0], "Replay the audio for the current game.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Delete cache", new Argument[0], "Delete the cache of a game.", new string[0], Restriction.OwnerOnly, null)));
@@ -80,6 +80,8 @@ namespace SanaraV3.Module.Game
                 await ReplyAsync("This command can only be done on multiplayer games");
             else if (game.GetState() != GameState.PREPARE)
                 await ReplyAsync("The game in this channel is already running.");
+            else if (!game.IsLobbyOwner(Context.User))
+                await ReplyAsync("Only the lobby owner can use this command");
             else
                 await game.StartAsync();
         }
