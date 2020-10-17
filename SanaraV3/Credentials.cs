@@ -14,5 +14,6 @@
         public string GithubKey;
         public string StatsWebsiteUrl;
         public string StatsWebsiteToken;
+        public string MyDramaListApiKey;
     }
 }
