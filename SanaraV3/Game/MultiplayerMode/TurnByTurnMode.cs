@@ -49,6 +49,12 @@ namespace SanaraV3.Game.MultiplayerMode
         public string GetWinner()
             => _users[0].Mention;
 
+        public bool CanLooseAuto()
+            => true;
+
+        public string GetOutroLoose()
+            => null;
+
         private List<IUser> _users;
         private int _currentTurn;
     }

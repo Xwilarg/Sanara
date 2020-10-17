@@ -278,13 +278,14 @@ namespace SanaraV3.Game
             if (_lobby != null) // Multiplayer games
             {
                 string msg = $"You lost: {reason}\n{GetAnswer()}\n";
-                if (_multiplayerMode.Loose() && !bypassMultiplayerCheck)
-                    await PostAsync(msg);
-                else
+                if (bypassMultiplayerCheck || (_multiplayerMode.CanLooseAuto() && _multiplayerMode.Loose()))
                 {
-                    await _textChan.SendMessageAsync(msg + $"{_multiplayerMode.GetWinner()} won");
+                    string outro = _multiplayerMode.GetOutroLoose();
+                    await _textChan.SendMessageAsync(msg + $"{_multiplayerMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
                     _state = GameState.LOST;
                 }
+                else
+                    await PostAsync(msg);
                 return;
             }
             _state = GameState.LOST;

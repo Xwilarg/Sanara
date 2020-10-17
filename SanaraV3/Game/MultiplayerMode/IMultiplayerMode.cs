@@ -13,7 +13,11 @@ namespace SanaraV3.Game.MultiplayerMode
 
         public void AnswerIsCorrect(IUser user); // Called when an user find a good answer
 
+        public bool CanLooseAuto(); // Can the normal game flow decide the end of the game
+
         public bool Loose(); // Called when an user loose, returns if the game should stop
+
+        public string GetOutroLoose();
 
         public string GetWinner();
     }
