@@ -143,14 +143,14 @@ namespace SanaraV3.Game
                 } catch (GameLost e)
                 {
                     _state = GameState.RUNNING;
-                    await LooseAsync(e.Message);
+                    await LooseAsync(e.Message, true);
                     return;
                 } catch (System.Exception e)
                 {
                     await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     if (nbTries == 3)
                     {
-                        await LooseAsync("Failed to get something to post after 3 tries...");
+                        await LooseAsync("Failed to get something to post after 3 tries...", true);
                         return;
                     }
                     nbTries++;
@@ -202,7 +202,7 @@ namespace SanaraV3.Game
                     catch (GameLost e)
                     {
                         if (_state == GameState.RUNNING)
-                            LooseAsync(e.Message).GetAwaiter().GetResult();
+                            LooseAsync(e.Message, false).GetAwaiter().GetResult();
                         return Task.CompletedTask;
                     }
                     catch (InvalidGameAnswer e)
@@ -229,11 +229,29 @@ namespace SanaraV3.Game
                 return;
             }
 
-            await LooseAsync("Game cancelled");
+            await LooseAsync("Game cancelled", true);
         }
 
-        private async Task LooseAsync(string reason)
+        /// <summary>
+        /// Loose the current game
+        /// </summary>
+        /// <param name="reason">Why the game was lost</param>
+        /// <param name="bypassMultiplayerCheck">If true, will stop the whole game even in multiplayer. If false, will just make the current player loose</param>
+        /// <returns></returns>
+        private async Task LooseAsync(string reason, bool bypassMultiplayerCheck)
         {
+            if (_lobby != null) // Multiplayer games
+            {
+                await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}");
+                if (_multiplayerMode.Loose() && !bypassMultiplayerCheck)
+                    await PostAsync();
+                else
+                {
+                    await _textChan.SendMessageAsync($"{_multiplayerMode.GetWinner()} won");
+                    _state = GameState.LOST;
+                }
+                return;
+            }
             _state = GameState.LOST;
 
             await CheckAnswersAsync(); // We check the answers that were sent to be sure to not loose a game while we are still supposed to treat an answer
@@ -263,7 +281,7 @@ namespace SanaraV3.Game
                 return;
 
             if (_lastPost.AddSeconds(GetGameTime()) < DateTime.Now) // If post time + game time is < to current time, that means the player spent too much time answering
-                await LooseAsync("Time out");
+                await LooseAsync("Time out", false);
         }
 
         /// <summary>

@@ -18,5 +18,15 @@ namespace SanaraV3.Game.MultiplayerMode
         {
             throw new System.NotImplementedException();
         }
+
+        public bool Loose()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string GetWinner()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

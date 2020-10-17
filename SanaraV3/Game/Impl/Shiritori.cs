@@ -60,7 +60,6 @@ namespace SanaraV3.Game.Impl
 
             if (_lastUserChoice == null)
             {
-                System.Console.WriteLine("INSIDE: " + answer);
                 if (hiraganaAnswer != "しりとり")
                     throw new InvalidGameAnswer("Your first word must be しりとり (shiritori)");
                 _alreadySaid.Add("しりとり");

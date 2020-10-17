@@ -8,12 +8,13 @@ namespace SanaraV3.Game.MultiplayerMode
     {
         public void Init(List<IUser> users)
         {
+            var tmp = new List<IUser>(users);
             _users = new List<IUser>();
-            while (users.Count > 0)
+            while (tmp.Count > 0)
             {
-                var index = StaticObjects.Random.Next(0, users.Count);
-                _users.Add(users[index]);
-                users.RemoveAt(index);
+                var index = StaticObjects.Random.Next(0, tmp.Count);
+                _users.Add(tmp[index]);
+                tmp.RemoveAt(index);
             }
             _currentTurn = 0;
         }
@@ -34,6 +35,19 @@ namespace SanaraV3.Game.MultiplayerMode
             if (_currentTurn == _users.Count)
                 _currentTurn = 0;
         }
+
+        public bool Loose()
+        {
+            _users.RemoveAt(_currentTurn);
+            if (_users.Count == 1) // If there is only one player remaining, he won
+                return false;
+            if (_currentTurn == _users.Count)
+                _currentTurn = 0;
+            return true;
+        }
+
+        public string GetWinner()
+            => _users[0].Mention;
 
         private List<IUser> _users;
         private int _currentTurn;
