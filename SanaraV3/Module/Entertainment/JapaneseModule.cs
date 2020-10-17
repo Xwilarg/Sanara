@@ -376,12 +376,15 @@ namespace SanaraV3.Module.Entertainment
             if (Context.Channel is ITextChannel channel && !channel.IsNsfw && token["nsfw"] != null && token["nsfw"].Value<bool>())
                 throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
 
+            var description = "";
+            if (token["synopsis"].Value<string>() != null)
+                description = token["synopsis"].Value<string>().Length > 1000 ? token["synopsis"].Value<string>().Substring(0, 1000) + " [...]" : token["synopsis"].Value<string>(); // Description that fill the whole screen are a pain
             var embed = new EmbedBuilder
             {
                 Title = token["canonicalTitle"].Value<string>(),
                 Color = token["nsfw"] == null ? Color.Green : (token["nsfw"].Value<bool>() ? new Color(255, 20, 147) : Color.Green),
                 Url = "https://kitsu.io/" + (media == JapaneseMedia.ANIME ? "anime" : "manga") + "/" + token["slug"].Value<string>(),
-                Description = token["synopsis"].Value<string>().Length > 1000 ? token["synopsis"].Value<string>().Substring(0, 1000) + " [...]" : token["synopsis"].Value<string>(), // Description that fill the whole screen are a pain
+                Description = description,
                 ImageUrl = token["posterImage"]["original"].Value<string>()
             };
             if (token["titles"] != null && token["titles"]["en"] != null && !string.IsNullOrEmpty(token["titles"]["en"].Value<string>()) && token["titles"]["en"].Value<string>() != token["canonicalTitle"].Value<string>()) // No use displaying this if it's the same as the embed title

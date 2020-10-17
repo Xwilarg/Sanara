@@ -1,4 +1,5 @@
 ﻿using Discord;
+using SanaraV3.Exception;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +13,16 @@ namespace SanaraV3.Game.MultiplayerMode
             _scores = new Dictionary<IUser, int>();
             foreach (var u in users)
                 _scores.Add(u, 0);
+            _remainingGames = 11;
         }
 
         public string PrePost()
-            => null;
+        {
+            _remainingGames--;
+            if (_remainingGames == 0)
+                throw new GameLost("Game ended");
+            return null;
+        }
 
         public void PreAnswerCheck(IUser user)
         { }
@@ -50,5 +57,6 @@ namespace SanaraV3.Game.MultiplayerMode
         }
 
         private Dictionary<IUser, int> _scores;
+        private int _remainingGames;
     }
 }
