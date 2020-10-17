@@ -227,7 +227,7 @@ namespace SanaraV3
                 Website = new UploadManager(credentials.StatsWebsiteUrl, credentials.StatsWebsiteToken);
             }
 
-            if(credentials.MyDramaListApiKey != null)
+            if (credentials.MyDramaListApiKey != null)
             {
                 MyDramaListApiKey = credentials.MyDramaListApiKey;
             }

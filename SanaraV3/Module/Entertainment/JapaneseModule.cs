@@ -214,7 +214,7 @@ namespace SanaraV3.Module.Entertainment
             await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
         }
 
-        [Command("drama", RunMode = RunMode.Async)]
+        [Command("Drama", RunMode = RunMode.Async)]
         public async Task DramaAsync([Remainder] string name)
         {
             var request = new HttpRequestMessage()
