@@ -174,7 +174,7 @@ namespace SanaraV3.Game
                     if (!(_postMode is TextMode))
                     {
                         string str = GetPostContent();
-                        if (str != null)
+                        if (str != "")
                             await _textChan.SendMessageAsync(str);
                     }
                 } catch (GameLost e)

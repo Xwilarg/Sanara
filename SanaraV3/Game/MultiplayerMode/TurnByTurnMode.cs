@@ -17,10 +17,16 @@ namespace SanaraV3.Game.MultiplayerMode
                 tmp.RemoveAt(index);
             }
             _currentTurn = 0;
+            _remainingGames = 11;
         }
 
         public string PrePost()
-            => _users[_currentTurn].Mention + " turns to play";
+        {
+            _remainingGames--;
+            if (_remainingGames == 0)
+                throw new GameLost("Game ended");
+            return _users[_currentTurn].Mention + " turns to play";
+        }
 
         public void PreAnswerCheck(IUser user)
         {
@@ -57,5 +63,6 @@ namespace SanaraV3.Game.MultiplayerMode
 
         private List<IUser> _users;
         private int _currentTurn;
+        private int _remainingGames;
     }
 }
