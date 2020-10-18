@@ -50,7 +50,7 @@ namespace SanaraV3.Game.Impl
         protected override int GetGameTime()
             => 60;
 
-        protected override string GetSuccessMessage()
+        protected override string GetSuccessMessage(IUser _)
             => "You found at least 75% of the tags on the image!";
 
         protected override string GetHelp()

@@ -27,7 +27,9 @@ namespace SanaraV3.Game
             _gameName = preload.GetGameNames()[0];
             _argument = preload.GetNameArg();
 
-            textChan.SendMessageAsync(preload.GetRules() + $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
+            textChan.SendMessageAsync(preload.GetRules() +
+                (_lobby != null ? "\n*Multiplayer rules:* " + _multiplayerMode.GetRules() : "") +
+                $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
                 "If the game break, you can use the 'Cancel' command to cancel it.\n" +
                 "You can cooperate with other players to find the answers." +
                 (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : "") +
@@ -38,14 +40,15 @@ namespace SanaraV3.Game
             _contributors = new List<ulong>();
             _score = 0;
 
-            StaticObjects.Website?.AddGameAsync(_gameName, _argument);
+            if (StaticObjects.Website != null)
+                StaticObjects.Website.AddGameAsync(_gameName, _argument);
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
         protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
-        protected abstract string GetSuccessMessage(); // Congratulation message, empty string to ignore
+        protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
         protected virtual void DisposeInternal() // By default there isn't much to dispose but some child class might need it
         { }
         protected virtual string GetHelp() // Does display help in format X*****
@@ -110,9 +113,11 @@ namespace SanaraV3.Game
                 }
                 _multiplayerMode.Init(_lobby.GetUsers());
                 introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
-                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, _lobby.GetUserCount());
+
+                if (StaticObjects.Website != null)
+                    await StaticObjects.Website.AddGamePlayerAsync(_gameName, _lobby.GetUserCount());
             }
-            else
+            else if (StaticObjects.Website != null)
                 await StaticObjects.Website?.AddGamePlayerAsync(_gameName, 1);
 
             _state = GameState.RUNNING;
@@ -221,42 +226,47 @@ namespace SanaraV3.Game
             {
                 if (_state != GameState.RUNNING && _state != GameState.LOST)
                     return Task.CompletedTask;
-                foreach (var msg in _messages)
+                try
                 {
-                    try
+                    foreach (var msg in _messages)
                     {
-                        if (_lobby != null)
-                            _multiplayerMode.PreAnswerCheck(msg.Author);
-                        CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
-                        string introMsg = GetSuccessMessage();
-                        if (!_contributors.Contains(msg.Author.Id))
-                            _contributors.Add(msg.Author.Id);
-                        _score++;
-                        if (_state == GameState.LOST)
-                            _state = GameState.RUNNING;
-                        _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
-                        if (_lobby != null)
-                            _multiplayerMode.AnswerIsCorrect(msg.Author);
-                        break; // Good answer found, no need to check the others ones
-                    }
-                    catch (GameLost e)
-                    {
-                        if (_state == GameState.RUNNING)
-                            LooseAsync(e.Message, false).GetAwaiter().GetResult();
-                        return Task.CompletedTask;
-                    }
-                    catch (InvalidGameAnswer e)
-                    {
-                        _ = Task.Run(async () =>
+                        try
                         {
-                            if (e.Message.Length == 0)
-                                await msg.AddReactionAsync(new Emoji("❌"));
-                            else
-                                _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
-                        });
+                            if (_lobby != null)
+                                _multiplayerMode.PreAnswerCheck(msg.Author);
+                            CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
+                            string introMsg = GetSuccessMessage(msg.Author);
+                            if (!_contributors.Contains(msg.Author.Id))
+                                _contributors.Add(msg.Author.Id);
+                            _score++;
+                            if (_state == GameState.LOST)
+                                _state = GameState.RUNNING;
+                            _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
+                            if (_lobby != null)
+                                _multiplayerMode.AnswerIsCorrect(msg.Author);
+                            break; // Good answer found, no need to check the others ones
+                        }
+                        catch (GameLost e)
+                        {
+                            if (_state == GameState.RUNNING)
+                                LooseAsync(e.Message, false).GetAwaiter().GetResult();
+                            return Task.CompletedTask;
+                        }
+                        catch (InvalidGameAnswer e)
+                        {
+                            _ = Task.Run(async () =>
+                            {
+                                if (e.Message.Length == 0)
+                                    await msg.AddReactionAsync(new Emoji("❌"));
+                                else
+                                    _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
+                            });
+                        }
                     }
+                    _messages.Clear();
                 }
-                _messages.Clear();
+                catch (InvalidOperationException) // This is only done when we don't need the current messages anyway
+                { }
             }
             return Task.CompletedTask;
         }
@@ -282,15 +292,22 @@ namespace SanaraV3.Game
         {
             if (_lobby != null) // Multiplayer games
             {
-                string msg = $"You lost: {reason}\n{GetAnswer()}\n";
-                if (bypassMultiplayerCheck || (_multiplayerMode.CanLooseAuto() && _multiplayerMode.Loose()))
+                string msg;
+                bool canLoose = _multiplayerMode.CanLooseAuto();
+                if (canLoose)
+                    msg = $"You lost: {reason}";
+                else
+                    msg = $"Nobody found the answer";
+                if (bypassMultiplayerCheck || (canLoose && !_multiplayerMode.Loose()))
                 {
                     string outro = _multiplayerMode.GetOutroLoose();
-                    await _textChan.SendMessageAsync(msg + $"{_multiplayerMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
+                    await _textChan.SendMessageAsync(msg + (canLoose ? "\n" + GetAnswer() : "") + $"\n{_multiplayerMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
                     _state = GameState.LOST;
                 }
                 else
-                    await PostAsync(msg);
+                {
+                    await PostAsync(msg + (!canLoose ? "\n" + GetAnswer() : "") + "\n");
+                }
                 return;
             }
             _state = GameState.LOST;

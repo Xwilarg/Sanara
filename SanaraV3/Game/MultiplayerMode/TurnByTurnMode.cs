@@ -41,7 +41,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _users.RemoveAt(_currentTurn);
             if (_users.Count == 1) // If there is only one player remaining, he won
                 return false;
-            if (_currentTurn == _users.Count)
+            if (_currentTurn > _users.Count)
                 _currentTurn = 0;
             return true;
         }
@@ -54,6 +54,9 @@ namespace SanaraV3.Game.MultiplayerMode
 
         public string GetOutroLoose()
             => null;
+
+        public string GetRules()
+            => "You must answer turn by turn, the last player standing win.";
 
         private List<IUser> _users;
         private int _currentTurn;

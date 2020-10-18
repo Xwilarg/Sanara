@@ -68,9 +68,6 @@ namespace SanaraV3.Game.Impl
                 return;
             }
 
-            if (_alreadySaid.Contains(hiraganaAnswer))
-                throw new GameLost("This word was already said.");
-
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", hiraganaAnswer))));
             var data = (JArray)json["data"];
             if (data.Count == 0)
@@ -113,6 +110,8 @@ namespace SanaraV3.Game.Impl
             var ending = GetWordEnding(_currWord);
             if (!hiraganaAnswer.StartsWith(ending))
                 throw new InvalidGameAnswer($"Your word must begin by {ending} ({LanguageModule.ToRomaji(ending)}).");
+            if (_alreadySaid.Contains(hiraganaAnswer))
+                throw new GameLost("This word was already said.");
             if (!isNoun)
                 throw new InvalidGameAnswer("Your word must be a noun.");
             if (hiraganaAnswer == GetWordEnding(hiraganaAnswer)) // We can't just check the word count since しゃ would count as only one character
@@ -145,7 +144,7 @@ namespace SanaraV3.Game.Impl
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
 
-        protected override string GetSuccessMessage()
+        protected override string GetSuccessMessage(IUser _)
             => null;
 
         private ShiritoriPreloadResult GetRandomValidWord(string ending)

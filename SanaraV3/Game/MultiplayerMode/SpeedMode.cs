@@ -13,7 +13,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _scores = new Dictionary<IUser, int>();
             foreach (var u in users)
                 _scores.Add(u, 0);
-            _remainingGames = 6;
+            _remainingGames = 11;
         }
 
         public string PrePost()
@@ -21,7 +21,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _remainingGames--;
             if (_remainingGames == 0)
                 throw new GameLost("Game ended");
-            return null;
+            return _remainingGames + " image remaining";
         }
 
         public void PreAnswerCheck(IUser user)
@@ -45,7 +45,10 @@ namespace SanaraV3.Game.MultiplayerMode
         }
 
         public bool CanLooseAuto()
-            => true;
+            => false;
+
+        public string GetRules()
+            => "You must be the first to answer, the player with the most points win.";
 
         public string GetOutroLoose()
         {

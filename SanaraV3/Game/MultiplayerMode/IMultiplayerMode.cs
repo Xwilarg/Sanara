@@ -20,5 +20,7 @@ namespace SanaraV3.Game.MultiplayerMode
         public string GetOutroLoose();
 
         public string GetWinner();
+
+        public string GetRules();
     }
 }

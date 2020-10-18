@@ -65,8 +65,13 @@ namespace SanaraV3.Game.Impl
         protected override int GetGameTime()
             => 15;
 
-        protected override string GetSuccessMessage()
-            => "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
+        protected override string GetSuccessMessage(IUser user)
+        {
+            if (_lobby != null)
+                return user.Username + " found the right answer.";
+            else
+                return "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
+        }
 
         protected QuizzPreloadResult _current; // Word to guess
         protected List<QuizzPreloadResult> _words;
