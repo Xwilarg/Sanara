@@ -80,6 +80,7 @@ namespace SanaraV3
             StaticObjects.Client.Connected += ConnectedAsync;
             StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
             StaticObjects.Client.ReactionAdded += Log.ReactionAddedAsync;
+            StaticObjects.Client.ReactionAdded += Module.Tool.LanguageModule.ReactionAddedAsync;
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;

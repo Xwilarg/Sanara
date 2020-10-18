@@ -207,6 +207,14 @@ namespace SanaraV3.Database
             ).RunAsync(_conn);
         }
 
+        public async Task UpdateFlagAsync(ulong guildId, bool value)
+        {
+            _guilds[guildId].TranslateUsingFlags = value;
+            await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
+                .With("TranslateUsingFlags", value)
+            ).RunAsync(_conn);
+        }
+
         public async Task UpdateAnonymizeAsync(ulong guildId, bool value)
         {
             _guilds[guildId].Anonymize = value;

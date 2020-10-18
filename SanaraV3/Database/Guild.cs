@@ -23,6 +23,9 @@ namespace SanaraV3.Database
         [JsonProperty]
         public string[] AvailabilityModules = new string[0];
 
+        [JsonProperty]
+        public bool TranslateUsingFlags = false;
+
         // We can't serialize scores to keep compatibility with SanaraV2 db
         public bool DoesContainsGame(string name)
             => _scores.ContainsKey(name);

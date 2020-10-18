@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordUtils;
 using Google;
 using Google.Cloud.Vision.V1;
@@ -34,6 +35,27 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class LanguageModule : ModuleBase
     {
+        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        {
+            string emote = react.Emote.ToString();
+            bool allowFlags = chan is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+            // If emote is not from the bot and is an arrow emote
+            if (allowFlags && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
+            {
+                var gMsg = (await msg.GetOrDownloadAsync()).Content;
+                if (!string.IsNullOrEmpty(gMsg))
+                {
+                    var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
+                    await chan.SendMessageAsync(embed: new EmbedBuilder
+                    {
+                        Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                        Description = translation.TranslatedText,
+                        Color = Color.Blue
+                    }.Build());
+                }
+            }
+        }
+
         [Command("Translate", RunMode = RunMode.Async)]
         public async Task TranslateAsync(string language)
         {

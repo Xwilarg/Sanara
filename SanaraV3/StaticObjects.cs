@@ -107,7 +107,21 @@ namespace SanaraV3
             { "ko", "korean" },
             { "ge", "german" },
             { "es", "spanish" },
-            { "nl", "dutch" },
+            { "nl", "dutch" }
+        };
+        public static Dictionary<string, string> Flags { set; get; } = new Dictionary<string, string>
+        {
+            { "🇫🇷", "fr" },
+            { "🇺🇸", "en" },
+            { "🇬🇧", "en" },
+            { "🇯🇵", "ja" },
+            { "🇷🇺", "ru" },
+            { "🇹🇼", "zh" },
+            { "🇨🇳", "zh" },
+            { "🇰🇷", "ko" },
+            { "🇩🇪", "ge" },
+            { "🇪🇸", "es" },
+            { "🇳🇱", "nl" }
         };
         public static Dictionary<string, string> ISO639Reverse { set; get; } = new Dictionary<string, string>();
 
