@@ -24,7 +24,7 @@ namespace SanaraV3.Game.MultiplayerMode
 
         public void PreAnswerCheck(IUser user)
         {
-            if (_users[_currentTurn] != user)
+            if (_currentTurn >= _users.Count || _users[_currentTurn] != user)
                 throw new InvalidGameAnswer("");
         }
 
@@ -41,7 +41,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _users.RemoveAt(_currentTurn);
             if (_users.Count == 1) // If there is only one player remaining, he won
                 return false;
-            if (_currentTurn > _users.Count)
+            if (_currentTurn >= _users.Count)
                 _currentTurn = 0;
             return true;
         }
