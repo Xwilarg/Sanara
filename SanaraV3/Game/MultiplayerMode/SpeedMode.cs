@@ -13,7 +13,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _scores = new Dictionary<IUser, int>();
             foreach (var u in users)
                 _scores.Add(u, 0);
-            _remainingGames = 11;
+            _remainingGames = 6;
         }
 
         public string PrePost()

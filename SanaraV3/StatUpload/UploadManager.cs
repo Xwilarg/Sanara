@@ -76,6 +76,11 @@ namespace SanaraV3.StatUpload
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", name + (option == null ? "" : "-" + option)) });
         }
 
+        public async Task AddGamePlayerAsync(string name, int playerCount)
+        {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("gamesPlayers", name + ";" + playerCount.ToString()) });
+        }
+
         // Clean name before sending it to the website for stats (| and $ are delimitators so we remove them)
         private string GetName(string name)
             => name.Replace("|", "").Replace("$", "");

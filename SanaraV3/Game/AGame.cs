@@ -110,7 +110,10 @@ namespace SanaraV3.Game
                 }
                 _multiplayerMode.Init(_lobby.GetUsers());
                 introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
+                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, _lobby.GetUserCount());
             }
+            else
+                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, 1);
 
             _state = GameState.RUNNING;
             await PostAsync(introMsg);
@@ -157,6 +160,8 @@ namespace SanaraV3.Game
                     }
                     else
                     {
+                        if (!(_postMode is TextMode) && introMsg != null)
+                            await _textChan.SendMessageAsync(introMsg);
                         foreach (var tmp in post)
                         {
                             _current = tmp;
