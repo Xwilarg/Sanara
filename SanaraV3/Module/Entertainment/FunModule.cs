@@ -1,6 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using WebSocketSharp;
 
 namespace SanaraV3.Help
@@ -12,6 +15,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Fun", "Various small entertainement commands");
             _help.Add(("Entertainment", new Help("Fun", "Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", new string[0], Restriction.None, null)));
             _help.Add(("Entertainment", new Help("Fun", "Complete", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Complete the given sentence using machine learning.", new string[0], Restriction.None, "Complete Why can't cats just")));
+            _help.Add(("Entertainment", new Help("Fun", "Pirate", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Translate a sentence to pirate language.", new string[0], Restriction.None, "Pirate Hello there")));
         }
     }
 }
@@ -23,6 +27,12 @@ namespace SanaraV3.Module.Entertainment
     /// </summary>
     public sealed class FunModule : ModuleBase
     {
+        [Command("Pirate")]
+        public async Task InspireAsync([Remainder] string sentence)
+        {
+            await ReplyAsync(JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://api.funtranslations.com/translate/pirate.json?text=" + HttpUtility.HtmlEncode(sentence)))["contents"]["translated"].Value<string>());
+        }
+
         [Command("Inspire")]
         public async Task InspireAsync()
         {

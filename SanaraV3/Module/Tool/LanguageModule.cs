@@ -40,18 +40,36 @@ namespace SanaraV3.Module.Tool
             string emote = react.Emote.ToString();
             bool allowFlags = chan is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
             // If emote is not from the bot and is an arrow emote
-            if (allowFlags && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
+            if (allowFlags && react.User.Value.Id != StaticObjects.ClientId)
             {
-                var gMsg = (await msg.GetOrDownloadAsync()).Content;
-                if (!string.IsNullOrEmpty(gMsg))
+                if (StaticObjects.Flags.ContainsKey(emote))
                 {
-                    var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
-                    await chan.SendMessageAsync(embed: new EmbedBuilder
+                    var gMsg = (await msg.GetOrDownloadAsync()).Content;
+                    if (!string.IsNullOrEmpty(gMsg))
                     {
-                        Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                        Description = translation.TranslatedText,
-                        Color = Color.Blue
-                    }.Build());
+                        var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
+                        await chan.SendMessageAsync(embed: new EmbedBuilder
+                        {
+                            Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                            Description = translation.TranslatedText,
+                            Color = Color.Blue
+                        }.Build());
+                    }
+                }
+                else if (emote == "🏴‍☠️")
+                {
+                    var gMsg = (await msg.GetOrDownloadAsync()).Content;
+                    if (!string.IsNullOrEmpty(gMsg))
+                    {
+                        var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, "en");
+                        await chan.SendMessageAsync(embed: new EmbedBuilder
+                        {
+                            Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                            Description =
+                            JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://api.funtranslations.com/translate/pirate.json?text=" + HttpUtility.HtmlEncode(translation.TranslatedText)))["contents"]["translated"].Value<string>(),
+                            Color = Color.Blue
+                        }.Build());
+                    }
                 }
             }
         }
