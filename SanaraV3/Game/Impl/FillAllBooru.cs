@@ -7,6 +7,7 @@ using SanaraV3.Game.Preload;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -23,9 +24,11 @@ namespace SanaraV3.Game.Impl
         protected override string[] GetPostInternal()
         {
             var post = StaticObjects.Gelbooru.GetRandomPostAsync().GetAwaiter().GetResult();
-            _allTags = post.tags.Select(x => HttpUtility.UrlDecode(x)).ToArray();
+            var tags = post.tags.Select(x => HttpUtility.UrlDecode(x)).ToList();
+            tags.RemoveAll(x => Regex.Match(x, "bad[^ ]* id").Success);
+            _allTags = tags.ToArray();
             _foundTags = new List<string>();
-            _nbNeed = (int)Math.Floor(_allTags.Length * 75.0 / 100);
+            _nbNeed = _lobby == null ? (int)Math.Floor(_allTags.Length * 75.0 / 100) : _allTags.Length;
             return new[] { post.fileUrl.AbsoluteUri };
         }
 
@@ -58,10 +61,10 @@ namespace SanaraV3.Game.Impl
             => 60;
 
         protected override string GetSuccessMessage(IUser _)
-            => "You found at least 75% of the tags on the image!";
+            => _lobby == null ? "You found at least 75% of the tags on the image!" : null;
 
         protected override string GetHelp()
-            => "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find.";
+            => _lobby == null ? "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find." : null;
 
         private string[] _allTags;
         private List<string> _foundTags;
