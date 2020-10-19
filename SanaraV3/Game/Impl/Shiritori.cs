@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
@@ -59,11 +60,11 @@ namespace SanaraV3.Game.Impl
             }
         }
 
-        protected override async Task CheckAnswerInternalAsync(string answer)
+        protected override async Task CheckAnswerInternalAsync(SocketUserMessage answer)
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = LanguageModule.ToHiragana(answer);
+            string hiraganaAnswer = LanguageModule.ToHiragana(answer.Content);
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");

@@ -45,7 +45,7 @@ namespace SanaraV3.Game
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
-        protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
+        protected abstract Task CheckAnswerInternalAsync(SocketUserMessage answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
@@ -234,7 +234,7 @@ namespace SanaraV3.Game
                         {
                             if (_lobby != null)
                                 _multiplayerMode.PreAnswerCheck(msg.Author);
-                            CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
+                            CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
                             string introMsg = GetSuccessMessage(msg.Author);
                             if (!_contributors.Contains(msg.Author.Id))
                                 _contributors.Add(msg.Author.Id);
@@ -369,6 +369,6 @@ namespace SanaraV3.Game
         // MULTIPLAYER
         protected MultiplayerLobby _lobby;
         private const int _lobbyTimer = 30;
-        private IMultiplayerMode _multiplayerMode;
+        protected IMultiplayerMode _multiplayerMode;
     }
 }

@@ -6,22 +6,22 @@ using System.Text;
 
 namespace SanaraV3.Game.MultiplayerMode
 {
-    public class SpeedMode : IMultiplayerMode
+    public class SpeedFillAllBooruMode : IMultiplayerMode
     {
         public void Init(List<IUser> users)
         {
             _scores = new Dictionary<IUser, int>();
             foreach (var u in users)
                 _scores.Add(u, 0);
-            _remainingGames = 11;
+            _isDone = false;
         }
 
         public string PrePost()
         {
-            _remainingGames--;
-            if (_remainingGames == 0)
+            if (!_isDone) _isDone = true;
+            else
                 throw new GameLost("Game ended");
-            return _remainingGames + " remaining";
+            return null;
         }
 
         public void PreAnswerCheck(IUser user)
@@ -48,7 +48,7 @@ namespace SanaraV3.Game.MultiplayerMode
             => false;
 
         public string GetRules()
-            => "You must be the first to answer, the player with the most points win.";
+            => "You must find as much tags as possible, the player with the most points win.";
 
         public string GetOutroLoose()
         {
@@ -60,6 +60,6 @@ namespace SanaraV3.Game.MultiplayerMode
         }
 
         private Dictionary<IUser, int> _scores;
-        protected int _remainingGames;
+        protected bool _isDone;
     }
 }

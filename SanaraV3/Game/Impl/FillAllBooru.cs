@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using DiscordUtils;
 using SanaraV3.Exception;
 using SanaraV3.Game.MultiplayerMode;
@@ -16,7 +17,7 @@ namespace SanaraV3.Game.Impl
     /// </summary>
     public class FillAllBooru : AGame
     {
-        public FillAllBooru(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedMode(), settings)
+        public FillAllBooru(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedFillAllBooruMode(), settings)
         { }
 
         protected override string[] GetPostInternal()
@@ -28,17 +29,23 @@ namespace SanaraV3.Game.Impl
             return new[] { post.fileUrl.AbsoluteUri };
         }
 
-        protected override Task CheckAnswerInternalAsync(string answer)
+        protected override Task CheckAnswerInternalAsync(SocketUserMessage answer)
         {
-            string userAnswer = Utils.CleanWord(answer);
+            string userAnswer = Utils.CleanWord(answer.Content);
             var foundTag = _allTags.Where(x => Utils.CleanWord(x) == userAnswer).FirstOrDefault();
             if (foundTag == null)
                 throw new InvalidGameAnswer("");
             if (_foundTags.Contains(foundTag))
                 throw new InvalidGameAnswer("This tag was already found.");
             _foundTags.Add(foundTag);
+
+            if (_lobby != null)
+            {
+                _multiplayerMode.AnswerIsCorrect(answer.Author);
+            }
+
             if (_nbNeed != _foundTags.Count)
-                throw new InvalidGameAnswer($"You found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
+                throw new InvalidGameAnswer($"{(_lobby == null ? "You" : answer.Author.Username)} found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
             return Task.CompletedTask;
         }
 
