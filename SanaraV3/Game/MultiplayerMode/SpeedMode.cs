@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SanaraV3.Game.MultiplayerMode
 {
-    public class SpeedMode : IMultiplayerMode
+    public sealed class SpeedMode : IMultiplayerMode
     {
         public void Init(List<IUser> users)
         {
@@ -21,7 +21,7 @@ namespace SanaraV3.Game.MultiplayerMode
             _remainingGames--;
             if (_remainingGames == 0)
                 throw new GameLost("Game ended");
-            return _remainingGames + " image remaining";
+            return _remainingGames + " remaining";
         }
 
         public void PreAnswerCheck(IUser user)

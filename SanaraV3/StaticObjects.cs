@@ -168,11 +168,17 @@ namespace SanaraV3
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
             Preloads = new IPreload[]
             {
+                // AUDIO
+                new ArknightsAudioPreload(),
+                new KancolleAudioPreload(),
+
+                // HARD
+                new ShiritoriHardPreload(),
+
+                // OTHERS
                 new ShiritoriPreload(),
                 new ArknightsPreload(),
-                new ArknightsAudioPreload(),
                 new KancollePreload(),
-                new KancolleAudioPreload(),
                 new GirlsFrontlinePreload(),
                 new AzurLanePreload(),
                 new FateGOPreload(),

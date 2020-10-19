@@ -253,9 +253,9 @@ namespace SanaraV3.Module.Administration
             foreach (var elem in StaticObjects.Preloads)
             {
                 string name = elem.GetGameNames()[0];
-                if (gameNames.Contains(name))
+                if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
                     continue;
-                gameNames.Add(name);
+                gameNames.Add(name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : ""));
                 var loadInfo = elem.Load();
                 if (loadInfo != null)
                     str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: {elem.Load().Count} words.");

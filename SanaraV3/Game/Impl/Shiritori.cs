@@ -15,12 +15,22 @@ namespace SanaraV3.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
+        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, int minWordLength) : base(textChan, user, preload, StaticObjects.ModeText, new TurnByTurnMode(), settings)
+        {
+            _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
+            _isFirst = true;
+            _alreadySaid = new List<string>();
+            _lastUserChoice = null;
+            _minWordLength = minWordLength;
+        }
+
         public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeText, new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
             _alreadySaid = new List<string>();
             _lastUserChoice = null;
+            _minWordLength = 2;
         }
 
         protected override string[] GetPostInternal()
@@ -114,8 +124,8 @@ namespace SanaraV3.Game.Impl
                 throw new GameLost("This word was already said.");
             if (!isNoun)
                 throw new InvalidGameAnswer("Your word must be a noun.");
-            if (hiraganaAnswer == GetWordEnding(hiraganaAnswer)) // We can't just check the word count since しゃ would count as only one character
-                throw new InvalidGameAnswer("Your word must be at least 2 characters.");
+            if (!IsLongEnough(hiraganaAnswer, _minWordLength)) // We can't just check the word count since しゃ would count as only one character
+                throw new InvalidGameAnswer($"Your word must be at least {_minWordLength} syllable.");
             if (hiraganaAnswer.Last() == 'ん')
                 throw new GameLost("Your word is finishing with a ん (n).");
             if (_words.Any(x => x.Word == hiraganaAnswer))
@@ -153,11 +163,24 @@ namespace SanaraV3.Game.Impl
             return validWords[StaticObjects.Random.Next(validWords.Length)];
         }
 
+        public static bool IsLongEnough(string word, int requiredLength)
+        {
+            while (requiredLength > 0)
+            {
+                if (word.Length == 0)
+                    return false;
+                var ending = GetWordEnding(word);
+                word = word.Substring(0, word.Length - ending.Length);
+                requiredLength--;
+            }
+            return true;
+        }
+
         /// <summary>
         /// We get the latest character (cause in shiritori the next word must begin by the ending of the last one)
         /// But in a word like じてんしゃ we need to get the "しゃ" and not the "ゃ"
         /// </summary>
-        private string GetWordEnding(string word)
+        private static string GetWordEnding(string word)
         {
             char lastChar = word.Last();
             if (lastChar == 'ゃ' || lastChar == 'ぃ' || lastChar == 'ゅ'
@@ -173,6 +196,7 @@ namespace SanaraV3.Game.Impl
         private bool _isFirst; // Is the first word (because we must start by saying "shiritori")
         private readonly List<string> _alreadySaid; // A word can't be said twice
         private string _currWord; // The last word that was said
+        private int _minWordLength;
 
         // Used for multiplayer
         private string _lastUserChoice;
