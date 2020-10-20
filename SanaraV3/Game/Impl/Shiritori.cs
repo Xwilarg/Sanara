@@ -64,7 +64,7 @@ namespace SanaraV3.Game.Impl
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = LanguageModule.ToHiragana(answer.Content);
+            string hiraganaAnswer = LanguageModule.ToHiragana(answer.Content.ToLower());
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
