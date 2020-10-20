@@ -55,7 +55,7 @@ namespace SanaraV3.Module.Game
                 {
                     int myScore = guild.GetScore(s);
                     var scores = StaticObjects.Db.GetAllScores(s);
-                    str.AppendLine("You are ranked #" + scores.Count(x => x > myScore));
+                    str.AppendLine("You are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count);
                     str.AppendLine("Your score: " + myScore);
                     str.AppendLine("Best score: " + scores.Max());
                     globalScore += myScore / scores.Max();

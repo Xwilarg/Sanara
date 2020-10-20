@@ -1,10 +1,7 @@
 ﻿using Discord;
 using SanaraV3.Game.Impl;
 using SanaraV3.Game.Preload.Result;
-using SanaraV3.Module.Tool;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 
 namespace SanaraV3.Game.Preload.Impl
@@ -13,7 +10,7 @@ namespace SanaraV3.Game.Preload.Impl
     {
         public ShiritoriHardPreload()
         {
-            _preload = Static.Shiritori.GetWords().ToArray();
+            _preload = Static.Shiritori.GetWords().Where(x => Shiritori.IsLongEnough(x.Word, 3)).ToArray();
         }
 
         public ReadOnlyCollection<IPreloadResult> Load()
