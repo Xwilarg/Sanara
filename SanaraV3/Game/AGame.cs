@@ -317,7 +317,7 @@ namespace SanaraV3.Game
             if (_state != GameState.LOST)
                 return;
 
-            int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
+            int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
             string scoreSentence = "";
             if (_lobby == null) // Score aren't saved in multiplayer games

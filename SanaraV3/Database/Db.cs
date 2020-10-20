@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json.Linq;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using SanaraV3.Game.Preload.Result;
@@ -59,6 +60,16 @@ namespace SanaraV3.Database
                     _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
             }
             _guilds.Add(sGuild.Id, guild);
+
+            // Get score
+            var json = (JObject)await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync(_conn);
+            foreach (var name in StaticObjects.AllGameNames)
+            {
+                if (json[name] != null)
+                {
+                    guild.UpdateScore(name, int.Parse(json[name].Value<string>().Split("|")[0]));
+                }
+            }
         }
 
         // AVAILABILITY
@@ -230,17 +241,13 @@ namespace SanaraV3.Database
 
         // SCORES
 
-        public async Task<int> GetGameScoreAsync(ulong guildId, string name, string argument)
+        public int GetGameScore(ulong guildId, string name, string argument)
         {
             string fullName = argument == null ? name : (name + "-" + argument);
             Guild g = _guilds[guildId];
             if (g.DoesContainsGame(fullName)) // Score already in cache
                 return g.GetScore(fullName);
-            if (await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(fullName).Count().Eq(0).RunAsync<bool>(_conn)) // No score for this game in the db
-                return 0;
-            var tmp = (Cursor<string>)await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(fullName).RunAsync<string>(_conn);
-            tmp.MoveNext();
-            return int.Parse(tmp.Current.Split("|")[0]);
+            return 0;
         }
 
         public async Task SaveGameScoreAsync(ulong guildId, int score, List<ulong> contributors, string name, string argument)
@@ -251,6 +258,9 @@ namespace SanaraV3.Database
                 .With(fullName, score + "|" + string.Join("|", contributors))
             ).RunAsync(_conn);
         }
+
+        public List<int> GetAllScores(string gameName)
+            => _guilds.Where(x => x.Value.DoesContainsGame(gameName)).Select(x => x.Value.GetScore(gameName)).ToList();
 
         private readonly RethinkDB _r;
         private Connection _conn;

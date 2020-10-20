@@ -4,6 +4,7 @@ using SanaraV3.Attribute;
 using SanaraV3.Exception;
 using SanaraV3.Game;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Help
@@ -14,6 +15,7 @@ namespace SanaraV3.Help
         {
             _submoduleHelp.Add("Game", "Play various games directly on Discord");
             _help.Add(("Game", new Help("Game", "Play", new[] { new Argument(ArgumentType.MANDATORY, "shiritori / arknights / kancolle / girlsfrontline / fatego / pokemon / anime / booruquizz / boorufill"), new Argument(ArgumentType.OPTIONAL, "audio / multiplayer") }, "Play a game. Rules will be displayed when you start it. Audio parameter is only available for Arknights and KanColle quizzes.", new string[0], Restriction.None, "Play arknights audio")));
+            _help.Add(("Game", new Help("Game", "Score", new Argument[0], "Display your score and ranking for all games.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Cancel", new Argument[0], "Cancel a game running in this channel.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Replay", new Argument[0], "Replay the audio for the current game.", new string[0], Restriction.None, null)));
             _help.Add(("Game", new Help("Game", "Delete cache", new Argument[0], "Delete the cache of a game.", new string[0], Restriction.OwnerOnly, null)));
@@ -35,9 +37,34 @@ namespace SanaraV3.Module.Game
         }
 
         [Command("Score")]
-        public Task ScoreAsync()
+        public async Task ScoreAsync()
         {
-            throw new NotYetAvailable();
+            var guild = StaticObjects.Db.GetGuild(Context.Guild.Id);
+            var embed = new EmbedBuilder
+            {
+                Title = "Scores",
+                Color = Color.Blue
+            };
+            float globalScore = 0;
+            foreach (string s in StaticObjects.AllGameNames)
+            {
+                StringBuilder str = new StringBuilder();
+                if (!guild.DoesContainsGame(s))
+                    str.AppendLine("You are not ranked in this game");
+                else
+                {
+                    int myScore = guild.GetScore(s);
+                    var scores = StaticObjects.Db.GetAllScores(s);
+                    str.AppendLine("You are ranked #" + scores.Count(x => x > myScore));
+                    str.AppendLine("Your score: " + myScore);
+                    str.AppendLine("Best score: " + scores.Max());
+                    globalScore += myScore / scores.Max();
+                }
+                str.AppendLine();
+                embed.AddField(s, str.ToString());
+            }
+            embed.Description = "Global Score: " + (globalScore / StaticObjects.AllGameNames.Length * 100f).ToString("0.00") + "%";
+            await ReplyAsync(embed: embed.Build());
         }
 
         [Command("Play", RunMode = RunMode.Async)]
