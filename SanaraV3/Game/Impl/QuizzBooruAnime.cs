@@ -18,7 +18,7 @@ namespace SanaraV3.Game.Impl
             base.GetPostInternal();
 
             var results = _booru.GetRandomPostsAsync(10, _current.ImageUrl).GetAwaiter().GetResult();
-            results = results.Where(x => _allowedFormats.Contains(Path.GetExtension(x.fileUrl.AbsoluteUri)) && !x.tags.Contains("western") && !x.tags.Contains("web")).ToArray();
+            results = results.Where(x => _allowedFormats.Contains(Path.GetExtension(x.fileUrl.AbsoluteUri)) && !x.tags.Contains("western") && !x.tags.Contains("web") && x.rating == BooruSharp.Search.Post.Rating.Safe).ToArray();
             if (results.Length == 0)
                 throw new IndexOutOfRangeException("No result with correct format found");
 
