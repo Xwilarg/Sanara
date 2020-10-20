@@ -155,11 +155,12 @@ namespace SanaraV3.Game
             {
                 try
                 {
+                    var postContent = GetPostContent();
                     _messages.Clear();
                     var post = GetPostInternal();
                     if (post.Length == 0 && _postMode is TextMode)
                     {
-                        var output = (introMsg == null ? "" : introMsg) + GetPostContent();
+                        var output = (introMsg == null ? "" : introMsg) + postContent;
                         if (output != "")
                             await _textChan.SendMessageAsync(output);
                     }
@@ -174,7 +175,7 @@ namespace SanaraV3.Game
                                 _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
                             else if (_postMode is TextMode)
                             {
-                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + GetPostContent(), this);
+                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + postContent, this);
                                 introMsg = null;
                             }
                             else
@@ -183,9 +184,8 @@ namespace SanaraV3.Game
                     }
                     if (!(_postMode is TextMode))
                     {
-                        string str = GetPostContent();
-                        if (str != "")
-                            await _textChan.SendMessageAsync(str);
+                        if (postContent != "")
+                            await _textChan.SendMessageAsync(postContent);
                     }
                 } catch (GameLost e)
                 {

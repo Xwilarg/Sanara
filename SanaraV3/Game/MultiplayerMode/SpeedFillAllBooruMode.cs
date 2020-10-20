@@ -45,7 +45,7 @@ namespace SanaraV3.Game.MultiplayerMode
         }
 
         public bool CanLooseAuto()
-            => false;
+            => true;
 
         public string GetRules()
             => "You must find as much tags as possible, the player with the most points win.";

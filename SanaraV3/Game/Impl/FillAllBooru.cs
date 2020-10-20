@@ -25,7 +25,7 @@ namespace SanaraV3.Game.Impl
         {
             var post = StaticObjects.Gelbooru.GetRandomPostAsync().GetAwaiter().GetResult();
             var tags = post.tags.Select(x => HttpUtility.UrlDecode(x)).ToList();
-            tags.RemoveAll(x => Regex.Match(x, "bad[^ ]* id").Success);
+            tags.RemoveAll(x => Regex.Match(x, "bad( )?[^ ]* id").Success || Regex.Match(x, "[a-zA-Z]+ request").Success);
             _allTags = tags.ToArray();
             _foundTags = new List<string>();
             _nbNeed = _lobby == null ? (int)Math.Floor(_allTags.Length * 75.0 / 100) : _allTags.Length;
