@@ -120,7 +120,7 @@ namespace SanaraV3.Game
             else if (StaticObjects.Website != null)
                 await StaticObjects.Website?.AddGamePlayerAsync(_gameName, 1);
 
-            _state = GameState.RUNNING;
+            _state = GameState.READY;
             await PostAsync(introMsg);
         }
 
@@ -144,7 +144,7 @@ namespace SanaraV3.Game
         /// <param name="introMsg">Message to be sent before the game content, null if none</param>
         private async Task PostAsync(string introMsg)
         {
-            if (_state != GameState.RUNNING)
+            if (_state != GameState.RUNNING && _state != GameState.READY)
                 return;
 
             _state = GameState.POSTING;
@@ -155,9 +155,9 @@ namespace SanaraV3.Game
             {
                 try
                 {
-                    var postContent = GetPostContent();
                     _messages.Clear();
                     var post = GetPostInternal();
+                    var postContent = GetPostContent();
                     if (post.Length == 0 && _postMode is TextMode)
                     {
                         var output = (introMsg == null ? "" : introMsg) + postContent;

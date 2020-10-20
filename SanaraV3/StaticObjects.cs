@@ -89,6 +89,7 @@ namespace SanaraV3
         public static string[] AllGameNames { set; get; }
         private static GameManager GM { get; } = new GameManager();
         public static Dictionary<string, BooruSharp.Search.Tag.TagType> QuizzTagsCache { get; } = new Dictionary<string, BooruSharp.Search.Tag.TagType>();
+        public static Dictionary<string, BooruSharp.Search.Tag.TagType> GelbooruTags { get; } = new Dictionary<string, BooruSharp.Search.Tag.TagType>();
 
         // LANGUAGE MODULE
         public static Dictionary<string, string> RomajiToHiragana { set; get; } = new Dictionary<string, string>();

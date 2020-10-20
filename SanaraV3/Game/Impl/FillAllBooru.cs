@@ -25,7 +25,14 @@ namespace SanaraV3.Game.Impl
         {
             var post = StaticObjects.Gelbooru.GetRandomPostAsync().GetAwaiter().GetResult();
             var tags = post.tags.Select(x => HttpUtility.UrlDecode(x)).ToList();
-            tags.RemoveAll(x => Regex.Match(x, "bad( )?[^ ]* id").Success || Regex.Match(x, "[a-zA-Z]+ request").Success);
+            tags.RemoveAll(x => // TODO: Put that in some cache
+            {
+                if (StaticObjects.GelbooruTags.ContainsKey(x))
+                    return StaticObjects.GelbooruTags[x] == BooruSharp.Search.Tag.TagType.Metadata;
+                var tag = StaticObjects.Gelbooru.GetTagAsync(x).GetAwaiter().GetResult();
+                StaticObjects.GelbooruTags.Add(x, tag.type);
+                return tag.type == BooruSharp.Search.Tag.TagType.Metadata;
+            });
             _allTags = tags.ToArray();
             _foundTags = new List<string>();
             _nbNeed = _lobby == null ? (int)Math.Floor(_allTags.Length * 75.0 / 100) : _allTags.Length;
@@ -64,7 +71,7 @@ namespace SanaraV3.Game.Impl
             => _lobby == null ? "You found at least 75% of the tags on the image!" : null;
 
         protected override string GetHelp()
-            => _lobby == null ? "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find." : null;
+            => _lobby == null ? "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find." : "There are " + _allTags.Length + " tags on the image.";
 
         private string[] _allTags;
         private List<string> _foundTags;
