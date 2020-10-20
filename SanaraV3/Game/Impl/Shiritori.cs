@@ -181,7 +181,7 @@ namespace SanaraV3.Game.Impl
         /// We get the latest character (cause in shiritori the next word must begin by the ending of the last one)
         /// But in a word like じてんしゃ we need to get the "しゃ" and not the "ゃ"
         /// </summary>
-        private static string GetWordEnding(string word)
+        private static string GetWordEnding(string word) // TODO: Doesn't handle things like っし
         {
             char lastChar = word.Last();
             if (lastChar == 'ゃ' || lastChar == 'ぃ' || lastChar == 'ゅ'
