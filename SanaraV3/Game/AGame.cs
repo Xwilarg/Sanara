@@ -271,7 +271,7 @@ namespace SanaraV3.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    if (e.Message.Length == 0)
+                                    if (e.InnerException.Message.Length == 0)
                                         await msg.AddReactionAsync(new Emoji("❌"));
                                     else
                                         _textChan.SendMessageAsync(e.InnerException.Message).GetAwaiter().GetResult();
