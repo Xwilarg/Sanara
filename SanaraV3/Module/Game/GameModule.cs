@@ -57,6 +57,9 @@ namespace SanaraV3.Module.Game
                     var scores = StaticObjects.Db.GetAllScores(s);
                     str.AppendLine("You are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count);
                     str.AppendLine("Your score: " + myScore);
+                    var bestScores = scores.Where(x => x > myScore);
+                    if (bestScores.Count() > 0)
+                        str.AppendLine("Next score for rank up: " + bestScores.Min());
                     str.AppendLine("Best score: " + scores.Max());
                     globalScore += myScore / scores.Max();
                 }
