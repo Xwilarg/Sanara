@@ -230,37 +230,61 @@ namespace SanaraV3.Game
                 {
                     foreach (var msg in _messages)
                     {
-                        try
+                        var task = Task.Run(() =>
                         {
                             if (_lobby != null)
                                 _multiplayerMode.PreAnswerCheck(msg.Author);
                             CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
-                            string introMsg = GetSuccessMessage(msg.Author);
-                            if (!_contributors.Contains(msg.Author.Id))
-                                _contributors.Add(msg.Author.Id);
-                            _score++;
-                            if (_state == GameState.LOST)
-                                _state = GameState.RUNNING;
-                            _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
-                            if (_lobby != null)
-                                _multiplayerMode.AnswerIsCorrect(msg.Author);
-                            break; // Good answer found, no need to check the others ones
-                        }
-                        catch (GameLost e)
+                        });
+                        try
                         {
-                            if (_state == GameState.RUNNING)
-                                LooseAsync(e.Message, false).GetAwaiter().GetResult();
-                            return Task.CompletedTask;
-                        }
-                        catch (InvalidGameAnswer e)
-                        {
-                            _ = Task.Run(async () =>
+                            if (task.Wait(5000)) // Not supposed to timeout, but we just put a timer of 5s to be sure
                             {
-                                if (e.Message.Length == 0)
-                                    await msg.AddReactionAsync(new Emoji("❌"));
-                                else
-                                    _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
-                            });
+                                string introMsg = GetSuccessMessage(msg.Author);
+                                if (!_contributors.Contains(msg.Author.Id))
+                                    _contributors.Add(msg.Author.Id);
+                                _score++;
+                                if (_state == GameState.LOST)
+                                    _state = GameState.RUNNING;
+                                _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
+                                if (_lobby != null)
+                                    _multiplayerMode.AnswerIsCorrect(msg.Author);
+                                break; // Good answer found, no need to check the others ones
+                            }
+                            else
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    await msg.AddReactionAsync(new Emoji("❔"));
+                                });
+                            }
+                        }
+                        catch (AggregateException e)
+                        {
+                            if (e.InnerException is GameLost)
+                            {
+                                if (_state == GameState.RUNNING)
+                                    LooseAsync(e.InnerException.Message, false).GetAwaiter().GetResult();
+                                break;
+                            }
+                            else if (e.InnerException is InvalidGameAnswer)
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    if (e.Message.Length == 0)
+                                        await msg.AddReactionAsync(new Emoji("❌"));
+                                    else
+                                        _textChan.SendMessageAsync(e.InnerException.Message).GetAwaiter().GetResult();
+                                });
+                            }
+                            else
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.InnerException.Source, e.InnerException.Message, e.InnerException));
+                                    await msg.AddReactionAsync(new Emoji("🕷"));
+                                });
+                            }
                         }
                     }
                     _messages.Clear();
