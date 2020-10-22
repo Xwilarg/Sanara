@@ -53,6 +53,8 @@ namespace SanaraV3.Game.Impl
                     return new[] { "しりとり (shiritori)" };
                 }
                 var randomWord = GetRandomValidWord(GetWordEnding(_currWord));
+                if (randomWord == null)
+                    throw new GameLost("I don't know any work beginning by " + GetWordEnding(_currWord));
                 _words.Remove(randomWord);
                 _alreadySaid.Add(randomWord.Word);
                 _currWord = randomWord.Word;
@@ -152,6 +154,8 @@ namespace SanaraV3.Game.Impl
             }
             if (word == null)
                 word = GetRandomValidWord(ending);
+            if (word == null)
+                return null;
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
 
@@ -161,6 +165,8 @@ namespace SanaraV3.Game.Impl
         private ShiritoriPreloadResult GetRandomValidWord(string ending)
         {
             var validWords = _words.Where(x => x.Word.StartsWith(ending)).ToArray(); // Valid words are the ones beginning by the ending of the current word
+            if (validWords.Length == 0)
+                return null;
             return validWords[StaticObjects.Random.Next(validWords.Length)];
         }
 
