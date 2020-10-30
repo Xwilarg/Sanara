@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using DiscordUtils;
 using SanaraV3.Exception;
 using SanaraV3.Game.MultiplayerMode;
@@ -41,9 +42,9 @@ namespace SanaraV3.Game.Impl
             return new[] { _current.ImageUrl };
         }
 
-        protected override Task CheckAnswerInternalAsync(string answer)
+        protected override Task CheckAnswerInternalAsync(SocketUserMessage answer)
         {
-            string userAnswer = Utils.CleanWord(answer);
+            string userAnswer = Utils.CleanWord(answer.Content);
             if (!_allValidNames.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer(""); // We just add a reaction to the message to not spam the text channel
             if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))

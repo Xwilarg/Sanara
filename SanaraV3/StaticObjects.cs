@@ -87,8 +87,10 @@ namespace SanaraV3
         public static UrlMode ModeUrl { get; } = new UrlMode();
         public static AudioMode ModeAudio { get; } = new AudioMode();
         public static IPreload[] Preloads { set; get; }
+        public static string[] AllGameNames { set; get; }
         private static GameManager GM { get; } = new GameManager();
         public static Dictionary<string, BooruSharp.Search.Tag.TagType> QuizzTagsCache { get; } = new Dictionary<string, BooruSharp.Search.Tag.TagType>();
+        public static Dictionary<string, BooruSharp.Search.Tag.TagType> GelbooruTags { get; } = new Dictionary<string, BooruSharp.Search.Tag.TagType>();
 
         // LANGUAGE MODULE
         public static Dictionary<string, string> RomajiToHiragana { set; get; } = new Dictionary<string, string>();
@@ -169,11 +171,17 @@ namespace SanaraV3
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
             Preloads = new IPreload[]
             {
+                // AUDIO
+                new ArknightsAudioPreload(),
+                new KancolleAudioPreload(),
+
+                // HARD
+                new ShiritoriHardPreload(),
+
+                // OTHERS
                 new ShiritoriPreload(),
                 new ArknightsPreload(),
-                new ArknightsAudioPreload(),
                 new KancollePreload(),
-                new KancolleAudioPreload(),
                 new GirlsFrontlinePreload(),
                 new AzurLanePreload(),
                 new FateGOPreload(),
@@ -182,6 +190,14 @@ namespace SanaraV3
                 new BooruQuizzPreload(),
                 new BooruFillPreload()
             };
+            List<string> allNames = new List<string>();
+            foreach (var p in Preloads)
+            {
+                var name = p.GetGameNames()[0];
+                var option = p.GetNameArg();
+                allNames.Add(name + (option == null ? "" : "-" + option));
+            }
+            AllGameNames = allNames.ToArray();
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 
             await SM.InitAsync();

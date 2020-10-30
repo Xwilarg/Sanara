@@ -253,14 +253,14 @@ namespace SanaraV3.Module.Administration
             foreach (var elem in StaticObjects.Preloads)
             {
                 string name = elem.GetGameNames()[0];
-                if (gameNames.Contains(name))
+                if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
                     continue;
-                gameNames.Add(name);
+                var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
                 var loadInfo = elem.Load();
                 if (loadInfo != null)
-                    str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
+                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
                 else
-                    str.AppendLine($"**{char.ToUpper(name[0]) + string.Join("", name.Skip(1)).ToLower()}**: None");
+                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
             }
             embed.AddField("Games", str.ToString());
             embed.AddField("Subscriptions", string.Join("\n", StaticObjects.SM.GetSubscriptionCount().Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));

@@ -45,7 +45,7 @@ namespace SanaraV3.Game
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
-        protected abstract Task CheckAnswerInternalAsync(string answer); // Check if user answer is right
+        protected abstract Task CheckAnswerInternalAsync(SocketUserMessage answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
@@ -120,7 +120,7 @@ namespace SanaraV3.Game
             else if (StaticObjects.Website != null)
                 await StaticObjects.Website?.AddGamePlayerAsync(_gameName, 1);
 
-            _state = GameState.RUNNING;
+            _state = GameState.READY;
             await PostAsync(introMsg);
         }
 
@@ -144,7 +144,7 @@ namespace SanaraV3.Game
         /// <param name="introMsg">Message to be sent before the game content, null if none</param>
         private async Task PostAsync(string introMsg)
         {
-            if (_state != GameState.RUNNING)
+            if (_state != GameState.RUNNING && _state != GameState.READY)
                 return;
 
             _state = GameState.POSTING;
@@ -157,9 +157,10 @@ namespace SanaraV3.Game
                 {
                     _messages.Clear();
                     var post = GetPostInternal();
+                    var postContent = GetPostContent();
                     if (post.Length == 0 && _postMode is TextMode)
                     {
-                        var output = (introMsg == null ? "" : introMsg) + GetPostContent();
+                        var output = (introMsg == null ? "" : introMsg) + postContent;
                         if (output != "")
                             await _textChan.SendMessageAsync(output);
                     }
@@ -174,7 +175,7 @@ namespace SanaraV3.Game
                                 _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
                             else if (_postMode is TextMode)
                             {
-                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + GetPostContent(), this);
+                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + postContent, this);
                                 introMsg = null;
                             }
                             else
@@ -183,9 +184,8 @@ namespace SanaraV3.Game
                     }
                     if (!(_postMode is TextMode))
                     {
-                        string str = GetPostContent();
-                        if (str != "")
-                            await _textChan.SendMessageAsync(str);
+                        if (postContent != "")
+                            await _textChan.SendMessageAsync(postContent);
                     }
                 } catch (GameLost e)
                 {
@@ -230,37 +230,61 @@ namespace SanaraV3.Game
                 {
                     foreach (var msg in _messages)
                     {
-                        try
+                        var task = Task.Run(() =>
                         {
                             if (_lobby != null)
                                 _multiplayerMode.PreAnswerCheck(msg.Author);
-                            CheckAnswerInternalAsync(msg.Content).GetAwaiter().GetResult();
-                            string introMsg = GetSuccessMessage(msg.Author);
-                            if (!_contributors.Contains(msg.Author.Id))
-                                _contributors.Add(msg.Author.Id);
-                            _score++;
-                            if (_state == GameState.LOST)
-                                _state = GameState.RUNNING;
-                            _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
-                            if (_lobby != null)
-                                _multiplayerMode.AnswerIsCorrect(msg.Author);
-                            break; // Good answer found, no need to check the others ones
-                        }
-                        catch (GameLost e)
+                            CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
+                        });
+                        try
                         {
-                            if (_state == GameState.RUNNING)
-                                LooseAsync(e.Message, false).GetAwaiter().GetResult();
-                            return Task.CompletedTask;
-                        }
-                        catch (InvalidGameAnswer e)
-                        {
-                            _ = Task.Run(async () =>
+                            if (task.Wait(5000)) // Not supposed to timeout, but we just put a timer of 5s to be sure
                             {
-                                if (e.Message.Length == 0)
-                                    await msg.AddReactionAsync(new Emoji("❌"));
-                                else
-                                    _textChan.SendMessageAsync(e.Message).GetAwaiter().GetResult();
-                            });
+                                string introMsg = GetSuccessMessage(msg.Author);
+                                if (!_contributors.Contains(msg.Author.Id))
+                                    _contributors.Add(msg.Author.Id);
+                                _score++;
+                                if (_state == GameState.LOST)
+                                    _state = GameState.RUNNING;
+                                _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
+                                if (_lobby != null)
+                                    _multiplayerMode.AnswerIsCorrect(msg.Author);
+                                break; // Good answer found, no need to check the others ones
+                            }
+                            else
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    await msg.AddReactionAsync(new Emoji("❔"));
+                                });
+                            }
+                        }
+                        catch (AggregateException e)
+                        {
+                            if (e.InnerException is GameLost)
+                            {
+                                if (_state == GameState.RUNNING)
+                                    LooseAsync(e.InnerException.Message, false).GetAwaiter().GetResult();
+                                break;
+                            }
+                            else if (e.InnerException is InvalidGameAnswer)
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    if (e.InnerException.Message.Length == 0)
+                                        await msg.AddReactionAsync(new Emoji("❌"));
+                                    else
+                                        _textChan.SendMessageAsync(e.InnerException.Message).GetAwaiter().GetResult();
+                                });
+                            }
+                            else
+                            {
+                                _ = Task.Run(async () =>
+                                {
+                                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.InnerException.Source, e.InnerException.Message, e.InnerException));
+                                    await msg.AddReactionAsync(new Emoji("🕷"));
+                                });
+                            }
                         }
                     }
                     _messages.Clear();
@@ -317,7 +341,7 @@ namespace SanaraV3.Game
             if (_state != GameState.LOST)
                 return;
 
-            int bestScore = await StaticObjects.Db.GetGameScoreAsync(_guildId, _gameName, _argument);
+            int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
             string scoreSentence = "";
             if (_lobby == null) // Score aren't saved in multiplayer games
@@ -369,6 +393,6 @@ namespace SanaraV3.Game
         // MULTIPLAYER
         protected MultiplayerLobby _lobby;
         private const int _lobbyTimer = 30;
-        private IMultiplayerMode _multiplayerMode;
+        protected IMultiplayerMode _multiplayerMode;
     }
 }
