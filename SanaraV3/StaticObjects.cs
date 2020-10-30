@@ -79,6 +79,7 @@ namespace SanaraV3
         public static string KitsuRefreshToken { set; get; }
         public static Vndb VnClient { get; } = new Vndb();
         public static string MyDramaListApiKey { set; get; }
+        public static string UnsplashToken { set; get; }
 
         // GAME MODULE
         public static List<AGame> Games { get; } = new List<AGame>();
@@ -245,6 +246,8 @@ namespace SanaraV3
             {
                 MyDramaListApiKey = credentials.MyDramaListApiKey;
             }
+
+            UnsplashToken = credentials.UnsplashToken;
         }
 
         public static async Task UpdateTopGgAsync()
