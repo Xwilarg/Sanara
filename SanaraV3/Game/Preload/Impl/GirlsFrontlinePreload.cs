@@ -23,11 +23,11 @@ namespace SanaraV3.Game.Preload.Impl
                     try
                     {
                         // Get URL
-                        string shipUrl = "https://en.gfwiki.com/wiki/File:" + tDoll.Item1 + ".png";
+                        string shipUrl = "http://iopwiki.com/wiki/File:" + tDoll.Item1 + ".png";
                         string html = StaticObjects.HttpClient.GetStringAsync(shipUrl).GetAwaiter().GetResult();
                         Match m = Regex.Match(html, "src=\"(\\/images\\/thumb\\/[^\"]+)\"");
 
-                        var result = new QuizzPreloadResult("https://en.gfwiki.com" + m.Groups[1].Value, new[] { tDoll.Item2 }); // Not sure if the Replace is necessary but it was here in the V2
+                        var result = new QuizzPreloadResult("http://iopwiki.com" + m.Groups[1].Value, new[] { tDoll.Item2 }); // Not sure if the Replace is necessary but it was here in the V2
                         StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
