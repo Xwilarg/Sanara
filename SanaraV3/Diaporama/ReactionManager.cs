@@ -13,7 +13,7 @@ namespace SanaraV3.Diaporama
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
-            if (react.User.Value.Id != StaticObjects.ClientId && Constants.DIAPORAMA_EMOTES.Contains(emote) && StaticObjects.Diaporamas.ContainsKey(msg.Id))
+            if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && Constants.DIAPORAMA_EMOTES.Contains(emote) && StaticObjects.Diaporamas.ContainsKey(msg.Id))
             {
                 var dMsg = await msg.GetOrDownloadAsync();
                 var elem = StaticObjects.Diaporamas[msg.Id];
