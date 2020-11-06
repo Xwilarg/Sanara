@@ -40,7 +40,7 @@ namespace SanaraV3.Module.Tool
             string emote = react.Emote.ToString();
             bool allowFlags = chan is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
             // If emote is not from the bot and is an arrow emote
-            if (allowFlags && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
+            if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
             {
                 var gMsg = (await msg.GetOrDownloadAsync()).Content;
                 if (!string.IsNullOrEmpty(gMsg))

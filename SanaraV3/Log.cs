@@ -59,7 +59,7 @@ namespace SanaraV3
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
-            if (react.User.Value.Id != StaticObjects.ClientId && emote == "🕷" && StaticObjects.Errors.ContainsKey(msg.Id))
+            if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && emote == "🕷" && StaticObjects.Errors.ContainsKey(msg.Id))
             {
                 var error = StaticObjects.Errors[msg.Id];
                 await (await msg.GetOrDownloadAsync()).ModifyAsync((curr) =>
