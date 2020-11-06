@@ -15,7 +15,7 @@ namespace SanaraV3.Game.PostMode
             quizzAudio.GetNewProcess();
             var process = Process.Start(new ProcessStartInfo
             {
-                FileName = "ffmpeg.exe",
+                FileName = "ffmpeg",
                 Arguments = $"-hide_banner -loglevel fatal -i - -af volume=0.2 -f s16le -ac 2 -ar 48000 pipe:1",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,

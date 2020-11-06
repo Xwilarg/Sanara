@@ -172,11 +172,9 @@ namespace SanaraV3.Module.Radio
             if (Playlist.Count == 1) // There is only one music remaining in the playlist so we add a custom suggestion based on the last one
                 _ = Task.Run(AddAutosuggestionAsync);
             await _textChan.SendMessageAsync(embed: Playlist[0].Embed);
-            if (!File.Exists("ffmpeg.exe"))
-                throw new FileNotFoundException("ffmpeg.exe was not found near the bot executable.");
             _process = Process.Start(new ProcessStartInfo
             {
-                FileName = "ffmpeg.exe",
+                FileName = "ffmpeg",
                 // -af volume=0.2 reduce the volume of the song since by default it's really loud
                 Arguments = $"-hide_banner -loglevel panic -i \"{Playlist[0].Path}\" -af volume=0.2 -ac 2 -f s16le -ar 48000 pipe:1",
                 UseShellExecute = false,
