@@ -1,0 +1,11 @@
+[Unit]
+Description=Sanara
+After=network-online.target rethinkdb.target
+
+[Service]
+ExecStart=dotnet /home/zirk/bots/Sanara/Sanara.dll
+WorkingDirectory=/home/zirk/bots/Sanara
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
