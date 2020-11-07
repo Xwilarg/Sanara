@@ -1,6 +1,7 @@
 [Unit]
 Description=Sanara
 After=network-online.target rethinkdb.target
+OnFailure=Sanara-notify.service
 
 [Service]
 ExecStart=dotnet /home/zirk/bots/Sanara/Sanara.dll

@@ -1,0 +1,6 @@
+[Unit]
+Description=Send webhook
+
+[Service]
+Type=oneshot
+ExecStart=curl -H "Content-Type: application/json" -d "{\"content\": \"Sanara crashed""\"}" $SANARA_CRASH_WEBHOOK
