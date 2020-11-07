@@ -283,7 +283,7 @@ namespace SanaraV3.Module.Tool
         }
 
         public static string ToRomaji(string entry)
-            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.HiraganaToRomaji, 'っ'), StaticObjects.KatakanaToRomaji, 'ッ');
+            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
 
         public static string ToHiragana(string entry)
             => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
@@ -303,11 +303,31 @@ namespace SanaraV3.Module.Tool
             while (entry.Length > 0)
             {
                 doubleNext = false;
+
+                // SPECIAL CASES FOR KATAKANA
                 if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
                 {
                     entry = entry.Substring(1);
                     continue;
                 }
+                if (entry[0] == 'ァ' || entry[0] == 'ィ'|| entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
+                {
+                    result.Remove(result.Length - 1, 1);
+                    char tmp;
+                    switch (entry[0])
+                    {
+                        case 'ァ': tmp = 'a'; break;
+                        case 'ィ': tmp = 'i'; break;
+                        case 'ゥ': tmp = 'u'; break;
+                        case 'ェ': tmp = 'e'; break;
+                        case 'ォ': tmp = 'o'; break;
+                        default: throw new ArgumentException("Invalid katakana " + entry[0]);
+                    }
+                    result.Append(tmp);
+                    entry = entry.Substring(1);
+                    continue;
+                }
+
                 if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
                 {
                     result.Append(doubleChar);
