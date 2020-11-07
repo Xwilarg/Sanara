@@ -41,6 +41,8 @@ namespace SanaraV3.Module.Tool
         [Command("Serverinfo"), Alias("Guildinfo")]
         public async Task ServerinfoAsync()
         {
+            var subs = await StaticObjects.GetSubscriptionsAsync(Context.Guild.Id);
+            var mySubs = subs?.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention));
             await ReplyAsync(embed: new EmbedBuilder
             {
                 Title = Context.Guild.ToString(),
@@ -50,7 +52,7 @@ namespace SanaraV3.Module.Tool
                     new EmbedFieldBuilder
                     {
                         Name = "Subscriptions",
-                        Value = string.Join("\n", (await StaticObjects.SM.GetSubscriptionsAsync(Context.Guild.Id)).Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention)))
+                        Value = subs == null ? "Not yet initialized" : (mySubs.Count() == 0 ? "None" : string.Join("\n", mySubs))
                     }
                 }
             }.Build());

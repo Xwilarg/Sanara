@@ -41,7 +41,12 @@ namespace SanaraV3.Subscription
                     await Update();
                 }
             });
+
+            _isInit = true;
         }
+
+        public bool IsInit()
+            => _isInit;
 
         public async Task<Dictionary<string, ITextChannel>> GetSubscriptionsAsync(ulong guildId)
         {
@@ -49,7 +54,7 @@ namespace SanaraV3.Subscription
             foreach (var sub in _subscriptions)
             {
                 string name = sub.GetName();
-                d.Add(name, await StaticObjects.Db.HasSubscriptionExistAsync(guildId, name) ? StaticObjects.Db.GetAllSubscriptions(name).Where(x => x.TextChan.GuildId == guildId).First().TextChan : null);
+                d.Add(name, await StaticObjects.Db.HasSubscriptionExistAsync(guildId, name) ? StaticObjects.Db.GetAllSubscriptions(name).Where(x => x.TextChan.GuildId == guildId).FirstOrDefault()?.TextChan : null);
             }
             return d;
         }
@@ -102,5 +107,6 @@ namespace SanaraV3.Subscription
         }
 
         private ISubscription[] _subscriptions;
+        private bool _isInit = false;
     }
 }

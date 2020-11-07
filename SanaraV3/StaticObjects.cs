@@ -133,7 +133,27 @@ namespace SanaraV3
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new Dictionary<ulong, Diaporama.Diaporama>();
 
         // SUBSCRIPTION
-        public static SubscriptionManager SM { get; } = new SubscriptionManager();
+        private static SubscriptionManager SM { get; } = new SubscriptionManager();
+
+        public static Dictionary<string, int> GetSubscriptionCount()
+        {
+            if (!SM.IsInit())
+                return null;
+            return SM.GetSubscriptionCount();
+        }
+
+        public static async Task<Dictionary<string, ITextChannel>> GetSubscriptionsAsync(ulong guildId)
+        {
+            if (!SM.IsInit())
+                return null;
+            return await SM.GetSubscriptionsAsync(guildId);
+        }
+
+        private static async Task InitializeSubscriptions()
+        {
+            await SM.InitAsync();
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Subscription initialized"));
+        }
 
         public static async Task InitializeAsync(Credentials credentials)
         {
@@ -215,8 +235,7 @@ namespace SanaraV3
             }
             AllGameNames = allNames.ToArray();
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Subscription Manager")); // TODO: Initialization is sometimes stuck here for a long time
-            await SM.InitAsync();
+            _ = Task.Run(InitializeSubscriptions);
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();

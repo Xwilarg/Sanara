@@ -263,7 +263,8 @@ namespace SanaraV3.Module.Administration
                     str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
             }
             embed.AddField("Games", str.ToString());
-            embed.AddField("Subscriptions", string.Join("\n", StaticObjects.SM.GetSubscriptionCount().Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
+            var subs = StaticObjects.GetSubscriptionCount();
+            embed.AddField("Subscriptions", subs == null ? "Not yet initialized" : string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
             await ReplyAsync(embed: embed.Build());
         }
 
