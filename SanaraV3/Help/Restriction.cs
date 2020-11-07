@@ -9,6 +9,6 @@ namespace SanaraV3.Help
         Nsfw = 1,
         AdminOnly = 2,
         OwnerOnly = 4,
-        PremiumOnly
+        PremiumOnly = 8
     }
 }
