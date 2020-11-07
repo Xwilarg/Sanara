@@ -23,32 +23,8 @@ namespace SanaraV3.StatUpload
                 {
                     await Task.Delay(60000); // 1 minute
 
-                    // Biggest servers
-                    List<Tuple<string, int>> guilds = new List<Tuple<string, int>>();
-                    foreach (IGuild g in StaticObjects.Client.Guilds)
-                    {
-                        guilds.Add(new Tuple<string, int>(g.Name, ((SocketGuild)g).MemberCount));
-                    }
-
-                    Tuple<string, int> biggest = null;
-                    string finalStr = "";
-                    for (int i = 0; i < 10; i++)
-                    {
-                        foreach (var tuple in guilds)
-                        {
-                            if (biggest == null || tuple.Item2 > biggest.Item2)
-                                biggest = tuple;
-                        }
-                        if (biggest == null)
-                            break;
-                        finalStr += GetName(biggest.Item1) + "|" + biggest.Item2 + "$";
-                        guilds.Remove(biggest);
-                        biggest = null;
-                    }
-
                     await UpdateElement(new Tuple<string, string>[] {
-                        new Tuple<string, string>("serverCount", StaticObjects.Client.Guilds.Count.ToString()),
-                        new Tuple<string, string>("serversBiggest", finalStr)
+                        new Tuple<string, string>("serverCount", StaticObjects.Client.Guilds.Count.ToString())
                     });
                 }
             });
@@ -76,9 +52,9 @@ namespace SanaraV3.StatUpload
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("games", name + (option == null ? "" : "-" + option)) });
         }
 
-        public async Task AddGamePlayerAsync(string name, int playerCount)
+        public async Task AddGamePlayerAsync(string name, string option, int playerCount)
         {
-            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("gamesPlayers", name + ";" + playerCount.ToString()) });
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("gamesPlayers", name + (option == null ? "" : "-" + option) + ";" + playerCount.ToString()) });
         }
 
         // Clean name before sending it to the website for stats (| and $ are delimitators so we remove them)

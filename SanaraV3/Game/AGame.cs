@@ -115,10 +115,10 @@ namespace SanaraV3.Game
                 introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
 
                 if (StaticObjects.Website != null)
-                    await StaticObjects.Website.AddGamePlayerAsync(_gameName, _lobby.GetUserCount());
+                    await StaticObjects.Website.AddGamePlayerAsync(_gameName, _argument, _lobby.GetUserCount());
             }
             else if (StaticObjects.Website != null)
-                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, 1);
+                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, _argument, 1);
 
             _state = GameState.READY;
             await PostAsync(introMsg);
