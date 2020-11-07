@@ -26,6 +26,7 @@ using Google.Cloud.Vision.V1;
 using Google.Cloud.Translation.V2;
 using SanaraV3.StatUpload;
 using VndbSharp;
+using System.Linq;
 
 namespace SanaraV3
 {
@@ -169,27 +170,42 @@ namespace SanaraV3
             }
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
-            Preloads = new IPreload[]
+            Type[] types = new[]
             {
                 // AUDIO
-                new ArknightsAudioPreload(),
-                new KancolleAudioPreload(),
+                typeof(ArknightsAudioPreload),
+                typeof(KancolleAudioPreload),
 
                 // HARD
-                new ShiritoriHardPreload(),
+                typeof(ShiritoriHardPreload),
 
                 // OTHERS
-                new ShiritoriPreload(),
-                new ArknightsPreload(),
-                new KancollePreload(),
-                new GirlsFrontlinePreload(),
-                new AzurLanePreload(),
-                new FateGOPreload(),
-                new PokemonPreload(),
-                new AnimePreload(),
-                new BooruQuizzPreload(),
-                new BooruFillPreload()
+                typeof(ShiritoriPreload),
+                typeof(ArknightsPreload),
+                typeof(KancollePreload),
+                typeof(GirlsFrontlinePreload),
+                typeof(AzurLanePreload),
+                typeof(FateGOPreload),
+                typeof(PokemonPreload),
+                typeof(AnimePreload),
+                typeof(BooruQuizzPreload),
+                typeof(BooruFillPreload)
             };
+            Preloads = new IPreload[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                try
+                {
+                    Preloads[i] = (IPreload)Activator.CreateInstance(types[i]);
+                    await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " successfully loaded"));
+                }
+                catch (System.Exception e)
+                {
+                    Preloads[i] = null;
+                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " failed to load"));
+                }
+            }
             List<string> allNames = new List<string>();
             foreach (var p in Preloads)
             {
