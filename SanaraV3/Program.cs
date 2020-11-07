@@ -185,7 +185,7 @@ namespace SanaraV3
         {
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
-            await StaticObjects.Client.SetGameAsync("https://sanara.zirk.eu Sanara V3 is out!", null, ActivityType.CustomStatus);
+            await StaticObjects.Client.SetGameAsync("https://sanara.zirk.eu", null, ActivityType.CustomStatus);
             await StaticObjects.UpdateTopGgAsync();
 
             StaticObjects.Website?.KeepSendStats();

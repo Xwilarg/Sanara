@@ -13,10 +13,16 @@ namespace SanaraV3.StatUpload
         {
             _url = url;
             _token = token;
+            _isSendingStats = false;
         }
+
+        private bool _isSendingStats;
 
         public void KeepSendStats()
         {
+            if (_isSendingStats)
+                return;
+            _isSendingStats = true;
             _ = Task.Run(async () =>
             {
                 while (true)
