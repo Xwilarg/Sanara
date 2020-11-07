@@ -1,5 +1,7 @@
-﻿using SanaraV3.Exception;
+﻿using Newtonsoft.Json;
+using SanaraV3.Exception;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SanaraV3.Help
@@ -24,6 +26,8 @@ namespace SanaraV3.Help
             LoadRadioHelp();
             LoadScienceHelp();
             LoadSettingHelp();
+
+            File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(_help));
         }
 #pragma warning restore CS0649
 
