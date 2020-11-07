@@ -9,6 +9,7 @@ using SanaraV3.Exception;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -82,8 +83,10 @@ namespace SanaraV3.Module.Entertainment
         {
             name = name.ToLowerInvariant();
             var http = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.reddit.com/r/" + name + "/" + filter));
-            if (http.StatusCode == System.Net.HttpStatusCode.NotFound)
-                throw new CommandFailed("This subreddit doesn't exist");
+            if (http.StatusCode == HttpStatusCode.NotFound)
+                throw new CommandFailed("This subreddit doesn't exist.");
+            if (http.StatusCode == HttpStatusCode.Forbidden)
+                throw new CommandFailed("This subreddit is private.");
             JArray arr = JsonConvert.DeserializeObject<JToken>(await http.Content.ReadAsStringAsync())["data"]["children"].Value<JArray>();
             List<Diaporama.Impl.Reddit> elems = new List<Diaporama.Impl.Reddit>();
             foreach (var e in arr)

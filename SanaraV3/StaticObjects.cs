@@ -214,10 +214,14 @@ namespace SanaraV3
                 allNames.Add(name + (option == null ? "" : "-" + option));
             }
             AllGameNames = allNames.ToArray();
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Game preload done"));
 
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Subscription Manager")); // TODO: Initialization is sometimes stuck here for a long time
             await SM.InitAsync();
+
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();
+
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
 
             if (File.Exists("Saves/Premium.txt"))
                 AllowedPremium = File.ReadAllLines("Saves/Premium.txt");
@@ -280,6 +284,8 @@ namespace SanaraV3
             }
 
             UnsplashToken = credentials.UnsplashToken;
+
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Static Preload done"));
         }
 
         public static async Task UpdateTopGgAsync()
