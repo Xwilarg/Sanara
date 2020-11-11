@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -25,6 +27,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Science", "Encode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Encode a text", new string[0], Restriction.None, "Encode https://github.com/Xwilarg/")));
             _help.Add(("Tool", new Help("Science", "Decode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Decode a text", new string[0], Restriction.None, "Decode (%e2%95%af%c2%b0%e2%96%a1%c2%b0%ef%bc%89%e2%95%af%ef%b8%b5+%e2%94%bb%e2%94%81%e2%94%bb")));
             _help.Add(("Tool", new Help("Science", "Hash", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Hash a text", new string[0], Restriction.None, "Hash hello")));
+            _help.Add(("Tool", new Help("Science", "Regex", new[] { new Argument(ArgumentType.MANDATORY, "regex"), new Argument(ArgumentType.MANDATORY, "sentence") }, "Evaluate a sentence with a REGEX", new string[0], Restriction.None, "Regex <a href=\"([^\"]+)\">([^<]+)</a>\" <a href=\"https://google.com/\">Google</a>")));
         }
     }
 }
@@ -33,6 +36,33 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
+        [Command("REGEX", RunMode = RunMode.Async)]
+        public async Task RegexAsync(string regex, [Remainder]string sentence)
+        {
+            Match match;
+            try
+            {
+                match = Regex.Match(sentence, regex);
+            }
+            catch (ArgumentException)
+            {
+                throw new CommandFailed("Your REGEX is invalid.");
+            }
+            if (!match.Success)
+                throw new CommandFailed("Your REGEX didn't match.");
+            await ReplyAsync(embed: new Discord.EmbedBuilder
+            {
+                Title = "Your REGEX matched",
+                Color = Discord.Color.Blue,
+                Description = match.Value,
+                Fields = match.Groups.Cast<Group>().Skip(1).Select((x, i) => new Discord.EmbedFieldBuilder
+                {
+                    Name = "Match " + (i + 1),
+                    Value = x.Value
+                }).ToList()
+            }.Build());
+        }
+
         [Command("Hash")]
         public async Task HashAsync([Remainder]string content)
         {

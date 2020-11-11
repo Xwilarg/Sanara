@@ -41,7 +41,7 @@ namespace SanaraV3.Game
             _score = 0;
 
             if (StaticObjects.Website != null)
-                StaticObjects.Website.AddGameAsync(_gameName, _argument);
+                Task.Run(() => StaticObjects.Website.AddGameAsync(_gameName, _argument));
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
