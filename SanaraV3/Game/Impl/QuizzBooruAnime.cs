@@ -18,7 +18,7 @@ namespace SanaraV3.Game.Impl
             base.GetPostInternal();
 
             var results = _booru.GetRandomPostsAsync(10, _current.ImageUrl).GetAwaiter().GetResult();
-            results = results.Where(x => _allowedFormats.Contains(Path.GetExtension(x.fileUrl.AbsoluteUri)) && !x.tags.Contains("western") && !x.tags.Contains("web") && x.rating == BooruSharp.Search.Post.Rating.Safe).ToArray();
+            results = results.Where(x => _allowedFormats.Contains(Path.GetExtension(x.FileUrl.AbsoluteUri)) && !x.Tags.Contains("western") && !x.Tags.Contains("web") && x.Rating == BooruSharp.Search.Post.Rating.Safe).ToArray();
             if (results.Length == 0)
                 throw new IndexOutOfRangeException("No result with correct format found");
 
@@ -26,7 +26,7 @@ namespace SanaraV3.Game.Impl
 
             List<string> answers = new List<string>();
 
-            foreach (var t in result.tags)
+            foreach (var t in result.Tags)
             {
                 var name = _booru.ToString() + "_" + t;
                 if (StaticObjects.QuizzTagsCache.ContainsKey(name))
@@ -39,17 +39,17 @@ namespace SanaraV3.Game.Impl
                     var info = _booru.GetTagAsync(t).GetAwaiter().GetResult();
                     lock (StaticObjects.QuizzTagsCache)
                     {
-                        StaticObjects.QuizzTagsCache.Add(name, info.type);
+                        StaticObjects.QuizzTagsCache.Add(name, info.Type);
                     }
-                    if (info.type == BooruSharp.Search.Tag.TagType.Copyright)
+                    if (info.Type == BooruSharp.Search.Tag.TagType.Copyright)
                         answers.Add(t);
                 }
             }
             if (answers.Count == 0)
-                throw new IndexOutOfRangeException("No answer found for " + result.postUrl.AbsoluteUri);
+                throw new IndexOutOfRangeException("No answer found for " + result.PostUrl.AbsoluteUri);
             _current = new QuizzPreloadResult(_current.ImageUrl, answers.ToArray());
 
-            return new[] { result.fileUrl.AbsoluteUri };
+            return new[] { result.FileUrl.AbsoluteUri };
         }
     }
 }

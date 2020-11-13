@@ -21,7 +21,7 @@ namespace SanaraV3.Game.Impl
 
             _current = new Preload.Result.QuizzPreloadResult(_current.ImageUrl, _current.Answers.Select(x => HttpUtility.UrlDecode(x)).ToArray());
 
-            return results.Select(x => x.fileUrl.AbsoluteUri).ToArray();
+            return results.Select(x => x.FileUrl.AbsoluteUri).ToArray();
         }
     }
 }

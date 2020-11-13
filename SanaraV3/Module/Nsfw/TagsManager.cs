@@ -30,11 +30,11 @@ namespace SanaraV3.Module.Nsfw
 
             var post = _tags[id];
 
-            foreach (string s in post.Item2.tags)
+            foreach (string s in post.Item2.Tags)
             {
                 try
                 {
-                    switch ((await post.Item1.GetTagAsync(s)).type)
+                    switch ((await post.Item1.GetTagAsync(s)).Type)
                     {
                         case BooruSharp.Search.Tag.TagType.Artist:
                             if (artists.Count == 10)

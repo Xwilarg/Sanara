@@ -77,14 +77,14 @@ namespace SanaraV3.Module.Nsfw
             var res = info.Value;
 
             // If the post is SFW or if we are in a NSFW channel
-            bool isPostAcceptable = res.Booru.IsSafe() || (!res.Booru.IsSafe() && Utils.CanSendNsfw(Context.Channel));
-            int gcd = Utils.GCD(res.Post.width, res.Post.height);
+            bool isPostAcceptable = res.Booru.IsSafe || (!res.Booru.IsSafe && Utils.CanSendNsfw(Context.Channel));
+            int gcd = Utils.GCD(res.Post.Width, res.Post.Height);
 
             var embed = new EmbedBuilder
             {
-                Color = RatingToColor(res.Post.rating),
+                Color = RatingToColor(res.Post.Rating),
                 Title = "From " + Utils.ToWordCase(res.Booru.ToString().Split('.').Last()),
-                Description = res.Post.width + " x " + res.Post.height + "(" + (res.Post.width / gcd) + ":" + (res.Post.height / gcd) + ")",
+                Description = res.Post.Width + " x " + res.Post.Height + "(" + (res.Post.Width / gcd) + ":" + (res.Post.Height / gcd) + ")",
                 Fields = new List<EmbedFieldBuilder>
                 {
                     new EmbedFieldBuilder
@@ -106,9 +106,9 @@ namespace SanaraV3.Module.Nsfw
             };
 
             if (isPostAcceptable)
-                embed.Url = res.Post.postUrl.AbsoluteUri;
-            if (isPostAcceptable || res.Post.rating == Rating.Safe)
-                embed.ImageUrl = res.Post.previewUrl.AbsoluteUri;
+                embed.Url = res.Post.PostUrl.AbsoluteUri;
+            if (isPostAcceptable || res.Post.Rating == Rating.Safe)
+                embed.ImageUrl = res.Post.PreviewUrl.AbsoluteUri;
 
             await ReplyAsync(embed: embed.Build());
         }
@@ -133,7 +133,7 @@ namespace SanaraV3.Module.Nsfw
                     var related = await new Konachan().GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
                     if (related.Length == 0)
                         throw new CommandFailed("There is no image with those tags.");
-                    newTags.Add(related.OrderBy(x => GetStringDistance(x.name, s)).First().name);
+                    newTags.Add(related.OrderBy(x => GetStringDistance(x.Name, s)).First().Name);
                 }
                 try
                 {
@@ -147,16 +147,16 @@ namespace SanaraV3.Module.Nsfw
                 }
             }
 
-            int id = int.Parse("" + (int)booruId + post.id);
+            int id = int.Parse("" + (int)booruId + post.ID);
             StaticObjects.Tags.AddTag(id, booru, post);
 
-            if (post.fileUrl == null)
+            if (post.FileUrl == null)
                 throw new CommandFailed("A post was found but no image was available.");
             await ReplyAsync(embed: new EmbedBuilder
             {
-                Color = RatingToColor(post.rating),
-                ImageUrl = post.fileUrl.AbsoluteUri,
-                Url = post.postUrl.AbsoluteUri,
+                Color = RatingToColor(post.Rating),
+                ImageUrl = post.FileUrl.AbsoluteUri,
+                Url = post.PostUrl.AbsoluteUri,
                 Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
                 Footer = new EmbedFooterBuilder
                 {
