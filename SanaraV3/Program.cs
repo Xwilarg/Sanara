@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3
@@ -145,7 +146,7 @@ namespace SanaraV3
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot) // We ignore messages from bots
+            if (arg.Author.IsBot && !StaticObjects.AllowedBots.Contains(arg.Author.Id.ToString())) // We ignore messages from bots (except whitelisted ones)
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return; // The message received isn't a message we can deal with

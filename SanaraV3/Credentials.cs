@@ -15,5 +15,6 @@
         public string StatsWebsiteToken;
         public string MyDramaListApiKey;
         public string UnsplashToken;
+        public string[] AllowedBots;
     }
 }

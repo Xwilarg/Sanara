@@ -51,6 +51,7 @@ namespace SanaraV3
         private static AuthDiscordBotListApi DblApi { set; get; } = null;
         private static DateTime DblLastSend { set; get; } = DateTime.Now;
         public static UploadManager Website { set; get; } = null;
+        public static string[] AllowedBots { set; get; } = new string[0];
 
         // INFORMATION MODULE
         public static string GithubKey { set; get; }
@@ -244,6 +245,8 @@ namespace SanaraV3
 
             if (File.Exists("Saves/Premium.txt"))
                 AllowedPremium = File.ReadAllLines("Saves/Premium.txt");
+
+            AllowedBots = credentials.AllowedBots;
 
             if (credentials.YouTubeKey != null)
             {
