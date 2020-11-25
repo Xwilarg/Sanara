@@ -41,7 +41,7 @@ namespace SanaraV3.Module.Tool
         public async Task RandomAsync([Remainder]string choices)
         {
             var arr = choices.Split(' ');
-            await ReplyAsync(arr[StaticObjects.Random.Next(0, arr.Length)]);
+            await ReplyAsync(Discord.Format.Sanitize(arr[StaticObjects.Random.Next(0, arr.Length)]));
         }
 
         [Command("Random")]
@@ -49,7 +49,7 @@ namespace SanaraV3.Module.Tool
         {
             if (max < 1)
                 throw new CommandFailed("Max number must be more than 1");
-            await ReplyAsync(StaticObjects.Random.Next(max).ToString());
+            await ReplyAsync((StaticObjects.Random.Next(max) + 1).ToString());
         }
 
         [Command("Random")]
@@ -57,7 +57,7 @@ namespace SanaraV3.Module.Tool
         {
             if (max <= min)
                 throw new CommandFailed("Upper bound must be superior to lower bound");
-            await ReplyAsync(StaticObjects.Random.Next(min, max).ToString());
+            await ReplyAsync((StaticObjects.Random.Next(min, max) + 1).ToString());
         }
 
         [Command("REGEX", RunMode = RunMode.Async)]
