@@ -37,14 +37,14 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
-        [Command("Random")]
+        [Command("Random"), Alias("Rand", "Pick")]
         public async Task RandomAsync([Remainder]string choices)
         {
             var arr = choices.Split(' ');
             await ReplyAsync(Discord.Format.Sanitize(arr[StaticObjects.Random.Next(0, arr.Length)]));
         }
 
-        [Command("Random")]
+        [Command("Random"), Alias("Rand", "Pick")]
         public async Task RandomAsync(int max)
         {
             if (max < 1)
@@ -52,7 +52,7 @@ namespace SanaraV3.Module.Tool
             await ReplyAsync((StaticObjects.Random.Next(max) + 1).ToString());
         }
 
-        [Command("Random")]
+        [Command("Random"), Alias("Rand", "Pick")]
         public async Task RandomAsync(int min, int max)
         {
             if (max <= min)
