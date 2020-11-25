@@ -28,6 +28,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Science", "Decode", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Decode a text", new string[0], Restriction.None, "Decode (%e2%95%af%c2%b0%e2%96%a1%c2%b0%ef%bc%89%e2%95%af%ef%b8%b5+%e2%94%bb%e2%94%81%e2%94%bb")));
             _help.Add(("Tool", new Help("Science", "Hash", new[] { new Argument(ArgumentType.MANDATORY, "text") }, "Hash a text", new string[0], Restriction.None, "Hash hello")));
             _help.Add(("Tool", new Help("Science", "Regex", new[] { new Argument(ArgumentType.MANDATORY, "regex"), new Argument(ArgumentType.MANDATORY, "sentence") }, "Evaluate a sentence with a REGEX", new string[0], Restriction.None, "Regex <a href=\"([^\"]+)\">([^<]+)</a>\" <a href=\"https://google.com/\">Google</a>")));
+            _help.Add(("Tool", new Help("Science", "Random", new[] { new Argument(ArgumentType.MANDATORY, "range/choices/max") }, "Get a random choice or number", new string[0], Restriction.None, "Random orange lemon strawberry")));
         }
     }
 }
@@ -36,6 +37,29 @@ namespace SanaraV3.Module.Tool
 {
     public sealed class ScienceModule : ModuleBase
     {
+        [Command("Random")]
+        public async Task RandomAsync([Remainder]string choices)
+        {
+            var arr = choices.Split(' ');
+            await ReplyAsync(arr[StaticObjects.Random.Next(0, arr.Length)]);
+        }
+
+        [Command("Random")]
+        public async Task RandomAsync(int max)
+        {
+            if (max < 1)
+                throw new CommandFailed("Max number must be more than 1");
+            await ReplyAsync(StaticObjects.Random.Next(max).ToString());
+        }
+
+        [Command("Random")]
+        public async Task RandomAsync(int min, int max)
+        {
+            if (max <= min)
+                throw new CommandFailed("Upper bound must be superior to lower bound");
+            await ReplyAsync(StaticObjects.Random.Next(min, max).ToString());
+        }
+
         [Command("REGEX", RunMode = RunMode.Async)]
         public async Task RegexAsync(string regex, [Remainder]string sentence)
         {
