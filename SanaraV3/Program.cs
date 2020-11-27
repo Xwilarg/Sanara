@@ -146,7 +146,7 @@ namespace SanaraV3
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot && !StaticObjects.AllowedBots.Contains(arg.Author.Id.ToString())) // We ignore messages from bots (except whitelisted ones)
+            if (arg.Author.IsBot && (StaticObjects.AllowedBots == null || !StaticObjects.AllowedBots.Contains(arg.Author.Id.ToString()))) // We ignore messages from bots (except whitelisted ones)
                 return;
             var msg = arg as SocketUserMessage;
             if (msg == null) return; // The message received isn't a message we can deal with

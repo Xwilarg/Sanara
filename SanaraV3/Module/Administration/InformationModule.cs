@@ -229,9 +229,9 @@ namespace SanaraV3.Module.Administration
             };
             StringBuilder str = new StringBuilder();
             Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in fullHelp.Where(x => x.Item2.CommandName.ToUpper() == name || x.Item2.Aliases.Contains(name)))
+            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
             {
-                str.AppendLine("**" + help.Item2.CommandName + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
                     (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
             }
             embed.Description = str.ToString();
