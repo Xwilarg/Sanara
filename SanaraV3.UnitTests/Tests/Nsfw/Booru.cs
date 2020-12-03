@@ -82,10 +82,8 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
         [TestCase("Gelbooru")]
         [TestCase("Rule34")]
         [TestCase("Konachan")]
-        public async Task BooruWithTagInvalidTest(string methodName)
+        public void BooruWithTagInvalidTest(string methodName)
         {
-            bool isDone = false;
-
             var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, null);
             var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
