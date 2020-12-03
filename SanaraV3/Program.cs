@@ -87,6 +87,7 @@ namespace SanaraV3
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
             StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
             StaticObjects.Client.Disconnected += Disconnected;
+            StaticObjects.Client.Ready += Ready;
             _commands.CommandExecuted += CommandExecuted;
 
             // Add readers
@@ -114,6 +115,11 @@ namespace SanaraV3
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private async Task Ready()
+        {
+            await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
         }
 
         private async Task CommandExecuted(Optional<CommandInfo> cmd, ICommandContext context, IResult result)
@@ -186,7 +192,6 @@ namespace SanaraV3
         {
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
-            await StaticObjects.Client.SetGameAsync("https://sanara.zirk.eu", null, ActivityType.CustomStatus);
             await StaticObjects.UpdateTopGgAsync();
 
             StaticObjects.Website?.KeepSendStats();
