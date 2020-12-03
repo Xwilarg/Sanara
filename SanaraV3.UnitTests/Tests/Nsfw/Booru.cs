@@ -85,29 +85,11 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
         public async Task BooruWithTagInvalidTest(string methodName)
         {
             bool isDone = false;
-            var callback = new Func<UnitTestUserMessage, Task>(async (msg) =>
-            {
-                Assert.AreEqual(1, msg.Embeds.Count);
-                var embed = (Embed)msg.Embeds.ElementAt(0);
-                await CheckBooruAsync(embed);
-                Assert.True(embed.Footer.Value.Text.Contains("arknights"));
-                isDone = true;
-            });
 
             var mod = new Module.Nsfw.BooruModule();
-            Common.AddContext(mod, callback);
+            Common.AddContext(mod, null);
             var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
-            try
-            {
-                await (Task)method.Invoke(mod, new[] { new[] { "arknigh" } });
-            }
-            catch (CommandFailed)
-            {
-                if (methodName != "E621") // E621 sometimes find a post with no image inside, not much we can do for that
-                    throw;
-            }
-            while (!isDone)
-            { }
+            Assert.ThrowsAsync<CommandFailed>(async () => await (Task)method.Invoke(mod, new[] { new[] { "azezaeaze" } }));
         }
     }
 }
