@@ -3,7 +3,7 @@
 
 | Linux                                                                 | Windows                                                                   |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| ![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg) | ![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg) |
+| [![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3ALinux) | |![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3AWindows) |
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage)
 # Sanara
