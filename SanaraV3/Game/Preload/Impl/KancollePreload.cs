@@ -25,7 +25,7 @@ namespace SanaraV3.Game.Preload.Impl
                         string html = StaticObjects.HttpClient.GetStringAsync(shipUrl).GetAwaiter().GetResult();
 
                         // TODO: There are some issues for ships like Imuya that are called I-168 by the wikia (even if it's her "real" name we need to accept both)
-                        var result = new QuizzPreloadResult(Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/" + name + "_Full\\.png").Value, new[] { name });
+                        var result = new QuizzPreloadResult(Regex.Match(html, "https:\\/\\/[^\\/]+\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/" + name + "_Full\\.png").Value, new[] { name });
                         StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }

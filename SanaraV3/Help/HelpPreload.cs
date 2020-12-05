@@ -19,6 +19,7 @@ namespace SanaraV3.Help
             LoadDoujinshiHelp();
             LoadFunHelp();
             LoadGameHelp();
+            LoadGameInfoHelp();
             LoadInformationHelp();
             LoadJapaneseHelp();
             LoadLanguageHelp();

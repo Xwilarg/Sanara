@@ -99,6 +99,7 @@ namespace SanaraV3
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
             await _commands.AddModuleAsync<Module.Community.CommunityModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
+            await _commands.AddModuleAsync<Module.Entertainment.GameInfoModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.JapaneseModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
             await _commands.AddModuleAsync<Module.Game.GameModule>(null);
