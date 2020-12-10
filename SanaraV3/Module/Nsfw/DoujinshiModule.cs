@@ -52,7 +52,7 @@ namespace SanaraV3.Module.Nsfw
                 await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
         }
 
-        [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin", "Download nhentai")]
+        [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin", "Download nhentai", "dl doujinshi", "dl doujin", "dl nhentai", "dldj")]
         public async Task GetDownloadDoujinshiAsync(int id)
         {
             string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);

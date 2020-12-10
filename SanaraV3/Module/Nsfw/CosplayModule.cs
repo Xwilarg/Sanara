@@ -28,7 +28,7 @@ namespace SanaraV3.Module.Nsfw
     public sealed class CosplayModule : ModuleBase
     {
         // TODO: We can probably centralize downloads somewhere
-        [Command("Download cosplay", RunMode = RunMode.Async)]
+        [Command("Download cosplay", RunMode = RunMode.Async), Alias("dl cosplay")]
         public async Task DownloadCosplayAsync(string id)
         {
             var splitId = id.Split('/', StringSplitOptions.RemoveEmptyEntries);
