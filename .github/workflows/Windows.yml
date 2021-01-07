@@ -22,7 +22,7 @@ jobs:
     - name: Init submodules
       run: git submodule init && git submodule update
     - name: Clean
-      run: dotnet clean ./Sanara/SanaraV3.sln --configuration Release && dotnet nuget locals all --clear
+      run: dotnet clean ./SanaraV3.sln --configuration Release && dotnet nuget locals all --clear
     - name: Install dependencies
       run: dotnet restore
     - name: Install ReThinkdb
