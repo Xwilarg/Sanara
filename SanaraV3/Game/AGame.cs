@@ -153,10 +153,12 @@ namespace SanaraV3.Game
             int nbTries = 0;
             do
             {
+                string[] currentPostDebug = new string[0]; // We save the current post here to send it to Sentry if an exception occurs
                 try
                 {
                     _messages.Clear();
                     var post = GetPostInternal();
+                    currentPostDebug = post;
                     var postContent = GetPostContent();
                     if (post.Length == 0 && _postMode is TextMode)
                     {
@@ -194,6 +196,8 @@ namespace SanaraV3.Game
                     return;
                 } catch (System.Exception e)
                 {
+                    var specifierException = new System.Exception("Error while posting for " + _gameName + ", tried to post " + currentPostDebug.Length + " elements."
+                        + (currentPostDebug.Length == 0 ? "" : "First element is: " + currentPostDebug[0]));
                     await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
                     if (nbTries == 3)
                     {
