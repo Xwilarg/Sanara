@@ -337,9 +337,9 @@ namespace SanaraV3.Module.Entertainment
             foreach (var elem in allData)
             {
                 if (elem["attributes"]["canonicalTitle"].Value<string>().ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en"] != null && elem["attributes"]["titles"]["en"].Value<string>().ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en_jp"] != null && elem["attributes"]["titles"]["en_jp"].Value<string>().ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en_us"] != null && elem["attributes"]["titles"]["en_us"].Value<string>().ToUpper() == upperName)
+                    elem["attributes"]["titles"]["en"] != null && elem["attributes"]["titles"]["en"].Value<string>()?.ToUpper() == upperName ||
+                    elem["attributes"]["titles"]["en_jp"] != null && elem["attributes"]["titles"]["en_jp"].Value<string>()?.ToUpper() == upperName ||
+                    elem["attributes"]["titles"]["en_us"] != null && elem["attributes"]["titles"]["en_us"].Value<string>()?.ToUpper() == upperName)
                 {
                     return elem;
                 }
