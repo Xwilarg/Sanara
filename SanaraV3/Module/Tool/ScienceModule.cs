@@ -272,6 +272,10 @@ namespace SanaraV3.Module.Tool
             {
                 await ReplyAsync("I can't calculate the expression you gave");
             }
+            catch (OverflowException)
+            {
+                await ReplyAsync("The result of this expression is either too big or too small");
+            }
         }
     }
 }
