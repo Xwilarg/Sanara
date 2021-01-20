@@ -27,6 +27,7 @@ namespace SanaraV3.Help
             LoadRadioHelp();
             LoadScienceHelp();
             LoadSettingHelp();
+            LoadVideoHelp();
 
             File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(_help));
         }

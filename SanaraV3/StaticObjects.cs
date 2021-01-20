@@ -27,6 +27,7 @@ using Google.Cloud.Translation.V2;
 using SanaraV3.StatUpload;
 using VndbSharp;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SanaraV3
 {
@@ -68,6 +69,7 @@ namespace SanaraV3
         public static Konachan Konachan { get; } = new Konachan();
         public static Sakugabooru Sakugabooru { get; } = new Sakugabooru();
         public static TagsManager Tags { get; } = new TagsManager();
+        public static List<string> JavmostCategories { get; } = new List<string>();
 
         // RADIO MODULE
         public static Dictionary<ulong, RadioChannel> Radios { get; } = new Dictionary<ulong, RadioChannel>();
@@ -156,6 +158,33 @@ namespace SanaraV3
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Subscription initialized"));
         }
 
+        private static async Task InitializeAV()
+        {
+            List<string> newTags;
+            int page = 1;
+            do
+            {
+                newTags = new List<string>(); // We keep track of how many tags we found in this page
+                var request = new HttpRequestMessage(new HttpMethod("GET"), "https://www5.javmost.com/allcategory/" + page);
+                request.Headers.Add("Host", "javmost.com"); // Javmost keep redirecting me if I don't send this
+                string html = HttpClient.SendAsync(request).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
+                {
+                    string content = m.Groups[1].Value.Trim().ToLower();
+                    if (!JavmostCategories.Contains(content)) // Make sure to not add things twice
+                        newTags.Add(content);
+                }
+                JavmostCategories.AddRange(newTags);
+                page++;
+            } while (newTags.Count > 0);
+
+            // There 2 tags aren't in the tag list so we add them manually
+            JavmostCategories.Add("censor");
+            JavmostCategories.Add("uncensor");
+
+            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
+        }
+
         public static async Task InitializeAsync(Credentials credentials)
         {
             await Db.InitAsync("Sanara");
@@ -237,6 +266,7 @@ namespace SanaraV3
             AllGameNames = allNames.ToArray();
 
             _ = Task.Run(InitializeSubscriptions);
+            _ = Task.Run(InitializeAV);
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();
