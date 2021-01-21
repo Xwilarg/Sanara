@@ -165,9 +165,7 @@ namespace SanaraV3
             do
             {
                 newTags = new List<string>(); // We keep track of how many tags we found in this page
-                var request = new HttpRequestMessage(new HttpMethod("GET"), "https://www5.javmost.com/allcategory/" + page);
-                request.Headers.Add("Host", "javmost.com"); // Javmost keep redirecting me if I don't send this
-                string html = HttpClient.SendAsync(request).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                string html = await VideoModule.DoJavmostHttpRequestAsync("https://www5.javmost.com/allcategory/" + page);
                 foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
                 {
                     string content = m.Groups[1].Value.Trim().ToLower();
@@ -178,9 +176,12 @@ namespace SanaraV3
                 page++;
             } while (newTags.Count > 0);
 
-            // There 2 tags aren't in the tag list so we add them manually
-            JavmostCategories.Add("censor");
-            JavmostCategories.Add("uncensor");
+            if (JavmostCategories.Count == 0) // This mean we weren't able to load the other tags
+            {
+                // There 2 tags aren't in the tag list so we add them manually
+                JavmostCategories.Add("censor");
+                JavmostCategories.Add("uncensor");
+            }
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
         }

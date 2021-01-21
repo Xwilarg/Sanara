@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using RethinkDb.Driver;
 using SanaraV3.Exception;
 using System;
 using System.Linq;
@@ -23,6 +24,25 @@ namespace SanaraV3.Module.Nsfw
 {
     public class VideoModule : ModuleBase
     {
+        public static async Task<string> DoJavmostHttpRequestAsync(string url)
+        {
+            int redirectCounter = 0;
+            string html;
+            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), url);
+            do
+            {
+                request.Headers.Add("Host", "www5.javmost.com");
+                html = await(await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync();
+                Match redirect = Regex.Match(html, "<p>The document has moved <a href=\"([^\"]+)\">");
+                if (redirect.Success)
+                    request = new HttpRequestMessage(new HttpMethod("GET"), redirect.Groups[1].Value);
+                else
+                    break;
+                redirectCounter++;
+            } while (redirectCounter < 10);
+            return html;
+        }
+
         [Command("AdultVideo", RunMode = RunMode.Async), RequireNsfw, Alias("AV")]
         public async Task AdultVideoAsync(string tag = "")
         {
@@ -36,17 +56,13 @@ namespace SanaraV3.Module.Nsfw
                 throw new CommandFailed("This tag doesn't exist");
 
             string url = "https://www5.javmost.com/category/" + tag;
-            var request = new HttpRequestMessage(new HttpMethod("GET"), url);
-            request.Headers.Add("Host", "javmost.com");
-            string html = await (await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync();
+            string html = await DoJavmostHttpRequestAsync(url);
             int perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
             int total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
             int page = StaticObjects.Random.Next(total / perPage);
             if (page > 0) // If it's the first page, we already got the HTML
             {
-                request = new HttpRequestMessage(new HttpMethod("GET"), url + "/page/" + (page + 1));
-                request.Headers.Add("Host", "javmost.com");
-                html = await (await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync();
+                html = await DoJavmostHttpRequestAsync(url + "/page/" + (page + 1));
             }
             var arr = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None).Skip(1).ToList(); // We remove things life header and stuff
             Match videoMatch = null;
