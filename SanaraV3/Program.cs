@@ -179,6 +179,8 @@ namespace SanaraV3
                     else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)
                         await context.Channel.SendMessageAsync(embed: Module.Administration.InformationModule.GetSingleHelpEmbed(context.Message.Content.Substring(pos), context));
                 }
+                else
+                    StaticObjects.LastMessage = DateTime.UtcNow;
             }
             else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing // TODO: Need to check if it's not the bot prefix
             {

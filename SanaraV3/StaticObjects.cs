@@ -53,6 +53,7 @@ namespace SanaraV3
         private static DateTime DblLastSend { set; get; } = DateTime.Now;
         public static UploadManager Website { set; get; } = null;
         public static string[] AllowedBots { set; get; } = new string[0];
+        public static DateTime LastMessage { set; get; } = DateTime.UtcNow;
 
         // INFORMATION MODULE
         public static string GithubKey { set; get; }

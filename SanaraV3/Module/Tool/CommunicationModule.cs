@@ -107,6 +107,12 @@ namespace SanaraV3.Module.Tool
                         Name = "Guild Count",
                         Value = StaticObjects.Client.Guilds.Count,
                         IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Last message received",
+                        Value = StaticObjects.LastMessage.ToString("HH:mm:ss UTC+0"),
+                        IsInline = true
                     }
                 }
             }.Build());
