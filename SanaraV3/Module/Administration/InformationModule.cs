@@ -19,13 +19,13 @@ namespace SanaraV3.Help
         public void LoadInformationHelp()
         {
             _submoduleHelp.Add("Information", "Get important information about the bot");
-            _help.Add(("Administration", new Help("Information", "Random", new Argument[0], "Suggest a random command.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "V3", new Argument[0], "Get information about the transition from the V2 to the V3.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Logs", new Argument[0], "Get the latest commits made to the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Gdpr", new Argument[0], "Display all the data saved about your guild.", new string[0], Restriction.AdminOnly, null)));
+            _help.Add(("Administration", new Help("Information", "Ping", new Argument[0], "Get the latency between the bot and Discord.", new string[0], Restriction.None, null)));
         }
     }
 }
@@ -34,24 +34,12 @@ namespace SanaraV3.Module.Administration
 {
     public class InformationModule : ModuleBase
     {
-        [Command("Random")]
-        public async Task RandomAsync()
+        [Command("Ping")]
+        public async Task PingAsync()
         {
-            var help = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), false, false);
-            var random = help[StaticObjects.Random.Next(0, help.Count)];
-
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Why not trying \"" + random.Item2.CommandName + "\"",
-                Description = "**" + random.Item2.CommandName + " " + string.Join(" ", random.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {random.Item2.Description}" +
-                        (random.Item2.Example != null ? $"\n*Example: {random.Item2.Example}*" : ""),
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            }.Build());
+            var content = ":ping_pong: Pong!";
+            var msg = await ReplyAsync(content);
+            await msg.ModifyAsync(x => x.Content = content + "\nLatency: " + msg.CreatedAt.Subtract(Context.Message.CreatedAt).TotalMilliseconds + "ms");
         }
 
         [Command("Logs")]
@@ -183,7 +171,7 @@ namespace SanaraV3.Module.Administration
             var embed = new EmbedBuilder
             {
                 Color = Color.Blue,
-                Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x))),
+                Title = "Help",
                 Footer = new EmbedFooterBuilder
                 {
                     Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
@@ -240,7 +228,7 @@ namespace SanaraV3.Module.Administration
             var embed = new EmbedBuilder
             {
                 Color = Color.Blue,
-                Title = name[0] + string.Join("", name.Skip(1).Select(x => char.ToLower(x))),
+                Title = "Help",
                 Footer = new EmbedFooterBuilder
                 {
                     Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +

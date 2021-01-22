@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
 using SanaraV3.Exception;
+using SanaraV3.Help;
+using SanaraV3.Module.Administration;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,6 +23,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Communication", "BotInfo", new Argument[0], "Get information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "ServerInfo", new Argument[0], "Get information about the server.", new[] { "GuildInfo" }, Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "Invite", new Argument[0], "Get the bot invitation link.", new string[0], Restriction.None, null)));
+            _help.Add(("Tool", new Help("Communication", "Random", new Argument[0], "Suggest a random command.", new string[0], Restriction.None, null)));
         }
     }
 }
@@ -199,6 +202,26 @@ namespace SanaraV3.Module.Tool
             if (msg == null)
                 throw new CommandFailed("This user didn't post any message here recently.");
             await QuoteInternalAsync(msg);
+        }
+
+        [Command("Random")]
+        public async Task RandomAsync()
+        {
+            var help = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, Context.Channel is ITextChannel chan ? chan.IsNsfw : true, false, false);
+            var random = help[StaticObjects.Random.Next(0, help.Count)];
+
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = "Why not trying \"" + random.Item2.CommandName + "\"",
+                Description = "**" + random.Item2.CommandName + " " + string.Join(" ", random.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {random.Item2.Description}" +
+                        (random.Item2.Example != null ? $"\n*Example: {random.Item2.Example}*" : ""),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
+                }
+            }.Build());
         }
 
         [Command("Quote", RunMode = RunMode.Async), Priority(-1)]
