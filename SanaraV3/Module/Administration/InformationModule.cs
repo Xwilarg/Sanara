@@ -19,6 +19,7 @@ namespace SanaraV3.Help
         public void LoadInformationHelp()
         {
             _submoduleHelp.Add("Information", "Get important information about the bot");
+            _help.Add(("Administration", new Help("Information", "Random", new Argument[0], "Suggest a random command.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
@@ -33,6 +34,26 @@ namespace SanaraV3.Module.Administration
 {
     public class InformationModule : ModuleBase
     {
+        [Command("Random")]
+        public async Task RandomAsync()
+        {
+            var help = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), false, false);
+            var random = help[StaticObjects.Random.Next(0, help.Count)];
+
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = "Why not trying \"" + random.Item2.CommandName + "\"",
+                Description = "**" + random.Item2.CommandName + " " + string.Join(" ", random.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {random.Item2.Description}" +
+                        (random.Item2.Example != null ? $"\n*Example: {random.Item2.Example}*" : ""),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
+                }
+            }.Build());
+        }
+
         [Command("Logs")]
         public async Task LogsAsync()
         {
