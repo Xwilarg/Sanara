@@ -116,10 +116,10 @@ namespace SanaraV3.Game
                 introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
 
                 if (StaticObjects.Website != null)
-                    await StaticObjects.Website.AddGamePlayerAsync(_gameName, _argument, _lobby.GetUserCount());
+                    await StaticObjects.Website.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
             }
             else if (StaticObjects.Website != null)
-                await StaticObjects.Website?.AddGamePlayerAsync(_gameName, _argument, 1);
+                await StaticObjects.Website?.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
 
             _state = GameState.READY;
             await PostAsync(introMsg);
@@ -346,11 +346,11 @@ namespace SanaraV3.Game
             if (_state != GameState.LOST)
                 return;
 
-            int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
-
             string scoreSentence = "";
             if (_lobby == null && !_isCustomGame) // Score aren't saved in multiplayer games
             {
+                int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
+
                 if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
                 else
