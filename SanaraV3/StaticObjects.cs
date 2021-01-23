@@ -267,8 +267,8 @@ namespace SanaraV3
             }
             AllGameNames = allNames.ToArray();
 
-            _ = Task.Run(InitializeSubscriptions);
-            _ = Task.Run(InitializeAV);
+            _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Utils.LogErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
+            _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Utils.LogErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
 
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();
