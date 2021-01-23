@@ -20,7 +20,14 @@ namespace SanaraV3.Game.MultiplayerMode
         }
 
         public string PrePost()
-            => _users[_currentTurn].Mention + " turns to play";
+        {
+            string mention;
+            lock (_users)
+            {
+                mention = _users[_currentTurn].Mention;
+            }
+            return mention + " turns to play";
+        }
 
         public void PreAnswerCheck(IUser user)
         {
@@ -31,9 +38,12 @@ namespace SanaraV3.Game.MultiplayerMode
         public void AnswerIsCorrect(IUser user)
         {
             // We assume that the user who answer is the current one (check done in PreAnswerCheck)
-            _currentTurn++;
-            if (_currentTurn == _users.Count)
-                _currentTurn = 0;
+            lock (_users)
+            {
+                _currentTurn++;
+                if (_currentTurn == _users.Count)
+                    _currentTurn = 0;
+            }
         }
 
         public bool Loose()
