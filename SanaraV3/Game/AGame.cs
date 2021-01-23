@@ -23,6 +23,7 @@ namespace SanaraV3.Game
             _postMode = postMode;
             _multiplayerMode = multiplayerMode;
             _lobby = settings.Lobby;
+            _doesSaveScore = settings.DoesSaveScore;
 
             _gameName = preload.GetGameNames()[0];
             _argument = preload.GetNameArg();
@@ -348,14 +349,14 @@ namespace SanaraV3.Game
             int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
             string scoreSentence = "";
-            if (_lobby == null) // Score aren't saved in multiplayer games
+            if (_lobby == null || !_doesSaveScore) // Score aren't saved in multiplayer games
             {
                 if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
                 else
                 {
                     await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
-                    scoreSentence = $"You best your best score of {bestScore} with a new score of {_score}!";
+                    scoreSentence = $"You have beat your best score of {bestScore} with a new score of {_score}!";
                 }
             }
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
@@ -393,6 +394,7 @@ namespace SanaraV3.Game
         // SCORES
         private List<ulong> _contributors; // Users that contributed
         protected int _score;
+        private bool _doesSaveScore;
 
         // MULTIPLAYER
         protected MultiplayerLobby _lobby;

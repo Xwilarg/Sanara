@@ -20,10 +20,11 @@ namespace SanaraV3.Game.Impl
         /// <summary>
         /// Called by QuizzAudio
         /// </summary>
-        protected Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode) : base(textChan, user, preload, mode, new SpeedMode(), settings)
+        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode, bool doesCongratulate) : base(textChan, user, preload, mode, new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
+            _doesCongratulate = doesCongratulate;
         }
 
         public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedMode(), settings)
@@ -35,7 +36,7 @@ namespace SanaraV3.Game.Impl
         protected override string[] GetPostInternal()
         {
             if (_words.Count == 0)
-                throw new GameLost("All characters were found! Congratulations!");
+                throw new GameLost("All questions were answered! Congratulations!");
 
             _current = _words[StaticObjects.Random.Next(0, _words.Count)];
             _words.Remove(_current);
@@ -68,14 +69,16 @@ namespace SanaraV3.Game.Impl
 
         protected override string GetSuccessMessage(IUser user)
         {
+            if (!_doesCongratulate)
+                return null;
             if (_lobby != null)
                 return user.Username + " found the right answer.";
-            else
-                return "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
+            return "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
         }
 
         protected QuizzPreloadResult _current; // Word to guess
         protected List<QuizzPreloadResult> _words;
         protected readonly string[] _allValidNames;
+        private bool _doesCongratulate;
     }
 }

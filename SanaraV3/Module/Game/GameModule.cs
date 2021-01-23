@@ -1,9 +1,18 @@
 ﻿using Discord;
 using Discord.Commands;
+using Newtonsoft.Json;
 using SanaraV3.Attribute;
 using SanaraV3.Exception;
 using SanaraV3.Game;
+using SanaraV3.Game.Custom;
+using SanaraV3.Game.Impl;
+using SanaraV3.Game.Preload.Impl;
+using SanaraV3.Game.Preload.Result;
+using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,6 +84,28 @@ namespace SanaraV3.Module.Game
         {
             if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
                 await ReplyAsync("A game is already running in this channel.");
+            if (gameName.ToUpperInvariant() == "CUSTOM")
+            {
+                if (Context.Message.Attachments.Count == 0)
+                    throw new CommandFailed("You must attach the file containing game answers");
+
+                var url = Context.Message.Attachments.ToArray()[0].Url;
+                using WebClient wc = new WebClient();
+                byte[] buffer = wc.DownloadData(url);
+                var content = Encoding.Default.GetString(buffer);
+                Console.WriteLine(content);
+                CustomPreload preload;
+                try
+                {
+                    preload = new CustomPreload(JsonConvert.DeserializeObject<CustomGame>(content));
+                } catch (JsonException) {
+                    throw new CommandFailed("The JSON given can't be parsed");
+                }
+                var lobby = modes.Contains("multi") || modes.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
+                var game = preload.CreateGame(Context.Channel, Context.User, new GameSettings(lobby, false));
+                StaticObjects.Games.Add(game);
+                await game.StartWhenReadyAsync();
+            }
             else
             {
                 var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel, Context.User, modes);
@@ -139,7 +170,7 @@ namespace SanaraV3.Module.Game
                     if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                         throw new CommandFailed("This game can only be launched in a NSFW channel.");
                     var lobby = arguments.Contains("multi") || arguments.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                    return preload.CreateGame(textChan, user, new GameSettings(lobby));
+                    return preload.CreateGame(textChan, user, new GameSettings(lobby, true));
                 }
             }
             return null;
