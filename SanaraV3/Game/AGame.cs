@@ -23,7 +23,7 @@ namespace SanaraV3.Game
             _postMode = postMode;
             _multiplayerMode = multiplayerMode;
             _lobby = settings.Lobby;
-            _doesSaveScore = settings.DoesSaveScore;
+            _isCustomGame = settings.IsCustomGame;
 
             _gameName = preload.GetGameNames()[0];
             _argument = preload.GetNameArg();
@@ -42,7 +42,7 @@ namespace SanaraV3.Game
             _score = 0;
 
             if (StaticObjects.Website != null)
-                Task.Run(() => StaticObjects.Website.AddGameAsync(_gameName, _argument));
+                Task.Run(() => StaticObjects.Website.AddGameAsync(_isCustomGame ? "custom" : _gameName, _argument));
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
@@ -349,7 +349,7 @@ namespace SanaraV3.Game
             int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
             string scoreSentence = "";
-            if (_lobby == null && _doesSaveScore) // Score aren't saved in multiplayer games
+            if (_lobby == null && !_isCustomGame) // Score aren't saved in multiplayer games
             {
                 if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
@@ -394,7 +394,7 @@ namespace SanaraV3.Game
         // SCORES
         private List<ulong> _contributors; // Users that contributed
         protected int _score;
-        private bool _doesSaveScore;
+        private bool _isCustomGame;
 
         // MULTIPLAYER
         protected MultiplayerLobby _lobby;

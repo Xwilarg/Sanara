@@ -102,7 +102,7 @@ namespace SanaraV3.Module.Game
                     throw new CommandFailed("The JSON given can't be parsed");
                 }
                 var lobby = modes.Contains("multi") || modes.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                var game = preload.CreateGame(Context.Channel, Context.User, new GameSettings(lobby, false));
+                var game = preload.CreateGame(Context.Channel, Context.User, new GameSettings(lobby, true));
                 StaticObjects.Games.Add(game);
                 await game.StartWhenReadyAsync();
             }
@@ -170,7 +170,7 @@ namespace SanaraV3.Module.Game
                     if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                         throw new CommandFailed("This game can only be launched in a NSFW channel.");
                     var lobby = arguments.Contains("multi") || arguments.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                    return preload.CreateGame(textChan, user, new GameSettings(lobby, true));
+                    return preload.CreateGame(textChan, user, new GameSettings(lobby, false));
                 }
             }
             return null;
