@@ -14,12 +14,12 @@ namespace SanaraV3.Help
     {
         public void LoadRadioHelp()
         {
-            _submoduleHelp.Add("Radio", "Play musics in a vocal channel");
+            /*_submoduleHelp.Add("Radio", "Play musics in a vocal channel");
             _help.Add(("Radio", new Help("Radio", "Radio start", new Argument[0], "Make Sanara join your vocal channel.", new[] { "Skip radio" }, Restriction.PremiumOnly, null)));
             _help.Add(("Radio", new Help("Radio", "Radio add", new[] { new Argument(ArgumentType.MANDATORY, "keywords/id/url") }, "Add a music to the radio.", new[] { "Add radio" }, Restriction.PremiumOnly, "Radio add GgF9zH3Yv1I")));
             _help.Add(("Radio", new Help("Radio", "Radio remove", new[] { new Argument(ArgumentType.MANDATORY, "name/index") }, "Remove a radio from the playlist.", new[] { "Remove radio" }, Restriction.None, "Radio remove 1")));
             _help.Add(("Radio", new Help("Radio", "Radio skip", new Argument[0], "Skip the song that is currently being played.", new[] { "Skip radio" }, Restriction.None, null)));
-            _help.Add(("Radio", new Help("Radio", "Radio playlist", new Argument[0], "Display the current playlist.", new[] { "Playlist radio" }, Restriction.None, null)));
+            _help.Add(("Radio", new Help("Radio", "Radio playlist", new Argument[0], "Display the current playlist.", new[] { "Playlist radio" }, Restriction.None, null)));*/
         }
     }
 }
