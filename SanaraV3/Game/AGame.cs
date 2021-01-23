@@ -349,7 +349,7 @@ namespace SanaraV3.Game
             int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
             string scoreSentence = "";
-            if (_lobby == null || !_doesSaveScore) // Score aren't saved in multiplayer games
+            if (_lobby == null && _doesSaveScore) // Score aren't saved in multiplayer games
             {
                 if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
