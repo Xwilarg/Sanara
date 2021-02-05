@@ -66,8 +66,11 @@ namespace SanaraV3.Module.Tool
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
 
-            if (Context.Message.Attachments.Count == 0 || !Utils.IsImage(Path.GetExtension(Context.Message.Attachments.First().Url)))
-                throw new CommandFailed("This command have some invalid parameters.");
+            if (Context.Message.Attachments.Count == 0)
+                throw new CommandFailed("No text or image was attached.");
+
+            if (!Utils.IsImage(Path.GetExtension(Context.Message.Attachments.First().Url)))
+                throw new CommandFailed("The file attached was not an image");
 
             try
             {
