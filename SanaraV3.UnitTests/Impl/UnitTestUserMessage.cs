@@ -68,9 +68,20 @@ namespace SanaraV3.UnitTests.Impl
 
         public ulong Id => ulong.Parse(DateTime.Now.ToString("mmssff"));
 
+        public IUserMessage ReferencedMessage => throw new NotImplementedException();
+
+        public bool MentionedEveryone => throw new NotImplementedException();
+
+        public MessageFlags? Flags => throw new NotImplementedException();
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             return Task.CompletedTask;
+        }
+
+        public Task CrosspostAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
         }
 
         public Task DeleteAsync(RequestOptions options = null)
@@ -99,6 +110,11 @@ namespace SanaraV3.UnitTests.Impl
         }
 
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }

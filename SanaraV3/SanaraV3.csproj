@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
-    <PackageReference Include="BooruSharp" Version="3.0.1" />
+    <PackageReference Include="BooruSharp" Version="3.0.2" />
     <PackageReference Include="Discord.Net" Version="2.3.0" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.49.0.2225" />

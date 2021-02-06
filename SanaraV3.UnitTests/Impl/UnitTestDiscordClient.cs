@@ -28,6 +28,11 @@ namespace SanaraV3.UnitTests.Impl
             throw new System.NotImplementedException();
         }
 
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             throw new System.NotImplementedException();
