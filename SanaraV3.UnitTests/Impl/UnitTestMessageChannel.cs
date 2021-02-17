@@ -21,23 +21,6 @@ namespace SanaraV3.UnitTests.Impl
 
         public ulong Id => 0;
 
-        public async Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-        {
-            var msg = new UnitTestUserMessage(this, text, embed);
-            await _callback(msg);
-            return msg;
-        }
-
-        public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -93,9 +76,11 @@ namespace SanaraV3.UnitTests.Impl
             throw new NotImplementedException();
         }
 
-        public Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
+        public async Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
         {
-            throw new NotImplementedException();
+            var msg = new UnitTestUserMessage(this, text, embed);
+            await _callback(msg);
+            return msg;
         }
 
         public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
