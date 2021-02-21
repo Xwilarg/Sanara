@@ -6,6 +6,7 @@ using SanaraV3.Game.PostMode;
 using SanaraV3.Game.Preload;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanaraV3.Game
@@ -357,6 +358,12 @@ namespace SanaraV3.Game
                 {
                     await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
                     scoreSentence = $"You have beat your best score of {bestScore} with a new score of {_score}!";
+
+                    var guild = StaticObjects.Db.GetGuild(_guildId);
+                    string fullName = _argument == null ? _gameName : (_gameName + "-" + _argument);
+                    int myScore = guild.GetScore(fullName);
+                    var scores = StaticObjects.Db.GetAllScores(fullName);
+                    scoreSentence += "\nYou are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count;
                 }
             }
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
