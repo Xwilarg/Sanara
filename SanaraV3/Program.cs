@@ -161,7 +161,8 @@ namespace SanaraV3
 
             int pos = 0;
             ITextChannel textChan = msg.Channel as ITextChannel;
-            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || (textChan != null && msg.HasStringPrefix(StaticObjects.Db.GetGuild(textChan.GuildId).Prefix, ref pos)))
+            var prefix = textChan == null ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
+            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
             {
                 if (textChan != null && !StaticObjects.Help.IsModuleAvailable(textChan.GuildId, msg.Content.Substring(pos).ToLower()))
                 {
