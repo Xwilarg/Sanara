@@ -176,8 +176,8 @@ namespace SanaraV3.Module.Nsfw
                 elems.Add(new Diaporama.Impl.Doujinshi(doujinshi.url.AbsoluteUri, doujinshi.pages[0].imageUrl.AbsoluteUri, doujinshi.prettyTitle, doujinshi.tags.Select(x => x.name).ToArray(), doujinshi.id));
             }
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
-            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
         }
 
         [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
@@ -198,8 +198,8 @@ namespace SanaraV3.Module.Nsfw
                 elems.Add(new Diaporama.Impl.Doujinshi(doujinshi.url.AbsoluteUri, doujinshi.pages[0].imageUrl.AbsoluteUri, doujinshi.prettyTitle, doujinshi.tags.Select(x => x.name).ToArray(), doujinshi.id));
             }
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
-            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
         }
 
         private Embed FormatDoujinshi(GalleryElement result)
@@ -218,33 +218,39 @@ namespace SanaraV3.Module.Nsfw
             }.Build();
         }
 
+        [Command("Dlrand", RunMode = RunMode.Async), RequireNsfw]
+        public async Task Dlrand()
+        {
+
+        }
+
         [Command("Dlsite", RunMode = RunMode.Async), RequireNsfw]
         public async Task Dlsite([Remainder]string query = "")
         {
-            var html = await StaticObjects.HttpClient.GetStringAsync("https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category[0]/male/keyword/" + string.Join("+", query.Split(' ')));
+            var html = await StaticObjects.HttpClient.GetStringAsync("https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category%5B0%5D/male/ana_flg/all/order%5B0%5D/trend/genre_and_or/or/options_and_or/or/per_page/100/show_type/1/from/fsr.again/keyword/" + query);
 
             // Parse HTML to only keep search results
             html = html.Split(new[] { "id=\"search_result_list\"" }, StringSplitOptions.None)[1];
             html = html.Split(new[] { "class=\"result_contents\"" }, StringSplitOptions.None)[0];
 
             var elems = new List<Diaporama.Impl.Dlsite>();
-            foreach (var elem in html.Split("search_result_img_box_inner", StringSplitOptions.None).Skip(1))
+            foreach (var elem in html.Split("work_1col_thumb", StringSplitOptions.None).Skip(1))
             {
                 var url = Regex.Match(elem, "href=\"([^\"]+)\"").Groups[1].Value;
+                var preview = "http:" + Regex.Match(elem, "src=\"([^\"]+)\"").Groups[1].Value;
+                var name = Regex.Match(elem, "alt=\"([^\"]+)\"").Groups[1].Value;
+                var id = long.Parse(Regex.Match(elem, "[A-Z]{2}([^\\.]+)\\.html").Groups[1].Value);
                 var rating = Regex.Match(elem, "star_rating star_([0-9]{2})");
-                elems.Add(new(
-                    url, // URL
-                    "http:" + Regex.Match(elem, "src=\"([^\"]+)\"").Groups[1].Value, // Preview
-                    Regex.Match(elem, "alt=\"([^\"]+)\"").Groups[1].Value, // Name
-                    long.Parse(Regex.Match(elem, "[A-Z]{2}([^\\.]+)\\.html").Groups[1].Value), // Id
-                    rating.Length > 1 ? int.Parse(rating.Groups[1].Value) / 10f : null, // Rating
-                    Regex.Match(elem, "<span class=\"_dl_count_[A-Z]{2}[0-9]+\">([0-9,]+)").Groups[1].Value.Replace(',', ' '), // Nb of download
-                    Regex.Match(elem, "<span class=\"work_price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ') // Price
-                    ));
+                var nbDownload = Regex.Match(elem, "<span class=\"_dl_count_[A-Z]{2}[0-9]+\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
+                var price = Regex.Match(elem, "<span class=\"work_price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
+                var description = Regex.Match(elem, "<dd class=\"work_text\">([^<]+)+").Groups[1].Value;
+                var tags = Regex.Matches(elem, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                var type = Regex.Match(elem, "work_type[^\"]+\">([^<]+)").Groups[1].Value;
+                elems.Add(new(url, preview, name, id, rating.Length > 1 ? int.Parse(rating.Groups[1].Value) / 10f : null, nbDownload, price, description, tags, type));
             }
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
-            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
         }
     }
 }

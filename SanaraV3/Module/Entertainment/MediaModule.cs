@@ -102,8 +102,8 @@ namespace SanaraV3.Module.Entertainment
                 throw new CommandFailed("There is no safe post available in this subreddit");
             }
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
-            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
+            await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
         }
 
         private Diaporama.Impl.Reddit GetRedditEmbed(JToken elem) // Parse a JSON and get a Reddit object out of it

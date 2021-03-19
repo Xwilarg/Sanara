@@ -105,8 +105,15 @@ namespace SanaraV3.Diaporama
                 Title = elem.Title,
                 Url = elem.Url,
                 ImageUrl = elem.ImageUrl,
+                Description = elem.Description,
                 Fields = new List<EmbedFieldBuilder>
                 {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Type",
+                        Value = elem.Type,
+                        IsInline = true
+                    },
                     new EmbedFieldBuilder
                     {
                         Name = "Price",
@@ -128,7 +135,7 @@ namespace SanaraV3.Diaporama
                 },
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Page {currPage} out of {maxPage}"
+                    Text = $"Tags: {string.Join(", ", elem.Tags)}\nPage {currPage} out of {maxPage}"
                 }
             }.Build();
         }
