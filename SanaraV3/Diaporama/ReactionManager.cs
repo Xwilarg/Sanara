@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using SanaraV3.Diaporama.Impl;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,10 +22,12 @@ namespace SanaraV3.Diaporama
                 if (nextPage != elem.CurrentPage) // No need to modify anything if we didn't change the page
                 {
                     var next = elem.Elements[nextPage];
-                    if (next is Reddit)
-                        await dMsg.ModifyAsync(x => x.Embed = Post((Reddit)next, nextPage + 1, elem.Elements.Length));
-                    else if (next is Doujinshi)
-                        await dMsg.ModifyAsync(x => x.Embed = Post((Doujinshi)next, nextPage + 1, elem.Elements.Length));
+                    if (next is Reddit reddit)
+                        await dMsg.ModifyAsync(x => x.Embed = Post(reddit, nextPage + 1, elem.Elements.Length));
+                    else if (next is Doujinshi doujinshi)
+                        await dMsg.ModifyAsync(x => x.Embed = Post(doujinshi, nextPage + 1, elem.Elements.Length));
+                    else if (next is Dlsite dlsite)
+                        await dMsg.ModifyAsync(x => x.Embed = Post(dlsite, nextPage + 1, elem.Elements.Length));
                     else
                         throw new ArgumentException("Unknown type for next");
                     StaticObjects.Diaporamas[msg.Id].CurrentPage = nextPage;
@@ -90,6 +93,42 @@ namespace SanaraV3.Diaporama
                 Footer = new EmbedFooterBuilder
                 {
                     Text = $"Do the 'Download doujinshi' command with the id '{doujin.Id}' to download the doujinshi.\nPage {currPage} out of {maxPage}"
+                }
+            }.Build();
+        }
+
+        public static Embed Post(Dlsite elem, int currPage, int maxPage)
+        {
+            return new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Title = elem.Title,
+                Url = elem.Url,
+                ImageUrl = elem.ImageUrl,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Price",
+                        Value = elem.Price + " ¥",
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Rating",
+                        Value = elem.Rating.HasValue ? elem.Rating.Value + " / 5" : "Not rated",
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Number of Download",
+                        Value = elem.NbDownload == "" ? "Not release yet" : elem.NbDownload,
+                        IsInline = true
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Page {currPage} out of {maxPage}"
                 }
             }.Build();
         }

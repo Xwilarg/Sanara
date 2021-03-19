@@ -45,21 +45,22 @@ namespace SanaraV3
 
         public async Task StartAsync()
         {
-            // Setting Logs callback
-            StaticObjects.Client.Log += Utils.Log;
-            _commands.Log += Log.ErrorAsync;
             await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
-
-            // Load credentials
-            if (!File.Exists("Keys/Credentials.json"))
-                throw new FileNotFoundException("Missing Credentials file");
-            var _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
 
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
             if (!Directory.Exists("Saves/Radio")) Directory.CreateDirectory("Saves/Radio");
             if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
             if (!Directory.Exists("Saves/Game")) Directory.CreateDirectory("Saves/Game");
+
+            // Setting Logs callback
+            StaticObjects.Client.Log += Utils.Log;
+            _commands.Log += Log.ErrorAsync;
+
+            // Load credentials
+            if (!File.Exists("Keys/Credentials.json"))
+                throw new FileNotFoundException("Missing Credentials file");
+            var _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
 
             // Set culture to invarriant (so we don't use , instead of . for decimal separator)
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
