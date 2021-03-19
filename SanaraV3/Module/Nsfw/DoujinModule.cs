@@ -11,8 +11,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SanaraV3.Help
 {
@@ -23,6 +26,7 @@ namespace SanaraV3.Help
             _submoduleHelp.Add("Doujinshi", "Get self published work");
             _help.Add(("Nsfw", new Help("Doujin", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin", "Nhentai" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
             _help.Add(("Nsfw", new Help("Doujin", "Dlsite", new[] { new Argument(ArgumentType.MANDATORY, "query") }, "Get the most popular work from dlsite given a query.", Array.Empty<string>(), Restriction.Nsfw, "Dlsite 艦隊")));
+            _help.Add(("Nsfw", new Help("Doujin", "Dlrand", Array.Empty<Argument>(), "Get a random work from dlsite.", Array.Empty<string>(), Restriction.Nsfw, null)));
             _help.Add(("Nsfw", new Help("Doujin", "Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", new[] { "Download doujin" }, Restriction.Nsfw, "Download doujin 321633")));
             _help.Add(("Nsfw", new Help("Doujin", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin", "Subscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
             _help.Add(("Nsfw", new Help("Doujin", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin", "Unsubscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
@@ -221,7 +225,61 @@ namespace SanaraV3.Module.Nsfw
         [Command("Dlrand", RunMode = RunMode.Async), RequireNsfw]
         public async Task Dlrand()
         {
+            var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
+            var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
 
+            var html = await StaticObjects.HttpClient.GetStringAsync(url);
+            int maxId = int.Parse(Regex.Match(html, "RJ([0-9]+)\\.html").Groups[1].Value) + 1;
+            int id;
+            string doujinUrl;
+            HttpResponseMessage msg;
+
+            do
+            {
+                id = StaticObjects.Random.Next(1, maxId);
+                doujinUrl = "https://www.dlsite.com/maniax/work/=/product_id/RJ" + id + ".html";
+                msg = await StaticObjects.HttpClient.GetAsync(doujinUrl);
+            } while (msg.StatusCode == HttpStatusCode.NotFound);
+            html = await msg.Content.ReadAsStringAsync();
+
+            var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
+            title = title[0..^9];
+            var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
+            var description = Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value;
+            var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
+            var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
+            html = html.Contains("main_genre") ?
+                html.Split(new[] { "main_genre" }, StringSplitOptions.None)[1].Split(new[] { "</dd>" }, StringSplitOptions.None)[0]
+                : "";
+            var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Title = title,
+                Url = doujinUrl,
+                ImageUrl = imageUrl,
+                Description = description,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Type",
+                        Value = type,
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Price",
+                        Value = price + " ¥",
+                        IsInline = true
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Tags: {string.Join(", ", tags)}"
+                }
+            }.Build());
         }
 
         [Command("Dlsite", RunMode = RunMode.Async), RequireNsfw]
@@ -243,9 +301,12 @@ namespace SanaraV3.Module.Nsfw
                 var rating = Regex.Match(elem, "star_rating star_([0-9]{2})");
                 var nbDownload = Regex.Match(elem, "<span class=\"_dl_count_[A-Z]{2}[0-9]+\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
                 var price = Regex.Match(elem, "<span class=\"work_price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
-                var description = Regex.Match(elem, "<dd class=\"work_text\">([^<]+)+").Groups[1].Value;
-                var tags = Regex.Matches(elem, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                var description = HttpUtility.HtmlDecode(Regex.Match(elem, "<dd class=\"work_text\">([^<]+)+").Groups[1].Value);
                 var type = Regex.Match(elem, "work_type[^\"]+\">([^<]+)").Groups[1].Value;
+                var subElem = elem.Contains("search_tag") ?
+                    elem.Split(new[] { "search_tag" }, StringSplitOptions.None)[1].Split(new[] { "</dd>" }, StringSplitOptions.None)[0]
+                    : "";
+                var tags = Regex.Matches(subElem, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
                 elems.Add(new(url, preview, name, id, rating.Length > 1 ? int.Parse(rating.Groups[1].Value) / 10f : null, nbDownload, price, description, tags, type));
             }
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
