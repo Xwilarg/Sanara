@@ -73,7 +73,7 @@ namespace SanaraV3.Module.Nsfw
                 Match m = Regex.Match(html2, "<img id=\"img\" src=\"([^\"]+)\"");
                 string url = m.Groups[1].Value;
                 string extension = "." + url.Split('.').Last();
-                File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + DoujinshiModule.Get3DigitNumber(i.ToString()) + extension,
+                File.WriteAllBytes("Saves/Download/" + path + "/" + idStr + "/" + DoujinModule.Get3DigitNumber(i.ToString()) + extension,
                 await StaticObjects.HttpClient.GetByteArrayAsync(url));
                 if (i == limitPages)
                 {

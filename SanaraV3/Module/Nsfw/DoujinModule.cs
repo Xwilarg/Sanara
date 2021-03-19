@@ -18,21 +18,21 @@ namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {
-        public void LoadDoujinshiHelp()
+        public void LoadDoujinHelp()
         {
-            _submoduleHelp.Add("Doujinshi", "Get self published manga");
-            _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin", "Nhentai" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", new[] { "Download doujin" }, Restriction.Nsfw, "Download doujin 321633")));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin", "Subscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin", "Unsubscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
-            _help.Add(("Nsfw", new Help("Doujinshi", "Doujinshi popularity", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get the most popular doujinshi given some tags. If none are provided, give the trending ones.", new[] { "Doujinshi popularity", "Doujinshi p", "Doujin p", "Doujin popularity", "Nhentai p", "Nhentai popularity" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
+            _submoduleHelp.Add("Doujinshi", "Get self published work");
+            _help.Add(("Nsfw", new Help("Doujin", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin", "Nhentai" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
+            _help.Add(("Nsfw", new Help("Doujin", "Download doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Download a doujinshi given its id.", new[] { "Download doujin" }, Restriction.Nsfw, "Download doujin 321633")));
+            _help.Add(("Nsfw", new Help("Doujin", "Subscribe doujinshi", new[] { new Argument(ArgumentType.MANDATORY, "text channel"), new Argument(ArgumentType.OPTIONAL, "tags") }, "Get information on all new doujinshi in a channel.", new[] { "Subscribe doujin", "Subscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, "Subscribe doujinshi +\"ke-ta\"")));
+            _help.Add(("Nsfw", new Help("Doujin", "Unsubscribe doujinshi", new Argument[0], "Remove a doujinshi subscription.", new[] { "Unsubscribe doujin", "Unsubscribe nhentai" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
+            _help.Add(("Nsfw", new Help("Doujin", "Doujinshi popularity", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get the most popular doujinshi given some tags. If none are provided, give the trending ones.", new[] { "Doujinshi popularity", "Doujinshi p", "Doujin p", "Doujin popularity", "Nhentai p", "Nhentai popularity" }, Restriction.Nsfw | Restriction.AdminOnly, null)));
         }
     }
 }
 
 namespace SanaraV3.Module.Nsfw
 {
-    public sealed class DoujinshiModule : ModuleBase
+    public sealed class DoujinModule : ModuleBase
     {
         [Command("Subscribe doujinshi"), Alias("Subscribe doujin", "Subscribe nhentai"), RequireNsfw, RequireAdmin]
         public async Task SubscribeDoujinshiAsync(ITextChannel chan, params string[] tags)

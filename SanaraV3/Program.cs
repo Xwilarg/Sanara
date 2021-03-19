@@ -104,7 +104,7 @@ namespace SanaraV3
             await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
             await _commands.AddModuleAsync<Module.Game.GameModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.BooruModule>(null);
-            await _commands.AddModuleAsync<Module.Nsfw.DoujinshiModule>(null);
+            await _commands.AddModuleAsync<Module.Nsfw.DoujinModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.CosplayModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.VideoModule>(null);
             await _commands.AddModuleAsync<Module.Radio.RadioModule>(null);

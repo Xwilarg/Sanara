@@ -33,7 +33,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Module.Nsfw.DoujinshiModule();
+            var mod = new Module.Nsfw.DoujinModule();
             Common.AddContext(mod, callback);
             await mod.GetDoujinshiAsync(tags);
             while (!isDone)
@@ -52,7 +52,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Module.Nsfw.DoujinshiModule();
+            var mod = new Module.Nsfw.DoujinModule();
             Common.AddContext(mod, callback);
             await mod.GetDoujinshiAsync();
             while (!isDone)

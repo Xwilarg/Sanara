@@ -16,7 +16,7 @@ namespace SanaraV3.Help
             LoadBooruHelp();
             LoadCommunicationHelp();
             LoadCosplayHelp();
-            LoadDoujinshiHelp();
+            LoadDoujinHelp();
             LoadFunHelp();
             LoadGameHelp();
             LoadGameInfoHelp();
