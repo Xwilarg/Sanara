@@ -243,9 +243,9 @@ namespace SanaraV3.Module.Nsfw
             html = await msg.Content.ReadAsStringAsync();
 
             var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
-            title = title[0..^9];
+            title = HttpUtility.HtmlDecode(title[0..^9]);
             var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
-            var description = Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value;
+            var description = HttpUtility.HtmlDecode(Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value);
             var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
             var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
             html = html.Contains("main_genre") ?
