@@ -23,7 +23,7 @@ namespace SanaraV3.Help
     {
         public void LoadDoujinHelp()
         {
-            _submoduleHelp.Add("Doujinshi", "Get self published work");
+            _submoduleHelp.Add("Doujin", "Get self published work");
             _help.Add(("Nsfw", new Help("Doujin", "Doujinshi", new[] { new Argument(ArgumentType.OPTIONAL, "tags/id") }, "Get a random doujinshi. You can either provide some tags or directly give its id.", new[] { "Doujin", "Nhentai" }, Restriction.Nsfw, "Doujinshi kancolle yuri")));
             _help.Add(("Nsfw", new Help("Doujin", "Dlsite", new[] { new Argument(ArgumentType.MANDATORY, "query") }, "Get the most popular work from dlsite given a query.", Array.Empty<string>(), Restriction.Nsfw, "Dlsite 艦隊")));
             _help.Add(("Nsfw", new Help("Doujin", "Dlrand", Array.Empty<Argument>(), "Get a random work from dlsite.", Array.Empty<string>(), Restriction.Nsfw, null)));
