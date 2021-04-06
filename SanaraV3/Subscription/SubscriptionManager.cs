@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Net;
 using DiscordUtils;
 using SanaraV3.Subscription.Impl;
 using System.Collections.Generic;
@@ -91,6 +92,11 @@ namespace SanaraV3.Subscription
                                         await elem.TextChan.SendMessageAsync(embed: data.Embed);
                                     }
                                 }
+                            }
+                            catch (HttpException http)
+                            {
+                                if (http.DiscordCode != 50001) // Missing access to the channel
+                                    throw;
                             }
                             catch (System.Exception e)
                             {
