@@ -42,7 +42,3 @@ If you have any wonder about what the bot collect on you and how you can get/del
 
 ## Others
 You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
-
-Preview:<br/>
-![Preview](https://files.zirk.eu/Sanara/Preview.gif)<br/>
-<sup>This GIF is from an old version of the bot</sup>
