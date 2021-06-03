@@ -23,7 +23,7 @@ namespace SanaraV3.Help
             _help.Add(("Tool", new Help("Communication", "BotInfo", new Argument[0], "Get information about the bot.", new string[0], Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "ServerInfo", new Argument[0], "Get information about the server.", new[] { "GuildInfo" }, Restriction.None, null)));
             _help.Add(("Tool", new Help("Communication", "Invite", new Argument[0], "Get the bot invitation link.", new string[0], Restriction.None, null)));
-            _help.Add(("Tool", new Help("Communication", "Random", new Argument[0], "Suggest a random command.", new string[0], Restriction.None, null)));
+            _help.Add(("Tool", new Help("Communication", "RandomCmd", new Argument[0], "Suggest a random command.", new string[0], Restriction.None, null)));
         }
     }
 }
@@ -204,7 +204,7 @@ namespace SanaraV3.Module.Tool
             await QuoteInternalAsync(msg);
         }
 
-        [Command("Random")]
+        [Command("RandomCmd"), Alias("RandomCommand")]
         public async Task RandomAsync()
         {
             var help = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, Context.Channel is ITextChannel chan ? chan.IsNsfw : true, false, false);
