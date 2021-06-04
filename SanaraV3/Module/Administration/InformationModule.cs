@@ -123,7 +123,7 @@ namespace SanaraV3.Module.Administration
         [Command("Help")]
         public async Task Help()
         {
-            await ReplyAsync(embed: GetHelpEmbed());
+            await ReplyAsync(embed: await GetHelpEmbedAsync());
         }
 
         private bool IsNsfw()
@@ -132,13 +132,21 @@ namespace SanaraV3.Module.Administration
         private bool IsAdmin()
             => Context.User is IGuildUser user ? Context.Guild.OwnerId == user.Id || user.GuildPermissions.ManageGuild : true;
 
-        private bool IsOwner()
-            => Context.User.Id == 144851584478740481; // TODO: Don't hardcode this
+        private async Task<bool> IsOwnerAsync()
+        {
+            if (_ownerId == 0)
+            {
+                _ownerId = (await StaticObjects.Client.GetApplicationInfoAsync()).Owner.Id;
+            }
+            return Context.User.Id == _ownerId;
+        }
 
-        private Embed GetHelpEmbed()
+        private static ulong _ownerId = 0;
+
+        private async Task<Embed> GetHelpEmbedAsync()
         {
             Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner()))
+            foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), await IsOwnerAsync()))
             {
                 if (!modules.ContainsKey(help.Item1))
                     modules.Add(help.Item1, new List<string>());
@@ -179,7 +187,7 @@ namespace SanaraV3.Module.Administration
                         "(argument): Optional argument"
                 }
             };
-            var fullHelp = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), IsOwner());
+            var fullHelp = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), await IsOwnerAsync());
             if (fullHelp.Any(x => x.Item2.SubmoduleName.ToUpper() == name))
             {
                 StringBuilder str = new StringBuilder();
