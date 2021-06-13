@@ -3,15 +3,16 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SanaraV3.Exception;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using VndbSharp;
 using VndbSharp.Models;
-using WebSocketSharp;
 
 namespace SanaraV3.Help
 {
@@ -21,7 +22,7 @@ namespace SanaraV3.Help
         {
             _submoduleHelp.Add("Fun", "Various small entertainement commands");
             _help.Add(("Entertainment", new Help("Fun", "Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", new string[0], Restriction.None, null)));
-            _help.Add(("Entertainment", new Help("Fun", "Complete", new[] { new Argument(ArgumentType.MANDATORY, "sentence") }, "Complete the given sentence using machine learning.", new string[0], Restriction.None, "Complete Why can't cats just")));
+            _help.Add(("Entertainment", new Help("Fun", "Complete", new[] { new Argument(ArgumentType.OPTIONAL, "sentence") }, "Complete the given sentence using machine learning.", new string[0], Restriction.None, "Complete Why can't cats just")));
             _help.Add(("Entertainment", new Help("Fun", "Photo", new[] { new Argument(ArgumentType.OPTIONAL, "query") }, "Get a photo given some search terms, if none is provided, get a random one.", new string[0], Restriction.None, "Photo France")));
             _help.Add(("Entertainment", new Help("Fun", "VNQuote", new Argument[0], "Get a quote from a random Visual Novel.", new string[0], Restriction.Nsfw, null)));
         }
@@ -94,77 +95,24 @@ namespace SanaraV3.Module.Entertainment
         }
 
         [Command("Complete", RunMode = RunMode.Async)]
-        public async Task CompleteAsync([Remainder]string sentence)
+        public async Task CompleteAsync([Remainder]string sentence = "")
         {
-            IUserMessage msg = null;
-            string content = sentence;
-            string oldContent = content;
-
-            var ws = new WebSocket("wss://bellard.org/textsynth/ws");
-            ws.Origin = "https://bellard.org";
-
-            // Since we may receive a lot of messages from the website, we don't update the embed everytimes we get one
-            // Instead we store it in "content"
-            ws.OnMessage += (sender, e) =>
+            var embed = new EmbedBuilder
             {
-                // We need to escape things because of Discord
-                content += e.Data.Replace("*", "\\*").Replace("_", "\\_");
+                Description = "Please wait, this can take up to a few minutes...",
+                Color = Color.Blue
             };
-
-            ws.OnError += (sender, e) =>
+            var msg = await ReplyAsync(embed: embed.Build());
+            var timer = DateTime.Now;
+            var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
+            resp.EnsureSuccessStatusCode();
+            embed.Footer = new EmbedFooterBuilder
             {
-                content = null;
-                _ = Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Exception.Source, e.Message, e.Exception));
+                Text = $"Time elapsed: {(DateTime.Now - timer).TotalSeconds.ToString("0.00")}s"
             };
-
-            ws.OnClose += (sender, e) =>
-            {
-                // Sometimes the connection close before we even send the message
-                if (msg != null)
-                {
-                    msg.ModifyAsync(x => x.Embed = new EmbedBuilder
-                    {
-                        Color = Color.Blue,
-                        Description = content
-                    }.Build()).GetAwaiter().GetResult();
-                }
-                content = null;
-            };
-
-            ws.Connect();
-            ws.Send("g,1558M,40,0.9,1," + StaticObjects.Random.Next(0, int.MaxValue) + "," + sentence);
-
-            msg = await ReplyAsync("", false, new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Description = content,
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "Please wait for the bot to update the embed"
-                }
-            }.Build());
-            
-            // We keep waiting for update until the connection close or an error occur
-            await Task.Run(async () =>
-            {
-                while (content != null)
-                {
-                    await Task.Delay(2000);
-                    if (content != null && oldContent != content)
-                    {
-                        await msg.ModifyAsync(x => x.Embed = new EmbedBuilder
-                        {
-                            Color = Color.Blue,
-                            Description = content,
-                            Footer = new EmbedFooterBuilder
-                            {
-                                Text = "Please wait for the bot to update the embed"
-                            }
-                        }.Build());
-                    }
-                    oldContent = content;
-                }
-            });
+            var json = await resp.Content.ReadAsStringAsync();
+            embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JObject>(json)["completion"].Value<string>();
+            await msg.ModifyAsync(x => x.Embed = embed.Build());
         }
     }
 }
