@@ -104,7 +104,7 @@ namespace SanaraV3.Module.Entertainment
             };
             var msg = await ReplyAsync(embed: embed.Build());
             var timer = DateTime.Now;
-            var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
+            var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"").Replace("\n", "\\n") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
             resp.EnsureSuccessStatusCode();
             embed.Footer = new EmbedFooterBuilder
             {
