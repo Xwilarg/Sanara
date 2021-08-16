@@ -124,37 +124,43 @@ namespace SanaraV3.Module.Entertainment
 
             string html;
             // HttpClient doesn't really look likes to handle redirection properly
-            using (HttpWebResponse response = GetHttpResponse(http))
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                html = reader.ReadToEnd();
-            }
+            using HttpWebResponse response = GetHttpResponse(http);
+            using Stream stream = response.GetResponseStream();
+            using StreamReader reader = new(stream);
+            html = reader.ReadToEnd();
 
-            // Parse HTML and go though every VN, check the original name and translated name to get the VN id
-            // TODO: Use string length for comparison
             uint id = 0;
-            MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
-            foreach (Match match in matches)
+            if (response.StatusCode == HttpStatusCode.OK) // Search succeed
             {
-                string titleName = Utils.CleanWord(match.Groups[3].Value);
-                string titleNameBase = match.Groups[2].Value;
-                if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
-                    id = uint.Parse(match.Groups[1].Value);
-                if (titleName == name || titleNameBase == name)
+                // Parse HTML and go though every VN, check the original name and translated name to get the VN id
+                // TODO: Use string length for comparison
+                MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
+                foreach (Match match in matches)
                 {
-                    id = uint.Parse(match.Groups[1].Value);
-                    break;
+                    string titleName = Utils.CleanWord(match.Groups[3].Value);
+                    string titleNameBase = match.Groups[2].Value;
+                    if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
+                        id = uint.Parse(match.Groups[1].Value);
+                    if (titleName == name || titleNameBase == name)
+                    {
+                        id = uint.Parse(match.Groups[1].Value);
+                        break;
+                    }
+                }
+                // If no matching name, we take the first one in the search list, if none these NotFound
+                if (id == 0)
+                {
+                    if (matches.Count == 0)
+                        throw new CommandFailed("Nothing was found with this name.");
+                    id = uint.Parse(matches[0].Groups[1].Value);
                 }
             }
-
-            // If no matching name, we take the first one in the search list, if none these NotFound
-            if (id == 0)
+            else // Only one VN found, search is trying to redirect us
             {
-                if (matches.Count == 0)
-                    throw new CommandFailed("Nothing was found with this name.");
-                id = uint.Parse(matches[0].Groups[1].Value);
+                id = uint.Parse(response.Headers["Location"][2..]); // VN ID is the location which is in format /VXXXX, XXXX being our numbers
             }
+
+
             var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
 
             var embed = new EmbedBuilder()
