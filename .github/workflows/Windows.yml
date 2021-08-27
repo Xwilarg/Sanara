@@ -32,7 +32,7 @@ jobs:
     - name: Get ReThinkdb config
       run: curl https://raw.githubusercontent.com/rethinkdb/rethinkdb/next/packaging/assets/config/default.conf.sample -o default.conf
     - name: Start ReThinkdb
-      run: start rethinkdb.exe --config-file default.conf
+      run: start rethinkdb.exe install-service --config-file default.conf
     - name: Test
       env:
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
