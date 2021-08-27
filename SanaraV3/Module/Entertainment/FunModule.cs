@@ -111,7 +111,7 @@ namespace SanaraV3.Module.Entertainment
                 Text = $"Time elapsed: {(DateTime.Now - timer).TotalSeconds.ToString("0.00")}s"
             };
             var json = await resp.Content.ReadAsStringAsync();
-            embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JObject>(json)["completion"].Value<string>();
+            embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
             await msg.ModifyAsync(x => x.Embed = embed.Build());
         }
     }
