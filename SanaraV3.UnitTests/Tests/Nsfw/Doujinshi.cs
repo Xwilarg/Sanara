@@ -21,7 +21,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.True(Utils.IsImage(Path.GetExtension(embed.Image.Value.Url)), embed.Image.Value.Url + " is not an image.");
         }
 
-        [TestCase("kancolle")]
+        [TestCase("hololive")]
         [TestCase("ikazuchi color")]
         public async Task DoujinshiTest(string tags)
         {
