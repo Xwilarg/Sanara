@@ -31,10 +31,7 @@ namespace SanaraV3.Help
 
 namespace SanaraV3.Module.Entertainment
 {
-    /// <summary>
-    /// All "Fun" commands that have no real purposes
-    /// </summary>
-    public sealed class FunModule : ModuleBase
+    public sealed class FunNsfwModule : ModuleBase
     {
         [Command("VNQuote"), RequireNsfw]
         public async Task VNQuote()
@@ -51,7 +48,13 @@ namespace SanaraV3.Module.Entertainment
                 Color = Color.Blue
             }.Build());
         }
+    }
 
+    /// <summary>
+    /// All "Fun" commands that have no real purposes
+    /// </summary>
+    public sealed class FunModule : ModuleBase
+    {
         [Command("Photo", RunMode = RunMode.Async)]
         public async Task PhotoAsync()
         {

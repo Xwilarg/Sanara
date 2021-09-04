@@ -33,6 +33,43 @@ namespace SanaraV3.Help
 
 namespace SanaraV3.Module.Tool
 {
+    public sealed class LanguageNsfwModule : ModuleBase
+    {
+
+        [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
+        public async Task UrbanAsync([Remainder] string query)
+        {
+            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(query)));
+            if (json["list"].Value<JArray>().Count == 0)
+                throw new CommandFailed("There is no definition for this query.");
+            string definition = json["list"][0]["definition"].Value<string>();
+            if (definition.Length > 1000)
+                definition = definition.Substring(0, 1000) + " [...]";
+            string example = json["list"][0]["example"].Value<string>();
+            if (example.Length > 1000)
+                example = example.Substring(0, 1000) + " [...]";
+            await ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = char.ToUpper(query[0]) + string.Concat(query.ToLower().Skip(1)),
+                Url = json["list"][0]["permalink"].Value<string>(),
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Definition",
+                        Value = definition
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Example",
+                        Value = example
+                    }
+                }
+            }.Build());
+        }
+    }
+
     public sealed class LanguageModule : ModuleBase
     {
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
@@ -124,39 +161,6 @@ namespace SanaraV3.Module.Tool
             {
                 throw new CommandFailed("The language you provided is invalid.");
             }
-        }
-
-        [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
-        public async Task UrbanAsync([Remainder]string query)
-        {
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(query)));
-            if (json["list"].Value<JArray>().Count == 0)
-                throw new CommandFailed("There is no definition for this query.");
-            string definition = json["list"][0]["definition"].Value<string>();
-            if (definition.Length > 1000)
-                definition = definition.Substring(0, 1000) + " [...]";
-            string example = json["list"][0]["example"].Value<string>();
-            if (example.Length > 1000)
-                example = example.Substring(0, 1000) + " [...]";
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = char.ToUpper(query[0]) + string.Concat(query.ToLower().Skip(1)),
-                Url = json["list"][0]["permalink"].Value<string>(),
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Definition",
-                        Value = definition
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Example",
-                        Value = example
-                    }
-                }
-            }.Build());
         }
 
         [Command("Kanji", RunMode = RunMode.Async)]

@@ -29,6 +29,10 @@ namespace SanaraV3.Help
             LoadSettingHelp();
             LoadVideoHelp();
 
+#if !NSFW_BUILD
+            _help.RemoveAll(x => (x.Item2.Restriction & Restriction.Nsfw) != 0);
+#endif
+
             File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(_help));
         }
 #pragma warning restore CS0649

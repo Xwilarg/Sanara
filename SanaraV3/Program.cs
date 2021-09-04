@@ -98,16 +98,20 @@ namespace SanaraV3
             // Discord modules
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
-            await _commands.AddModuleAsync<Module.Community.CommunityModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.GameInfoModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.JapaneseModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
             await _commands.AddModuleAsync<Module.Game.GameModule>(null);
+#if NSFW_BUILD
+            await _commands.AddModuleAsync<Module.Entertainment.FunNsfwModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.BooruModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.DoujinModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.CosplayModule>(null);
             await _commands.AddModuleAsync<Module.Nsfw.VideoModule>(null);
+            await _commands.AddModuleAsync<Module.Tool.LanguageNsfwModule>(null);
+#endif
+            await _commands.AddModuleAsync<Module.Nsfw.BooruSfwModule>(null);
             await _commands.AddModuleAsync<Module.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Module.Tool.CommunicationModule>(null);
             await _commands.AddModuleAsync<Module.Tool.LanguageModule>(null);

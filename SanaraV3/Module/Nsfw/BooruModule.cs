@@ -17,55 +17,36 @@ namespace SanaraV3.Help
         public void LoadBooruHelp()
         {
             _submoduleHelp.Add("Booru", "Get anime images given some tags");
-            _help.Add(("Nsfw", new Help("Booru", "Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", new string[0], Restriction.None, "Safebooru kantai_collection")));
-            _help.Add(("Nsfw", new Help("Booru", "E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", new string[0], Restriction.None, "E926 short_hair")));
-            _help.Add(("Nsfw", new Help("Booru", "Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", new string[0], Restriction.Nsfw, "Gelbooru cirno")));
-            _help.Add(("Nsfw", new Help("Booru", "E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", new string[0], Restriction.Nsfw, "E621 swimsuit")));
-            _help.Add(("Nsfw", new Help("Booru", "Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", new string[0], Restriction.Nsfw, "Rule34 cat_ears")));
-            _help.Add(("Nsfw", new Help("Booru", "Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", new string[0], Restriction.Nsfw, "Konachan landscape")));
-            _help.Add(("Nsfw", new Help("Booru", "Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", new [] { "Image" }, Restriction.None, "Booru arknights")));
-            _help.Add(("Nsfw", new Help("Booru", "Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", new string[0], Restriction.None, null)));
+
+#if NSFW_BUILD
+            var categoryName = "Nsfw";
+#else
+            var categoryName = "Images";
+#endif
+
+            _help.Add((categoryName, new Help("Booru", "Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", new string[0], Restriction.None, "Safebooru kantai_collection")));
+            _help.Add((categoryName, new Help("Booru", "E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", new string[0], Restriction.None, "E926 short_hair")));
+            _help.Add((categoryName, new Help("Booru", "Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", new string[0], Restriction.Nsfw, "Gelbooru cirno")));
+            _help.Add((categoryName, new Help("Booru", "E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", new string[0], Restriction.Nsfw, "E621 swimsuit")));
+            _help.Add((categoryName, new Help("Booru", "Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", new string[0], Restriction.Nsfw, "Rule34 cat_ears")));
+            _help.Add((categoryName, new Help("Booru", "Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", new string[0], Restriction.Nsfw, "Konachan landscape")));
+            _help.Add((categoryName, new Help("Booru", "Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", new [] { "Image" }, Restriction.None, "Booru arknights")));
+            _help.Add((categoryName, new Help("Booru", "Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", new string[0], Restriction.None, null)));
         }
     }
 }
 
 namespace SanaraV3.Module.Nsfw
 {
-    /// <summary>
-    /// Contains all Booru related commands (booru are websites such as Gelbooru and Rule34)
-    /// </summary>
-    public sealed class BooruModule : ModuleBase
+    public sealed class BooruSfwModule : ModuleBase
     {
         [Command("Safebooru", RunMode = RunMode.Async)]
         public async Task SafebooruAsync(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU);
+            => await BooruModule.SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU, Context.Channel);
 
         [Command("E926", RunMode = RunMode.Async)]
         public async Task E926Async(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.E926, tags, BooruType.E926);
-
-        [Command("Gelbooru", RunMode = RunMode.Async), RequireNsfw]
-        public async Task GelbooruAsync(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU);
-
-        [Command("E621", RunMode = RunMode.Async), RequireNsfw]
-        public async Task E621Async(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.E621, tags, BooruType.E621);
-
-        [Command("Rule34", RunMode = RunMode.Async), RequireNsfw]
-        public async Task Rule34Async(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.Rule34, tags, BooruType.RULE34);
-
-        [Command("Konachan", RunMode = RunMode.Async), RequireNsfw]
-        public async Task KonachanAsync(params string[] tags)
-            => await SearchBooruAsync(StaticObjects.Konachan, tags, BooruType.KONACHAN);
-
-        [Command("Booru", RunMode = RunMode.Async), Alias("Image")]
-        public async Task ImageAsync(params string[] tags)
-        {
-            if (Utils.CanSendNsfw(Context.Channel)) await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU);
-            else await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU);
-        }
+            => await BooruModule.SearchBooruAsync(StaticObjects.E926, tags, BooruType.E926, Context.Channel);
 
         [Command("Tags", RunMode = RunMode.Async)]
         public async Task TagsAsync(int id)
@@ -82,7 +63,7 @@ namespace SanaraV3.Module.Nsfw
 
             var embed = new EmbedBuilder
             {
-                Color = RatingToColor(res.Post.Rating),
+                Color = BooruModule.RatingToColor(res.Post.Rating),
                 Title = "From " + Utils.ToWordCase(res.Booru.ToString().Split('.').Last()),
                 Description = res.Post.Width + " x " + res.Post.Height + "(" + (res.Post.Width / gcd) + ":" + (res.Post.Height / gcd) + ")",
                 Fields = new List<EmbedFieldBuilder>
@@ -112,8 +93,37 @@ namespace SanaraV3.Module.Nsfw
 
             await ReplyAsync(embed: embed.Build());
         }
+    }
 
-        private async Task SearchBooruAsync(ABooru booru, string[] tags, BooruType booruId)
+    /// <summary>
+    /// Contains all Booru related commands (booru are websites such as Gelbooru and Rule34)
+    /// </summary>
+    public sealed class BooruModule : ModuleBase
+    {
+        [Command("Gelbooru", RunMode = RunMode.Async), RequireNsfw]
+        public async Task GelbooruAsync(params string[] tags)
+            => await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU, Context.Channel);
+
+        [Command("E621", RunMode = RunMode.Async), RequireNsfw]
+        public async Task E621Async(params string[] tags)
+            => await SearchBooruAsync(StaticObjects.E621, tags, BooruType.E621, Context.Channel);
+
+        [Command("Rule34", RunMode = RunMode.Async), RequireNsfw]
+        public async Task Rule34Async(params string[] tags)
+            => await SearchBooruAsync(StaticObjects.Rule34, tags, BooruType.RULE34, Context.Channel);
+
+        [Command("Konachan", RunMode = RunMode.Async), RequireNsfw]
+        public async Task KonachanAsync(params string[] tags)
+            => await SearchBooruAsync(StaticObjects.Konachan, tags, BooruType.KONACHAN, Context.Channel);
+
+        [Command("Booru", RunMode = RunMode.Async), Alias("Image")]
+        public async Task ImageAsync(params string[] tags)
+        {
+            if (Utils.CanSendNsfw(Context.Channel)) await SearchBooruAsync(StaticObjects.Gelbooru, tags, BooruType.GELBOORU, Context.Channel);
+            else await SearchBooruAsync(StaticObjects.Safebooru, tags, BooruType.SAFEBOORU, Context.Channel);
+        }
+
+        public static async Task SearchBooruAsync(ABooru booru, string[] tags, BooruType booruId, IMessageChannel chan)
         {
             // GetRandomImageAsync crash if we send it something null
             tags ??= new string[0];
@@ -152,7 +162,7 @@ namespace SanaraV3.Module.Nsfw
 
             if (post.FileUrl == null)
                 throw new CommandFailed("A post was found but no image was available.");
-            await ReplyAsync(embed: new EmbedBuilder
+            await chan.SendMessageAsync(embed: new EmbedBuilder
             {
                 Color = RatingToColor(post.Rating),
                 ImageUrl = post.FileUrl.AbsoluteUri,
@@ -166,7 +176,7 @@ namespace SanaraV3.Module.Nsfw
             }.Build());
         }
 
-        private Color RatingToColor(Rating rating)
+        public static Color RatingToColor(Rating rating)
         {
             if (rating == Rating.Safe) return Color.Green;
             if (rating == Rating.Questionable) return new Color(255, 255, 0); // Yellow
