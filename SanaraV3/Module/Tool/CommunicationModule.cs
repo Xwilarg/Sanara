@@ -69,6 +69,7 @@ namespace SanaraV3.Module.Tool
                 Title = StaticObjects.Client.CurrentUser.ToString(),
                 Color = Color.Purple,
                 ImageUrl = StaticObjects.Client.CurrentUser.GetAvatarUrl(),
+#if NSFW_BUILD
                 Description = "**List of useful links:**\n" +
                 " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
                 " - [Website](https://sanara.zirk.eu/)\n" +
@@ -79,6 +80,7 @@ namespace SanaraV3.Module.Tool
                 "**Credits:**\n" +
                 "Programming: [Zirk#0001](https://zirk.eu/)\n" +
                 "Picture Profile: [BlankSensei](https://www.pixiv.net/en/users/23961764)",
+#endif
                 Fields = new List<EmbedFieldBuilder>
                 {
                     new EmbedFieldBuilder
