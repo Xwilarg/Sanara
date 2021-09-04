@@ -14,6 +14,10 @@ Here are some of her features:
 - Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
 - Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
 - Subscription, stay aware of the new anime and doujinshi airing
+
+| ![Preview Doujin](Preview/Doujin.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) |
+| ------------------------------------- | ----------------------------------- | --------------------------------- |
+| Doujin command preview                | Booru command preview               | Game command preview              |
  
 There are also a multitude of others commands and if the one you're looking for isn't here, just suggest it
 
@@ -26,6 +30,9 @@ Or by doing the help command
 
 ## How to invite her on my server
 You can just use her invite link: <https://discordapp.com/oauth2/authorize?client_id=329664361016721408&permissions=3196928&scope=bot>
+
+### SFW version
+If you want to get rid of all the commands and mentions of NSFW commands, you can use SFW version instead: <https://discord.com/oauth2/authorize?client_id=883767204733157397&permissions=3196928&scope=bot>
 
 ## Contact
 If you need anything you can come [open an issue](https://github.com/Xwilarg/Sanara/issues), [come to her official server](https://discordapp.com/invite/H6wMRYV) or contact Zirk#0001 on Discord.
