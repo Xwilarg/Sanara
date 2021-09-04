@@ -12,7 +12,11 @@ namespace SanaraV3.Database
         }
 
         [JsonProperty]
+#if NSFW_BUILD
         public string Prefix = "s.";
+#else
+        public string Prefix = "h.";
+#endif
 
         [JsonProperty]
         public string id;
