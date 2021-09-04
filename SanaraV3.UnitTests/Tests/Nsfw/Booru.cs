@@ -28,6 +28,15 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Assert.True(embed.Image.Value.Url.Contains(title));
         }
 
+        private MethodInfo CreateMethod(string methodName)
+        {
+            if (methodName == "Safebooru")
+            {
+                return typeof(Module.Nsfw.BooruSfwModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            }
+            return typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+        }
+
         // TODO: Somehow, E621/E926 test don't pass but work in release, don't know why
 
         //[TestCase("E621")]
@@ -48,7 +57,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = CreateMethod(methodName);
             await (Task)method.Invoke(mod, new object[] { null });
             while (!isDone)
             { }
@@ -72,7 +81,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
 
             var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
-            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = CreateMethod(methodName);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
             while (!isDone)
             { }
@@ -88,7 +97,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
         {
             var mod = new Module.Nsfw.BooruModule();
             Common.AddContext(mod, null);
-            var method = typeof(Module.Nsfw.BooruModule).GetMethod(methodName + "Async", BindingFlags.Instance | BindingFlags.Public);
+            var method = CreateMethod(methodName);
             Assert.ThrowsAsync<CommandFailed>(async () => await (Task)method.Invoke(mod, new[] { new[] { "azezaeaze" } }));
         }
     }
