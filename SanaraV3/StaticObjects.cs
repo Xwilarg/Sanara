@@ -190,7 +190,11 @@ namespace SanaraV3
         public static async Task InitializeAsync(Credentials credentials)
         {
             await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Static Objects"));
+#if NSFW_BUILD
             await Db.InitAsync("Sanara");
+#else
+            await Db.InitAsync("Hanaki");
+#endif
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 
             if (credentials.RavenKey != null)

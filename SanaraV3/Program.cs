@@ -126,7 +126,11 @@ namespace SanaraV3
 
         private async Task Ready()
         {
+#if NSFW_BUILD
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
+#else
+            await StaticObjects.Client.SetActivityAsync(new Discord.Game("h.help for command list", ActivityType.Watching));
+#endif
         }
 
         private async Task CommandExecuted(Optional<CommandInfo> cmd, ICommandContext context, IResult result)
@@ -166,7 +170,12 @@ namespace SanaraV3
 
             int pos = 0;
             ITextChannel textChan = msg.Channel as ITextChannel;
-            var prefix = textChan == null ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
+#if NSFW_BUILD
+            var defaultPrefix = "s.";
+#else
+            var defaultPrefix = "h.";
+#endif
+            var prefix = textChan == null ? defaultPrefix : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
             if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
             {
                 if (textChan != null && !StaticObjects.Help.IsModuleAvailable(textChan.GuildId, msg.Content.Substring(pos).ToLower()))
