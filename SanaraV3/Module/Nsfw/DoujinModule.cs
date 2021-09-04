@@ -94,7 +94,7 @@ namespace SanaraV3.Module.Nsfw
             // Delete folder
             Directory.Delete("Saves/Download/" + path + "/" + id);
 
-            FileInfo fi = new FileInfo(finalPath);
+            FileInfo fi = new(finalPath);
             if (fi.Length < 8000000) // 8MB
             {
                 await Context.Channel.SendFileAsync(finalPath);
@@ -139,18 +139,19 @@ namespace SanaraV3.Module.Nsfw
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin", "NHentai")]
         public async Task GetDoujinshiAsync([Remainder]string tags) // Doujin search with tags given
         {
-            NHentaiSharp.Search.SearchResult result;
-            try
-            {
-                result = await SearchClient.SearchWithTagsAsync(tags);
-            }
-            catch (InvalidArgumentException)
+            // Somehow the API return invalid values depending of the country we are doing the request from
+            // To avoid that, we parse the HTML instead
+            string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
+            var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
+            if (!m.Success)
             {
                 throw new CommandFailed("There is no doujin with these tags");
             }
-            int page = StaticObjects.Random.Next(0, result.numPages) + 1;
-            result = await SearchClient.SearchWithTagsAsync(new[] { tags }, page);
-            await ReplyAsync(embed: FormatDoujinshi(result.elements[StaticObjects.Random.Next(0, result.elements.Length)]));
+            int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
+            html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
+            var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
+            var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
+            await ReplyAsync(embed: FormatDoujinshi(result));
         }
 
         [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Priority(1), Alias("Doujin", "NHentai")]
