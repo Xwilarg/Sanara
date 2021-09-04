@@ -74,6 +74,8 @@ namespace SanaraV3.UnitTests.Impl
 
         public MessageFlags? Flags => throw new NotImplementedException();
 
+        public IReadOnlyCollection<ISticker> Stickers => throw new NotImplementedException();
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             return Task.CompletedTask;
