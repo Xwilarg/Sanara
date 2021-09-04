@@ -248,12 +248,20 @@ namespace SanaraV3
                 typeof(BooruQuizzPreload),
                 typeof(BooruFillPreload)
             };
-            Preloads = new IPreload[types.Length];
+            var preloads = new List<IPreload>();
             for (int i = 0; i < types.Length; i++)
             {
                 try
                 {
-                    Preloads[i] = (IPreload)Activator.CreateInstance(types[i]);
+                    var p = (IPreload)Activator.CreateInstance(types[i]);
+#if !NSFW_BUILD
+                    if (!p.IsSafe())
+                    {
+                        await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " was skipped"));
+                        continue;
+                    }
+#endif
+                    preloads.Add(p);
                     await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " successfully loaded"));
                 }
                 catch (System.Exception e)
@@ -263,6 +271,7 @@ namespace SanaraV3
                     await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " failed to load"));
                 }
             }
+            Preloads = preloads.ToArray();
             List<string> allNames = new List<string>();
             foreach (var p in Preloads)
             {

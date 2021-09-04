@@ -145,7 +145,7 @@ namespace SanaraV3.Module.Administration
 
         private async Task<Embed> GetHelpEmbedAsync()
         {
-            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            Dictionary<string, List<string>> modules = new();
             foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), await IsOwnerAsync()))
             {
                 if (!modules.ContainsKey(help.Item1))
@@ -160,7 +160,9 @@ namespace SanaraV3.Module.Administration
                 Footer = new EmbedFooterBuilder
                 {
                     Text = "Do help module/submodule for more information.\nExample: help information\n\n" +
+#if NSFW_BUILD
                         "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
+#endif
                         "[argument]: Mandatory argument\n" +
                         "(argument): Optional argument"
                 }
@@ -182,7 +184,10 @@ namespace SanaraV3.Module.Administration
                 Title = "Help",
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
+                    Text =
+#if NSFW_BUILD
+                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
+#endif
                         "[argument]: Mandatory argument\n" +
                         "(argument): Optional argument"
                 }
