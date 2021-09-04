@@ -8,7 +8,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage)
 # Sanara
 
-Sanara is a multipurpose bot that is now in more than 600 servers (09/2020).<br/>
+Sanara is a multipurpose bot that is now in more than 1300 servers (09/2021).<br/>
 Here are some of her features:
 - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), compete against others servers for the best score
 - Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
