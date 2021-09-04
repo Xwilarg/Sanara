@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Commands;
 using DiscordUtils;
 using NUnit.Framework;
 using SanaraV3.Exception;
@@ -55,7 +56,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Module.Nsfw.BooruModule();
+            var mod = methodName == "Safebooru" ? (ModuleBase)new Module.Nsfw.BooruSfwModule() : (ModuleBase)new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
             var method = CreateMethod(methodName);
             await (Task)method.Invoke(mod, new object[] { null });
@@ -79,7 +80,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
                 isDone = true;
             });
 
-            var mod = new Module.Nsfw.BooruModule();
+            var mod = methodName == "Safebooru" ? (ModuleBase)new Module.Nsfw.BooruSfwModule() : (ModuleBase)new Module.Nsfw.BooruModule();
             Common.AddContext(mod, callback);
             var method = CreateMethod(methodName);
             await (Task)method.Invoke(mod, new[] { new[] { "kantai_collection" } });
@@ -95,7 +96,7 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
         [TestCase("Konachan")]
         public void BooruWithTagInvalidTest(string methodName)
         {
-            var mod = new Module.Nsfw.BooruModule();
+            var mod = methodName == "Safebooru" ? (ModuleBase)new Module.Nsfw.BooruSfwModule() : (ModuleBase)new Module.Nsfw.BooruModule();
             Common.AddContext(mod, null);
             var method = CreateMethod(methodName);
             Assert.ThrowsAsync<CommandFailed>(async () => await (Task)method.Invoke(mod, new[] { new[] { "azezaeaze" } }));
