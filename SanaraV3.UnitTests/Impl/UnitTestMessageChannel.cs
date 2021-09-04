@@ -92,5 +92,10 @@ namespace SanaraV3.UnitTests.Impl
         {
             throw new NotImplementedException();
         }
+
+        public Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
