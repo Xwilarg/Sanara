@@ -15,9 +15,9 @@ Here are some of her features:
 - Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
 - Subscription, stay aware of the new anime and doujinshi airing
 
-| ![Preview Doujin](Preview/Doujin.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) |
-| ------------------------------------- | ----------------------------------- | --------------------------------- |
-| Doujin command preview                | Booru command preview               | Game command preview              |
+| ![Preview Doujin](Preview/Doujin.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
+| ------------------------------------- | ----------------------------------- | --------------------------------- | ------------------------------------------------- |
+| Doujin command preview                | Booru command preview               | Game command preview              | Subscription command preview                      |
  
 There are also a multitude of others commands and if the one you're looking for isn't here, just suggest it
 
