@@ -286,7 +286,14 @@ namespace SanaraV3.Module.Administration
             }
             embed.AddField("Games", str.ToString());
             var subs = StaticObjects.GetSubscriptionCount();
-            embed.AddField("Subscriptions", subs == null ? "Not yet initialized" : string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
+            embed.AddField("Subscriptions",
+                subs == null ?
+                    "Not yet initialized" :
+#if NSFW_BUILD
+                    string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
+#else
+                    "**Anime**: " + subs["anime"]);
+#endif
             await ReplyAsync(embed: embed.Build());
         }
 
