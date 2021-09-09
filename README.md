@@ -1,13 +1,9 @@
-[<img src="https://discordbots.org/api/widget/owner/329664361016721408.svg"/>](https://discordbots.org/bot/329664361016721408)
-[![Server Count](https://img.shields.io/endpoint?color=deepgreen&url=https%3A%2F%2Fapi.zirk.eu%2Fbots.php%3Fname%3DSanara%26shield%3Dtrue)](https://sanara.zirk.eu/stats.html)
-
-| Linux                                                                 | Windows                                                                   |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3ALinux) | [![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3AWindows) |
-
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage)
 # Sanara
+| Guild Count | Linux | Windows | Coverage |
+| --------- | ----- | ------- | -------- |
+| [![Server Count](https://img.shields.io/endpoint?color=deepgreen&url=https%3A%2F%2Fapi.zirk.eu%2Fbots.php%3Fname%3DSanara%26shield%3Dtrue)](https://sanara.zirk.eu/stats.html) | [![Linux](https://github.com/Xwilarg/Sanara/workflows/Linux/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3ALinux) | [![Windows](https://github.com/Xwilarg/Sanara/workflows/Windows/badge.svg)](https://github.com/Xwilarg/Sanara/actions?query=workflow%3AWindows) | [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/2e32086b79d44914a697dd58d7545fe3)](https://www.codacy.com/manual/Xwilarg/Sanara?utm_source=github.com&utm_medium=referral&utm_content=Xwilarg/Sanara&utm_campaign=Badge_Coverage) |
 
+## Description
 Sanara is a multipurpose bot that is now in more than 1300 servers (09/2021).<br/>
 Here are some of her features:
 - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), compete against others servers for the best score
