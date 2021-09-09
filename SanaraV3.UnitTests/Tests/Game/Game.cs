@@ -32,7 +32,7 @@ namespace SanaraV3.UnitTests.Tests.Game
 
         [TestCase(typeof(KancollePreload))]
         [TestCase(typeof(FateGOPreload))]
-        [TestCase(typeof(AzurLanePreload))]
+        //[TestCase(typeof(AzurLanePreload))]
         [TestCase(typeof(PokemonPreload))]
         [TestCase(typeof(ArknightsPreload))]
         [TestCase(typeof(GirlsFrontlinePreload))]
@@ -47,21 +47,6 @@ namespace SanaraV3.UnitTests.Tests.Game
 
                 await CheckImageAsync(current);
             }
-        }
-
-        [TestCase("Kisaragi")]
-        [TestCase("Nicoloso da Recco")]
-        [TestCase("Le Malin µ")]
-        [TestCase("Béarn")]
-        public async Task AzurLaneImageTestAsync(string name)
-        {
-            var preload = new AzurLanePreload();
-            var names = preload.Load().Cast<QuizzPreloadResult>().ToArray();
-
-            var current = names.FirstOrDefault(x => x.Answers.Select(x => x.ToUpperInvariant()).Contains(name.ToUpperInvariant()));
-            Assert.IsTrue(current != null);
-
-            await CheckImageAsync(current);
         }
     }
 }
