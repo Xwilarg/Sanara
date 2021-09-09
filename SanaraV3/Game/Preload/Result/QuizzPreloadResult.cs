@@ -19,5 +19,10 @@ namespace SanaraV3.Game.Preload.Result
 
         [JsonProperty]
         public string[] Answers;  // Possible answers
+
+        public override string ToString()
+        {
+            return "Quizz Preload " + Answers[0];
+        }
     }
 }
