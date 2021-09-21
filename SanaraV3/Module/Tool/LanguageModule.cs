@@ -42,16 +42,34 @@ namespace SanaraV3.Module.Tool
             var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(query)));
             if (json["list"].Value<JArray>().Count == 0)
                 throw new CommandFailed("There is no definition for this query.");
+
+            int up = json["list"][0]["thumbs_up"].Value<int>();
+            int down = json["list"][0]["thumbs_down"].Value<int>();
+
+            if (up <= down)
+            {
+                throw new CommandFailed("There is no definition having a positive vote ratio for this query");
+            }
+
+            int GCD(int a, int b)
+            {
+                return b == 0 ? Math.Abs(a) : GCD(b, a % b);
+            }
+            int gcd = GCD(up, down);
+
             string definition = json["list"][0]["definition"].Value<string>();
             if (definition.Length > 1000)
                 definition = definition.Substring(0, 1000) + " [...]";
             string example = json["list"][0]["example"].Value<string>();
             if (example.Length > 1000)
                 example = example.Substring(0, 1000) + " [...]";
+
+            var word = json["list"][0]["word"].Value<string>();
+
             await ReplyAsync(embed: new EmbedBuilder
             {
                 Color = Color.Blue,
-                Title = char.ToUpper(query[0]) + string.Concat(query.ToLower().Skip(1)),
+                Title = char.ToUpper(word[0]) + string.Concat(word.Skip(1)),
                 Url = json["list"][0]["permalink"].Value<string>(),
                 Fields = new List<EmbedFieldBuilder>
                 {
@@ -65,6 +83,10 @@ namespace SanaraV3.Module.Tool
                         Name = "Example",
                         Value = example
                     }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Up/Down vote ratio: {up / gcd} : {down / gcd}"
                 }
             }.Build());
         }
