@@ -168,7 +168,7 @@ namespace SanaraV3.Module.Entertainment
                 Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
                 Url = "https://vndb.org/v" + vn.Id,
                 ImageUrl = Context.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg > 1 || vn.ImageRating.ViolenceAvg > 1) ? null : vn.Image,
-                Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
+                Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description[0..1000]  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
                 Color = Color.Blue
             };
             embed.AddField("Available in english?", vn.Languages.Contains("en") ? "Yes" : "No", true);
