@@ -31,7 +31,7 @@ namespace SanaraV3.UnitTests.Tests.Game
         }
 
         [TestCase(typeof(KancollePreload))]
-        [TestCase(typeof(FateGOPreload))]
+        //[TestCase(typeof(FateGOPreload))]
         //[TestCase(typeof(AzurLanePreload))]
         [TestCase(typeof(PokemonPreload))]
         [TestCase(typeof(ArknightsPreload))]
