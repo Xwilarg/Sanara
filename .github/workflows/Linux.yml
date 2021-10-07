@@ -42,5 +42,19 @@ jobs:
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage.xml
+    - name: Publish Sanara
+      run: dotnet publish -c Release -r Sanara -o Release Sanara/Sanara.csproj
+    - name: Publish Sanara SFW version
+      run: dotnet publish -c Release-SFW -r Sanara-SFW -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Sanara
+        path: ./Release
+        retention-days: 2
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Sanara-SFW
+        path: ./Release-SFW
+        retention-days: 2
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
