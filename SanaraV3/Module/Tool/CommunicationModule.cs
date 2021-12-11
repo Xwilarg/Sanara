@@ -79,7 +79,7 @@ namespace SanaraV3.Module.Tool
                 " - [Top.gg](https://discordbots.org/bot/329664361016721408)\n\n" +
                 "**Credits:**\n" +
                 "Programming: [Zirk#0001](https://zirk.eu/)\n" +
-                "Picture Profile: [BlankSensei](https://www.pixiv.net/en/users/23961764)",
+                "Profile Picture: [BlankSensei](https://www.pixiv.net/en/users/23961764)",
 #endif
                 Fields = new List<EmbedFieldBuilder>
                 {
