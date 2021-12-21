@@ -1,10 +1,7 @@
 ﻿using BooruSharp.Booru;
 using BooruSharp.Search;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace SanaraV3.Module.Nsfw
+namespace SanaraV3
 {
     public class TagsManager
     {
