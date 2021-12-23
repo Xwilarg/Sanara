@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests
+namespace Sanara.UnitTests
 {
     [SetUpFixture]
     public class Setup

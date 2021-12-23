@@ -1,10 +1,8 @@
 ﻿using Discord.Commands;
-using SanaraV3.UnitTests.Impl;
-using System;
+using Sanara.UnitTests.Impl;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Tests
+namespace Sanara.UnitTests.Tests
 {
     public static class Common
     {

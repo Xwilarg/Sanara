@@ -1,16 +1,19 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Impl
+namespace Sanara.UnitTests.Impl
 {
     public sealed class UnitTestMessageChannel : IMessageChannel
     {
         public UnitTestMessageChannel(Func<UnitTestUserMessage, Task> callback)
         {
             _callback = callback;
+        }
+
+        public async Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        {
+            var msg = new UnitTestUserMessage(this, text, embed);
+            await _callback(msg);
+            return msg;
         }
 
         private readonly Func<UnitTestUserMessage, Task> _callback;
@@ -76,13 +79,6 @@ namespace SanaraV3.UnitTests.Impl
             throw new NotImplementedException();
         }
 
-        public async Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
-        {
-            var msg = new UnitTestUserMessage(this, text, embed);
-            await _callback(msg);
-            return msg;
-        }
-
         public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
         {
             throw new NotImplementedException();
@@ -94,6 +90,26 @@ namespace SanaraV3.UnitTests.Impl
         }
 
         public Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
         {
             throw new NotImplementedException();
         }

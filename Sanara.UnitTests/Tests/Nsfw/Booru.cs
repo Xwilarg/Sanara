@@ -1,20 +1,16 @@
 ﻿using Discord;
 using Discord.Commands;
-using DiscordUtils;
 using NUnit.Framework;
-using SanaraV3.Exception;
-using SanaraV3.UnitTests.Impl;
-using System;
-using System.Linq;
+using Sanara.Exception;
+using Sanara.UnitTests.Impl;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Tests.Nsfw
+namespace Sanara.UnitTests.Tests.Nsfw
 {
     [TestFixture]
     public sealed class Booru
-    {
+    {/*
         /// <summary>
         /// Generic unit test method for all booru
         /// </summary>
@@ -100,6 +96,6 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             Common.AddContext(mod, null);
             var method = CreateMethod(methodName);
             Assert.ThrowsAsync<CommandFailed>(async () => await (Task)method.Invoke(mod, new[] { new[] { "azezaeaze" } }));
-        }
+        }*/
     }
 }

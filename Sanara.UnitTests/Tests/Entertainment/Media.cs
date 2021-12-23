@@ -1,21 +1,16 @@
 ﻿using Discord;
-using DiscordUtils;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using NUnit.Framework;
-using SanaraV3.Exception;
-using SanaraV3.UnitTests.Impl;
-using System;
-using System.IO;
-using System.Linq;
+using Sanara.Exception;
+using Sanara.UnitTests.Impl;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SanaraV3.UnitTests.Tests.Entertainment
 {
     [TestFixture]
     public sealed class Media
-    {
+    {/*
         private async Task CheckRedditAsync(Embed embed, bool isImage)
         {
             if (isImage)
@@ -240,6 +235,6 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
             await mod.XkcdAsync(1172);
             while (!isDone)
             { }
-        }
+        }*/
     }
 }

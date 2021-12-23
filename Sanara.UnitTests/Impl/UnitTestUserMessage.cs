@@ -1,9 +1,6 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Impl
+namespace Sanara.UnitTests.Impl
 {
     public sealed class UnitTestUserMessage : IUserMessage
     {
@@ -75,6 +72,14 @@ namespace SanaraV3.UnitTests.Impl
         public MessageFlags? Flags => throw new NotImplementedException();
 
         public IReadOnlyCollection<ISticker> Stickers => throw new NotImplementedException();
+
+        public string CleanContent => throw new NotImplementedException();
+
+        public IReadOnlyCollection<IMessageComponent> Components => throw new NotImplementedException();
+
+        public IMessageInteraction Interaction => throw new NotImplementedException();
+
+        IReadOnlyCollection<IStickerItem> IMessage.Stickers => throw new NotImplementedException();
 
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {

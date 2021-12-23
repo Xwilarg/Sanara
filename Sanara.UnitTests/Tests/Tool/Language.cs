@@ -1,11 +1,8 @@
 ﻿using NUnit.Framework;
-using SanaraV3.UnitTests.Impl;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Sanara.UnitTests.Impl;
 
-namespace SanaraV3.UnitTests.Tests.Tool
-{
+namespace Sanara.UnitTests.Tests.Tool
+{/*
     [TestFixture]
     public sealed class Language
     {
@@ -119,5 +116,5 @@ namespace SanaraV3.UnitTests.Tests.Tool
         {
             Assert.AreEqual(result, Module.Tool.LanguageModule.ToRomaji(entry));
         }
-    }
+    }*/
 }

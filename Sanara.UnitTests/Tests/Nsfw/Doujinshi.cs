@@ -1,17 +1,12 @@
 ﻿using Discord;
-using DiscordUtils;
 using NUnit.Framework;
-using SanaraV3.UnitTests.Impl;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Sanara.UnitTests.Impl;
 
-namespace SanaraV3.UnitTests.Tests.Nsfw
+namespace Sanara.UnitTests.Tests.Nsfw
 {
     [TestFixture]
     public sealed class Doujinshi
-    {
+    {/*
         private async Task CheckEmbedAsync(Embed embed)
         {
             Assert.NotNull(embed.Image);
@@ -57,6 +52,6 @@ namespace SanaraV3.UnitTests.Tests.Nsfw
             await mod.GetDoujinshiAsync();
             while (!isDone)
             { }
-        }
+        }*/
     }
 }

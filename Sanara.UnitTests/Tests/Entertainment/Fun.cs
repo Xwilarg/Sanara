@@ -1,16 +1,11 @@
-﻿using DiscordUtils;
-using NUnit.Framework;
-using SanaraV3.UnitTests.Impl;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using NUnit.Framework;
+using Sanara.UnitTests.Impl;
 
-namespace SanaraV3.UnitTests.Tests.Entertainment
+namespace Sanara.UnitTests.Tests.Entertainment
 {
     [TestFixture]
     public sealed class Fun
-    {
+    {/*
         [Test]
         public async Task InspireTest()
         {
@@ -30,6 +25,6 @@ namespace SanaraV3.UnitTests.Tests.Entertainment
             await mod.InspireAsync();
             while (!isDone)
             { }
-        }
+        }*/
     }
 }

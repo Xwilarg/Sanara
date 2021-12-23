@@ -1,14 +1,12 @@
 ﻿using NUnit.Framework;
-using SanaraV3.UnitTests.Impl;
-using System;
+using Sanara.UnitTests.Impl;
 using System.Globalization;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Tests.Tool
+namespace Sanara.UnitTests.Tests.Tool
 {
     [TestFixture]
     public sealed class Science
-    {
+    {/*
         [TestCase("3+3*2", "9")]
         [TestCase("(3+3)*2", "12")]
         [TestCase("25/2", "12.5")]
@@ -29,6 +27,6 @@ namespace SanaraV3.UnitTests.Tests.Tool
             await mod.CalcAsync(entry);
             while (!isDone)
             { }
-        }
+        }*/
     }
 }

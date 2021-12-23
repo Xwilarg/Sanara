@@ -1,17 +1,14 @@
 ﻿using NUnit.Framework;
-using SanaraV3.Game.Preload;
-using SanaraV3.Game.Preload.Impl;
-using SanaraV3.Game.Preload.Result;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Sanara;
+using Sanara.Game.Preload;
+using Sanara.Game.Preload.Impl;
+using Sanara.Game.Preload.Result;
 
-namespace SanaraV3.UnitTests.Tests.Game
+namespace Sanara.UnitTests.Tests.Game
 {
     [TestFixture]
     public sealed class Game
-    {
+    {/*
         private async Task CheckImageAsync(QuizzPreloadResult current)
         {
             var h = await StaticObjects.HttpClient.GetStringAsync(current.ImageUrl);
@@ -47,6 +44,6 @@ namespace SanaraV3.UnitTests.Tests.Game
 
                 await CheckImageAsync(current);
             }
-        }
+        }*/
     }
 }

@@ -28,4 +28,17 @@
     <Folder Include="Module\Tool\" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;NSFW_BUILD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="LanguageResource\Hiragana.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LanguageResource\Katakana.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

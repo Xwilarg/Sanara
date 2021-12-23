@@ -1,9 +1,6 @@
 ﻿using Discord;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace SanaraV3.UnitTests.Impl
+namespace Sanara.UnitTests.Impl
 {
     public sealed class UnitTestDiscordClient : IDiscordClient
     {
@@ -12,6 +9,16 @@ namespace SanaraV3.UnitTests.Impl
         public ISelfUser CurrentUser => null;
 
         public TokenType TokenType => TokenType.Bot;
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IApplicationCommand> CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
         {
@@ -46,6 +53,16 @@ namespace SanaraV3.UnitTests.Impl
         public Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Task<IApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
