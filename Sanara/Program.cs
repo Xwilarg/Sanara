@@ -135,7 +135,7 @@ namespace Sanara
             {
                 foreach (var c in s.CreateCommands())
                 {
-                    if (StaticObjects.DebugGuildId != null)
+                    if (StaticObjects.DebugGuildId != 0)
                     {
                         await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c);
                     }
