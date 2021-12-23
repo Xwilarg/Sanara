@@ -135,11 +135,14 @@ namespace Sanara
             {
                 foreach (var c in s.CreateCommands())
                 {
-                    if (StaticObjects.DebugGuildId != 0)
+                    if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
                     {
                         await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c);
                     }
-                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
+                    else
+                    {
+                        await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
+                    }
                 }
             }
 
