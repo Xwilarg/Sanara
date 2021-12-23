@@ -1,0 +1,39 @@
+﻿using Discord;
+using Sanara.Game.Preload.Impl;
+using Sanara.Game.Preload.Impl.Static;
+using Sanara.Game.Preload.Result;
+using System.Collections.ObjectModel;
+
+namespace Sanara.Game.Preload.Impl
+{
+    public sealed class ArknightsAudioPreload : IPreload
+    {
+        public ArknightsAudioPreload()
+        {
+            _preload = Arknights.GetOperators().Select((x) =>
+            {
+                return new QuizzPreloadResult("https://aceship.github.io/AN-EN-Tags/etc/voice/" + x.Item1 + "/CN_001.mp3", x.Item2.ToArray());
+            }).ToArray();
+        }
+
+        public ReadOnlyCollection<IPreloadResult> Load()
+            => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
+
+        public string[] GetGameNames()
+            => new[] { "arknights", "ak" };
+
+        public string GetNameArg()
+            => "audio";
+
+        public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
+            => new QuizzAudio(chan, user, this, settings);
+
+        public string GetRules()
+            => "I'll play a vocal line of an operator, you'll have to give his/her name.";
+
+        public bool IsSafe()
+            => true;
+
+        private readonly QuizzPreloadResult[] _preload;
+    }
+}

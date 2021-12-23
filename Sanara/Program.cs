@@ -11,7 +11,7 @@ namespace Sanara
 {
     public sealed class Program
     {
-        private readonly CommandService _commands = new CommandService();
+        private readonly CommandService _commands = new();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
 
@@ -25,7 +25,7 @@ namespace Sanara
             {
                 throw;
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 if (!Debugger.IsAttached)
                 {
@@ -40,16 +40,15 @@ namespace Sanara
 
         public async Task StartAsync()
         {
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
             // Create saves directories
             if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
-            if (!Directory.Exists("Saves/Radio")) Directory.CreateDirectory("Saves/Radio");
             if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
             if (!Directory.Exists("Saves/Game")) Directory.CreateDirectory("Saves/Game");
 
             // Setting Logs callback
-            StaticObjects.Client.Log += Utils.Log;
+            StaticObjects.Client.Log += Log.LogAsync;
             _commands.Log += Log.ErrorAsync;
 
             // Load credentials

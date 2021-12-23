@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using Sanara.Database;
 using Sanara.Help;
 using Sanara.StatUpload;
+using Sanara.Subscription;
 
 namespace Sanara
 {
@@ -38,7 +39,7 @@ namespace Sanara
         /// <summary>
         /// Current ID of the bot
         /// </summary>
-        public static ulong ClientId { get; }
+        public static ulong ClientId { set; get; }
         /// <summary>
         /// Access to the Database
         /// </summary>
@@ -47,10 +48,6 @@ namespace Sanara
         /// Help object, contains help for all commands
         /// </summary>
         public static HelpPreload Help { get; } = new();
-        /// <summary>
-        /// Sentry instance, used for automatic bug report
-        /// </summary>
-        public static SentryClient SentryClient { set; get; }
         /// <summary>
         /// List of all errors that occured
         /// </summary>
@@ -235,16 +232,19 @@ namespace Sanara
         public static Dictionary<ulong, Diaporama.Diaporama> Diaporamas = new();
 
         // SUBSCRIPTION
+        /// <summary>
+        /// Subscription manager, follows a feed and post updates in a channel
+        /// </summary>
         private static SubscriptionManager SM { get; } = new();
 
-        public static Dictionary<string, int> GetSubscriptionCount()
+        public static Dictionary<string, int>? GetSubscriptionCount()
         {
             if (!SM.IsInit())
                 return null;
             return SM.GetSubscriptionCount();
         }
 
-        public static async Task<Dictionary<string, ITextChannel>> GetSubscriptionsAsync(ulong guildId)
+        public static async Task<Dictionary<string, ITextChannel>?> GetSubscriptionsAsync(ulong guildId)
         {
             if (!SM.IsInit())
                 return null;
@@ -254,7 +254,7 @@ namespace Sanara
         private static async Task InitializeSubscriptions()
         {
             await SM.InitAsync();
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Subscription initialized"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Subscription initialized"));
         }
 
         private static async Task InitializeAV()
@@ -263,7 +263,7 @@ namespace Sanara
             int page = 1;
             do
             {
-                newTags = new List<string>(); // We keep track of how many tags we found in this page
+                newTags = new(); // We keep track of how many tags we found in this page
                 string html = await VideoModule.DoJavmostHttpRequestAsync("https://www5.javmost.com/allcategory/" + page);
                 foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
                 {
@@ -282,12 +282,12 @@ namespace Sanara
                 JavmostCategories.Add("uncensor");
             }
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
         }
 
         public static async Task InitializeAsync(Credentials credentials)
         {
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Static Objects"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Static Objects"));
 #if NSFW_BUILD
             await Db.InitAsync("Sanara");
 #else
@@ -297,7 +297,7 @@ namespace Sanara
 
             if (credentials.RavenKey != null)
             {
-                RavenClient = new RavenClient(credentials.RavenKey);
+                SentrySdk.Init(credentials.RavenKey);
             }
 
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
@@ -324,7 +324,7 @@ namespace Sanara
                 ISO639Reverse.Add(elem.Value, elem.Key);
             }
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
             Type[] types = new[]
             {
                 // AUDIO
@@ -355,18 +355,18 @@ namespace Sanara
 #if !NSFW_BUILD
                     if (!p.IsSafe())
                     {
-                        await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " was skipped"));
+                        await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " was skipped"));
                         continue;
                     }
 #endif
                     preloads.Add(p);
-                    await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " successfully loaded"));
+                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " successfully loaded"));
                 }
                 catch (System.Exception e)
                 {
                     Preloads[i] = null;
                     await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
-                    await Utils.Log(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " failed to load"));
+                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " failed to load"));
                 }
             }
             Preloads = preloads.ToArray();
@@ -379,16 +379,13 @@ namespace Sanara
             }
             AllGameNames = allNames.ToArray();
 
-            _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Utils.LogErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
-            _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Utils.LogErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
+            _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
+            _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
-
-            if (File.Exists("Saves/Premium.txt"))
-                AllowedPremium = File.ReadAllLines("Saves/Premium.txt");
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
 
             AllowedBots = credentials.AllowedBots;
 
@@ -451,7 +448,7 @@ namespace Sanara
 
             UnsplashToken = credentials.UnsplashToken;
 
-            await Utils.Log(new LogMessage(LogSeverity.Info, "Static Preload", "Static Preload done"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Static Preload done"));
         }
 
         public static async Task UpdateTopGgAsync()

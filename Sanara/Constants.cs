@@ -1,4 +1,4 @@
-﻿namespace SanaraV3
+﻿namespace Sanara
 {
     public static class Constants
     {

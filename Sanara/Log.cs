@@ -19,7 +19,7 @@ namespace Sanara
                 LogSeverity.Info => ConsoleColor.White,
                 LogSeverity.Verbose => ConsoleColor.Green,
                 LogSeverity.Debug => ConsoleColor.DarkGreen,
-                _ => throw new NotImplementedException("Invalid log level " + msg.Severity);
+                _ => throw new NotImplementedException("Invalid log level " + msg.Severity)
             };
             Console.WriteLine(msg);
             Console.ForegroundColor = cc;
@@ -37,8 +37,8 @@ namespace Sanara
                     return;
                 }
 
-                if (StaticObjects.SentryClient != null) // If we can log the error to Sentry
-                    StaticObjects.SentryClient.CaptureException(new System.Exception(ce.Context.Message.ToString(), msg.Exception));
+                if (SentrySdk.IsEnabled) // If we can log the error to Sentry
+                    SentrySdk.CaptureException(new System.Exception(ce.Context.Message.ToString(), msg.Exception));
 
                 var sentMsg = await ce.Context.Channel.SendMessageAsync(embed: new EmbedBuilder
                 {
@@ -59,8 +59,8 @@ namespace Sanara
             }
             else
             {
-                if (StaticObjects.SentryClient != null)
-                    StaticObjects.SentryClient.CaptureException(msg.Exception);
+                if (SentrySdk.IsEnabled)
+                    SentrySdk.CaptureException(msg.Exception);
 
                 StaticObjects.Website?.AddErrorAsync(msg.Exception);
             }
@@ -69,7 +69,7 @@ namespace Sanara
         /// <summary>
         /// Callback handing when the user add a little spider to have more info about a bug
         /// </summary>
-        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote

@@ -6,7 +6,7 @@ namespace Sanara.Diaporama
 {
     public static class ReactionManager
     {
-        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel _, SocketReaction react)
+        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> _, SocketReaction react)
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
