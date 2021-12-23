@@ -37,8 +37,8 @@ namespace Sanara.Module.Administration
             {
                 new SlashCommandBuilder()
                 {
-                    Name = "Ping",
-                    Description = "Get the latency between the bot and Discord."
+                    Name = "ping",
+                    Description = "Get the latency between the bot and Discord"
                 }.Build()
             };
         }
@@ -58,7 +58,7 @@ namespace Sanara.Module.Administration
                         "(argument): Optional argument"
                 }
             };
-            StringBuilder str = new StringBuilder();
+            StringBuilder str = new();
             Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
             foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
             {

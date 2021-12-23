@@ -30,8 +30,9 @@ namespace Sanara
     {
         public static DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
         {
-            LogLevel = LogSeverity.Verbose,
+            GatewayIntents = GatewayIntents.AllUnprivileged
         });
+        public static ulong DebugGuildId { set; get; }
         /// <summary>
         /// HttpClient used for all web requests
         /// </summary>
@@ -298,6 +299,11 @@ namespace Sanara
 #else
             await Db.InitAsync("Hanaki");
 #endif
+            if (credentials.DebugGuild != null)
+            {
+                DebugGuildId = ulong.Parse(credentials.DebugGuild);
+            }
+
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 
             if (credentials.RavenKey != null)

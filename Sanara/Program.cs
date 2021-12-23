@@ -85,6 +85,7 @@ namespace Sanara
             StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
             StaticObjects.Client.Disconnected += Disconnected;
             StaticObjects.Client.Ready += Ready;
+            StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
             _commands.CommandExecuted += CommandExecuted;
 
             // Add readers
@@ -92,17 +93,6 @@ namespace Sanara
             _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
 
             // Discord modules
-            List<ICommand> _submodules = new();
-
-            _submodules.Add(new InformationModule());
-
-            foreach (var s in _submodules)
-            {
-                foreach (var c in s.CreateCommands())
-                {
-                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
-                }
-            }
             /*
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
@@ -131,8 +121,28 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
+        private Task SlashCommandExecuted(SocketSlashCommand arg)
+        {
+            arg.Channel.SendMessageAsync("I received the slash command!");
+            return Task.CompletedTask;
+        }
+
         private async Task Ready()
         {
+            List<ICommand> _submodules = new();
+            _submodules.Add(new InformationModule());
+            foreach (var s in _submodules)
+            {
+                foreach (var c in s.CreateCommands())
+                {
+                    if (StaticObjects.DebugGuildId != null)
+                    {
+                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c);
+                    }
+                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
+                }
+            }
+
 #if NSFW_BUILD
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
 #else
