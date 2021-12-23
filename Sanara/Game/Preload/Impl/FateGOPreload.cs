@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Sanara;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -7,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace SanaraV3.Game.Preload.Impl
+namespace Sanara.Game.Preload.Impl
 {
     public sealed class FateGOPreload : IPreload
     {
@@ -24,7 +23,7 @@ namespace SanaraV3.Game.Preload.Impl
                     {
                         string html = StaticObjects.HttpClient.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + elem).GetAwaiter().GetResult();
 
-                        List<string> allAnswer = new List<string>();
+                        List<string> allAnswer = new();
                         allAnswer.Add(elem);
                         string cleanAnswer = Common.RemoveAccents(elem);
                         if (elem != cleanAnswer)

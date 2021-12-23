@@ -1,5 +1,5 @@
 ﻿using Discord;
-using SanaraV3.Game.Impl;
+using Sanara.Game.Impl;
 using System.Collections.ObjectModel;
 
 namespace Sanara.Game.Preload.Impl

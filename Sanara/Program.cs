@@ -90,6 +90,7 @@ namespace Sanara
             _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
 
             // Discord modules
+            /*
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
@@ -106,11 +107,10 @@ namespace Sanara
             await _commands.AddModuleAsync<Module.Tool.LanguageNsfwModule>(null);
 #endif
             await _commands.AddModuleAsync<Module.Nsfw.BooruSfwModule>(null);
-            await _commands.AddModuleAsync<Module.Radio.RadioModule>(null);
             await _commands.AddModuleAsync<Module.Tool.CommunicationModule>(null);
             await _commands.AddModuleAsync<Module.Tool.LanguageModule>(null);
             await _commands.AddModuleAsync<Module.Tool.ScienceModule>(null);
-
+            */
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
 

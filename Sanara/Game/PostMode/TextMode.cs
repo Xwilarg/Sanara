@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace SanaraV3.Game.PostMode
+namespace Sanara.Game.PostMode
 {
     public class TextMode : IPostMode
     {

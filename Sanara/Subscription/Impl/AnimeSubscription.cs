@@ -20,7 +20,7 @@ namespace Sanara.Subscription.Impl
                 string description = "";
                 try
                 {
-                    var result = await Module.Entertainment.JapaneseModule.SearchMediaAsync(Module.Entertainment.JapaneseMedia.ANIME, animeName, true);
+                    var result = await Module.Entertainment.JapaneseModule.SearchMediaAsync(Module.Entertainment.JapaneseMedia.Anime, animeName, true);
                     if (result["attributes"]["synopsis"].Value<string>() != null)
                         description = result["attributes"]["synopsis"].Value<string>().Length > 1000 ? result["attributes"]["synopsis"].Value<string>().Substring(0, 1000) + " [...]" : result["attributes"]["synopsis"].Value<string>();
                 }

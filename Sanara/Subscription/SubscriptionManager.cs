@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Net;
-using SanaraV3.Subscription.Impl;
+using Sanara.Subscription.Impl;
 
 namespace Sanara.Subscription
 {

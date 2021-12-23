@@ -1,26 +1,21 @@
 ﻿using Discord;
 using Discord.Commands;
-using RethinkDb.Driver;
-using SanaraV3.Exception;
-using System;
-using System.Linq;
-using System.Net.Http;
+using Sanara.Exception;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace SanaraV3.Help
+namespace Sanara.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadVideoHelp()
         {
             _submoduleHelp.Add("Video", "Get pornographic videos");
-            _help.Add(("Nsfw", new Help("Video", "AdultVideo", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Search for an adult video given an optional tag.", new[] { "AV" }, Restriction.Nsfw, null)));
+            _help.Add(("Nsfw", new Help("Video", "AdultVideo", new[] { new Argument(ArgumentType.Optional, "tags") }, "Search for an adult video given an optional tag.", new[] { "AV" }, Restriction.Nsfw, null)));
         }
     }
 }
 
-namespace SanaraV3.Module.Nsfw
+namespace Sanara.Module.Nsfw
 {
     public class VideoModule : ModuleBase
     {
@@ -42,7 +37,7 @@ namespace SanaraV3.Module.Nsfw
             } while (redirectCounter < 10);
             return html;
         }
-
+        /*
         [Command("AdultVideo", RunMode = RunMode.Async), RequireNsfw, Alias("AV")]
         public async Task AdultVideoAsync(string tag = "")
         {
@@ -90,5 +85,6 @@ namespace SanaraV3.Module.Nsfw
                 ImageUrl = previewUrl
             }.Build());
         }
+        */
     }
 }

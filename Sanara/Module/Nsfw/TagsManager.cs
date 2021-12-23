@@ -1,14 +1,15 @@
 ﻿using BooruSharp.Booru;
 using BooruSharp.Search;
+using Sanara.Module.Nsfw;
 
-namespace SanaraV3
+namespace Sanara
 {
     public class TagsManager
     {
         /// <summary>
         /// Associate an id with a booru and a post
         /// </summary>
-        private readonly Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>>();
+        private readonly Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new();
 
         public void AddTag(int id, ABooru booru, BooruSharp.Search.Post.SearchResult post)
         {
@@ -21,9 +22,9 @@ namespace SanaraV3
             if (!_tags.ContainsKey(id))
                 return null;
 
-            List<string> artists = new List<string>();
-            List<string> characters = new List<string>();
-            List<string> sources = new List<string>();
+            List<string> artists = new();
+            List<string> characters = new();
+            List<string> sources = new();
 
             var post = _tags[id];
 

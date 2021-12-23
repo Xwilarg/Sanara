@@ -11,7 +11,7 @@ namespace Sanara.Game
     {
         protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode multiplayerMode, GameSettings settings)
         {
-            _state = GameState.PREPARE;
+            _state = GameState.Prepare;
             _textChan = textChan;
             if (_textChan is ITextChannel)
                 _guildId = ((ITextChannel)_textChan).GuildId;
@@ -85,7 +85,7 @@ namespace Sanara.Game
 
         public bool Join(IUser user)
         {
-            if (_state != GameState.PREPARE)
+            if (_state != GameState.Prepare)
                 return false;
 
             return _lobby.AddUser(user);
@@ -96,7 +96,7 @@ namespace Sanara.Game
 
         public async Task StartAsync()
         {
-            if (_state != GameState.PREPARE)
+            if (_state != GameState.Prepare)
                 return;
 
             string introMsg = null;
@@ -105,7 +105,7 @@ namespace Sanara.Game
             {
                 if (_lobby.GetUserCount() < 2)
                 {
-                    _state = GameState.LOST;
+                    _state = GameState.Lost;
                     await _textChan.SendMessageAsync("The game was cancelled because there wasn't enough players (at least 2 are required)");
                     return;
                 }
@@ -118,7 +118,7 @@ namespace Sanara.Game
             else if (StaticObjects.Website != null)
                 await StaticObjects.Website?.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
 
-            _state = GameState.READY;
+            _state = GameState.Ready;
             await PostAsync(introMsg);
         }
 
@@ -142,10 +142,10 @@ namespace Sanara.Game
         /// <param name="introMsg">Message to be sent before the game content, null if none</param>
         private async Task PostAsync(string introMsg)
         {
-            if (_state != GameState.RUNNING && _state != GameState.READY)
+            if (_state != GameState.Running && _state != GameState.Ready)
                 return;
 
-            _state = GameState.POSTING;
+            _state = GameState.Posting;
 
             // If somehow an error happened, we try sending a new image (up to 3 times)
             int nbTries = 0;
@@ -189,7 +189,7 @@ namespace Sanara.Game
                     }
                 } catch (GameLost e)
                 {
-                    _state = GameState.RUNNING;
+                    _state = GameState.Running;
                     await LooseAsync(e.Message, true);
                     return;
                 } catch (System.Exception e)
@@ -208,7 +208,7 @@ namespace Sanara.Game
                 break;
             } while (true);
             _lastPost = DateTime.Now; // Reset timer
-            _state = GameState.RUNNING;
+            _state = GameState.Running;
         }
 
         public void AddAnswer(SocketUserMessage msg)
@@ -226,7 +226,7 @@ namespace Sanara.Game
         {
             lock (_messages)
             {
-                if (_state != GameState.RUNNING && _state != GameState.LOST)
+                if (_state != GameState.Running && _state != GameState.Lost)
                     return Task.CompletedTask;
                 try
                 {
@@ -246,8 +246,8 @@ namespace Sanara.Game
                                 if (!_contributors.Contains(msg.Author.Id))
                                     _contributors.Add(msg.Author.Id);
                                 _score++;
-                                if (_state == GameState.LOST)
-                                    _state = GameState.RUNNING;
+                                if (_state == GameState.Lost)
+                                    _state = GameState.Running;
                                 _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
                                 if (_lobby != null)
                                     _multiplayerMode.AnswerIsCorrect(msg.Author);
@@ -265,7 +265,7 @@ namespace Sanara.Game
                         {
                             if (e.InnerException is GameLost)
                             {
-                                if (_state == GameState.RUNNING)
+                                if (_state == GameState.Running)
                                     LooseAsync(e.InnerException.Message, false).GetAwaiter().GetResult();
                                 break;
                             }
@@ -299,7 +299,7 @@ namespace Sanara.Game
 
         public async Task CancelAsync()
         {
-            if (_state == GameState.LOST) // No point cancelling a game that is already lost
+            if (_state == GameState.Lost) // No point cancelling a game that is already lost
             {
                 await _textChan.SendMessageAsync("The game is already lost.");
                 return;
@@ -328,7 +328,7 @@ namespace Sanara.Game
                 {
                     string outro = _multiplayerMode.GetOutroLoose();
                     await _textChan.SendMessageAsync(msg + (canLoose ? "\n" + GetAnswer() : "") + $"\n{_multiplayerMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
-                    _state = GameState.LOST;
+                    _state = GameState.Lost;
                 }
                 else
                 {
@@ -336,11 +336,11 @@ namespace Sanara.Game
                 }
                 return;
             }
-            _state = GameState.LOST;
+            _state = GameState.Lost;
 
             await CheckAnswersAsync(); // We check the answers that were sent to be sure to not loose a game while we are still supposed to treat an answer
 
-            if (_state != GameState.LOST)
+            if (_state != GameState.Lost)
                 return;
 
             string scoreSentence = "";
@@ -367,7 +367,7 @@ namespace Sanara.Game
 
         public async Task CheckTimerAsync()
         {
-            if (_state != GameState.RUNNING)
+            if (_state != GameState.Running)
                 return;
 
             if (_lastPost.AddSeconds(GetGameTime()) < DateTime.Now) // If post time + game time is < to current time, that means the player spent too much time answering
@@ -378,7 +378,7 @@ namespace Sanara.Game
         /// Is the game lost
         /// </summary>
         public bool AsLost()
-            => _state == GameState.LOST;
+            => _state == GameState.Lost;
 
         public bool IsMyGame(ulong chanId)
             => _textChan.Id == chanId;

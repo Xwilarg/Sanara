@@ -2,35 +2,29 @@
 using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SanaraV3.Attribute;
-using SanaraV3.Exception;
-using SanaraV3.Help;
-using System;
-using System.Collections.Generic;
+using Sanara.Attribute;
+using Sanara.Exception;
+using Sanara.Help;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace SanaraV3.Help
+namespace Sanara.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadInformationHelp()
         {
             _submoduleHelp.Add("Information", "Get important information about the bot");
-            _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.MANDATORY, "module/submodule") }, "Display this help.", new string[0], Restriction.None, "Help information")));
-            _help.Add(("Administration", new Help("Information", "Status", new Argument[0], "Display various information about the bot.", new string[0], Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Premium", new Argument[0], "Get information about premium features.", new string[0], Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "V3", new Argument[0], "Get information about the transition from the V2 to the V3.", new string[0], Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Logs", new Argument[0], "Get the latest commits made to the bot.", new string[0], Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Gdpr", new Argument[0], "Display all the data saved about your guild.", new string[0], Restriction.AdminOnly, null)));
-            _help.Add(("Administration", new Help("Information", "Ping", new Argument[0], "Get the latency between the bot and Discord.", new string[0], Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
+            _help.Add(("Administration", new Help("Information", "Status", Array.Empty<Argument>(), "Display various information about the bot.", Array.Empty<string>(), Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Logs", Array.Empty<Argument>(), "Get the latest commits made to the bot.", Array.Empty<string>(), Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), "Display all the data saved about your guild.", Array.Empty<string>(), Restriction.AdminOnly, null)));
+            _help.Add(("Administration", new Help("Information", "Ping", Array.Empty<Argument>(), "Get the latency between the bot and Discord.", Array.Empty<string>(), Restriction.None, null)));
         }
     }
 }
 
-namespace SanaraV3.Module.Administration
+namespace Sanara.Module.Administration
 {
     public class InformationModule : ModuleBase
     {
@@ -92,34 +86,6 @@ namespace SanaraV3.Module.Administration
             }.Build());
         }
 
-        [Command("V3")]
-        public async Task V3Async()
-        {
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = "Sanara V3",
-                Color = Color.Blue,
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "What is Sanara V3",
-                        Value = "Sanara V3 is the current version, released at the end of september of 2020."
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "What is the difference with the V2",
-                        Value = "The whole code was redesigned.\nFor me, that means implementing new feature is now easier.\nFor you, that means a better bot response time, less crashes and some improvements on current features."
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Sanara tells me my feature is not available",
-                        Value = "Most of the features from the V2 were reimplemented, however some of them are a bit harder to do.\nI'm planning to add them back but that may take a bit more of time."
-                    }
-                }
-            }.Build());
-        }
-
         [Command("Help")]
         public async Task Help()
         {
@@ -174,6 +140,32 @@ namespace SanaraV3.Module.Administration
             return embed.Build();
         }
 
+        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
+        {
+            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
+            name = name.ToUpper();
+            var embed = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = "Help",
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
+                        "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
+                }
+            };
+            StringBuilder str = new StringBuilder();
+            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
+            {
+                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.Mandatory ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
+            }
+            embed.Description = str.ToString();
+            return embed.Build();
+        }
+        /*
         [Command("Help")]
         public async Task HelpAsync(string name)
         {
@@ -234,32 +226,6 @@ namespace SanaraV3.Module.Administration
             await ReplyAsync(embed: embed.Build());
         }
 
-        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
-        {
-            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
-            name = name.ToUpper();
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Help",
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
-                        "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            };
-            StringBuilder str = new StringBuilder();
-            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
-            {
-                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
-                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
-            }
-            embed.Description = str.ToString();
-            return embed.Build();
-        }
-
         [Command("Status")]
         public async Task Status()
         {
@@ -302,6 +268,6 @@ namespace SanaraV3.Module.Administration
         {
             await ReplyAsync("Please check your private messages.");
             await Context.User.SendMessageAsync("```json\n" + (await StaticObjects.Db.DumpAsync(Context.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
-        }
+        }*/
     }
 }

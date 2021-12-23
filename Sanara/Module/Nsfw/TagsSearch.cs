@@ -1,8 +1,7 @@
 ﻿using BooruSharp.Booru;
 using BooruSharp.Search.Post;
-using System.Collections.Generic;
 
-namespace SanaraV3.Module.Nsfw
+namespace Sanara.Module.Nsfw
 {
     public struct TagsSearch
     {

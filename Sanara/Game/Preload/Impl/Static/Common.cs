@@ -1,4 +1,4 @@
-﻿namespace SanaraV3.Game.Preload.Impl.Static
+﻿namespace Sanara.Game.Preload.Impl.Static
 {
     public static class Common
     {

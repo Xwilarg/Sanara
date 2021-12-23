@@ -1,37 +1,31 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordUtils;
 using Google;
 using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SanaraV3.Exception;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Sanara.Exception;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
 
-namespace SanaraV3.Help
+namespace Sanara.Help
 {
     public sealed partial class HelpPreload
     {
         public void LoadLanguageHelp()
         {
             _submoduleHelp.Add("Language", "Get various information related to others languages");
-            _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", new string[0], Restriction.None, "Japanese submarine")));
-            _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.MANDATORY, "kanji") }, "Get information about a kanji.", new string[0], Restriction.None, "Kanji 艦")));
-            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.MANDATORY, "word") }, "Get the urban definition of a word.", new string[0], Restriction.Nsfw, "Urban bunny hop")));
-            _help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.MANDATORY, "language"), new Argument(ArgumentType.MANDATORY, "sentence/image") }, "Translate a sentence to the given language.", new string[0], Restriction.None, "Translate en 空は青いです")));
+            _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", Array.Empty<string>(), Restriction.None, "Japanese submarine")));
+            _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.Mandatory, "kanji") }, "Get information about a kanji.", Array.Empty<string>(), Restriction.None, "Kanji 艦")));
+            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the urban definition of a word.", Array.Empty<string>(), Restriction.Nsfw, "Urban bunny hop")));
+            _help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
         }
     }
 }
 
-namespace SanaraV3.Module.Tool
+namespace Sanara.Module.Tool
 {
     public sealed class LanguageNsfwModule : ModuleBase
     {
@@ -94,10 +88,10 @@ namespace SanaraV3.Module.Tool
 
     public sealed class LanguageModule : ModuleBase
     {
-        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel chan, SocketReaction react)
+        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
-            bool allowFlags = chan is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+            bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
             // If emote is not from the bot and is an arrow emote
             if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
             {
@@ -105,7 +99,7 @@ namespace SanaraV3.Module.Tool
                 if (!string.IsNullOrEmpty(gMsg))
                 {
                     var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
-                    await chan.SendMessageAsync(embed: new EmbedBuilder
+                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: new EmbedBuilder
                     {
                         Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
                         Description = translation.TranslatedText,
@@ -115,6 +109,8 @@ namespace SanaraV3.Module.Tool
             }
         }
 
+        //TODO
+        /*
         [Command("Translate", RunMode = RunMode.Async)]
         public async Task TranslateAsync(string language)
         {
@@ -309,7 +305,7 @@ namespace SanaraV3.Module.Tool
                 embed.AddField(title, content);
             }
             await ReplyAsync(embed: embed.Build());
-        }
+        }*/
 
         public static string ToRomaji(string entry)
             => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');

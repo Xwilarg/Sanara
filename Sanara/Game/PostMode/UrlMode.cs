@@ -1,6 +1,7 @@
 ﻿using Discord;
+using Sanara;
 
-namespace SanaraV3.Game.PostMode
+namespace Sanara.Game.PostMode
 {
     public class UrlMode : IPostMode
     {
