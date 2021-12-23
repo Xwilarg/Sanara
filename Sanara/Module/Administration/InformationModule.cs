@@ -8,34 +8,74 @@ using Sanara.Help;
 using System.Globalization;
 using System.Text;
 
-namespace Sanara.Help
+namespace Sanara.Module.Administration
 {
-    public sealed partial class HelpPreload
+    public class InformationModule : ModuleBase, ICommand
     {
-        public void LoadInformationHelp()
+        public SubmoduleInfo Help()
         {
-            _submoduleHelp.Add("Information", "Get important information about the bot");
+            //_submoduleHelp.Add("Information", "Get important information about the bot");
+            return new(
+                name: "Information",
+                help: new Help.Help[]
+                {
+                    new("Information", "Ping", Array.Empty<Argument>(), "Get the latency between the bot and Discord.", Array.Empty<string>(), Restriction.None, null)
+                }
+            );
+            /*
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", Array.Empty<Argument>(), "Display various information about the bot.", Array.Empty<string>(), Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Logs", Array.Empty<Argument>(), "Get the latest commits made to the bot.", Array.Empty<string>(), Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), "Display all the data saved about your guild.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-            _help.Add(("Administration", new Help("Information", "Ping", Array.Empty<Argument>(), "Get the latency between the bot and Discord.", Array.Empty<string>(), Restriction.None, null)));
+            _help.Add(("Administration", );
+            */
         }
-    }
-}
 
-namespace Sanara.Module.Administration
-{
-    public class InformationModule : ModuleBase
-    {
-        [Command("Ping")]
+        public SlashCommandProperties[] CreateCommands()
+        {
+            return new[]
+            {
+                new SlashCommandBuilder()
+                {
+                    Name = "Ping",
+                    Description = "Get the latency between the bot and Discord."
+                }.Build()
+            };
+        }
+
+        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
+        {
+            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
+            name = name.ToUpper();
+            var embed = new EmbedBuilder
+            {
+                Color = Color.Blue,
+                Title = "Help",
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
+                        "[argument]: Mandatory argument\n" +
+                        "(argument): Optional argument"
+                }
+            };
+            StringBuilder str = new StringBuilder();
+            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
+            {
+                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.Mandatory ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
+                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
+            }
+            embed.Description = str.ToString();
+            return embed.Build();
+        }
+
         public async Task PingAsync()
         {
             var content = ":ping_pong: Pong!";
             var msg = await ReplyAsync(content);
             await msg.ModifyAsync(x => x.Content = content + "\nLatency: " + msg.CreatedAt.Subtract(Context.Message.CreatedAt).TotalMilliseconds + "ms");
         }
-
+        /*
         [Command("Logs")]
         public async Task LogsAsync()
         {
@@ -137,32 +177,6 @@ namespace Sanara.Module.Administration
             {
                 embed.AddField(m.Key, string.Join("\n", m.Value.Select(x => "**" + x + "** - " + StaticObjects.Help.GetSubmoduleHelp(x))));
             }
-            return embed.Build();
-        }
-
-        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
-        {
-            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
-            name = name.ToUpper();
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Help",
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
-                        "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            };
-            StringBuilder str = new StringBuilder();
-            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
-            {
-                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.Mandatory ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
-                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
-            }
-            embed.Description = str.ToString();
             return embed.Build();
         }
         /*

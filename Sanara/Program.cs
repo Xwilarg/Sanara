@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sanara.CustomClass;
 using Sanara.Diaporama;
+using Sanara.Module;
+using Sanara.Module.Administration;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -90,6 +92,17 @@ namespace Sanara
             _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
 
             // Discord modules
+            List<ICommand> _submodules = new();
+
+            _submodules.Add(new InformationModule());
+
+            foreach (var s in _submodules)
+            {
+                foreach (var c in s.CreateCommands())
+                {
+                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
+                }
+            }
             /*
             await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
