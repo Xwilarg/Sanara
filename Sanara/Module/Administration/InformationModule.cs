@@ -62,22 +62,26 @@ namespace Sanara.Module.Administration
                 Color = Color.Purple
             };
             embed.AddField("Guild count", StaticObjects.Client.Guilds.Count, true);
-            embed.AddField("Total user count (may contains duplicate)", StaticObjects.Client.Guilds.Sum(x => x.Users.Count), true);
+
+            // Get informations about games
             StringBuilder str = new();
             List<string> gameNames = new();
             foreach (var elem in StaticObjects.Preloads)
             {
                 string name = elem.GetGameNames()[0];
+                // We only get games once so we skip when we get the "others" versions (like audio)
                 if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
                     continue;
                 var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
                 var loadInfo = elem.Load();
                 if (loadInfo != null)
                     str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
-                else
+                else // Get information at runtime
                     str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
             }
             embed.AddField("Games", str.ToString());
+
+            // Get information about subscriptions
             var subs = StaticObjects.GetSubscriptionCount();
             embed.AddField("Subscriptions",
                 subs == null ?
@@ -87,13 +91,17 @@ namespace Sanara.Module.Administration
 #else
                     "**Anime**: " + subs["anime"]);
 #endif
-            /*var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
+
+            // Get latests commits
+            str = new();
+            var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             foreach (var elem in json)
             {
-                embed.AddField(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture).ToString("dd/MM/yyyy HH:mm:ss") +
-                    " by " + elem["commit"]["author"]["name"].Value<string>(), elem["commit"]["message"].Value<string>());
+                var secs = (DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture) - epoch).TotalSeconds;
+                str.AppendLine($"<t:{secs}>" + ": " + elem["commit"]["message"].Value<string>());
             }
-            embed.AddField("Latest changes", json)*/
+            embed.AddField("Latest changes", str.ToString());
             await ctx.RespondAsync(embed: embed.Build());
         }
         /*

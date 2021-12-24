@@ -185,9 +185,9 @@ namespace Sanara
             await StaticObjects.Db.InitGuildAsync(guild);
         }
 
-        private async Task HandleCommandAsync(SocketMessage arg)
+        private Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot || arg is not SocketUserMessage msg) return; // The message received isn't a message we can deal with
+            if (arg.Author.IsBot || arg is not SocketUserMessage msg) return Task.CompletedTask; // The message received isn't a message we can deal with
 
             ITextChannel? textChan = msg.Channel as ITextChannel;
 
@@ -197,6 +197,8 @@ namespace Sanara
                 var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
                 game?.AddAnswer(msg);
             }
+
+            return Task.CompletedTask;
         }
 
         private async Task ConnectedAsync()
