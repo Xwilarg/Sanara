@@ -16,6 +16,7 @@ namespace Sanara
         private readonly CommandService _commands = new();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
+        private Dictionary<string, Func<SocketSlashCommand, Task>> _commandsAssociations = new();
 
         public static async Task Main()
         {
@@ -121,28 +122,38 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
-        private Task SlashCommandExecuted(SocketSlashCommand arg)
+        private async Task SlashCommandExecuted(SocketSlashCommand arg)
         {
-            arg.Channel.SendMessageAsync("I received the slash command!");
-            return Task.CompletedTask;
+            if (!_commandsAssociations.ContainsKey(arg.CommandName.ToUpperInvariant()))
+            {
+                throw new NotImplementedException($"Unknown command {arg.CommandName}");
+            }
+            await _commandsAssociations[arg.CommandName.ToUpperInvariant()](arg);
         }
 
         private async Task Ready()
         {
-            List<ICommand> _submodules = new();
+            // Commands already loaded
+            if (_commandsAssociations.Count != 0)
+            {
+                return;
+            }
+
+            List<ISubmodule> _submodules = new();
             _submodules.Add(new InformationModule());
             foreach (var s in _submodules)
             {
-                foreach (var c in s.CreateCommands())
+                foreach (var c in s.GetCommands())
                 {
                     if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
                     {
-                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c);
+                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
                     }
                     else
                     {
-                        await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c);
+                        await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
                     }
+                    _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c.Callback);
                 }
             }
 
@@ -153,7 +164,7 @@ namespace Sanara
 #endif
         }
 
-        private async Task CommandExecuted(Optional<CommandInfo> cmd, ICommandContext context, IResult result)
+        private async Task CommandExecuted(Optional<Discord.Commands.CommandInfo> cmd, ICommandContext context, IResult result)
         {
             if (StaticObjects.Website != null)
             {

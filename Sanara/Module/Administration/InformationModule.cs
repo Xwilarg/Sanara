@@ -1,27 +1,25 @@
 ﻿using Discord;
 using Discord.Commands;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sanara.Attribute;
-using Sanara.Exception;
+using Discord.WebSocket;
 using Sanara.Help;
-using System.Globalization;
 using System.Text;
 
 namespace Sanara.Module.Administration
 {
-    public class InformationModule : ModuleBase, ICommand
+    public class InformationModule : ISubmodule
     {
-        public SubmoduleInfo Help()
+        public SubmoduleInfo GetInfo()
         {
+            return new("Information", "Get important information about the bot");
             //_submoduleHelp.Add("Information", "Get important information about the bot");
-            return new(
+            /*return new(
                 name: "Information",
+                description
                 help: new Help.Help[]
                 {
                     new("Information", "Ping", Array.Empty<Argument>(), "Get the latency between the bot and Discord.", Array.Empty<string>(), Restriction.None, null)
                 }
-            );
+            );*/
             /*
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", Array.Empty<Argument>(), "Display various information about the bot.", Array.Empty<string>(), Restriction.None, null)));
@@ -31,15 +29,18 @@ namespace Sanara.Module.Administration
             */
         }
 
-        public SlashCommandProperties[] CreateCommands()
+        public CommandInfo[] GetCommands()
         {
             return new[]
             {
-                new SlashCommandBuilder()
-                {
-                    Name = "ping",
-                    Description = "Get the latency between the bot and Discord"
-                }.Build()
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "ping",
+                        Description = "Get the latency between the bot and Discord"
+                    }.Build(),
+                    callback: PingAsync
+                )
             };
         }
 
@@ -69,11 +70,12 @@ namespace Sanara.Module.Administration
             return embed.Build();
         }
 
-        public async Task PingAsync()
+        public async Task PingAsync(SocketSlashCommand ctx)
         {
             var content = ":ping_pong: Pong!";
-            var msg = await ReplyAsync(content);
-            await msg.ModifyAsync(x => x.Content = content + "\nLatency: " + msg.CreatedAt.Subtract(Context.Message.CreatedAt).TotalMilliseconds + "ms");
+            await ctx.RespondAsync(content);
+            var orMsg = await ctx.GetOriginalResponseAsync();
+            await ctx.ModifyOriginalResponseAsync(x => x.Content = orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
         }
         /*
         [Command("Logs")]

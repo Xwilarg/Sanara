@@ -2,10 +2,10 @@
 {
     public record SubmoduleInfo
     {
-        public SubmoduleInfo(string name, Help[] help)
-            => (Name, Help) = (name, help);
+        public SubmoduleInfo(string name, string description)
+            => (Name, Description) = (name, description);
 
-        public string Name { init; get; }
-        public Help[] Help { init; get; }
+        public string Name { private init; get; }
+        public string Description{ private init; get; }
     }
 }
