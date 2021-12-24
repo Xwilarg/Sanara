@@ -75,20 +75,9 @@ namespace Sanara
         /// </summary>
         public static UploadManager Website { set; get; }
         /// <summary>
-        /// Bots that are allowed to send messages to Sanara
-        /// Messages from others bots will be ignored
-        /// </summary>
-        public static string[] AllowedBots { set; get; } = Array.Empty<string>();
-        /// <summary>
         /// Last message received by the bot
         /// </summary>
         public static DateTime LastMessage { set; get; } = DateTime.UtcNow;
-
-        // INFORMATION MODULE
-        /// <summary>
-        /// GitHub API token
-        /// </summary>
-        public static string GithubKey { set; get; }
 
         // NSFW MODULE
         /// <summary>
@@ -398,8 +387,6 @@ namespace Sanara
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
 
-            AllowedBots = credentials.AllowedBots;
-
             if (credentials.YouTubeKey != null)
             {
                 YouTube = new YouTubeService(new BaseClientService.Initializer
@@ -433,11 +420,6 @@ namespace Sanara
             if (credentials.TopGgToken != null)
             {
                 DblToken = credentials.TopGgToken;
-            }
-
-            if (credentials.GithubKey != null)
-            {
-                GithubKey = credentials.GithubKey;
             }
 
             if (File.Exists("Keys/GoogleAPI.json"))

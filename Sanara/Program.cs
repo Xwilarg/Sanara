@@ -87,7 +87,6 @@ namespace Sanara
             StaticObjects.Client.Disconnected += Disconnected;
             StaticObjects.Client.Ready += Ready;
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
-            _commands.CommandExecuted += CommandExecuted;
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
@@ -129,6 +128,12 @@ namespace Sanara
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
             await _commandsAssociations[arg.CommandName.ToUpperInvariant()](arg);
+
+            if (StaticObjects.Website != null)
+            {
+                await StaticObjects.Website.AddNewMessageAsync();
+                await StaticObjects.Website.AddNewCommandAsync(arg.CommandName.ToUpperInvariant());
+            }
         }
 
         private async Task Ready()
@@ -159,19 +164,7 @@ namespace Sanara
 
 #if NSFW_BUILD
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
-#else
-            await StaticObjects.Client.SetActivityAsync(new Discord.Game("h.help for command list", ActivityType.Watching));
 #endif
-        }
-
-        private async Task CommandExecuted(Optional<Discord.Commands.CommandInfo> cmd, ICommandContext context, IResult result)
-        {
-            if (StaticObjects.Website != null)
-            {
-                await StaticObjects.Website.AddNewMessageAsync();
-                if (cmd.IsSpecified)
-                    await StaticObjects.Website.AddNewCommandAsync(cmd.Value.Name);
-            }
         }
 
         private Task Disconnected(System.Exception e)
@@ -194,47 +187,15 @@ namespace Sanara
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot && (StaticObjects.AllowedBots == null || !StaticObjects.AllowedBots.Contains(arg.Author.Id.ToString()))) // We ignore messages from bots (except whitelisted ones)
-                return;
-            var msg = arg as SocketUserMessage;
-            if (msg == null) return; // The message received isn't a message we can deal with
+            if (arg.Author.IsBot || arg is not SocketUserMessage msg) return; // The message received isn't a message we can deal with
 
-            int pos = 0;
-            ITextChannel textChan = msg.Channel as ITextChannel;
-#if NSFW_BUILD
-            var defaultPrefix = "s.";
-#else
-            var defaultPrefix = "h.";
-#endif
-            var prefix = textChan == null ? defaultPrefix : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
-            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
-            {
-                if (textChan != null && !StaticObjects.Help.IsModuleAvailable(textChan.GuildId, msg.Content.Substring(pos).ToLower()))
-                {
-                    await textChan.SendMessageAsync("This module was disabled by on your server.");
-                    return;
-                }
-                var context = new SocketCommandContext(StaticObjects.Client, msg);
-                var result = await _commands.ExecuteAsync(context, pos, null);
-                if (!result.IsSuccess)
-                {
-                    var error = result.Error.Value;
-                    Console.WriteLine(error.ToString()); // TODO: Debug
-                    if (error == CommandError.UnmetPrecondition)
-                        await context.Channel.SendMessageAsync(result.ErrorReason);
-                    else if (error == CommandError.BadArgCount || error == CommandError.ParseFailed)
-                        await context.Channel.SendMessageAsync(embed: Module.Administration.InformationModule.GetSingleHelpEmbed(context.Message.Content.Substring(pos), context));
-                }
-                else
-                    StaticObjects.LastMessage = DateTime.UtcNow;
-            }
-            else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing // TODO: Need to check if it's not the bot prefix
+            ITextChannel? textChan = msg.Channel as ITextChannel;
+
+            // TODO: What about commands?
+            if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing
             {
                 var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
-                if (game != null) // If we are in a game
-                {
-                    game.AddAnswer(msg);
-                }
+                game?.AddAnswer(msg);
             }
         }
 

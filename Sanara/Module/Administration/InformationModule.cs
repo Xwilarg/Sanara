@@ -1,7 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sanara.Help;
+using System.Globalization;
 using System.Text;
 
 namespace Sanara.Module.Administration
@@ -11,19 +14,10 @@ namespace Sanara.Module.Administration
         public SubmoduleInfo GetInfo()
         {
             return new("Information", "Get important information about the bot");
-            //_submoduleHelp.Add("Information", "Get important information about the bot");
-            /*return new(
-                name: "Information",
-                description
-                help: new Help.Help[]
-                {
-                    new("Information", "Ping", Array.Empty<Argument>(), "Get the latency between the bot and Discord.", Array.Empty<string>(), Restriction.None, null)
-                }
-            );*/
             /*
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
             _help.Add(("Administration", new Help("Information", "Status", Array.Empty<Argument>(), "Display various information about the bot.", Array.Empty<string>(), Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Logs", Array.Empty<Argument>(), "Get the latest commits made to the bot.", Array.Empty<string>(), Restriction.None, null)));
+            _help.Add(("Administration", new Help("Information", "Logs", Array.Empty<Argument>(), ".", Array.Empty<string>(), Restriction.None, null)));
             _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), "Display all the data saved about your guild.", Array.Empty<string>(), Restriction.AdminOnly, null)));
             _help.Add(("Administration", );
             */
@@ -40,34 +34,16 @@ namespace Sanara.Module.Administration
                         Description = "Get the latency between the bot and Discord"
                     }.Build(),
                     callback: PingAsync
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "status",
+                        Description = "Get various information about the bot"
+                    }.Build(),
+                    callback: StatusAsync
                 )
             };
-        }
-
-        public static Embed GetSingleHelpEmbed(string name, ICommandContext context)
-        {
-            var fullHelp = StaticObjects.Help.GetHelp(context.Guild?.Id ?? 0, true, true, true);
-            name = name.ToUpper();
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Help",
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "This help was displayed because the last command you sent had some invalid argument\n\n" +
-                        "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            };
-            StringBuilder str = new();
-            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-            foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
-            {
-                str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.Mandatory ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
-                    (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
-            }
-            embed.Description = str.ToString();
-            return embed.Build();
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)
@@ -77,56 +53,50 @@ namespace Sanara.Module.Administration
             var orMsg = await ctx.GetOriginalResponseAsync();
             await ctx.ModifyOriginalResponseAsync(x => x.Content = orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
         }
-        /*
-        [Command("Logs")]
-        public async Task LogsAsync()
-        {
-            if (StaticObjects.GithubKey == null)
-                throw new CommandFailed("This command is not available.");
 
+        public async Task StatusAsync(SocketSlashCommand ctx)
+        {
             var embed = new EmbedBuilder
             {
-                Title = "Latest changes",
-                Url = "https://github.com/Xwilarg/Sanara/commits/master",
+                Title = "Status",
                 Color = Color.Purple
             };
-            var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5&access_token=" + StaticObjects.GithubKey));
+            embed.AddField("Guild count", StaticObjects.Client.Guilds.Count, true);
+            embed.AddField("Total user count (may contains duplicate)", StaticObjects.Client.Guilds.Sum(x => x.Users.Count), true);
+            StringBuilder str = new();
+            List<string> gameNames = new();
+            foreach (var elem in StaticObjects.Preloads)
+            {
+                string name = elem.GetGameNames()[0];
+                if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
+                    continue;
+                var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
+                var loadInfo = elem.Load();
+                if (loadInfo != null)
+                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
+                else
+                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
+            }
+            embed.AddField("Games", str.ToString());
+            var subs = StaticObjects.GetSubscriptionCount();
+            embed.AddField("Subscriptions",
+                subs == null ?
+                    "Not yet initialized" :
+#if NSFW_BUILD
+                    string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
+#else
+                    "**Anime**: " + subs["anime"]);
+#endif
+            /*var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
             foreach (var elem in json)
             {
                 embed.AddField(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture).ToString("dd/MM/yyyy HH:mm:ss") +
                     " by " + elem["commit"]["author"]["name"].Value<string>(), elem["commit"]["message"].Value<string>());
             }
-            await ReplyAsync(embed: embed.Build());
+            embed.AddField("Latest changes", json)*/
+            await ctx.RespondAsync(embed: embed.Build());
         }
-
-        [Command("Premium")]
-        public async Task PremiumAsync()
-        {
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = "Premium",
-                Color = Color.Blue,
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "What is the premium feature?",
-                        Value = "While I'm trying to keeping Sanara as open as possible, storage and API calls aren't free\n" +
-                            "Therefor some features are now restricted to 'premium' users."
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "How can I apply?",
-                        Value = "For now users must be manually whitelisted"
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Radio module",
-                        Value = "YouTube API calls are heavily limited and Radio module need a lot of them, letting everyone use this module would result at reaching the maximum limit of call really quickly"
-                    }
-                }
-            }.Build());
-        }
+        /*
 
         [Command("Help")]
         public async Task Help()
@@ -239,43 +209,6 @@ namespace Sanara.Module.Administration
             }
             else
                 throw new CommandFailed("There is no command or module available with this name");
-            await ReplyAsync(embed: embed.Build());
-        }
-
-        [Command("Status")]
-        public async Task Status()
-        {
-            var embed = new EmbedBuilder
-            {
-                Title = "Status",
-                Color = Color.Purple
-            };
-            embed.AddField("Server count", StaticObjects.Client.Guilds.Count, true);
-            embed.AddField("Total user count (may contains duplicate)", StaticObjects.Client.Guilds.Sum(x => x.Users.Count), true);
-            StringBuilder str = new StringBuilder();
-            List<string> gameNames = new List<string>();
-            foreach (var elem in StaticObjects.Preloads)
-            {
-                string name = elem.GetGameNames()[0];
-                if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
-                    continue;
-                var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
-                var loadInfo = elem.Load();
-                if (loadInfo != null)
-                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
-                else
-                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
-            }
-            embed.AddField("Games", str.ToString());
-            var subs = StaticObjects.GetSubscriptionCount();
-            embed.AddField("Subscriptions",
-                subs == null ?
-                    "Not yet initialized" :
-#if NSFW_BUILD
-                    string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
-#else
-                    "**Anime**: " + subs["anime"]);
-#endif
             await ReplyAsync(embed: embed.Build());
         }
 
