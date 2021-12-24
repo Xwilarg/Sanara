@@ -99,7 +99,7 @@ namespace Sanara.Module.Administration
             foreach (var elem in json)
             {
                 var secs = (DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture) - epoch).TotalSeconds;
-                str.AppendLine($"<t:{secs}>" + ": " + elem["commit"]["message"].Value<string>());
+                str.AppendLine($"<t:{secs}>: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
             }
             embed.AddField("Latest changes", str.ToString());
             await ctx.RespondAsync(embed: embed.Build());
