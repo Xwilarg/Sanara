@@ -128,6 +128,7 @@ namespace Sanara
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
             await _commandsAssociations[arg.CommandName.ToUpperInvariant()](arg);
+            StaticObjects.LastMessage = DateTime.Now;
 
             if (StaticObjects.Website != null)
             {
@@ -144,13 +145,18 @@ namespace Sanara
                 return;
             }
 
+            var isDebug = StaticObjects.DebugGuildId != 0 && Debugger.IsAttached;
+            if (isDebug)
+            {
+                await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
+            }
             List<ISubmodule> _submodules = new();
             _submodules.Add(new InformationModule());
             foreach (var s in _submodules)
             {
                 foreach (var c in s.GetCommands())
                 {
-                    if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
+                    if (isDebug)
                     {
                         await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
                     }
@@ -165,6 +171,8 @@ namespace Sanara
 #if NSFW_BUILD
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
 #endif
+            // The bot is now really ready to interact with people
+            StaticObjects.Started = DateTime.Now;
         }
 
         private Task Disconnected(System.Exception e)

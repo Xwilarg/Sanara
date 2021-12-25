@@ -61,68 +61,6 @@ namespace SanaraV3.Module.Tool
             }.Build());
         }
 
-        [Command("Botinfo")]
-        public async Task BotinfoAsync() // TODO: Combine command with next one
-        {
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = StaticObjects.Client.CurrentUser.ToString(),
-                Color = Color.Purple,
-                ImageUrl = StaticObjects.Client.CurrentUser.GetAvatarUrl(),
-#if NSFW_BUILD
-                Description = "**List of useful links:**\n" +
-                " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
-                " - [Website](https://sanara.zirk.eu/)\n" +
-                " - [Invitation Link](https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot)\n" +
-                " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
-                " - [Upcoming Features](https://trello.com/b/dVoVeadz/sanara)\n" +
-                " - [Top.gg](https://discordbots.org/bot/329664361016721408)\n\n" +
-                "**Credits:**\n" +
-                "Programming: [Zirk#0001](https://zirk.eu/)\n" +
-                "Profile Picture: [BlankSensei](https://www.pixiv.net/en/users/23961764)",
-#endif
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Id",
-                        Value = StaticObjects.ClientId,
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Account Creation",
-                        Value = StaticObjects.Client.CurrentUser.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss"),
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Guild Joined",
-                        Value = (await Context.Guild.GetCurrentUserAsync()).JoinedAt.Value.ToString("dd/MM/yyyy HH:mm:ss"),
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Latest Version",
-                        Value = new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc.ToString("dd/MM/yyyy HH:mm:ss"),
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Guild Count",
-                        Value = StaticObjects.Client.Guilds.Count,
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Last message received",
-                        Value = StaticObjects.LastMessage.ToString("HH:mm:ss UTC+0"),
-                        IsInline = true
-                    }
-                }
-            }.Build());
-        }
-
         [Command("Info")]
         public async Task InfoAsync(IUser user = null)
         {

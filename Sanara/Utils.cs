@@ -22,5 +22,15 @@
             return (extension.StartsWith("gif") || extension.StartsWith("png") || extension.StartsWith("jpg")
                 || extension.StartsWith("jpeg"));
         }
+
+        public static string ToDiscordTimestamp(DateTime dt, bool useTimeAgo)
+        {
+            var secs = (int)(dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            if (useTimeAgo)
+            {
+                return $"<t:{secs}:R>";
+            }
+            return $"<t:{secs}>";
+        }
     }
 }

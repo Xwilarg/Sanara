@@ -32,6 +32,14 @@ namespace Sanara
         {
             GatewayIntents = GatewayIntents.AllUnprivileged
         });
+        /// <summary>
+        /// To display uptime
+        /// </summary>
+        public static DateTime Started { set; get; }
+        /// <summary>
+        /// Guild used for debug
+        /// Create guild slash command for there so it's faster to have access to new ones
+        /// </summary>
         public static ulong DebugGuildId { set; get; }
         /// <summary>
         /// HttpClient used for all web requests

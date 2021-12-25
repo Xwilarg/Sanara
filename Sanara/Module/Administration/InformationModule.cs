@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Help;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 namespace Sanara.Module.Administration
@@ -38,10 +39,10 @@ namespace Sanara.Module.Administration
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
-                        Name = "status",
+                        Name = "botinfo",
                         Description = "Get various information about the bot"
                     }.Build(),
-                    callback: StatusAsync
+                    callback: BotInfoAsync
                 )
             };
         }
@@ -54,13 +55,16 @@ namespace Sanara.Module.Administration
             await ctx.ModifyOriginalResponseAsync(x => x.Content = orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
         }
 
-        public async Task StatusAsync(SocketSlashCommand ctx)
+        public async Task BotInfoAsync(SocketSlashCommand ctx)
         {
             var embed = new EmbedBuilder
             {
                 Title = "Status",
                 Color = Color.Purple
             };
+            embed.AddField("Latest version", Utils.ToDiscordTimestamp(new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc, false), true);
+            embed.AddField("Last command received", Utils.ToDiscordTimestamp(StaticObjects.LastMessage, true), true);
+            embed.AddField("Uptime", Utils.ToDiscordTimestamp(StaticObjects.Started, true), true);
             embed.AddField("Guild count", StaticObjects.Client.Guilds.Count, true);
 
             // Get informations about games
@@ -95,13 +99,32 @@ namespace Sanara.Module.Administration
             // Get latests commits
             str = new();
             var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             foreach (var elem in json)
             {
-                var secs = (DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture) - epoch).TotalSeconds;
-                str.AppendLine($"<t:{secs}>: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
+                var time = Utils.ToDiscordTimestamp(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture), false);
+                str.AppendLine($"{time}: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
             }
             embed.AddField("Latest changes", str.ToString());
+
+            embed.AddField("Useful links",
+#if NSFW_BUILD
+                " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
+                " - [Website](https://sanara.zirk.eu/)\n" +
+#endif
+                " - [Invitation Link](https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot)\n" +
+#if NSFW_BUILD
+                " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
+                " - [Top.gg](https://discordbots.org/bot/329664361016721408)"
+#endif
+                );
+            embed.AddField("Credits",
+                "Programming: [Zirk#0001](https://zirk.eu/)\n" +
+                "With the help of [TheIndra](https://theindra.eu/)\n" +
+#if NSFW_BUILD
+                "Profile Picture: [BlankSensei](https://www.pixiv.net/en/users/23961764)"
+#endif // TODO: Can prob use current pfp for SFW version
+                );
+
             await ctx.RespondAsync(embed: embed.Build());
         }
         /*
