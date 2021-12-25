@@ -1,4 +1,6 @@
-﻿namespace Sanara
+﻿using Discord;
+
+namespace Sanara
 {
     public static class Utils
     {
@@ -32,5 +34,8 @@
             }
             return $"<t:{secs}>";
         }
+
+        public static bool IsAdmin(IGuild guild, IUser user)
+            => user is IGuildUser guildUser ? guild.OwnerId == user.Id || guildUser.GuildPermissions.ManageGuild : true;
     }
 }

@@ -6,6 +6,7 @@ using Sanara.CustomClass;
 using Sanara.Diaporama;
 using Sanara.Module;
 using Sanara.Module.Administration;
+using Sentry;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -52,7 +53,6 @@ namespace Sanara
 
             // Setting Logs callback
             StaticObjects.Client.Log += Log.LogAsync;
-            _commands.Log += Log.ErrorAsync;
 
             // Load credentials
             if (!File.Exists("Keys/Credentials.json"))
@@ -78,7 +78,6 @@ namespace Sanara
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
             StaticObjects.Client.Connected += ConnectedAsync;
             StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
-            StaticObjects.Client.ReactionAdded += Log.ReactionAddedAsync;
             StaticObjects.Client.ReactionAdded += Module.Tool.LanguageModule.ReactionAddedAsync;
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
@@ -87,6 +86,7 @@ namespace Sanara
             StaticObjects.Client.Disconnected += Disconnected;
             StaticObjects.Client.Ready += Ready;
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
+            StaticObjects.Client.ButtonExecuted += ButtonExecuted;
 
             // Add readers
             _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
@@ -114,7 +114,7 @@ namespace Sanara
             await _commands.AddModuleAsync<Module.Tool.LanguageModule>(null);
             await _commands.AddModuleAsync<Module.Tool.ScienceModule>(null);
             */
-            await _commands.AddModuleAsync<Module.DeprecationNotice>(null);
+            await _commands.AddModuleAsync<DeprecationNotice>(null);
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
@@ -123,19 +123,40 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
-        private async Task SlashCommandExecuted(SocketSlashCommand arg)
+        private async Task ButtonExecuted(SocketMessageComponent ctx)
         {
-            if (!_commandsAssociations.ContainsKey(arg.CommandName.ToUpperInvariant()))
+            if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
             {
-                throw new NotImplementedException($"Unknown command {arg.CommandName}");
+                var e = StaticObjects.Errors[ctx.Data.CustomId];
+                await ctx.RespondAsync(embed: new EmbedBuilder
+                {
+                    Color = Color.Red,
+                    Title = e.GetType().ToString(),
+                    Description = e.Message
+                }.Build());
             }
-            await _commandsAssociations[arg.CommandName.ToUpperInvariant()](arg);
-            StaticObjects.LastMessage = DateTime.UtcNow;
+        }
 
-            if (StaticObjects.Website != null)
+        private async Task SlashCommandExecuted(SocketSlashCommand ctx)
+        {
+            if (!_commandsAssociations.ContainsKey(ctx.CommandName.ToUpperInvariant()))
             {
-                await StaticObjects.Website.AddNewMessageAsync();
-                await StaticObjects.Website.AddNewCommandAsync(arg.CommandName.ToUpperInvariant());
+                throw new NotImplementedException($"Unknown command {ctx.CommandName}");
+            }
+            try
+            {
+                await _commandsAssociations[ctx.CommandName.ToUpperInvariant()](ctx);
+                StaticObjects.LastMessage = DateTime.UtcNow;
+
+                if (StaticObjects.Website != null)
+                {
+                    await StaticObjects.Website.AddNewMessageAsync();
+                    await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                }
+            }
+            catch (System.Exception e)
+            {
+                await Log.LogErrorAsync(e, ctx);
             }
         }
 

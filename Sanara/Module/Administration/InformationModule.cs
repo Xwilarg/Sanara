@@ -1,8 +1,8 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sanara.Exception;
 using Sanara.Help;
 using System.Globalization;
 using System.Reflection;
@@ -17,9 +17,7 @@ namespace Sanara.Module.Administration
             return new("Information", "Get important information about the bot");
             /*
             _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
-            _help.Add(("Administration", new Help("Information", "Status", Array.Empty<Argument>(), "Display various information about the bot.", Array.Empty<string>(), Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Logs", Array.Empty<Argument>(), ".", Array.Empty<string>(), Restriction.None, null)));
-            _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), "Display all the data saved about your guild.", Array.Empty<string>(), Restriction.AdminOnly, null)));
+            _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), ".", Array.Empty<string>(), Restriction.AdminOnly, null)));
             _help.Add(("Administration", );
             */
         }
@@ -43,8 +41,29 @@ namespace Sanara.Module.Administration
                         Description = "Get various information about the bot"
                     }.Build(),
                     callback: BotInfoAsync
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "gdpr",
+                        Description = "Display all the data saved about your guild"
+                    }.Build(),
+                    callback: GdprAsync
                 )
             };
+        }
+
+        public async Task GdprAsync(SocketSlashCommand ctx)
+        {
+            throw new CommandFailed("TEST");
+            if (ctx.Channel is ITextChannel textChan)
+            {
+                await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(textChan.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
+            }
+            else
+            {
+                await ctx.RespondAsync("This is only available in guilds");
+            }
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)
@@ -125,7 +144,7 @@ namespace Sanara.Module.Administration
 #endif // TODO: Can prob use current pfp for SFW version
                 );
 
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.RespondAsync(embed: embed.Build(), ephemeral: true);
         }
         /*
 
@@ -241,13 +260,6 @@ namespace Sanara.Module.Administration
             else
                 throw new CommandFailed("There is no command or module available with this name");
             await ReplyAsync(embed: embed.Build());
-        }
-
-        [Command("Gdpr"), RequireAdmin]
-        public async Task Gdpr()
-        {
-            await ReplyAsync("Please check your private messages.");
-            await Context.User.SendMessageAsync("```json\n" + (await StaticObjects.Db.DumpAsync(Context.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
         }*/
     }
 }

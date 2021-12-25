@@ -1,7 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Sanara.Exception;
 using Sentry;
 
 namespace Sanara
@@ -26,71 +24,32 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task ErrorAsync(LogMessage msg)
+        public static async Task LogErrorAsync(System.Exception e, SocketSlashCommand? ctx)
         {
-            await LogAsync(msg); // First thing, we log the error in the console
-            if (msg.Exception is CommandException ce) //Eexception thrown in a Discord channel
+            if (ctx != null)
             {
-                if (msg.Exception.InnerException is CommandFailed)
-                {
-                    await ce.Context.Channel.SendMessageAsync(msg.Exception.InnerException.Message);
-                    return;
-                }
+                var button = new ComponentBuilder()
+                        .WithButton("More information", ctx.Id.ToString());
 
-                if (SentrySdk.IsEnabled) // If we can log the error to Sentry
-                    SentrySdk.CaptureException(new System.Exception(ce.Context.Message.ToString(), msg.Exception));
+                StaticObjects.Errors.Add(ctx.Id.ToString(), e);
 
-                var sentMsg = await ce.Context.Channel.SendMessageAsync(embed: new EmbedBuilder
+                await ctx.RespondAsync(embed: new EmbedBuilder
                 {
                     Color = Color.Red,
                     Title = "An error occured",
-                    Description = "The error was automatically reported. If the error persist, please contact the bot owner.",
-                    Footer = new EmbedFooterBuilder
-                    {
-                        Text = "Add a 🕷️ emote to have more information about the error"
-                    }
-                }.Build());
+                    Description = "The error was automatically reported. If the error persist, please contact the bot owner."
+                }.Build(), components: button.Build());
 
-                StaticObjects.Errors.Add(sentMsg.Id, new ErrorData(ce.Context.Message.CreatedAt.UtcDateTime, ce));
-
-                await sentMsg.AddReactionAsync(new Emoji("🕷"));
-
-                StaticObjects.Website?.AddErrorAsync(ce.InnerException);
+                if (SentrySdk.IsEnabled)
+                    SentrySdk.CaptureException(new System.Exception($"Error while processing {ctx}", e));
             }
             else
             {
                 if (SentrySdk.IsEnabled)
-                    SentrySdk.CaptureException(msg.Exception);
-
-                StaticObjects.Website?.AddErrorAsync(msg.Exception);
+                    SentrySdk.CaptureException(e);
             }
-        }
 
-        /// <summary>
-        /// Callback handing when the user add a little spider to have more info about a bug
-        /// </summary>
-        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
-        {
-            string emote = react.Emote.ToString();
-            // If emote is not from the bot and is an arrow emote
-            if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && emote == "🕷" && StaticObjects.Errors.ContainsKey(msg.Id))
-            {
-                var error = StaticObjects.Errors[msg.Id];
-                await (await msg.GetOrDownloadAsync()).ModifyAsync((curr) =>
-                {
-                    curr.Embed = new EmbedBuilder
-                    {
-                        Color = Color.Red,
-                        Title = error.Exception.InnerException.GetType().ToString(),
-                        Description = error.Exception.InnerException.Message,
-                        Footer = new EmbedFooterBuilder
-                        {
-                            Text = "Command used: " + ((CommandException)error.Exception).Context.Message
-                        }
-                    }.Build();
-                });
-                StaticObjects.Errors.Remove(msg.Id);
-            }
+            StaticObjects.Website?.AddErrorAsync(e);
         }
     }
 }

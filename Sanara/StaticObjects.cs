@@ -65,7 +65,7 @@ namespace Sanara
         /// <summary>
         /// List of all errors that occured
         /// </summary>
-        public static Dictionary<ulong, ErrorData> Errors { get; } = new();
+        public static Dictionary<string, System.Exception> Errors { get; } = new();
         /// <summary>
         /// Authentification token for discordbotlist.com
         /// </summary>
@@ -373,7 +373,7 @@ namespace Sanara
                 catch (System.Exception e)
                 {
                     Preloads[i] = null;
-                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    await Log.LogErrorAsync(e, null);
                     await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " failed to load"));
                 }
             }
@@ -387,8 +387,8 @@ namespace Sanara
             }
             AllGameNames = allNames.ToArray();
 
-            _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
-            _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e)); } });
+            _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
+            _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();

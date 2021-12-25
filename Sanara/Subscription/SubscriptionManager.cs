@@ -96,14 +96,14 @@ namespace Sanara.Subscription
                             }
                             catch (System.Exception e)
                             {
-                                await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                                await Log.LogErrorAsync(e, null);
                             }
                         }
                     }
                 }
                 catch (System.Exception e) // If somehow wrong happens while getting new subscription
                 {
-                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    await Log.LogErrorAsync(e, null);
                 }
             }
         }

@@ -196,7 +196,7 @@ namespace Sanara.Game
                 {
                     var specifierException = new System.Exception("Error while posting for " + _gameName + ", tried to post " + currentPostDebug.Length + " elements."
                         + (currentPostDebug.Length == 0 ? "" : "First element is: " + currentPostDebug[0]));
-                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+                    await Log.LogErrorAsync(e, null);
                     if (nbTries == 3)
                     {
                         await LooseAsync("Failed to get something to post after 3 tries...", true);
@@ -283,7 +283,7 @@ namespace Sanara.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await Log.ErrorAsync(new LogMessage(LogSeverity.Error, e.InnerException.Source, e.InnerException.Message, e.InnerException));
+                                    await Log.LogErrorAsync(e, null);
                                     await msg.AddReactionAsync(new Emoji("🕷"));
                                 });
                             }
