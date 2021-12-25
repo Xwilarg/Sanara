@@ -111,7 +111,7 @@ namespace Sanara.Module.Administration
                 " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
                 " - [Website](https://sanara.zirk.eu/)\n" +
 #endif
-                " - [Invitation Link](https://discord.com/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=3196928&scope=bot)\n" +
+                " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&scope=bot%20applications.commands)\n" +
 #if NSFW_BUILD
                 " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
                 " - [Top.gg](https://discordbots.org/bot/329664361016721408)"
