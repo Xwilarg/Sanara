@@ -128,7 +128,7 @@ namespace Sanara
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
             await _commandsAssociations[arg.CommandName.ToUpperInvariant()](arg);
-            StaticObjects.LastMessage = DateTime.Now;
+            StaticObjects.LastMessage = DateTime.UtcNow;
 
             if (StaticObjects.Website != null)
             {
@@ -172,7 +172,7 @@ namespace Sanara
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
 #endif
             // The bot is now really ready to interact with people
-            StaticObjects.Started = DateTime.Now;
+            StaticObjects.Started = DateTime.UtcNow;
         }
 
         private Task Disconnected(System.Exception e)
