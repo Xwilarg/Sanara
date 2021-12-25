@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sanara.CustomClass;
 using Sanara.Diaporama;
+using Sanara.Exception;
 using Sanara.Module;
 using Sanara.Module.Administration;
 using Sentry;
@@ -156,6 +157,10 @@ namespace Sanara
             }
             catch (System.Exception e)
             {
+                if (e is CommandFailed)
+                {
+                    ctx.RespondAsync(e.Message, ephemeral: true);
+                }
                 await Log.LogErrorAsync(e, ctx);
             }
         }

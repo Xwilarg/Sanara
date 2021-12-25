@@ -55,14 +55,17 @@ namespace Sanara.Module.Administration
 
         public async Task GdprAsync(SocketSlashCommand ctx)
         {
-            throw new CommandFailed("TEST");
             if (ctx.Channel is ITextChannel textChan)
             {
+                if (!Utils.IsAdmin(textChan.Guild, ctx.User))
+                {
+                    throw new CommandFailed("Only admins have access to this command");
+                }
                 await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(textChan.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
             }
             else
             {
-                await ctx.RespondAsync("This is only available in guilds");
+                throw new CommandFailed("This is only available in guilds");
             }
         }
 
