@@ -27,7 +27,8 @@ namespace Sanara.Module.Administration
                         Description = "Get the latency between the bot and Discord"
                     }.Build(),
                     callback: PingAsync,
-                    precondition: Precondition.None
+                    precondition: Precondition.None,
+                    needDefer: false
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -36,7 +37,8 @@ namespace Sanara.Module.Administration
                         Description = "Get various information about the bot"
                     }.Build(),
                     callback: BotInfoAsync,
-                    precondition: Precondition.None
+                    precondition: Precondition.None,
+                    needDefer: false
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -45,7 +47,8 @@ namespace Sanara.Module.Administration
                         Description = "Display all the data saved about your guild"
                     }.Build(),
                     callback: GdprAsync,
-                    precondition: Precondition.AdminOnly | Precondition.GuildOnly
+                    precondition: Precondition.AdminOnly | Precondition.GuildOnly,
+                    needDefer: false
                 )
             };
         }
@@ -104,16 +107,6 @@ namespace Sanara.Module.Administration
                     "**Anime**: " + subs["anime"]);
 #endif
 
-            // Get latests commits
-            str = new();
-            var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
-            foreach (var elem in json)
-            {
-                var time = Utils.ToDiscordTimestamp(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture), Utils.TimestampInfo.None);
-                str.AppendLine($"{time}: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
-            }
-            embed.AddField("Latest changes", str.ToString());
-
             embed.AddField("Useful links",
 #if NSFW_BUILD
                 " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
@@ -134,6 +127,18 @@ namespace Sanara.Module.Administration
                 );
 
             await ctx.RespondAsync(embed: embed.Build(), ephemeral: true);
+
+            // Get latests commits
+            str = new();
+            var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
+            foreach (var elem in json)
+            {
+                var time = Utils.ToDiscordTimestamp(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture), Utils.TimestampInfo.None);
+                str.AppendLine($"{time}: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
+            }
+            embed.AddField("Latest changes", str.ToString());
+
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
         }
     }
 }

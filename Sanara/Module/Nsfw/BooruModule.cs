@@ -1,4 +1,5 @@
-﻿using BooruSharp.Search;
+﻿using BooruSharp.Booru;
+using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
 using Discord.WebSocket;
@@ -44,13 +45,19 @@ namespace Sanara.Module.Nsfw
                                     {
                                         Name = "Safebooru (SFW images only)",
                                         Value = (int)BooruType.Safebooru
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Gelbooru (SFW and NSFW images)",
+                                        Value = (int)BooruType.Gelbooru
                                     }
                                 }
                             }
                         }
                     }.Build(),
                     callback: BooruAsync,
-                    precondition: Precondition.None
+                    precondition: Precondition.None,
+                    needDefer: true
                 )
             };
         }
@@ -60,13 +67,19 @@ namespace Sanara.Module.Nsfw
             var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
             var type = (BooruType)(long)ctx.Data.Options.First(x => x.Name == "source").Value;
 
-            var booru = type switch
+            ABooru booru = type switch
             {
                 BooruType.Safebooru => StaticObjects.Safebooru,
+                BooruType.Gelbooru => StaticObjects.Gelbooru,
                 _ => throw new NotImplementedException($"Invalid booru type {type}")
             };
 
-            BooruSharp.Search.Post.SearchResult post;
+            if (!booru.IsSafe && ctx.Channel is ITextChannel tChan && !tChan.IsNsfw)
+            {
+                throw new CommandFailed("This booru is only available in NSFW channels");
+            }
+
+            SearchResult post;
             List<string> newTags = new();
             try
             {
@@ -101,7 +114,7 @@ namespace Sanara.Module.Nsfw
             if (post.FileUrl == null)
                 throw new CommandFailed("A post was found but no image was available.");
 
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
             {
                 Color = post.Rating switch
                 {

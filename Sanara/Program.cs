@@ -164,14 +164,21 @@ namespace Sanara
                 {
                     await ctx.RespondAsync("This command can only be done in a guild", ephemeral: true);
                 }
-
-                await cmd.Callback(ctx);
-                StaticObjects.LastMessage = DateTime.UtcNow;
-
-                if (StaticObjects.Website != null)
+                else
                 {
-                    await StaticObjects.Website.AddNewMessageAsync();
-                    await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                    if (cmd.NeedDefer)
+                    {
+                        await ctx.DeferAsync();
+                    }
+
+                    await cmd.Callback(ctx);
+                    StaticObjects.LastMessage = DateTime.UtcNow;
+
+                    if (StaticObjects.Website != null)
+                    {
+                        await StaticObjects.Website.AddNewMessageAsync();
+                        await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                    }
                 }
             }
             catch (System.Exception e)
