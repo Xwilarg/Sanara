@@ -11,9 +11,6 @@ namespace Sanara.Help
     {
         public void LoadJapaneseHelp()
         {
-            _help.Add(("Entertainment", new Help("Japanese", "Manga", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a manga.", Array.Empty<string>(), Restriction.None, "Manga made in abyss")));
-            _help.Add(("Entertainment", new Help("Japanese", "Anime", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about an anime.", Array.Empty<string>(), Restriction.None, "Anime nichijou")));
-            _help.Add(("Entertainment", new Help("Japanese", "Light Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a light novel.", new string[]{ "LN" }, Restriction.None, "Light novel so I'm a spider so what")));
             _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
             _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
@@ -40,13 +37,38 @@ namespace Sanara.Module.Entertainment
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "anime",
-                        Description = "Get information about an anime",
+                        Description = "Get information about an anime/manga/light novel",
                         Options = new()
                         {
                             new SlashCommandOptionBuilder()
                             {
+                                Name = "type",
+                                Description = "What kind of media you are looking for",
+                                Type = ApplicationCommandOptionType.Integer,
+                                IsRequired = true,
+                                Choices = new()
+                                {
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Anime",
+                                        Value = (int)JapaneseMedia.Anime
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Manga",
+                                        Value = (int)JapaneseMedia.Manga
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Light Novel",
+                                        Value = (int)JapaneseMedia.LightNovel
+                                    }
+                                }
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
                                 Name = "name",
-                                Description = "Name of the anime",
+                                Description = "Name",
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
@@ -60,21 +82,10 @@ namespace Sanara.Module.Entertainment
 
         public async Task AnimeAsync(SocketSlashCommand ctx)
         {
-           await PostAnimeEmbedAsync(JapaneseMedia.Anime, await SearchMediaAsync(JapaneseMedia.Anime, (string)ctx.Data.Options.ElementAt(0).Value), ctx);
+            var type = (JapaneseMedia)(long)ctx.Data.Options.ElementAt(0).Value;
+            var name = (string)ctx.Data.Options.ElementAt(1).Value;
+            await PostAnimeEmbedAsync(type, await SearchMediaAsync(type, name), ctx);
         }
-        /*
-        [Command("Anime", RunMode = RunMode.Async)]
-        public async Task AnimeAsync([Remainder] string name)
-        {
-            await PostAnimeEmbedAsync(JapaneseMedia.ANIME, await SearchMediaAsync(JapaneseMedia.ANIME, name));
-        }
-
-        [Command("Light novel", RunMode = RunMode.Async), Alias("LN")]
-        public async Task LightNovelAsync([Remainder] string name)
-        {
-            await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
-        }*/
-
 
         private async Task PostAnimeEmbedAsync(JapaneseMedia media, AnimeInfo info, SocketSlashCommand ctx)
         {

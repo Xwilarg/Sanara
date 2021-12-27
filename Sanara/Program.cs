@@ -133,7 +133,7 @@ namespace Sanara
                     Color = Color.Red,
                     Title = e.GetType().ToString(),
                     Description = e.Message
-                }.Build());
+                }.Build(), ephemeral: true);
             }
         }
 
