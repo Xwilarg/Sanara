@@ -8,6 +8,7 @@ using Sanara.Exception;
 using Sanara.Module;
 using Sanara.Module.Administration;
 using Sanara.Module.Entertainment;
+using Sanara.Module.Nsfw;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -194,38 +195,59 @@ namespace Sanara
                 return;
             }
 
-            var isDebug = StaticObjects.DebugGuildId != 0 && Debugger.IsAttached;
-            if (isDebug)
+            _ = Task.Run(async () =>
             {
-                await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
-            }
-            List<ISubmodule> _submodules = new();
-
-            // Add submodules
-            _submodules.Add(new InformationModule());
-            _submodules.Add(new JapaneseModule());
-
-            foreach (var s in _submodules)
-            {
-                foreach (var c in s.GetCommands())
+                try
                 {
+                    var isDebug = StaticObjects.DebugGuildId != 0 && Debugger.IsAttached;
                     if (isDebug)
                     {
-                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
+                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
                     }
-                    else
+                    List<ISubmodule> _submodules = new();
+
+                    // Add submodules
+                    _submodules.Add(new InformationModule());
+                    _submodules.Add(new JapaneseModule());
+                    _submodules.Add(new BooruModule());
+
+                    foreach (var s in _submodules)
                     {
-                        await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                        foreach (var c in s.GetCommands())
+                        {
+#if !NSFW_BUILD
+                    // We skip NSFW commands on SFW builds
+                    if ((c.Precondition & Precondition.NsfwOnly) != 0)
+                    {
+                        continue;
                     }
-                    _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
+#endif
+                            if (isDebug)
+                            {
+                                await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
+                            }
+                            else
+                            {
+                                await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                            }
+                            _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
+                        }
+                    }
+                    await Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready Handler", "Commands loaded"));
                 }
-            }
+                catch (System.Exception ex)
+                {
+                    await Log.LogErrorAsync(ex, null);
+                    await Log.LogAsync(new LogMessage(LogSeverity.Critical, "Ready Handler", "Some commands failed to load!"));
+                }
+
+                // The bot is now really ready to interact with people
+                StaticObjects.Started = DateTime.UtcNow;
+            });
 
 #if NSFW_BUILD
             await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
 #endif
-            // The bot is now really ready to interact with people
-            StaticObjects.Started = DateTime.UtcNow;
         }
 
         private Task Disconnected(System.Exception e)

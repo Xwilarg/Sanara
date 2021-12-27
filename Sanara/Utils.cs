@@ -5,6 +5,9 @@
         public static string CleanWord(string word)
             => string.Join("", word.Where(c => char.IsLetterOrDigit(c)));
 
+        public static string ToWordCase(string word)
+            => char.ToUpper(word[0]) + string.Join("", word.Skip(1)).ToLower();
+
         public static async Task<bool> IsLinkValid(string url)
         {
             if (url.StartsWith("http://") || url.StartsWith("https://"))
@@ -43,5 +46,42 @@
             }
             return $"<t:{secs}>";
         }
+
+        // From: https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560
+        public static int GetStringDistance(string a, string b)
+        {
+            var source1Length = a.Length;
+            var source2Length = b.Length;
+
+            var matrix = new int[source1Length + 1, source2Length + 1];
+
+            // First calculation, if one entry is empty return full length
+            if (source1Length == 0)
+                return source2Length;
+
+            if (source2Length == 0)
+                return source1Length;
+
+            // Initialization of matrix with row size source1Length and columns size source2Length
+            for (var i = 0; i <= source1Length; i++)
+                matrix[i, 0] = i;
+            for (var j = 0; j <= source2Length; j++)
+                matrix[0, j] = j;
+
+            // Calculate rows and columns distances
+            for (var i = 1; i <= source1Length; i++)
+            {
+                for (var j = 1; j <= source2Length; j++)
+                {
+                    var cost = (b[j - 1] == a[i - 1]) ? 0 : 1;
+
+                    matrix[i, j] = Math.Min(
+                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
+                        matrix[i - 1, j - 1] + cost);
+                }
+            }
+            return matrix[source1Length, source2Length];
+        }
+
     }
 }

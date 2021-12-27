@@ -1,6 +1,126 @@
-﻿namespace Sanara.Module.Nsfw
-{
+﻿using BooruSharp.Search;
+using BooruSharp.Search.Post;
+using Discord;
+using Discord.WebSocket;
+using Sanara.Exception;
+using Sanara.Help;
 
+namespace Sanara.Module.Nsfw
+{
+    public class BooruModule : ISubmodule
+    {
+        public SubmoduleInfo GetInfo()
+        {
+            return new("Booru", "Get anime images given some tags");
+        }
+
+        public CommandInfo[] GetCommands()
+        {
+            return new[]
+            {
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "booru",
+                        Description = "Get an anime image",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tags",
+                                Description = "Tags of the search, separated by an empty space",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "source",
+                                Description = "Where the image is coming from",
+                                Type = ApplicationCommandOptionType.Integer,
+                                IsRequired = true,
+                                Choices = new()
+                                {
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Safebooru (SFW images only)",
+                                        Value = (int)BooruType.Safebooru
+                                    }
+                                }
+                            }
+                        }
+                    }.Build(),
+                    callback: BooruAsync,
+                    precondition: Precondition.None
+                )
+            };
+        }
+
+        public async Task BooruAsync(SocketSlashCommand ctx)
+        {
+            var tags = ((string)ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "").Split(' ');
+            var type = (BooruType)(long)ctx.Data.Options.First(x => x.Name == "source").Value;
+
+            var booru = type switch
+            {
+                BooruType.Safebooru => StaticObjects.Safebooru,
+                _ => throw new NotImplementedException($"Invalid booru type {type}")
+            };
+
+            BooruSharp.Search.Post.SearchResult post;
+            List<string> newTags = new();
+            try
+            {
+                post = await booru.GetRandomPostAsync(tags);
+            }
+            catch (InvalidTags)
+            {
+                // On invalid tags we try to get guess which one the user wanted to use
+                newTags = new List<string>();
+                foreach (string s in tags)
+                {
+                    var related = await StaticObjects.Konachan.GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
+                    if (related.Length == 0)
+                        throw new CommandFailed("There is no image with those tags.");
+                    newTags.Add(related.OrderBy(x => Utils.GetStringDistance(x.Name, s)).First().Name);
+                }
+                try
+                {
+                    // Once we got our new tags, we try doing a new search with them
+                    post = await booru.GetRandomPostAsync(newTags.ToArray());
+                }
+                catch (InvalidTags)
+                {
+                    // Might happens if the Konachan tags don't exist in the current booru
+                    throw new CommandFailed("There is no image with those tags");
+                }
+            }
+
+            int id = int.Parse("" + (int)type + post.ID);
+            StaticObjects.Tags.AddTag(id, booru, post);
+
+            if (post.FileUrl == null)
+                throw new CommandFailed("A post was found but no image was available.");
+
+            await ctx.RespondAsync(embed: new EmbedBuilder
+            {
+                Color = post.Rating switch
+                {
+                    Rating.Safe => Color.Green,
+                    Rating.Questionable => new Color(255, 255, 0), // Yellow
+                    Rating.Explicit => Color.Red,
+                    _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
+                },
+                ImageUrl = post.FileUrl.AbsoluteUri,
+                Url = post.PostUrl.AbsoluteUri,
+                Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
+                        $"Do the 'Tags' command with then id '{id}' to have more information about this image."
+                }
+            }.Build());
+        }
+    }
 }
 
 /*
@@ -122,98 +242,7 @@ namespace SanaraV3.Module.Nsfw
 
         public static async Task SearchBooruAsync(ABooru booru, string[] tags, BooruType booruId, IMessageChannel chan)
         {
-            // GetRandomImageAsync crash if we send it something null
-            tags ??= new string[0];
-
-            BooruSharp.Search.Post.SearchResult post;
-            List<string> newTags = null;
-            try
-            {
-                post = await booru.GetRandomPostAsync(tags);
-            }
-            catch (InvalidTags)
-            {
-                // On invalid tags we try to get guess which one the user wanted to use
-                newTags = new List<string>();
-                foreach (string s in tags)
-                {
-                    var related = await new Konachan().GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
-                    if (related.Length == 0)
-                        throw new CommandFailed("There is no image with those tags.");
-                    newTags.Add(related.OrderBy(x => GetStringDistance(x.Name, s)).First().Name);
-                }
-                try
-                {
-                    // Once we got our new tags, we try doing a new search with them
-                    post = await booru.GetRandomPostAsync(newTags.ToArray());
-                }
-                catch (InvalidTags)
-                {
-                    // Might happens if the Konachan tags don't exist in the current booru
-                    throw new CommandFailed("There is no image with those tags.");
-                }
-            }
-
-            int id = int.Parse("" + (int)booruId + post.ID);
-            StaticObjects.Tags.AddTag(id, booru, post);
-
-            if (post.FileUrl == null)
-                throw new CommandFailed("A post was found but no image was available.");
-            await chan.SendMessageAsync(embed: new EmbedBuilder
-            {
-                Color = RatingToColor(post.Rating),
-                ImageUrl = post.FileUrl.AbsoluteUri,
-                Url = post.PostUrl.AbsoluteUri,
-                Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = (newTags == null ? "" : "Some of your tags were invalid, the current search was done with: " + string.Join(", ", newTags) + "\n") +
-                        "Do the 'Tags' command with then id '" + id + "' to have more information about this image."
-                }
-            }.Build());
-        }
-
-        public static Color RatingToColor(Rating rating)
-        {
-            if (rating == Rating.Safe) return Color.Green;
-            if (rating == Rating.Questionable) return new Color(255, 255, 0); // Yellow
-            return Color.Red;
-        }
-
-        // From: https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560
-        private static int GetStringDistance(string a, string b)
-        {
-            var source1Length = a.Length;
-            var source2Length = b.Length;
-
-            var matrix = new int[source1Length + 1, source2Length + 1];
-
-            // First calculation, if one entry is empty return full length
-            if (source1Length == 0)
-                return source2Length;
-
-            if (source2Length == 0)
-                return source1Length;
-
-            // Initialization of matrix with row size source1Length and columns size source2Length
-            for (var i = 0; i <= source1Length; i++)
-                matrix[i, 0] = i;
-            for (var j = 0; j <= source2Length; j++)
-                matrix[0, j] = j;
-
-            // Calculate rows and columns distances
-            for (var i = 1; i <= source1Length; i++)
-            {
-                for (var j = 1; j <= source2Length; j++)
-                {
-                    var cost = (b[j - 1] == a[i - 1]) ? 0 : 1;
-
-                    matrix[i, j] = Math.Min(
-                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
-                        matrix[i - 1, j - 1] + cost);
-                }
-            }
-            return matrix[source1Length, source2Length];
+            
         }
     }
 }

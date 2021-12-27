@@ -16,7 +16,6 @@ namespace Sanara.Help
             _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
             _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.Mandatory, "image") }, "Get the source of an image.", Array.Empty<string>(), Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
-            _help.Add(("Entertainment", new Help("Japanese", "Drama", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about an Asian drama.", Array.Empty<string>(), Restriction.None, "Drama my mister")));
         }
     }
 }
@@ -43,6 +42,13 @@ namespace Sanara.Module.Entertainment
                         {
                             new SlashCommandOptionBuilder()
                             {
+                                Name = "name",
+                                Description = "Name",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
                                 Name = "type",
                                 Description = "What kind of media you are looking for",
                                 Type = ApplicationCommandOptionType.Integer,
@@ -65,13 +71,6 @@ namespace Sanara.Module.Entertainment
                                         Value = (int)JapaneseMedia.LightNovel
                                     }
                                 }
-                            },
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "name",
-                                Description = "Name",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = true
                             }
                         }
                     }.Build(),
@@ -165,8 +164,8 @@ namespace Sanara.Module.Entertainment
 
         public async Task AnimeAsync(SocketSlashCommand ctx)
         {
-            var media = (JapaneseMedia)(long)ctx.Data.Options.ElementAt(0).Value;
-            var name = (string)ctx.Data.Options.ElementAt(1).Value;
+            var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
+            var media = (JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
             var answer = (await SearchMediaAsync(media, name)).Attributes;
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)

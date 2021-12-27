@@ -1,12 +1,12 @@
-﻿namespace SanaraV3.Module.Nsfw
+﻿namespace Sanara.Module.Nsfw
 {
     public enum BooruType
     {
-        SAFEBOORU,
+        Safebooru,
         E926,
-        GELBOORU,
+        Gelbooru,
         E621,
-        RULE34,
-        KONACHAN
+        Rule34,
+        Konachan
     }
 }
