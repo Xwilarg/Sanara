@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sanara.Exception;
+using Newtonsoft.Json.Linq;y
 using Sanara.Help;
 using System.Globalization;
 using System.Reflection;
@@ -15,11 +14,6 @@ namespace Sanara.Module.Administration
         public SubmoduleInfo GetInfo()
         {
             return new("Information", "Get important information about the bot");
-            /*
-            _help.Add(("Administration", new Help("Information", "Help", new[] { new Argument(ArgumentType.Mandatory, "module/submodule") }, "Display this help.", Array.Empty<string>(), Restriction.None, "Help information")));
-            _help.Add(("Administration", new Help("Information", "Gdpr", Array.Empty<Argument>(), ".", Array.Empty<string>(), Restriction.AdminOnly, null)));
-            _help.Add(("Administration", );
-            */
         }
 
         public CommandInfo[] GetCommands()
@@ -32,7 +26,8 @@ namespace Sanara.Module.Administration
                         Name = "ping",
                         Description = "Get the latency between the bot and Discord"
                     }.Build(),
-                    callback: PingAsync
+                    callback: PingAsync,
+                    precondition: Precondition.None
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -40,7 +35,8 @@ namespace Sanara.Module.Administration
                         Name = "botinfo",
                         Description = "Get various information about the bot"
                     }.Build(),
-                    callback: BotInfoAsync
+                    callback: BotInfoAsync,
+                    precondition: Precondition.None
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -48,25 +44,15 @@ namespace Sanara.Module.Administration
                         Name = "gdpr",
                         Description = "Display all the data saved about your guild"
                     }.Build(),
-                    callback: GdprAsync
+                    callback: GdprAsync,
+                    precondition: Precondition.AdminOnly | Precondition.GuildOnly
                 )
             };
         }
 
         public async Task GdprAsync(SocketSlashCommand ctx)
         {
-            if (ctx.Channel is ITextChannel textChan)
-            {
-                if (!Utils.IsAdmin(textChan.Guild, ctx.User))
-                {
-                    throw new CommandFailed("Only admins have access to this command");
-                }
-                await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(textChan.Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
-            }
-            else
-            {
-                throw new CommandFailed("This is only available in guilds");
-            }
+            await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)
@@ -149,120 +135,5 @@ namespace Sanara.Module.Administration
 
             await ctx.RespondAsync(embed: embed.Build(), ephemeral: true);
         }
-        /*
-
-        [Command("Help")]
-        public async Task Help()
-        {
-            await ReplyAsync(embed: await GetHelpEmbedAsync());
-        }
-
-        private bool IsNsfw()
-            => Context.Channel is ITextChannel chan ? chan.IsNsfw : true;
-
-        private bool IsAdmin()
-            => Context.User is IGuildUser user ? Context.Guild.OwnerId == user.Id || user.GuildPermissions.ManageGuild : true;
-
-        private async Task<bool> IsOwnerAsync()
-        {
-            if (_ownerId == 0)
-            {
-                _ownerId = (await StaticObjects.Client.GetApplicationInfoAsync()).Owner.Id;
-            }
-            return Context.User.Id == _ownerId;
-        }
-
-        private static ulong _ownerId = 0;
-
-        private async Task<Embed> GetHelpEmbedAsync()
-        {
-            Dictionary<string, List<string>> modules = new();
-            foreach (var help in StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), await IsOwnerAsync()))
-            {
-                if (!modules.ContainsKey(help.Item1))
-                    modules.Add(help.Item1, new List<string>());
-                if (!modules[help.Item1].Contains(help.Item2.SubmoduleName))
-                    modules[help.Item1].Add(help.Item2.SubmoduleName);
-            }
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Help",
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = "Do help module/submodule for more information.\nExample: help information\n\n" +
-#if NSFW_BUILD
-                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
-#endif
-                        "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            };
-            foreach (var m in modules.OrderBy(x => x.Key))
-            {
-                embed.AddField(m.Key, string.Join("\n", m.Value.Select(x => "**" + x + "** - " + StaticObjects.Help.GetSubmoduleHelp(x))));
-            }
-            return embed.Build();
-        }
-        /*
-        [Command("Help")]
-        public async Task HelpAsync(string name)
-        {
-            name = name.ToUpper();
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = "Help",
-                Footer = new EmbedFooterBuilder
-                {
-                    Text =
-#if NSFW_BUILD
-                        "You might have access to more commands if you are an admin or if you ask in a NSFW channel\n\n" +
-#endif
-                        "[argument]: Mandatory argument\n" +
-                        "(argument): Optional argument"
-                }
-            };
-            var fullHelp = StaticObjects.Help.GetHelp(Context.Guild?.Id ?? 0, IsNsfw(), IsAdmin(), await IsOwnerAsync());
-            if (fullHelp.Any(x => x.Item2.SubmoduleName.ToUpper() == name))
-            {
-                StringBuilder str = new StringBuilder();
-                Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in fullHelp.Where(x => x.Item2.SubmoduleName.ToUpper() == name))
-                {
-                    str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
-                        (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : "") + "\n");
-                }
-                embed.Description = str.ToString();
-            }
-            else if (fullHelp.Any(x => x.Item1.ToUpper() == name))
-            {
-                Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in fullHelp.Where(x => x.Item1.ToUpper() == name))
-                {
-                    if (!modules.ContainsKey(help.Item2.SubmoduleName))
-                        modules.Add(help.Item2.SubmoduleName, new List<string>());
-                    modules[help.Item2.SubmoduleName].Add("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}");
-                }
-                foreach (var m in modules.OrderBy(x => x.Key))
-                {
-                    embed.AddField(m.Key, string.Join("\n", m.Value));
-                }
-            }
-            else if (fullHelp.Any(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
-            {
-                StringBuilder str = new StringBuilder();
-                Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
-                foreach (var help in fullHelp.Where(x => name.Contains(x.Item2.CommandName.ToUpper()) || x.Item2.Aliases.Any(x => name.Contains(x))))
-                {
-                    str.AppendLine("**" + help.Item2.CommandName + " " + string.Join(" ", help.Item2.Arguments.Select(x => x.Type == ArgumentType.MANDATORY ? $"[{x.Content}]" : $"({x.Content})")) + $"**: {help.Item2.Description}" +
-                        (help.Item2.Example != null ? $"\n*Example: {help.Item2.Example}*" : ""));
-                }
-                embed.Description = str.ToString();
-            }
-            else
-                throw new CommandFailed("There is no command or module available with this name");
-            await ReplyAsync(embed: embed.Build());
-        }*/
     }
 }

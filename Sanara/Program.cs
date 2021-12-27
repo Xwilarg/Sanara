@@ -7,7 +7,6 @@ using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module;
 using Sanara.Module.Administration;
-using Sentry;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -18,7 +17,7 @@ namespace Sanara
         private readonly CommandService _commands = new();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
-        private Dictionary<string, Func<SocketSlashCommand, Task>> _commandsAssociations = new();
+        private Dictionary<string, Module.CommandInfo> _commandsAssociations = new();
 
         public static async Task Main()
         {
@@ -146,7 +145,26 @@ namespace Sanara
             }
             try
             {
-                await _commandsAssociations[ctx.CommandName.ToUpperInvariant()](ctx);
+                var cmd = _commandsAssociations[ctx.CommandName.ToUpperInvariant()];
+
+                var tChan = ctx.Channel as ITextChannel;
+                if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
+                    tChan != null && !tChan.IsNsfw)
+                {
+                    await ctx.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
+                }
+                else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
+                    tChan != null && tChan.Guild.OwnerId != ctx.User.Id && !((IGuildUser)ctx.User).GuildPermissions.ManageGuild)
+                {
+                    await ctx.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
+                }
+                else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
+                    tChan == null)
+                {
+                    await ctx.RespondAsync("This command can only be done in a guild", ephemeral: true);
+                }
+
+                await cmd.Callback(ctx);
                 StaticObjects.LastMessage = DateTime.UtcNow;
 
                 if (StaticObjects.Website != null)
@@ -159,7 +177,7 @@ namespace Sanara
             {
                 if (e is CommandFailed)
                 {
-                    ctx.RespondAsync(e.Message, ephemeral: true);
+                    await ctx.RespondAsync(e.Message);
                 }
                 await Log.LogErrorAsync(e, ctx);
             }
@@ -192,7 +210,7 @@ namespace Sanara
                     {
                         await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
                     }
-                    _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c.Callback);
+                    _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
                 }
             }
 
