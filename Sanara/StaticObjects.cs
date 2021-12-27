@@ -45,7 +45,6 @@ namespace Sanara
         /// HttpClient used for all web requests
         /// </summary>
         public static HttpClient HttpClient { get; } = new();
-        public static HttpClient KitsuHttpClient { get; } = new();
         /// <summary>
         /// Random instance for number generation
         /// </summary>
@@ -310,7 +309,6 @@ namespace Sanara
             }
 
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
-            KitsuHttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
 
             Safebooru.HttpClient = HttpClient;
             Gelbooru.HttpClient = HttpClient;

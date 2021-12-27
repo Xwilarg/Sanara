@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
+using System.Net.Http.Headers;
 using System.Web;
 
 namespace Sanara.Help
@@ -76,20 +77,97 @@ namespace Sanara.Module.Entertainment
                     }.Build(),
                     callback: AnimeAsync,
                     precondition: Precondition.None
+                ),
+
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "drama",
+                        Description = "Get information about a drama",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "name",
+                                Description = "Name",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: DramaAsync,
+                    precondition: Precondition.None
                 )
             };
         }
 
-        public async Task AnimeAsync(SocketSlashCommand ctx)
+        public async Task DramaAsync(SocketSlashCommand ctx)
         {
-            var type = (JapaneseMedia)(long)ctx.Data.Options.ElementAt(0).Value;
-            var name = (string)ctx.Data.Options.ElementAt(1).Value;
-            await PostAnimeEmbedAsync(type, await SearchMediaAsync(type, name), ctx);
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode((string)ctx.Data.Options.ElementAt(0).Value)),
+                Method = HttpMethod.Post
+            };
+            request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
+
+            var response = await StaticObjects.HttpClient.SendAsync(request);
+            var searchResults = JsonConvert.DeserializeObject<JArray>(await response.Content.ReadAsStringAsync());
+
+            if (searchResults.Count == 0)
+                throw new CommandFailed("Nothing was found with this name.");
+
+            var id = searchResults.First().Value<int>("id");
+            var drama = await GetDramaAsync(id);
+
+            var embed = new EmbedBuilder()
+            {
+                Title = drama.Value<string>("original_title"),
+                Description = drama.Value<string>("synopsis"),
+                Color = new Color(0, 97, 157),
+                Url = drama.Value<string>("permalink"),
+                ImageUrl = drama["images"].Value<string>("poster")
+            };
+
+            embed.AddField("English Title", drama.Value<string>("title"), true);
+            embed.AddField("Country", drama.Value<string>("country"), true);
+            embed.AddField("Episode Count", drama.Value<int>("episodes"), true);
+
+            if (drama["released"] != null)
+            {
+                embed.AddField("Released", drama.Value<string>("released"), true);
+            }
+            else
+            {
+                embed.AddField("Air date", drama.Value<string>("aired_start") + ((drama["aired_end"] != null) ? " - " + drama.Value<string>("aired_end") : ""), true);
+            }
+            embed.AddField("Audiance Warning", drama.Value<string>("certification"), true);
+
+            if (drama["votes"] != null)
+            {
+                embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
+            }
+
+            await ctx.RespondAsync(embed: embed.Build());
         }
 
-        private async Task PostAnimeEmbedAsync(JapaneseMedia media, AnimeInfo info, SocketSlashCommand ctx)
+        public static async Task<JObject> GetDramaAsync(int id)
         {
-            var answer = info.Attributes;
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://api.mydramalist.com/v1/titles/" + id),
+                Method = HttpMethod.Get
+            };
+            request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
+
+            var response = await StaticObjects.HttpClient.SendAsync(request);
+            return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task AnimeAsync(SocketSlashCommand ctx)
+        {
+            var media = (JapaneseMedia)(long)ctx.Data.Options.ElementAt(0).Value;
+            var name = (string)ctx.Data.Options.ElementAt(1).Value;
+            var answer = (await SearchMediaAsync(media, name)).Attributes;
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
                 throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
@@ -135,7 +213,7 @@ namespace Sanara.Module.Entertainment
                 }
                 else if (DateTime.Now > StaticObjects.KitsuRefreshDate) // Access token expired, need to refresh it
                 {
-                    var request = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token")
+                    var tokenReq = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token")
                     {
                         Content = new FormUrlEncodedContent(new Dictionary<string, string>
                         {
@@ -143,7 +221,7 @@ namespace Sanara.Module.Entertainment
                             { "refresh_token", StaticObjects.KitsuRefreshToken }
                         })
                     };
-                    var answer = await StaticObjects.HttpClient.SendAsync(request);
+                    var answer = await StaticObjects.HttpClient.SendAsync(tokenReq);
                     var authJson = JsonConvert.DeserializeObject<JObject>(await answer.Content.ReadAsStringAsync());
                     StaticObjects.KitsuAccessToken = authJson["access_token"].Value<string>();
                     StaticObjects.KitsuRefreshDate = DateTime.Now.AddSeconds(authJson["expires_in"].Value<int>());
@@ -151,12 +229,15 @@ namespace Sanara.Module.Entertainment
                 }
             }
 
-            StaticObjects.KitsuHttpClient.DefaultRequestHeaders.Authorization = new("Bearer", StaticObjects.KitsuAccessToken);
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
+                Method = HttpMethod.Get
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", StaticObjects.KitsuAccessToken);
             // For anime we need to contact the anime endpoint, manga and light novels are on the manga endpoint
             // The limit=5 is because we only take the 5 firsts results to not end up with things that are totally unrelated
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.KitsuHttpClient.GetStringAsync("https://kitsu.io/api/edge/" + (media == JapaneseMedia.Anime? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)));
-
-            StaticObjects.KitsuHttpClient.DefaultRequestHeaders.Authorization = null;
+            var json = JsonConvert.DeserializeObject<JObject>(await (await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync());
 
             var data = json!["data"]!.Value<JArray>()!.ToObject<AnimeInfo[]>();
 
@@ -371,69 +452,6 @@ private string AddZero(uint val)
    => val < 10 ? "0" + val : val.ToString();
 
 
-[Command("Drama", RunMode = RunMode.Async)]
-public async Task DramaAsync([Remainder] string name)
-{
-   var request = new HttpRequestMessage()
-   {
-       RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode(name)),
-       Method = HttpMethod.Post
-   };
-   request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
-
-   var response = await StaticObjects.HttpClient.SendAsync(request);
-   var searchResults = JsonConvert.DeserializeObject<JArray>(await response.Content.ReadAsStringAsync());
-
-   if (searchResults.Count == 0)
-       throw new CommandFailed("Nothing was found with this name.");
-
-   var id = searchResults.First().Value<int>("id");
-   var drama = await GetDramaAsync(id);
-
-   var embed = new EmbedBuilder()
-   {
-       Title = drama.Value<string>("original_title"),
-       Description = drama.Value<string>("synopsis"),
-       Color = new Color(0, 97, 157),
-       Url = drama.Value<string>("permalink"),
-       ImageUrl = drama["images"].Value<string>("poster")
-   };
-
-   embed.AddField("English Title", drama.Value<string>("title"));
-   embed.AddField("Episode Count", drama.Value<int>("episodes"), true);
-
-   if(drama["released"] != null)
-   {
-       embed.AddField("Released", drama.Value<string>("released"), true);
-   }
-   else
-   {
-       embed.AddField("Air date", drama.Value<string>("aired_start") + ((drama["aired_end"] != null) ? " - " + drama.Value<string>("aired_end") : ""), true);
-   }
-
-   embed.AddField("Country", drama.Value<string>("country"), true);
-   embed.AddField("Audiance Warning", drama.Value<string>("certification"), true);
-
-   if (drama["votes"] != null)
-   {
-       embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
-   }
-
-   await ReplyAsync(embed: embed.Build());
-}
-
-public static async Task<JObject> GetDramaAsync(int id)
-{
-   var request = new HttpRequestMessage()
-   {
-       RequestUri = new Uri("https://api.mydramalist.com/v1/titles/" + id),
-       Method = HttpMethod.Get
-   };
-   request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
-
-   var response = await StaticObjects.HttpClient.SendAsync(request);
-   return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
-}
 
 */
     }
