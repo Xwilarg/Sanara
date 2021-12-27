@@ -1,19 +1,9 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sanara.Attribute;
-using Sanara.CustomClass;
 using Sanara.Exception;
-using Sanara.Subscription.Tags;
-using System.Globalization;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 using System.Web;
-using VndbSharp;
-using VndbSharp.Models;
-using VndbSharp.Models.VisualNovel;
 
 namespace Sanara.Help
 {
@@ -44,9 +34,82 @@ namespace Sanara.Module.Entertainment
 
         public CommandInfo[] GetCommands()
         {
-            throw new NotImplementedException();
+            return new[]
+            {
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "anime",
+                        Description = "Get information about an anime",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "name",
+                                Description = "Name of the anime",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: AnimeAsync,
+                    precondition: Precondition.None
+                )
+            };
         }
-        public static async Task<JToken> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
+
+        public async Task AnimeAsync(SocketSlashCommand ctx)
+        {
+           await PostAnimeEmbedAsync(JapaneseMedia.Anime, await SearchMediaAsync(JapaneseMedia.Anime, (string)ctx.Data.Options.ElementAt(0).Value), ctx);
+        }
+        /*
+        [Command("Anime", RunMode = RunMode.Async)]
+        public async Task AnimeAsync([Remainder] string name)
+        {
+            await PostAnimeEmbedAsync(JapaneseMedia.ANIME, await SearchMediaAsync(JapaneseMedia.ANIME, name));
+        }
+
+        [Command("Light novel", RunMode = RunMode.Async), Alias("LN")]
+        public async Task LightNovelAsync([Remainder] string name)
+        {
+            await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
+        }*/
+
+
+        private async Task PostAnimeEmbedAsync(JapaneseMedia media, AnimeInfo info, SocketSlashCommand ctx)
+        {
+            var answer = info.Attributes;
+
+            if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
+                throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
+
+            var description = "";
+            if (answer.Synopsis != null)
+                description = answer.Synopsis.Length > 1000 ? answer.Synopsis[..1000] + " [...]" : answer.Synopsis; // Description that fill the whole screen are a pain
+            var embed = new EmbedBuilder
+            {
+                Title = answer.CanonicalTitle,
+                Color = answer.Nsfw ? new Color(255, 20, 147) : Color.Green,
+                Url = "https://kitsu.io/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
+                Description = description,
+                ImageUrl = answer.PosterImage.Original
+            };
+            if (answer.Titles?.En != null && answer.Titles?.En != answer.CanonicalTitle) // No use displaying this if it's the same as the embed title
+                embed.AddField("English Title", answer.Titles!.En, true);
+            if (answer.AverageRating != null)
+                embed.AddField("Kitsu User Rating", answer.AverageRating, true);
+            if (media == JapaneseMedia.Anime && answer.EpisodeCount != null)
+                embed.AddField("Episode Count", answer.EpisodeCount + (answer.EpisodeLength != null ? $" ({answer.EpisodeLength} min per episode)" : ""), true);
+            if (answer.StartDate == null)
+                embed.AddField("Release Date", "To Be Announced", true);
+            else
+                embed.AddField("Release Date", answer.StartDate + " - " + (answer.EndDate ?? "???"), true);
+            if (answer.AgeRatingGuide != null)
+                embed.AddField("Audiance Warning", answer.AgeRatingGuide, true);
+            await ctx.RespondAsync(embed: embed.Build());
+        }
+
+        public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
         {
             // Authentification is required to see NSFW content
             if (StaticObjects.KitsuAuth != null)
@@ -84,14 +147,14 @@ namespace Sanara.Module.Entertainment
 
             StaticObjects.KitsuHttpClient.DefaultRequestHeaders.Authorization = null;
 
-            var data = json["data"].Value<JArray>();
+            var data = json!["data"]!.Value<JArray>()!.ToObject<AnimeInfo[]>();
 
             // Filter data depending of wanted media
-            JToken[] allData;
+            AnimeInfo[] allData;
             if (media == JapaneseMedia.Manga)
-                allData = data.Where(x => x["attributes"]["subtype"].Value<string>() != "novel").ToArray();
+                allData = data.Where(x => x.Attributes.Subtype != "novel").ToArray();
             else if (media == JapaneseMedia.LightNovel)
-                allData = data.Where(x => x["attributes"]["subtype"].Value<string>() == "novel").ToArray();
+                allData = data.Where(x => x.Attributes.Subtype == "novel").ToArray();
             else
                 allData = data.ToArray();
 
@@ -101,13 +164,14 @@ namespace Sanara.Module.Entertainment
             string cleanName = Utils.CleanWord(query); // Cleaned word for comparaisons
 
             // If we can find an exact match, we go with that
-            string upperName = query.ToUpper();
+            string upperName = query.ToUpperInvariant();
             foreach (var elem in allData)
             {
-                if (elem["attributes"]["canonicalTitle"].Value<string>().ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en"] != null && elem["attributes"]["titles"]["en"].Value<string>()?.ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en_jp"] != null && elem["attributes"]["titles"]["en_jp"].Value<string>()?.ToUpper() == upperName ||
-                    elem["attributes"]["titles"]["en_us"] != null && elem["attributes"]["titles"]["en_us"].Value<string>()?.ToUpper() == upperName)
+                var answer = elem.Attributes;
+                if (answer.CanonicalTitle.ToUpperInvariant() == upperName ||
+                    answer.Titles.En?.ToUpperInvariant() == upperName ||
+                    answer.Titles.En_jp?.ToUpperInvariant() == upperName ||
+                    answer.Titles.En_us?.ToUpperInvariant() == upperName)
                 {
                     return elem;
                 }
@@ -119,14 +183,15 @@ namespace Sanara.Module.Entertainment
             // Else we try to find something that somehow match
             foreach (var elem in allData)
             {
-                if (Utils.CleanWord(elem["attributes"]["canonicalTitle"].Value<string>()).Contains(cleanName) ||
-                    elem["attributes"]["titles"]["en"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en"].Value<string>() ?? "").Contains(cleanName) ||
-                    elem["attributes"]["titles"]["en_jp"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en_jp"].Value<string>() ?? "").Contains(cleanName) ||
-                    elem["attributes"]["titles"]["en_us"] != null && Utils.CleanWord(elem["attributes"]["titles"]["en_us"].Value<string>() ?? "").Contains(cleanName))
+                var answer = elem.Attributes;
+                if (Utils.CleanWord(answer.CanonicalTitle).Contains(cleanName) ||
+                    Utils.CleanWord(answer.Titles.En?.ToUpperInvariant() ?? "").Contains(cleanName) ||
+                    Utils.CleanWord(answer.Titles.En_jp?.ToUpperInvariant() ?? "").Contains(cleanName) ||
+                    Utils.CleanWord(answer.Titles.En_us?.ToUpperInvariant() ?? "").Contains(cleanName))
                 {
                     // We would rather find the episodes and not some OVA/ONA
                     // We don't filter them before so we can fallback on them if we find nothing else
-                    if (media == JapaneseMedia.Anime && elem["attributes"]["subtype"].Value<string>() != "TV")
+                    if (media == JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
                         continue;
 
                     return elem;
@@ -294,23 +359,6 @@ public async Task VisualNovel([Remainder] string name)
 private string AddZero(uint val)
    => val < 10 ? "0" + val : val.ToString();
 
-[Command("Manga", RunMode = RunMode.Async)]
-public async Task MangaAsync([Remainder] string name)
-{
-   await PostAnimeEmbedAsync(JapaneseMedia.MANGA, await SearchMediaAsync(JapaneseMedia.MANGA, name));
-}
-
-[Command("Anime", RunMode = RunMode.Async)]
-public async Task AnimeAsync([Remainder] string name)
-{
-   await PostAnimeEmbedAsync(JapaneseMedia.ANIME, await SearchMediaAsync(JapaneseMedia.ANIME, name));
-}
-
-[Command("Light novel", RunMode = RunMode.Async), Alias("LN")]
-public async Task LightNovelAsync([Remainder] string name)
-{
-   await PostAnimeEmbedAsync(JapaneseMedia.LIGHT_NOVEL, await SearchMediaAsync(JapaneseMedia.LIGHT_NOVEL, name));
-}
 
 [Command("Drama", RunMode = RunMode.Async)]
 public async Task DramaAsync([Remainder] string name)
@@ -376,38 +424,6 @@ public static async Task<JObject> GetDramaAsync(int id)
    return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
 }
 
-private async Task PostAnimeEmbedAsync(JapaneseMedia media, JToken token)
-{
-   token = token["attributes"];
-
-   if (Context.Channel is ITextChannel channel && !channel.IsNsfw && token["nsfw"] != null && token["nsfw"].Value<bool>())
-       throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
-
-   var description = "";
-   if (token["synopsis"].Value<string>() != null)
-       description = token["synopsis"].Value<string>().Length > 1000 ? token["synopsis"].Value<string>().Substring(0, 1000) + " [...]" : token["synopsis"].Value<string>(); // Description that fill the whole screen are a pain
-   var embed = new EmbedBuilder
-   {
-       Title = token["canonicalTitle"].Value<string>(),
-       Color = token["nsfw"] == null ? Color.Green : (token["nsfw"].Value<bool>() ? new Color(255, 20, 147) : Color.Green),
-       Url = "https://kitsu.io/" + (media == JapaneseMedia.ANIME ? "anime" : "manga") + "/" + token["slug"].Value<string>(),
-       Description = description,
-       ImageUrl = token["posterImage"]["original"].Value<string>()
-   };
-   if (token["titles"] != null && token["titles"]["en"] != null && !string.IsNullOrEmpty(token["titles"]["en"].Value<string>()) && token["titles"]["en"].Value<string>() != token["canonicalTitle"].Value<string>()) // No use displaying this if it's the same as the embed title
-       embed.AddField("English Title", token["titles"]["en"].Value<string>());
-   if (media == JapaneseMedia.ANIME && token["episodeCount"] != null)
-       embed.AddField("Episode Count", token["episodeCount"].Value<string>() + (token["episodeLength"] != null ? $" ({token["episodeLength"].Value<string>()} minutes per episode)" : ""), true);
-   if (token["startDate"] == null)
-       embed.AddField("Release Date", "To Be Announced", true);
-   else
-       embed.AddField("Release Date", token["startDate"] + " - " + (token["endDate"] != null ? "???" : token["endDate"]), true);
-   if (!string.IsNullOrEmpty(token["ageRatingGuide"].Value<string>()))
-       embed.AddField("Audiance Warning", token["ageRatingGuide"].Value<string>(), true);
-   if (!string.IsNullOrEmpty(token["averageRating"].Value<string>()))
-       embed.AddField("Kitsu User Rating", token["averageRating"].Value<string>(), true);
-   await ReplyAsync(embed: embed.Build());
-}
 */
     }
 }

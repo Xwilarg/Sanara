@@ -7,6 +7,7 @@ using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module;
 using Sanara.Module.Administration;
+using Sanara.Module.Entertainment;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -98,7 +99,6 @@ namespace Sanara
             await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.GameInfoModule>(null);
-            await _commands.AddModuleAsync<Module.Entertainment.JapaneseModule>(null);
             await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
             await _commands.AddModuleAsync<Module.Game.GameModule>(null);
 #if NSFW_BUILD
@@ -177,9 +177,12 @@ namespace Sanara
             {
                 if (e is CommandFailed)
                 {
-                    await ctx.RespondAsync(e.Message);
+                    await ctx.RespondAsync(e.Message, ephemeral: true);
                 }
-                await Log.LogErrorAsync(e, ctx);
+                else
+                {
+                    await Log.LogErrorAsync(e, ctx);
+                }
             }
         }
 
@@ -197,7 +200,11 @@ namespace Sanara
                 await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
             }
             List<ISubmodule> _submodules = new();
+
+            // Add submodules
             _submodules.Add(new InformationModule());
+            _submodules.Add(new JapaneseModule());
+
             foreach (var s in _submodules)
             {
                 foreach (var c in s.GetCommands())

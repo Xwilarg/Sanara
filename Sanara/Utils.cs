@@ -23,12 +23,23 @@
                 || extension.StartsWith("jpeg"));
         }
 
-        public static string ToDiscordTimestamp(DateTime dt, bool useTimeAgo)
+        public enum TimestampInfo
+        {
+            None,
+            TimeAgo,
+            OnlyDate
+        }
+
+        public static string ToDiscordTimestamp(DateTime dt, TimestampInfo info)
         {
             var secs = (int)(dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-            if (useTimeAgo)
+            if (info == TimestampInfo.TimeAgo)
             {
                 return $"<t:{secs}:R>";
+            }
+            if (info == TimestampInfo.OnlyDate)
+            {
+                return $"<t:{secs}:D>";
             }
             return $"<t:{secs}>";
         }

@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;y
+using Newtonsoft.Json.Linq;
 using Sanara.Help;
 using System.Globalization;
 using System.Reflection;
@@ -70,9 +70,9 @@ namespace Sanara.Module.Administration
                 Title = "Status",
                 Color = Color.Purple
             };
-            embed.AddField("Latest version", Utils.ToDiscordTimestamp(new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc, false), true);
-            embed.AddField("Last command received", Utils.ToDiscordTimestamp(StaticObjects.LastMessage, true), true);
-            embed.AddField("Uptime", Utils.ToDiscordTimestamp(StaticObjects.Started, true), true);
+            embed.AddField("Latest version", Utils.ToDiscordTimestamp(new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc, Utils.TimestampInfo.None), true);
+            embed.AddField("Last command received", Utils.ToDiscordTimestamp(StaticObjects.LastMessage, Utils.TimestampInfo.TimeAgo), true);
+            embed.AddField("Uptime", Utils.ToDiscordTimestamp(StaticObjects.Started, Utils.TimestampInfo.TimeAgo), true);
             embed.AddField("Guild count", StaticObjects.Client.Guilds.Count, true);
 
             // Get informations about games
@@ -109,7 +109,7 @@ namespace Sanara.Module.Administration
             var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
             foreach (var elem in json)
             {
-                var time = Utils.ToDiscordTimestamp(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture), false);
+                var time = Utils.ToDiscordTimestamp(DateTime.ParseExact(elem["commit"]["author"]["date"].Value<string>(), "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture), Utils.TimestampInfo.None);
                 str.AppendLine($"{time}: [{elem["commit"]["message"].Value<string>()}](https://github.com/Xwilarg/Sanara/commit/{elem["sha"].Value<string>()})");
             }
             embed.AddField("Latest changes", str.ToString());

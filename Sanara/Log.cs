@@ -26,6 +26,8 @@ namespace Sanara
 
         public static async Task LogErrorAsync(System.Exception e, SocketSlashCommand? ctx)
         {
+            await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
+
             if (ctx != null)
             {
                 var button = new ComponentBuilder()

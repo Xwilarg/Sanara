@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Module\Administration\" />
-    <Folder Include="Module\Entertainment\" />
     <Folder Include="Module\Game\" />
     <Folder Include="Module\Nsfw\" />
     <Folder Include="Module\Tool\" />
