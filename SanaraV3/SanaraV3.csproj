@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
     <PackageReference Include="BooruSharp" Version="3.0.3" />
-    <PackageReference Include="Discord.Net" Version="2.4.0" />
+    <PackageReference Include="Discord.Net" Version="3.1.0" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.54.0.2434" />
     <PackageReference Include="Google.Cloud.Translation.V2" Version="2.1.0" />
