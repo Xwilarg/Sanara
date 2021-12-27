@@ -1,21 +1,5 @@
-﻿using Discord;
-using Discord.Commands;
-using Newtonsoft.Json;
-using SanaraV3.Attribute;
-using SanaraV3.Exception;
-using SanaraV3.Game;
-using SanaraV3.Game.Custom;
-using SanaraV3.Game.Impl;
-using SanaraV3.Game.Preload.Impl;
-using SanaraV3.Game.Preload.Result;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
+/*
 namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
@@ -177,3 +161,4 @@ namespace SanaraV3.Module.Game
         }
     }
 }
+*/

@@ -1,16 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
-using SanaraV3.Exception;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
-
+﻿/*
 namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
@@ -169,3 +157,4 @@ namespace SanaraV3.Module.Nsfw
         }
     }
 }
+*/

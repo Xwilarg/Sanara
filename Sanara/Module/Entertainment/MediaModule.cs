@@ -1,18 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using DiscordUtils;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SanaraV3.Exception;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿/*
 
 namespace SanaraV3.Help
 {
@@ -274,3 +260,4 @@ namespace SanaraV3.Module.Entertainment
         }
     }
 }
+*/

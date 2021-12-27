@@ -1,14 +1,9 @@
-﻿using BooruSharp.Booru;
-using BooruSharp.Search;
-using BooruSharp.Search.Post;
-using Discord;
-using Discord.Commands;
-using DiscordUtils;
-using SanaraV3.Exception;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿namespace Sanara.Module.Nsfw
+{
+
+}
+
+/*
 
 namespace SanaraV3.Help
 {
@@ -222,3 +217,4 @@ namespace SanaraV3.Module.Nsfw
         }
     }
 }
+*/

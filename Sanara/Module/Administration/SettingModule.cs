@@ -1,11 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using SanaraV3.Attribute;
-using SanaraV3.Exception;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿/*
 namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
@@ -107,3 +100,4 @@ namespace SanaraV3.Module.Administration
         }
     }
 }
+*/

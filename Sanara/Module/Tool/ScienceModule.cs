@@ -1,18 +1,4 @@
-﻿using Discord.Commands;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SanaraV3.Exception;
-using SimpleCrypto;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
+﻿/*
 
 namespace SanaraV3.Help
 {
@@ -279,3 +265,4 @@ namespace SanaraV3.Module.Tool
         }
     }
 }
+*/

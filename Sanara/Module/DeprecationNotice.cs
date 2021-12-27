@@ -4,7 +4,8 @@ namespace Sanara.Module
 {
     public class DeprecationNotice : ModuleBase
     {
-        [Command("Botinfo"), Alias("Help", "Ping", "Gdpr")]
+        [Command("Botinfo"), Alias("Help", "Ping", "Gdpr",
+            "Anime", "Manga", "LightNovel", "Drama")]
         public async Task Deprecated(params string[] _)
         {
             await ReplyAsync(

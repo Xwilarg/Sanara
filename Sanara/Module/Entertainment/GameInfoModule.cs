@@ -1,14 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SanaraV3.Exception;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
+﻿/*
 
 namespace SanaraV3.Help
 {
@@ -122,3 +112,4 @@ namespace SanaraV3.Module.Entertainment
         }
     }
 }
+*/

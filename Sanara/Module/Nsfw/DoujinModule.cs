@@ -1,21 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using NHentaiSharp.Core;
-using NHentaiSharp.Exception;
-using NHentaiSharp.Search;
-using SanaraV3.Attribute;
-using SanaraV3.Exception;
-using SanaraV3.Subscription.Tags;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
+﻿/*
 
 namespace SanaraV3.Help
 {
@@ -316,3 +299,4 @@ namespace SanaraV3.Module.Nsfw
         }
     }
 }
+*/

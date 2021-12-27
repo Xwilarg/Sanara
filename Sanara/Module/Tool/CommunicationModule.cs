@@ -1,14 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using SanaraV3.Exception;
-using SanaraV3.Help;
-using SanaraV3.Module.Administration;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
 
 namespace SanaraV3.Help
 {
@@ -192,3 +182,4 @@ namespace SanaraV3.Module.Tool
         }
     }
 }
+*/
