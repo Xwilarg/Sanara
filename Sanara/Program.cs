@@ -144,10 +144,9 @@ namespace Sanara
             {
                 throw new NotImplementedException($"Unknown command {ctx.CommandName}");
             }
+            var cmd = _commandsAssociations[ctx.CommandName.ToUpperInvariant()];
             try
             {
-                var cmd = _commandsAssociations[ctx.CommandName.ToUpperInvariant()];
-
                 var tChan = ctx.Channel as ITextChannel;
                 if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
                     tChan != null && !tChan.IsNsfw)
@@ -185,11 +184,18 @@ namespace Sanara
             {
                 if (e is CommandFailed)
                 {
-                    await ctx.RespondAsync(e.Message, ephemeral: true);
+                    if (cmd.NeedDefer)
+                    {
+                        await ctx.ModifyOriginalResponseAsync(x => x.Content = e.Message);
+                    }
+                    else
+                    {
+                        await ctx.RespondAsync(e.Message, ephemeral: true);
+                    }
                 }
                 else
                 {
-                    await Log.LogErrorAsync(e, ctx);
+                    await Log.LogErrorAsync(e, ctx, cmd.NeedDefer);
                 }
             }
         }
@@ -209,7 +215,8 @@ namespace Sanara
                     var isDebug = StaticObjects.DebugGuildId != 0 && Debugger.IsAttached;
                     if (isDebug)
                     {
-                        await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
+                        // Uncomment to reset guild commands
+                        // await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
                     }
                     List<ISubmodule> _submodules = new();
 
@@ -219,19 +226,25 @@ namespace Sanara
                     _submodules.Add(new BooruModule());
                     _submodules.Add(new FunModule());
 
+                    foreach (var c in await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).GetApplicationCommandsAsync())
+                    {
+
+                    }
+
                     foreach (var s in _submodules)
                     {
                         foreach (var c in s.GetCommands())
                         {
 #if !NSFW_BUILD
-                    // We skip NSFW commands on SFW builds
-                    if ((c.Precondition & Precondition.NsfwOnly) != 0)
-                    {
-                        continue;
-                    }
+                            // We skip NSFW commands on SFW builds
+                            if ((c.Precondition & Precondition.NsfwOnly) != 0)
+                            {
+                                continue;
+                            }
 #endif
                             if (isDebug)
                             {
+                                
                                 await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
                             }
                             else

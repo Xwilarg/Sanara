@@ -1,8 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sanara;
 using Sanara.Help;
 using Sanara.Module;
+using System.Text;
 using System.Text.RegularExpressions;
 using VndbSharp;
 using VndbSharp.Models;
@@ -37,6 +40,26 @@ public class FunModule : ISubmodule
                     callback: VNQuoteAsync,
                     precondition: Precondition.NsfwOnly,
                     needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "complete",
+                        Description = "Complete the given sentence using machine learning",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "sentence",
+                                Description = "Start of the sentence",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            }
+                        }
+                    }.Build(),
+                    callback: CompleteAsync,
+                    precondition: Precondition.None,
+                    needDefer: true
                 )
             };
     }
@@ -64,6 +87,27 @@ public class FunModule : ISubmodule
             Color = Color.Blue
         }.Build());
     }
+
+    public async Task CompleteAsync(SocketSlashCommand ctx)
+    {
+        var sentence = (string)ctx.Data.Options.ElementAt(0).Value;
+
+        var embed = new EmbedBuilder
+        {
+            Description = "Please wait, this can take up to a few minutes...",
+            Color = Color.Blue
+        };
+        var timer = DateTime.Now;
+        var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"").Replace("\n", "\\n") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
+        resp.EnsureSuccessStatusCode();
+        embed.Footer = new EmbedFooterBuilder
+        {
+            Text = $"Time elapsed: {(DateTime.Now - timer).TotalSeconds:0.00}s"
+        };
+        var json = await resp.Content.ReadAsStringAsync();
+        embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
+        await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+    }
 }
 /*
 
@@ -84,24 +128,6 @@ namespace SanaraV3.Help
 
 namespace SanaraV3.Module.Entertainment
 {
-    public sealed class FunNsfwModule : ModuleBase
-    {
-        [Command("VNQuote"), RequireNsfw]
-        public async Task VNQuote()
-        {
-            var html = await StaticObjects.HttpClient.GetStringAsync("https://vndb.org");
-            var match = Regex.Match(html, "footer\">\"<a href=\"\\/v([0-9]+)\"[^>]+>([^<]+)+<");
-            var id = match.Groups[1].Value;
-            var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id)), VndbFlags.FullVisualNovel)).ToArray()[0];
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = "From " + vn.Name,
-                Url = "https://vndb.org/v" + id,
-                Description = match.Groups[2].Value,
-                Color = Color.Blue
-            }.Build());
-        }
-    }
 
     /// <summary>
     /// All "Fun" commands that have no real purposes
@@ -138,27 +164,6 @@ namespace SanaraV3.Module.Entertainment
                 },
                 Color = Color.Blue
             }.Build());
-        }
-
-        [Command("Complete", RunMode = RunMode.Async)]
-        public async Task CompleteAsync([Remainder]string sentence = "")
-        {
-            var embed = new EmbedBuilder
-            {
-                Description = "Please wait, this can take up to a few minutes...",
-                Color = Color.Blue
-            };
-            var msg = await ReplyAsync(embed: embed.Build());
-            var timer = DateTime.Now;
-            var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"").Replace("\n", "\\n") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
-            resp.EnsureSuccessStatusCode();
-            embed.Footer = new EmbedFooterBuilder
-            {
-                Text = $"Time elapsed: {(DateTime.Now - timer).TotalSeconds.ToString("0.00")}s"
-            };
-            var json = await resp.Content.ReadAsStringAsync();
-            embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
-            await msg.ModifyAsync(x => x.Embed = embed.Build());
         }
     }
 }

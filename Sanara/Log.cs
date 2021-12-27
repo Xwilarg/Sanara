@@ -24,7 +24,7 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task LogErrorAsync(System.Exception e, SocketSlashCommand? ctx)
+        public static async Task LogErrorAsync(System.Exception e, SocketSlashCommand? ctx, bool needDefer = false)
         {
             await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
 
@@ -34,13 +34,25 @@ namespace Sanara
                         .WithButton("More information", ctx.Id.ToString());
 
                 StaticObjects.Errors.Add(ctx.Id.ToString(), e);
-
-                await ctx.RespondAsync(embed: new EmbedBuilder
+                var embed = new EmbedBuilder
                 {
                     Color = Color.Red,
                     Title = "An error occured",
                     Description = "The error was automatically reported. If the error persist, please contact the bot owner."
-                }.Build(), components: button.Build());
+                }.Build();
+
+                if (needDefer)
+                {
+                    await ctx.ModifyOriginalResponseAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components = button.Build();
+                    });
+                }
+                else
+                {
+                    await ctx.RespondAsync(embed: embed, components: button.Build());
+                }
 
                 if (SentrySdk.IsEnabled)
                     SentrySdk.CaptureException(new System.Exception($"Error while processing {ctx}", e));

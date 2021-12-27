@@ -6,7 +6,8 @@ namespace Sanara.Module
     {
         [Command("Botinfo"), Alias("Help", "Ping", "Gdpr",
             "Anime", "Manga", "LightNovel", "Drama",
-            "Safebooru", "Booru", "E629", "E926", "Gelbooru", "Rule34", "Konachan")]
+            "Safebooru", "Booru", "E629", "E926", "Gelbooru", "Rule34", "Konachan",
+            "Complete", "VNQuote", "Inspire")]
         public async Task Deprecated(params string[] _)
         {
             await ReplyAsync(
