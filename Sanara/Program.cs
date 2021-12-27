@@ -19,7 +19,7 @@ namespace Sanara
         private readonly CommandService _commands = new();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
-        private Dictionary<string, Module.CommandInfo> _commandsAssociations = new();
+        private readonly Dictionary<string, Module.CommandInfo> _commandsAssociations = new();
 
         public static async Task Main()
         {

@@ -57,7 +57,7 @@ namespace Sanara.Module.Nsfw
 
         public async Task BooruAsync(SocketSlashCommand ctx)
         {
-            var tags = ((string)ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "").Split(' ');
+            var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
             var type = (BooruType)(long)ctx.Data.Options.First(x => x.Name == "source").Value;
 
             var booru = type switch
