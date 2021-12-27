@@ -1,4 +1,43 @@
-﻿/*
+﻿using Discord;
+using Discord.WebSocket;
+using Sanara;
+using Sanara.Help;
+using Sanara.Module;
+
+public class FunModule : ISubmodule
+{
+    public SubmoduleInfo GetInfo()
+    {
+        return new("Fun", "Various small entertainement commands");
+    }
+
+    public CommandInfo[] GetCommands()
+    {
+        return new[]
+        {
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "inspire",
+                        Description = "Get a random \"inspirational\" quote"
+                    }.Build(),
+                    callback: InspireAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                )
+            };
+    }
+
+    public async Task InspireAsync(SocketSlashCommand ctx)
+    {
+        await ctx.RespondAsync(embed: new EmbedBuilder
+        {
+            Color = Color.Blue,
+            ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
+        }.Build());
+    }
+}
+/*
 
 namespace SanaraV3.Help
 {
@@ -70,16 +109,6 @@ namespace SanaraV3.Module.Entertainment
                     Text = json["description"].Value<string>()
                 },
                 Color = Color.Blue
-            }.Build());
-        }
-
-        [Command("Inspire")]
-        public async Task InspireAsync()
-        {
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = Color.Blue,
-                ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
             }.Build());
         }
 

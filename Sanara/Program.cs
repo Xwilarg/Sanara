@@ -217,6 +217,7 @@ namespace Sanara
                     _submodules.Add(new InformationModule());
                     _submodules.Add(new JapaneseModule());
                     _submodules.Add(new BooruModule());
+                    _submodules.Add(new FunModule());
 
                     foreach (var s in _submodules)
                     {
