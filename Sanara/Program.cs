@@ -212,12 +212,6 @@ namespace Sanara
             {
                 try
                 {
-                    var isDebug = StaticObjects.DebugGuildId != 0 && Debugger.IsAttached;
-                    if (isDebug)
-                    {
-                        // Uncomment to reset guild commands
-                        // await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).DeleteApplicationCommandsAsync();
-                    }
                     List<ISubmodule> _submodules = new();
 
                     // Add submodules
@@ -226,9 +220,10 @@ namespace Sanara
                     _submodules.Add(new BooruModule());
                     _submodules.Add(new FunModule());
 
-                    foreach (var c in await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).GetApplicationCommandsAsync())
+                    SocketGuild? debugGuild = null;
+                    if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
                     {
-
+                        debugGuild = StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId);
                     }
 
                     foreach (var s in _submodules)
@@ -242,10 +237,9 @@ namespace Sanara
                                 continue;
                             }
 #endif
-                            if (isDebug)
+                            if (debugGuild != null)
                             {
-                                
-                                await StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId).CreateApplicationCommandAsync(c.SlashCommand);
+                                await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
                             }
                             else
                             {
@@ -253,6 +247,16 @@ namespace Sanara
                             }
                             _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
                         }
+                    }
+
+                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand);
+                    if (debugGuild != null)
+                    {
+                        await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
+                    }
+                    else
+                    {
+                        await StaticObjects.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
                     }
                     await Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready Handler", "Commands loaded"));
                 }
