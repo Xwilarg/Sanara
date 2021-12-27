@@ -3,6 +3,9 @@ using Discord.WebSocket;
 using Sanara;
 using Sanara.Help;
 using Sanara.Module;
+using System.Text.RegularExpressions;
+using VndbSharp;
+using VndbSharp.Models;
 
 public class FunModule : ISubmodule
 {
@@ -24,6 +27,16 @@ public class FunModule : ISubmodule
                     callback: InspireAsync,
                     precondition: Precondition.None,
                     needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "vnquote",
+                        Description = "Get a quote from a random Visual Novel"
+                    }.Build(),
+                    callback: VNQuoteAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: false
                 )
             };
     }
@@ -34,6 +47,21 @@ public class FunModule : ISubmodule
         {
             Color = Color.Blue,
             ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
+        }.Build());
+    }
+
+    public async Task VNQuoteAsync(SocketSlashCommand ctx)
+    {
+        var html = await StaticObjects.HttpClient.GetStringAsync("https://vndb.org");
+        var match = Regex.Match(html, "footer\">\"<a href=\"\\/v([0-9]+)\"[^>]+>([^<]+)+<");
+        var id = match.Groups[1].Value;
+        var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id)), VndbFlags.FullVisualNovel)).ToArray()[0];
+        await ctx.RespondAsync(embed: new EmbedBuilder
+        {
+            Title = "From " + vn.Name,
+            Url = "https://vndb.org/v" + id,
+            Description = match.Groups[2].Value,
+            Color = Color.Blue
         }.Build());
     }
 }
