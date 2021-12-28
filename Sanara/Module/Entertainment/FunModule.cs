@@ -90,7 +90,7 @@ public class FunModule : ISubmodule
 
     public async Task CompleteAsync(SocketSlashCommand ctx)
     {
-        var sentence = (string)ctx.Data.Options.ElementAt(0).Value;
+        var sentence = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "sentence")?.Value ?? "");
 
         var embed = new EmbedBuilder
         {

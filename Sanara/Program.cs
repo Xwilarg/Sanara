@@ -145,59 +145,62 @@ namespace Sanara
                 throw new NotImplementedException($"Unknown command {ctx.CommandName}");
             }
             var cmd = _commandsAssociations[ctx.CommandName.ToUpperInvariant()];
-            try
+            _ = Task.Run(async () =>
             {
-                var tChan = ctx.Channel as ITextChannel;
-                if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
-                    tChan != null && !tChan.IsNsfw)
+                try
                 {
-                    await ctx.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
-                }
-                else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
-                    tChan != null && tChan.Guild.OwnerId != ctx.User.Id && !((IGuildUser)ctx.User).GuildPermissions.ManageGuild)
-                {
-                    await ctx.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
-                }
-                else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
-                    tChan == null)
-                {
-                    await ctx.RespondAsync("This command can only be done in a guild", ephemeral: true);
-                }
-                else
-                {
-                    if (cmd.NeedDefer)
+                    var tChan = ctx.Channel as ITextChannel;
+                    if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
+                        tChan != null && !tChan.IsNsfw)
                     {
-                        await ctx.DeferAsync();
+                        await ctx.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
                     }
-
-                    await cmd.Callback(ctx);
-                    StaticObjects.LastMessage = DateTime.UtcNow;
-
-                    if (StaticObjects.Website != null)
+                    else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
+                        tChan != null && tChan.Guild.OwnerId != ctx.User.Id && !((IGuildUser)ctx.User).GuildPermissions.ManageGuild)
                     {
-                        await StaticObjects.Website.AddNewMessageAsync();
-                        await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                        await ctx.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
                     }
-                }
-            }
-            catch (System.Exception e)
-            {
-                if (e is CommandFailed)
-                {
-                    if (cmd.NeedDefer)
+                    else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
+                        tChan == null)
                     {
-                        await ctx.ModifyOriginalResponseAsync(x => x.Content = e.Message);
+                        await ctx.RespondAsync("This command can only be done in a guild", ephemeral: true);
                     }
                     else
                     {
-                        await ctx.RespondAsync(e.Message, ephemeral: true);
+                        if (cmd.NeedDefer)
+                        {
+                            await ctx.DeferAsync();
+                        }
+
+                        await cmd.Callback(ctx);
+                        StaticObjects.LastMessage = DateTime.UtcNow;
+
+                        if (StaticObjects.Website != null)
+                        {
+                            await StaticObjects.Website.AddNewMessageAsync();
+                            await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                        }
                     }
                 }
-                else
+                catch (System.Exception e)
                 {
-                    await Log.LogErrorAsync(e, ctx, cmd.NeedDefer);
+                    if (e is CommandFailed)
+                    {
+                        if (cmd.NeedDefer)
+                        {
+                            await ctx.ModifyOriginalResponseAsync(x => x.Content = e.Message);
+                        }
+                        else
+                        {
+                            await ctx.RespondAsync(e.Message, ephemeral: true);
+                        }
+                    }
+                    else
+                    {
+                        await Log.LogErrorAsync(e, ctx, cmd.NeedDefer);
+                    }
                 }
-            }
+            });
         }
 
         private async Task Ready()

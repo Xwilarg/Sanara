@@ -78,7 +78,6 @@ namespace Sanara.Module.Entertainment
                     precondition: Precondition.None,
                     needDefer: true
                 ),
-
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
