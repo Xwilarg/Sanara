@@ -19,7 +19,7 @@ namespace Sanara
                 LogSeverity.Debug => ConsoleColor.DarkGreen,
                 _ => throw new NotImplementedException("Invalid log level " + msg.Severity)
             };
-            Console.WriteLine(msg);
+            Console.Out.WriteLineAsync(msg.ToString());
             Console.ForegroundColor = cc;
             return Task.CompletedTask;
         }
