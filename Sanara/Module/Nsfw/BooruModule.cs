@@ -132,6 +132,8 @@ namespace Sanara.Module.Nsfw
                         $"Do the 'Tags' command with then id '{id}' to have more information about this image."
                 }
             }.Build());
+
+            await StaticObjects.Website.AddBooruAsync(type.ToString());
         }
     }
 }

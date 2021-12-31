@@ -32,18 +32,11 @@
         /// <summary>
         /// Called when an user did a command
         /// </summary>
-        public async Task AddNewMessageAsync()
-        {
-            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
-            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", "OK") });
-        }
-
-        /// <summary>
-        /// Called when an user did a command
-        /// </summary>
         /// <param name="name">Command used</param>
         public async Task AddNewCommandAsync(string name)
         {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", "OK") });
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commands", name) });
         }
 
@@ -76,11 +69,10 @@
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("gamesPlayers", name + (option == null ? "" : "-" + option) + ";" + playerCount.ToString()) });
         }
 
-        /// <summary>
-        /// Clean name before sending it to the website for stats (| and $ are delimitators so we remove them)
-        /// </summary>
-        private static string GetName(string name)
-            => name.Replace("|", "").Replace("$", "");
+        public async Task AddBooruAsync(string name)
+        {
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("booru", name) });
+        }
 
         private async Task UpdateElement(Tuple<string, string>[] elems)
         {

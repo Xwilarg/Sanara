@@ -177,7 +177,6 @@ namespace Sanara
 
                         if (StaticObjects.Website != null)
                         {
-                            await StaticObjects.Website.AddNewMessageAsync();
                             await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
                         }
                     }
