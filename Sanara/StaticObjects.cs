@@ -28,6 +28,13 @@ namespace Sanara
     /// </summary>
     public static class StaticObjects
     {
+
+       public static string BotName { get; } =
+#if NSFW_BUILD
+                "Sanara";
+#else
+                "Hanaki";
+#endif
         public static DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
         {
             GatewayIntents = GatewayIntents.AllUnprivileged
