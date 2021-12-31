@@ -18,7 +18,8 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: '6.0.x'
+        include-prerelease: true
     - name: Init submodules
       run: git submodule init && git submodule update
     - name: Clean
