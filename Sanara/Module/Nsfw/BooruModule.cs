@@ -43,14 +43,36 @@ namespace Sanara.Module.Nsfw
                                 {
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
-                                        Name = "Safebooru (SFW images only)",
+                                        Name = "Safebooru (SFW)",
                                         Value = (int)BooruType.Safebooru
                                     },
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
-                                        Name = "Gelbooru (SFW and NSFW images)",
+                                        Name = "E926 (SFW, furry)",
+                                        Value = (int)BooruType.E926
+                                    },
+#if NSFW_BUILD
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Gelbooru (NSFW)",
                                         Value = (int)BooruType.Gelbooru
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "E621 (NSFW, furry)",
+                                        Value = (int)BooruType.E621
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Rule34 (NSFW, more variety of content)",
+                                        Value = (int)BooruType.Rule34
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Konachan (NSFW, wallpaper format)",
+                                        Value = (int)BooruType.Konachan
                                     }
+#endif
                                 }
                             }
                         }
@@ -71,6 +93,10 @@ namespace Sanara.Module.Nsfw
             {
                 BooruType.Safebooru => StaticObjects.Safebooru,
                 BooruType.Gelbooru => StaticObjects.Gelbooru,
+                BooruType.E621 => StaticObjects.E621,
+                BooruType.E926 => StaticObjects.E926,
+                BooruType.Rule34 => StaticObjects.Rule34,
+                BooruType.Konachan => StaticObjects.Konachan,
                 _ => throw new NotImplementedException($"Invalid booru type {type}")
             };
 
@@ -133,7 +159,10 @@ namespace Sanara.Module.Nsfw
                 }
             }.Build());
 
-            await StaticObjects.Website.AddBooruAsync(type.ToString());
+            if (StaticObjects.Website != null)
+            {
+                await StaticObjects.Website.AddBooruAsync(type.ToString());
+            }
         }
     }
 }
@@ -154,15 +183,7 @@ namespace SanaraV3.Help
             var categoryName = "Images";
 #endif
 
-            _help.Add((categoryName, new Help("Booru", "Safebooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru (only SFW images).", new string[0], Restriction.None, "Safebooru kantai_collection")));
-            _help.Add((categoryName, new Help("Booru", "E926", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E926 (only SFW furry images).", new string[0], Restriction.None, "E926 short_hair")));
-            _help.Add((categoryName, new Help("Booru", "Gelbooru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Gelbooru (all kinds of anime images).", new string[0], Restriction.Nsfw, "Gelbooru cirno")));
-            _help.Add((categoryName, new Help("Booru", "E621", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from E621 (only furry images).", new string[0], Restriction.Nsfw, "E621 swimsuit")));
-            _help.Add((categoryName, new Help("Booru", "Rule34", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Rule34 (mostly weird images).", new string[0], Restriction.Nsfw, "Rule34 cat_ears")));
-            _help.Add((categoryName, new Help("Booru", "Konachan", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Konachan (only images that can be used as wallpaper).", new string[0], Restriction.Nsfw, "Konachan landscape")));
-#if NSFW_BUILD
-            _help.Add((categoryName, new Help("Booru", "Booru", new[] { new Argument(ArgumentType.OPTIONAL, "tags") }, "Get a random image from Safebooru or Gelbooru depending if you're on a NSFW or not.", new [] { "Image" }, Restriction.None, "Booru arknights")));
-#endif
+
             _help.Add((categoryName, new Help("Booru", "Tags", new[] { new Argument(ArgumentType.MANDATORY, "id") }, "Get information about the tags of an image that was sent.", new string[0], Restriction.None, null)));
         }
     }

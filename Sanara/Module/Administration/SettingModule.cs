@@ -1,5 +1,4 @@
-﻿/*
-namespace SanaraV3.Help
+﻿/*namespace SanaraV3.Help
 {
     public sealed partial class HelpPreload
     {

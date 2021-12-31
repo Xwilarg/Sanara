@@ -116,7 +116,7 @@ namespace Sanara.Game
                     await StaticObjects.Website.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
             }
             else if (StaticObjects.Website != null)
-                await StaticObjects.Website?.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
+                await StaticObjects.Website.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
 
             _state = GameState.Ready;
             await PostAsync(introMsg);

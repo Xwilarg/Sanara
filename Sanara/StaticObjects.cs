@@ -378,7 +378,7 @@ namespace Sanara
                 }
             }
             Preloads = preloads.ToArray();
-            List<string> allNames = new List<string>();
+            List<string> allNames = new();
             foreach (var p in Preloads)
             {
                 var name = p.GetGameNames()[0];
