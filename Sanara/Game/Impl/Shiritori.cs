@@ -6,7 +6,6 @@ using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
-using Sanara.Module.Tool;
 using System.Web;
 
 namespace Sanara.Game.Impl
@@ -36,7 +35,7 @@ namespace Sanara.Game.Impl
             if (_lobby != null)
             {
                 if (_lastUserChoice == null)
-                    return new string[0];
+                    return Array.Empty<string>();
                 else
                     return new[] { _lastUserChoice };
             }
@@ -203,6 +202,6 @@ namespace Sanara.Game.Impl
         private int _minWordLength;
 
         // Used for multiplayer
-        private string _lastUserChoice;
+        private string? _lastUserChoice;
     }
 }

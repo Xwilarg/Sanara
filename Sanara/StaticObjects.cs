@@ -61,7 +61,7 @@ namespace Sanara
         /// <summary>
         /// Help object, contains help for all commands
         /// </summary>
-        public static HelpPreload Help { get; } = new();
+        public static HelpPreload? Help { set; get; }
         /// <summary>
         /// List of all errors that occured
         /// </summary>
@@ -69,11 +69,11 @@ namespace Sanara
         /// <summary>
         /// Authentification token for discordbotlist.com
         /// </summary>
-        private static string DblToken { set; get; }
+        private static string? DblToken { set; get; }
         /// <summary>
         /// Used to upload guild count to discordbotlist.com
         /// </summary>
-        private static AuthDiscordBotListApi DblApi { set; get; }
+        private static AuthDiscordBotListApi? DblApi { set; get; }
         /// <summary>
         /// Last request to discordbotlist.com
         /// </summary>
@@ -81,7 +81,7 @@ namespace Sanara
         /// <summary>
         /// Managed uploads to the API to update stats on the website of the bot
         /// </summary>
-        public static UploadManager Website { set; get; }
+        public static UploadManager? Website { set; get; }
         /// <summary>
         /// Last message received by the bot
         /// </summary>
@@ -91,11 +91,11 @@ namespace Sanara
         /// <summary>
         /// When downloading doujinshi, URL where the result is stored
         /// </summary>
-        public static string UploadWebsiteUrl { set; get; }
+        public static string? UploadWebsiteUrl { set; get; }
         /// <summary>
         /// When downloading doujinshi, location on the server where the doujinshi is stored
         /// </summary>
-        public static string UploadWebsiteLocation { set; get; }
+        public static string? UploadWebsiteLocation { set; get; }
 
         // BOORU INSTANCES
         public static Safebooru Safebooru { get; } = new();
@@ -119,17 +119,17 @@ namespace Sanara
         /// <summary>
         /// YouTube instance
         /// </summary>
-        public static YouTubeService YouTube { set; get; }
+        public static YouTubeService? YouTube { set; get; }
         /// <summary>
         /// Auth used for kitsu.io requests (Anime search)
         /// </summary>
-        public static HttpRequestMessage KitsuAuth { set; get; }
+        public static HttpRequestMessage? KitsuAuth { set; get; }
         /// <summary>
         /// Authentification token used for kitsu.io
         /// </summary>
-        public static string KitsuAccessToken { set; get; }
+        public static string? KitsuAccessToken { set; get; }
         public static DateTime KitsuRefreshDate { set; get; }
-        public static string KitsuRefreshToken { set; get; }
+        public static string? KitsuRefreshToken { set; get; }
         /// <summary>
         /// VNDB client (visual novel search)
         /// </summary>
@@ -137,11 +137,11 @@ namespace Sanara
         /// <summary>
         /// MyDramaList API key (drama search)
         /// </summary>
-        public static string MyDramaListApiKey { set; get; }
+        public static string? MyDramaListApiKey { set; get; }
         /// <summary>
         /// Unsplash token (image search)
         /// </summary>
-        public static string UnsplashToken { set; get; }
+        public static string? UnsplashToken { set; get; }
 
         // GAME MODULE
         /// <summary>
@@ -163,11 +163,11 @@ namespace Sanara
         /// <summary>
         /// Preload data for games
         /// </summary>
-        public static IPreload[] Preloads { set; get; }
+        public static IPreload?[] Preloads { set; get; } = Array.Empty<IPreload>();
         /// <summary>
         /// List of all game names available
         /// </summary>
-        public static string[] AllGameNames { set; get; }
+        public static string[] AllGameNames { set; get; } = Array.Empty<string>();
         /// <summary>
         /// Object managing games
         /// </summary>
@@ -185,11 +185,11 @@ namespace Sanara
         /// <summary>
         /// Google Translate client
         /// </summary>
-        public static TranslationClient TranslationClient { set; get; }
+        public static TranslationClient? TranslationClient { set; get; }
         /// <summary>
         /// Image detector client, used to translate text directly from images
         /// </summary>
-        public static ImageAnnotatorClient VisionClient { set; get; }
+        public static ImageAnnotatorClient? VisionClient { set; get; }
         /// <summary>
         /// ISO 639-1 acronym to full language
         /// </summary>
@@ -317,12 +317,12 @@ namespace Sanara
             Rule34.HttpClient = HttpClient;
             Konachan.HttpClient = HttpClient;
 
-            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Hiragana.json"));
+            RomajiToHiragana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Hiragana.json"))!;
             foreach (var elem in RomajiToHiragana)
             {
                 HiraganaToRomaji.Add(elem.Value, elem.Key);
             }
-            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Katakana.json"));
+            RomajiToKatakana = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Katakana.json"))!;
             foreach (var elem in RomajiToKatakana)
             {
                 KatakanaToRomaji.Add(elem.Value, elem.Key);
@@ -381,9 +381,12 @@ namespace Sanara
             List<string> allNames = new();
             foreach (var p in Preloads)
             {
-                var name = p.GetGameNames()[0];
-                var option = p.GetNameArg();
-                allNames.Add(name + (option == null ? "" : "-" + option));
+                if (p != null)
+                {
+                    var name = p.GetGameNames()[0];
+                    var option = p.GetNameArg();
+                    allNames.Add(name + (option == null ? "" : "-" + option));
+                }
             }
             AllGameNames = allNames.ToArray();
 

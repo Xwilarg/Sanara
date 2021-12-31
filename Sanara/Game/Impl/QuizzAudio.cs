@@ -66,7 +66,7 @@ namespace Sanara.Game.Impl
 
         private IVoiceChannel _voiceChan;
         private IAudioClient _voiceSession;
-        private Process _process;
+        private Process? _process;
         private AudioOutStream _outStream;
     }
 }

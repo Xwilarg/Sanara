@@ -11,7 +11,7 @@ namespace Sanara.UnitTests.Impl
             Embeds = new List<Embed>();
         }
 
-        public UnitTestUserMessage(IMessageChannel channel, string message, Embed embed)
+        public UnitTestUserMessage(IMessageChannel channel, string? message, Embed? embed)
         {
             Channel = channel;
             Content = message;
@@ -81,57 +81,57 @@ namespace Sanara.UnitTests.Impl
 
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => throw new NotImplementedException();
 
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+        public Task AddReactionAsync(IEmote emote, RequestOptions? options = null)
         {
             return Task.CompletedTask;
         }
 
-        public Task CrosspostAsync(RequestOptions options = null)
+        public Task CrosspostAsync(RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(RequestOptions options = null)
+        public Task DeleteAsync(RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null)
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions? options = null)
         {
             return Task.CompletedTask;
         }
 
-        public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null)
+        public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task PinAsync(RequestOptions options = null)
+        public Task PinAsync(RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+        public Task RemoveAllReactionsAsync(RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null)
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }
@@ -141,7 +141,7 @@ namespace Sanara.UnitTests.Impl
             throw new NotImplementedException();
         }
 
-        public Task UnpinAsync(RequestOptions options = null)
+        public Task UnpinAsync(RequestOptions? options = null)
         {
             throw new NotImplementedException();
         }

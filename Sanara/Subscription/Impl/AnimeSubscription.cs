@@ -41,7 +41,7 @@ namespace Sanara.Subscription.Impl
         public string GetName()
             => "anime";
 
-        private static string GetAttribute(XmlNode node, string name, string attribute = null)
+        private static string? GetAttribute(XmlNode node, string name, string? attribute = null)
         {
             foreach (XmlNode elem in node)
             {
@@ -49,7 +49,7 @@ namespace Sanara.Subscription.Impl
                 {
                     if (attribute == null)
                         return elem.InnerText;
-                    return elem.Attributes.GetNamedItem(attribute).InnerText;
+                    return elem.Attributes?.GetNamedItem(attribute)?.InnerText;
                 }
             }
             return null;

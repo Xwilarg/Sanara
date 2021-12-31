@@ -202,6 +202,8 @@ namespace Sanara
                     _submodules.Add(new BooruModule());
                     _submodules.Add(new FunModule());
 
+                    StaticObjects.Help = new(_submodules);
+
                     SocketGuild? debugGuild = null;
                     if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
                     {

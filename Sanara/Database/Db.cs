@@ -182,13 +182,13 @@ namespace Sanara.Database
             return !await _r.Db(_dbName).Table("Guilds").GetAll(guildId.ToString()).GetField(name + "Subscription").Count().Eq(0).RunAsync<bool>(_conn);
         }
 
-        private async Task<Tuple<ITextChannel, string[]>> GetSubscriptionAsync(SocketGuild sGuild, string name)
+        private async Task<Tuple<ITextChannel, string[]>?> GetSubscriptionAsync(SocketGuild sGuild, string name)
         {
             if (await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "Subscription").Count().Eq(0).RunAsync<bool>(_conn))
                 return null;
             var tmp = (Cursor<string>)await _r.Db(_dbName).Table("Guilds").GetAll(sGuild.Id.ToString()).GetField(name + "Subscription").RunAsync<string>(_conn);
             tmp.MoveNext();
-            string sub = tmp.Current == "0" ? null : tmp.Current;
+            string? sub = tmp.Current == "0" ? null : tmp.Current;
             if (sub == null) // No subscription
                 return null;
             var chan = sGuild.GetTextChannel(ulong.Parse(sub));
