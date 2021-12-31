@@ -201,6 +201,7 @@ namespace Sanara
                     _submodules.Add(new JapaneseModule());
                     _submodules.Add(new BooruModule());
                     _submodules.Add(new FunModule());
+                    _submodules.Add(new LanguageModule());
 
                     StaticObjects.Help = new(_submodules);
 

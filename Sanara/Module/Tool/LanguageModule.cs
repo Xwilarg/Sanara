@@ -1,13 +1,172 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Google;
 using Sanara;
 using Sanara.Exception;
+using Sanara.Help;
+using Sanara.Module;
 using System.Text;
-using System.Web;
 
+public class LanguageModule : ISubmodule
+{
+    public SubmoduleInfo GetInfo()
+    {
+        return new("Language", "Get various information related to others languages");
+    }
+
+    public Sanara.Module.CommandInfo[] GetCommands()
+    {
+        return new[]
+        {
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "translate",
+                    Description = "Translate a sentence",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "language",
+                            Description = "Target language (ISO 639-1)",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = true
+                        },
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "sentence",
+                            Description = "Sentence to translate",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = true
+                        }
+                    }
+                }.Build(),
+                callback: TranslateAsync,
+                precondition: Precondition.None,
+                needDefer: false
+            )
+        };
+    }
+
+    public async Task TranslateAsync(SocketSlashCommand ctx)
+    {
+        if (StaticObjects.TranslationClient == null)
+        {
+            throw new CommandFailed("Translation client is not available");
+        }
+
+        var language = (string)ctx.Data.Options.First(x => x.Name == "language").Value;
+        var sentence = (string)ctx.Data.Options.First(x => x.Name == "sentence").Value;
+
+        if (StaticObjects.ISO639Reverse.ContainsKey(language))
+            language = StaticObjects.ISO639Reverse[language];
+
+        if (language.Length != 2)
+            throw new CommandFailed("The language given must be in format ISO 639-1.");
+
+        try
+        {
+            var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
+            await ctx.RespondAsync(embed: new EmbedBuilder
+            {
+                Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                Description = translation.TranslatedText,
+                Color = Color.Blue
+            }.Build());
+        }
+        catch (GoogleApiException)
+        {
+            throw new CommandFailed("The language you provided is invalid.");
+        }
+    }
+
+    public static string ToRomaji(string entry)
+        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
+
+    public static string ToHiragana(string entry)
+        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
+
+    /// <summary>
+    /// Convert an entry from a language to another
+    /// </summary>
+    /// <param name="entry">The entry to translate</param>
+    /// <param name="dictionary">The dictionary that contains the from/to for each character</param>
+    /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
+    public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
+    {
+        StringBuilder result = new StringBuilder();
+        var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
+        bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
+        bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
+        while (entry.Length > 0)
+        {
+            doubleNext = false;
+
+            // SPECIAL CASES FOR KATAKANA
+            if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
+            {
+                entry = entry[1..];
+                continue;
+            }
+            if (entry[0] == 'ァ' || entry[0] == 'ィ' || entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
+            {
+                result.Remove(result.Length - 1, 1);
+                char tmp;
+                switch (entry[0])
+                {
+                    case 'ァ': tmp = 'a'; break;
+                    case 'ィ': tmp = 'i'; break;
+                    case 'ゥ': tmp = 'u'; break;
+                    case 'ェ': tmp = 'e'; break;
+                    case 'ォ': tmp = 'o'; break;
+                    default: throw new ArgumentException("Invalid katakana " + entry[0]);
+                }
+                result.Append(tmp);
+                entry = entry[1..];
+                continue;
+            }
+
+            if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
+            {
+                result.Append(doubleChar);
+                entry = entry[1..];
+                continue;
+            }
+            if (entry[0] == doubleChar)
+            {
+                doubleNext = true;
+                entry = entry[1..];
+                if (entry.Length == 0)
+                    continue;
+            }
+            // Iterate on biggest to 1 (We assume that 3 is the max number of character)
+            // We then test for each entry if we can convert
+            // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
+            for (int i = biggest; i > 0; i--)
+            {
+                if (entry.Length >= i)
+                {
+                    var value = entry[..i];
+                    if (dictionary.ContainsKey(value))
+                    {
+                        if (doubleNext)
+                            result.Append(dictionary[value][0]);
+                        result.Append(dictionary[value]);
+                        entry = entry[1..];
+                        goto found;
+                    }
+                }
+            }
+            result.Append(entry[0]);
+            entry = entry[1..];
+        found:;
+        }
+        return result.ToString();
+    }
+
+    private static bool IsLatinLetter(char c)
+        => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
 
 //_submoduleHelp.Add("Language", "Get various information related to others languages");
 //_help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", Array.Empty<string>(), Restriction.None, "Japanese submarine")));
@@ -77,8 +236,6 @@ namespace Sanara.Module.Tool
         }
     }
 */
-public sealed class LanguageModule : ModuleBase
-{
     /*
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
@@ -135,31 +292,6 @@ public sealed class LanguageModule : ModuleBase
                     throw new CommandFailed("There is no text on the image.");
 
                 var translation = await StaticObjects.TranslationClient.TranslateTextAsync(response.Text, language);
-                await ReplyAsync(embed: new EmbedBuilder
-                {
-                    Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                    Description = translation.TranslatedText,
-                    Color = Color.Blue
-                }.Build());
-            }
-            catch (GoogleApiException)
-            {
-                throw new CommandFailed("The language you provided is invalid.");
-            }
-        }
-
-        [Command("Translate", RunMode = RunMode.Async)]
-        public async Task TranslateAsync(string language, [Remainder]string sentence)
-        {
-            if (StaticObjects.ISO639Reverse.ContainsKey(language))
-                language = StaticObjects.ISO639Reverse[language];
-
-            if (language.Length != 2)
-                throw new CommandFailed("The language given must be in format ISO 639-1.");
-
-            try
-            {
-                var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
                 await ReplyAsync(embed: new EmbedBuilder
                 {
                     Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
@@ -298,91 +430,3 @@ public sealed class LanguageModule : ModuleBase
             }
             await ReplyAsync(embed: embed.Build());
         }*/
-
-    public static string ToRomaji(string entry)
-        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
-
-    public static string ToHiragana(string entry)
-        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
-
-    /// <summary>
-    /// Convert an entry from a language to another
-    /// </summary>
-    /// <param name="entry">The entry to translate</param>
-    /// <param name="dictionary">The dictionary that contains the from/to for each character</param>
-    /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
-    public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
-    {
-        StringBuilder result = new StringBuilder();
-        var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
-        bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
-        bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
-        while (entry.Length > 0)
-        {
-            doubleNext = false;
-
-            // SPECIAL CASES FOR KATAKANA
-            if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
-            {
-                entry = entry[1..];
-                continue;
-            }
-            if (entry[0] == 'ァ' || entry[0] == 'ィ' || entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
-            {
-                result.Remove(result.Length - 1, 1);
-                char tmp;
-                switch (entry[0])
-                {
-                    case 'ァ': tmp = 'a'; break;
-                    case 'ィ': tmp = 'i'; break;
-                    case 'ゥ': tmp = 'u'; break;
-                    case 'ェ': tmp = 'e'; break;
-                    case 'ォ': tmp = 'o'; break;
-                    default: throw new ArgumentException("Invalid katakana " + entry[0]);
-                }
-                result.Append(tmp);
-                entry = entry[1..];
-                continue;
-            }
-
-            if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
-            {
-                result.Append(doubleChar);
-                entry = entry.Substring(1);
-                continue;
-            }
-            if (entry[0] == doubleChar)
-            {
-                doubleNext = true;
-                entry = entry.Substring(1);
-                if (entry.Length == 0)
-                    continue;
-            }
-            // Iterate on biggest to 1 (We assume that 3 is the max number of character)
-            // We then test for each entry if we can convert
-            // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
-            for (int i = biggest; i > 0; i--)
-            {
-                if (entry.Length >= i)
-                {
-                    var value = entry[0..i];
-                    if (dictionary.ContainsKey(value))
-                    {
-                        if (doubleNext)
-                            result.Append(dictionary[value][0]);
-                        result.Append(dictionary[value]);
-                        entry = entry.Substring(i);
-                        goto found;
-                    }
-                }
-            }
-            result.Append(entry[0]);
-            entry = entry.Substring(1);
-        found:;
-        }
-        return result.ToString();
-    }
-
-    private static bool IsLatinLetter(char c)
-        => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-}

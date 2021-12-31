@@ -21,47 +21,47 @@ public class FunModule : ISubmodule
     {
         return new[]
         {
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "inspire",
+                    Description = "Get a random \"inspirational\" quote"
+                }.Build(),
+                callback: InspireAsync,
+                precondition: Precondition.None,
+                needDefer: false
+            ),
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "vnquote",
+                    Description = "Get a quote from a random Visual Novel"
+                }.Build(),
+                callback: VNQuoteAsync,
+                precondition: Precondition.NsfwOnly,
+                needDefer: false
+            ),
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "complete",
+                    Description = "Complete the given sentence using machine learning",
+                    Options = new()
                     {
-                        Name = "inspire",
-                        Description = "Get a random \"inspirational\" quote"
-                    }.Build(),
-                    callback: InspireAsync,
-                    precondition: Precondition.None,
-                    needDefer: false
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "vnquote",
-                        Description = "Get a quote from a random Visual Novel"
-                    }.Build(),
-                    callback: VNQuoteAsync,
-                    precondition: Precondition.NsfwOnly,
-                    needDefer: false
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "complete",
-                        Description = "Complete the given sentence using machine learning",
-                        Options = new()
+                        new SlashCommandOptionBuilder()
                         {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "sentence",
-                                Description = "Start of the sentence",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
-                            }
+                            Name = "sentence",
+                            Description = "Start of the sentence",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = false
                         }
-                    }.Build(),
-                    callback: CompleteAsync,
-                    precondition: Precondition.None,
-                    needDefer: true
-                )
-            };
+                    }
+                }.Build(),
+                callback: CompleteAsync,
+                precondition: Precondition.None,
+                needDefer: true
+            )
+        };
     }
 
     public async Task InspireAsync(SocketSlashCommand ctx)
