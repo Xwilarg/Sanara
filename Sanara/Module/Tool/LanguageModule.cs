@@ -1,29 +1,20 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Google;
-using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sanara;
 using Sanara.Exception;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 
-namespace Sanara.Help
-{
-    public sealed partial class HelpPreload
-    {
-        public void LoadLanguageHelp()
-        {
-            _submoduleHelp.Add("Language", "Get various information related to others languages");
-            _help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", Array.Empty<string>(), Restriction.None, "Japanese submarine")));
-            _help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.Mandatory, "kanji") }, "Get information about a kanji.", Array.Empty<string>(), Restriction.None, "Kanji 艦")));
-            _help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the urban definition of a word.", Array.Empty<string>(), Restriction.Nsfw, "Urban bunny hop")));
-            _help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
-        }
-    }
-}
+
+//_submoduleHelp.Add("Language", "Get various information related to others languages");
+//_help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", Array.Empty<string>(), Restriction.None, "Japanese submarine")));
+//_help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.Mandatory, "kanji") }, "Get information about a kanji.", Array.Empty<string>(), Restriction.None, "Kanji 艦")));
+//_help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the urban definition of a word.", Array.Empty<string>(), Restriction.Nsfw, "Urban bunny hop")));
+//_help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
+/*
 
 namespace Sanara.Module.Tool
 {
@@ -85,9 +76,10 @@ namespace Sanara.Module.Tool
             }.Build());
         }
     }
-
-    public sealed class LanguageModule : ModuleBase
-    {
+*/
+public sealed class LanguageModule : ModuleBase
+{
+    /*
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
@@ -307,91 +299,90 @@ namespace Sanara.Module.Tool
             await ReplyAsync(embed: embed.Build());
         }*/
 
-        public static string ToRomaji(string entry)
-            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
+    public static string ToRomaji(string entry)
+        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
 
-        public static string ToHiragana(string entry)
-            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
+    public static string ToHiragana(string entry)
+        => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
 
-        /// <summary>
-        /// Convert an entry from a language to another
-        /// </summary>
-        /// <param name="entry">The entry to translate</param>
-        /// <param name="dictionary">The dictionary that contains the from/to for each character</param>
-        /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
-        public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
+    /// <summary>
+    /// Convert an entry from a language to another
+    /// </summary>
+    /// <param name="entry">The entry to translate</param>
+    /// <param name="dictionary">The dictionary that contains the from/to for each character</param>
+    /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
+    public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
+    {
+        StringBuilder result = new StringBuilder();
+        var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
+        bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
+        bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
+        while (entry.Length > 0)
         {
-            StringBuilder result = new StringBuilder();
-            var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
-            bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
-            bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
-            while (entry.Length > 0)
+            doubleNext = false;
+
+            // SPECIAL CASES FOR KATAKANA
+            if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
             {
-                doubleNext = false;
-
-                // SPECIAL CASES FOR KATAKANA
-                if (entry[0] == 'ー') // We can't really convert this katakana so we just ignore it
-                {
-                    entry = entry.Substring(1);
-                    continue;
-                }
-                if (entry[0] == 'ァ' || entry[0] == 'ィ'|| entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
-                {
-                    result.Remove(result.Length - 1, 1);
-                    char tmp;
-                    switch (entry[0])
-                    {
-                        case 'ァ': tmp = 'a'; break;
-                        case 'ィ': tmp = 'i'; break;
-                        case 'ゥ': tmp = 'u'; break;
-                        case 'ェ': tmp = 'e'; break;
-                        case 'ォ': tmp = 'o'; break;
-                        default: throw new ArgumentException("Invalid katakana " + entry[0]);
-                    }
-                    result.Append(tmp);
-                    entry = entry.Substring(1);
-                    continue;
-                }
-
-                if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
-                {
-                    result.Append(doubleChar);
-                    entry = entry.Substring(1);
-                    continue;
-                }
-                if (entry[0] == doubleChar)
-                {
-                    doubleNext = true;
-                    entry = entry.Substring(1);
-                    if (entry.Length == 0)
-                        continue;
-                }
-                // Iterate on biggest to 1 (We assume that 3 is the max number of character)
-                // We then test for each entry if we can convert
-                // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
-                for (int i = biggest; i > 0; i--)
-                {
-                    if (entry.Length >= i)
-                    {
-                        var value = entry[0..i];
-                        if (dictionary.ContainsKey(value))
-                        {
-                            if (doubleNext)
-                                result.Append(dictionary[value][0]);
-                            result.Append(dictionary[value]);
-                            entry = entry.Substring(i);
-                            goto found;
-                        }
-                    }
-                }
-                result.Append(entry[0]);
-                entry = entry.Substring(1);
-            found:;
+                entry = entry[1..];
+                continue;
             }
-            return result.ToString();
-        }
+            if (entry[0] == 'ァ' || entry[0] == 'ィ' || entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
+            {
+                result.Remove(result.Length - 1, 1);
+                char tmp;
+                switch (entry[0])
+                {
+                    case 'ァ': tmp = 'a'; break;
+                    case 'ィ': tmp = 'i'; break;
+                    case 'ゥ': tmp = 'u'; break;
+                    case 'ェ': tmp = 'e'; break;
+                    case 'ォ': tmp = 'o'; break;
+                    default: throw new ArgumentException("Invalid katakana " + entry[0]);
+                }
+                result.Append(tmp);
+                entry = entry[1..];
+                continue;
+            }
 
-        private static bool IsLatinLetter(char c)
-            => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+            if (entry.Length >= 2 && entry[0] == entry[1] && isEntryRomaji) // kko -> っこ
+            {
+                result.Append(doubleChar);
+                entry = entry.Substring(1);
+                continue;
+            }
+            if (entry[0] == doubleChar)
+            {
+                doubleNext = true;
+                entry = entry.Substring(1);
+                if (entry.Length == 0)
+                    continue;
+            }
+            // Iterate on biggest to 1 (We assume that 3 is the max number of character)
+            // We then test for each entry if we can convert
+            // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
+            for (int i = biggest; i > 0; i--)
+            {
+                if (entry.Length >= i)
+                {
+                    var value = entry[0..i];
+                    if (dictionary.ContainsKey(value))
+                    {
+                        if (doubleNext)
+                            result.Append(dictionary[value][0]);
+                        result.Append(dictionary[value]);
+                        entry = entry.Substring(i);
+                        goto found;
+                    }
+                }
+            }
+            result.Append(entry[0]);
+            entry = entry.Substring(1);
+        found:;
+        }
+        return result.ToString();
     }
+
+    private static bool IsLatinLetter(char c)
+        => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }

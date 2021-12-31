@@ -1,19 +1,10 @@
-﻿using Discord;
-using Discord.Commands;
-using Sanara.Exception;
+﻿using Discord.Commands;
 using System.Text.RegularExpressions;
 
-namespace Sanara.Help
-{
-    public sealed partial class HelpPreload
-    {
-        public void LoadVideoHelp()
-        {
-            _submoduleHelp.Add("Video", "Get pornographic videos");
-            _help.Add(("Nsfw", new Help("Video", "AdultVideo", new[] { new Argument(ArgumentType.Optional, "tags") }, "Search for an adult video given an optional tag.", new[] { "AV" }, Restriction.Nsfw, null)));
-        }
-    }
-}
+
+            //_submoduleHelp.Add("Video", "Get pornographic videos");
+            //_help.Add(("Nsfw", new Help("Video", "AdultVideo", new[] { new Argument(ArgumentType.Optional, "tags") }, "Search for an adult video given an optional tag.", new[] { "AV" }, Restriction.Nsfw, null)));
+
 
 namespace Sanara.Module.Nsfw
 {

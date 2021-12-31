@@ -80,7 +80,7 @@ namespace Sanara
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
             StaticObjects.Client.Connected += ConnectedAsync;
             StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
-            StaticObjects.Client.ReactionAdded += Module.Tool.LanguageModule.ReactionAddedAsync;
+            //StaticObjects.Client.ReactionAdded += Module.Tool.LanguageModule.ReactionAddedAsync;
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
@@ -95,26 +95,6 @@ namespace Sanara
             _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
 
             // Discord modules
-            /*
-            await _commands.AddModuleAsync<Module.Administration.InformationModule>(null);
-            await _commands.AddModuleAsync<Module.Administration.SettingModule>(null);
-            await _commands.AddModuleAsync<Module.Entertainment.FunModule>(null);
-            await _commands.AddModuleAsync<Module.Entertainment.GameInfoModule>(null);
-            await _commands.AddModuleAsync<Module.Entertainment.MediaModule>(null);
-            await _commands.AddModuleAsync<Module.Game.GameModule>(null);
-#if NSFW_BUILD
-            await _commands.AddModuleAsync<Module.Entertainment.FunNsfwModule>(null);
-            await _commands.AddModuleAsync<Module.Nsfw.BooruModule>(null);
-            await _commands.AddModuleAsync<Module.Nsfw.DoujinModule>(null);
-            await _commands.AddModuleAsync<Module.Nsfw.CosplayModule>(null);
-            await _commands.AddModuleAsync<Module.Nsfw.VideoModule>(null);
-            await _commands.AddModuleAsync<Module.Tool.LanguageNsfwModule>(null);
-#endif
-            await _commands.AddModuleAsync<Module.Nsfw.BooruSfwModule>(null);
-            await _commands.AddModuleAsync<Module.Tool.CommunicationModule>(null);
-            await _commands.AddModuleAsync<Module.Tool.LanguageModule>(null);
-            await _commands.AddModuleAsync<Module.Tool.ScienceModule>(null);
-            */
             await _commands.AddModuleAsync<DeprecationNotice>(null);
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
@@ -306,10 +286,6 @@ namespace Sanara
             var prefix = textChan == null ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
             if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
             {
-                if (textChan != null && !StaticObjects.Help.IsModuleAvailable(textChan.GuildId, msg.Content.Substring(pos).ToLower()))
-                {
-                    return ;
-                }
                 var context = new SocketCommandContext(StaticObjects.Client, msg);
                 await _commands.ExecuteAsync(context, pos, null);
             }

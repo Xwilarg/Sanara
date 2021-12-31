@@ -3,28 +3,22 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
+using Sanara.Help;
 using System.Net.Http.Headers;
 using System.Web;
 
-namespace Sanara.Help
-{
-    public sealed partial class HelpPreload
-    {
-        public void LoadJapaneseHelp()
-        {
-            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
-            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-            _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.Mandatory, "image") }, "Get the source of an image.", Array.Empty<string>(), Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
-        }
-    }
-}
+
+//            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
+//            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
+//            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
+//            _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.Mandatory, "image") }, "Get the source of an image.", Array.Empty<string>(), Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
+
 
 namespace Sanara.Module.Entertainment
 {
     public sealed class JapaneseModule : ISubmodule
     {
-        public Help.SubmoduleInfo GetInfo()
+        public SubmoduleInfo GetInfo()
         {
             return new("Japanese", "Commands related to Japanese culture");
         }
