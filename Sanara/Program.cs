@@ -213,15 +213,12 @@ namespace Sanara
 
                     foreach (var s in _submodules)
                     {
-                        foreach (var c in s.GetCommands())
-                        {
+                        foreach (var c in s.GetCommands()
 #if !NSFW_BUILD
-                            // We skip NSFW commands on SFW builds
-                            if ((c.Precondition & Precondition.NsfwOnly) != 0)
-                            {
-                                continue;
-                            }
+                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0
 #endif
+                        )
+                        {
                             if (debugGuild != null)
                             {
                                 await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
@@ -234,7 +231,11 @@ namespace Sanara
                         }
                     }
 
-                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand);
+                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand)
+#if !NSFW_BUILD
+                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0
+#endif
+                    ;
                     if (debugGuild != null)
                     {
                         await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
