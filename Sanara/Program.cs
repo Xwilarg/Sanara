@@ -215,7 +215,7 @@ namespace Sanara
                     {
                         foreach (var c in s.GetCommands()
 #if !NSFW_BUILD
-                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0
+                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
 #endif
                         )
                         {
@@ -231,11 +231,11 @@ namespace Sanara
                         }
                     }
 
-                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand)
+                    var cmds = _commandsAssociations.Values
 #if !NSFW_BUILD
-                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0
+                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
 #endif
-                    ;
+                    .Select(x => x.SlashCommand);
                     if (debugGuild != null)
                     {
                         await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
