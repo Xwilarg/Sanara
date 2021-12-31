@@ -35,7 +35,13 @@
         /// <param name="name">Command used</param>
         public async Task AddNewCommandAsync(string name)
         {
-            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", "1") });
+            string botName =
+#if NSFW_BUILD
+                "Sanara";
+#else
+                "Hanaki";
+#endif
+            await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("nbMsgs", botName) });
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("errors", "OK") });
             await UpdateElement(new Tuple<string, string>[] { new Tuple<string, string>("commands", name) });
         }
