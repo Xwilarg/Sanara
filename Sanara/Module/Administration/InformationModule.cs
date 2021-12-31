@@ -112,16 +112,18 @@ namespace Sanara.Module.Administration
                 " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
                 " - [Website](https://sanara.zirk.eu/)\n" +
 #endif
-                " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&scope=bot%20applications.commands)\n" +
+                " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&scope=bot%20applications.commands)\n"
 #if NSFW_BUILD
+                +
                 " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
                 " - [Top.gg](https://discordbots.org/bot/329664361016721408)"
 #endif
                 );
             embed.AddField("Credits",
                 "Programming: [Zirk#0001](https://zirk.eu/)\n" +
-                "With the help of [TheIndra](https://theindra.eu/)\n" +
+                "With the help of [TheIndra](https://theindra.eu/)\n"
 #if NSFW_BUILD
+                +
                 "Profile Picture: [BlankSensei](https://www.pixiv.net/en/users/23961764)"
 #endif // TODO: Can prob use current pfp for SFW version
                 );
