@@ -19,7 +19,7 @@ namespace Sanara.Database
             _subscriptionProgress = new Dictionary<string, int>();
 
             _dbName = StaticObjects.BotName;
-            _statDbName = StaticObjects.BotName + "-stats";
+            _statDbName = StaticObjects.BotName + "_stats";
         }
 
         public async Task InitAsync()

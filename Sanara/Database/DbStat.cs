@@ -4,13 +4,13 @@
     {
         public async Task InitStatsAsync()
         {
-            await CreateIfDontExistsAsync(_dbName, "GuildCount");
-            await CreateIfDontExistsAsync(_dbName, "NbMessages");
-            await CreateIfDontExistsAsync(_dbName, "Errors");
-            await CreateIfDontExistsAsync(_dbName, "Commands");
-            await CreateIfDontExistsAsync(_dbName, "Games");
-            await CreateIfDontExistsAsync(_dbName, "GamesPlayers");
-            await CreateIfDontExistsAsync(_dbName, "Booru");
+            await CreateIfDontExistsAsync(_statDbName, "GuildCount");
+            await CreateIfDontExistsAsync(_statDbName, "NbMessages");
+            await CreateIfDontExistsAsync(_statDbName, "Errors");
+            await CreateIfDontExistsAsync(_statDbName, "Commands");
+            await CreateIfDontExistsAsync(_statDbName, "Games");
+            await CreateIfDontExistsAsync(_statDbName, "GamesPlayers");
+            await CreateIfDontExistsAsync(_statDbName, "Booru");
         }
 
         private string GetStatKey(string format)
@@ -22,10 +22,16 @@
         {
             if (await _r.Db(_statDbName).Table(table).GetAll(key).Count().Eq(0).RunAsync<bool>(_conn))
                 await _r.Db(_statDbName).Table(table).Insert(_r.HashMap("id", key)
-                    .With(field, 1)
-                ).RunAsync(_conn);
+                        .With(field, 1)
+                    ).RunAsync(_conn);
+            else if (!await _r.Db(_statDbName).Table(table).Get(key).HasFields(field).RunAsync<bool>(_conn))
+                await _r.Db(_statDbName).Table(table).Update(_r.HashMap("id", key)
+                        .With(field, 1)
+                    ).RunAsync(_conn);
             else
-                await _r.Db(_statDbName).Table(table).Get(key).Update(_r.Row(key).Add(1)).RunAsync(_conn);
+                await _r.Db(_statDbName).Table(table).Update(_r.HashMap("id", key)
+                        .With(field, await _r.Db(_statDbName).Table(table).Get(key).GetField(field).Add(1).RunAsync(_conn))
+                    ).RunAsync(_conn);
         }
 
         public async Task AddNewCommandAsync(string name)

@@ -294,6 +294,7 @@ namespace Sanara
         {
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Static Objects"));
             await Db.InitAsync();
+
             if (credentials.DebugGuild != null)
             {
                 DebugGuildId = ulong.Parse(credentials.DebugGuild);
