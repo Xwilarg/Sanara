@@ -159,10 +159,7 @@ namespace Sanara.Module.Nsfw
                 }
             }.Build());
 
-            if (StaticObjects.Website != null)
-            {
-                await StaticObjects.Website.AddBooruAsync(type.ToString());
-            }
+            await StaticObjects.Db.AddBooruAsync(type.ToString());
         }
     }
 }

@@ -9,7 +9,7 @@ using Sanara.Subscription.Tags;
 
 namespace Sanara.Database
 {
-    public sealed class Db
+    public sealed partial class Db
     {
         public Db()
         {
@@ -17,21 +17,38 @@ namespace Sanara.Database
             _guilds = new Dictionary<ulong, Guild>();
             _subscriptions = new Dictionary<string, Dictionary<ulong, SubscriptionGuild>>();
             _subscriptionProgress = new Dictionary<string, int>();
+
+            _dbName = StaticObjects.BotName;
+            _statDbName = StaticObjects.BotName + "-stats";
         }
 
-        public async Task InitAsync(string dbName)
+        public async Task InitAsync()
         {
-            _dbName = dbName;
             _conn = await _r.Connection().ConnectAsync();
+
+            // Creating dbs
             if (!await _r.DbList().Contains(_dbName).RunAsync<bool>(_conn))
                 _r.DbCreate(_dbName).Run(_conn);
-            if (!await _r.Db(_dbName).TableList().Contains("Guilds").RunAsync<bool>(_conn))
-                _r.Db(_dbName).TableCreate("Guilds").Run(_conn);
-            if (!await _r.Db(_dbName).TableList().Contains("Subscriptions").RunAsync<bool>(_conn))
-                _r.Db(_dbName).TableCreate("Subscriptions").Run(_conn);
+            if (!await _r.DbList().Contains(_statDbName).RunAsync<bool>(_conn))
+                _r.DbCreate(_statDbName).Run(_conn);
+
+            // Information about the different guilds
+            await CreateIfDontExistsAsync(_dbName, "Guilds");
+
+            // Current subscriptions
+            await CreateIfDontExistsAsync(_dbName, "Subscriptions");
+
+            await InitStatsAsync();
+
             var tmp = (Cursor<Subscription>)await _r.Db(_dbName).Table("Subscriptions").RunAsync<Subscription>(_conn);
             while (tmp.MoveNext())
                 _subscriptionProgress.Add(tmp.Current.id, tmp.Current.value);
+        }
+
+        private async Task CreateIfDontExistsAsync(string dbName, string tableName)
+        {
+            if (!await _r.Db(dbName).TableList().Contains(tableName).RunAsync<bool>(_conn))
+                _r.Db(dbName).TableCreate(tableName).Run(_conn);
         }
 
         public async Task InitGuildAsync(SocketGuild sGuild)
@@ -103,7 +120,7 @@ namespace Sanara.Database
         public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
         {
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
-                return new QuizzPreloadResult[0];
+                return Array.Empty<QuizzPreloadResult>();
             return ((Cursor<QuizzPreloadResult>)await _r.Db(_dbName).Table("Cache_" + name).RunAsync<QuizzPreloadResult>(_conn)).ToArray();
         }
 
@@ -171,7 +188,7 @@ namespace Sanara.Database
                 .With(name + "Subscription", "0")
             ).RunAsync(_conn);
             await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
-                .With(name + "SubscriptionTags", new string[0])
+                .With(name + "SubscriptionTags", Array.Empty<string>())
             ).RunAsync(_conn);
         }
 

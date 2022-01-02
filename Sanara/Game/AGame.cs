@@ -38,8 +38,7 @@ namespace Sanara.Game
             _contributors = new List<ulong>();
             _score = 0;
 
-            if (StaticObjects.Website != null)
-                Task.Run(() => StaticObjects.Website.AddGameAsync(_isCustomGame ? "custom" : _gameName, _argument));
+            StaticObjects.Db.AddGameAsync(_isCustomGame ? "custom" : _gameName, _argument).GetAwaiter().GetResult();
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
@@ -112,11 +111,10 @@ namespace Sanara.Game
                 _multiplayerMode.Init(_lobby.GetUsers());
                 introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
 
-                if (StaticObjects.Website != null)
-                    await StaticObjects.Website.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
+                await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
             }
-            else if (StaticObjects.Website != null)
-                await StaticObjects.Website.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
+            else
+                await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
 
             _state = GameState.Ready;
             await PostAsync(introMsg);

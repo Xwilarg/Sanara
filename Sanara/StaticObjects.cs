@@ -13,7 +13,6 @@ using VndbSharp;
 using System.Text.RegularExpressions;
 using Sanara.Database;
 using Sanara.Help;
-using Sanara.StatUpload;
 using Sanara.Subscription;
 using Sanara.Game;
 using Sanara.Game.PostMode;
@@ -85,10 +84,6 @@ namespace Sanara
         /// Last request to discordbotlist.com
         /// </summary>
         private static DateTime DblLastSend { set; get; } = DateTime.Now;
-        /// <summary>
-        /// Managed uploads to the API to update stats on the website of the bot
-        /// </summary>
-        public static UploadManager? Website { set; get; }
         /// <summary>
         /// Last message received by the bot
         /// </summary>
@@ -298,11 +293,7 @@ namespace Sanara
         public static async Task InitializeAsync(Credentials credentials)
         {
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Static Objects"));
-#if NSFW_BUILD
-            await Db.InitAsync("Sanara");
-#else
-            await Db.InitAsync("Hanaki");
-#endif
+            await Db.InitAsync();
             if (credentials.DebugGuild != null)
             {
                 DebugGuildId = ulong.Parse(credentials.DebugGuild);
@@ -445,11 +436,6 @@ namespace Sanara
                 GoogleCredential googleCredentials = GoogleCredential.FromFile("Keys/GoogleAPI.json");
                 TranslationClient = TranslationClient.Create();
                 VisionClient = ImageAnnotatorClient.Create();
-            }
-
-            if (credentials.StatsWebsiteUrl != null)
-            {
-                Website = new UploadManager(credentials.StatsWebsiteUrl, credentials.StatsWebsiteToken);
             }
 
             if (credentials.MyDramaListApiKey != null)

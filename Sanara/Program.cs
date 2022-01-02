@@ -155,10 +155,7 @@ namespace Sanara
                         await cmd.Callback(ctx);
                         StaticObjects.LastMessage = DateTime.UtcNow;
 
-                        if (StaticObjects.Website != null)
-                        {
-                            await StaticObjects.Website.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
-                        }
+                        await StaticObjects.Db.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
                     }
                 }
                 catch (System.Exception e)
@@ -272,6 +269,7 @@ namespace Sanara
         private async Task ChangeGuildCountAsync(SocketGuild _)
         {
             await StaticObjects.UpdateTopGgAsync();
+            await StaticObjects.Db.UpdateGuildCountAsync();
         }
 
         private async Task GuildJoined(SocketGuild guild)
@@ -307,8 +305,6 @@ namespace Sanara
             _didStart = true;
             StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
             await StaticObjects.UpdateTopGgAsync();
-
-            StaticObjects.Website?.KeepSendStats();
         }
     }
 }

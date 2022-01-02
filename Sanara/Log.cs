@@ -63,7 +63,7 @@ namespace Sanara
                     SentrySdk.CaptureException(e);
             }
 
-            StaticObjects.Website?.AddErrorAsync(e);
+            await StaticObjects.Db.AddErrorAsync(e);
         }
     }
 }

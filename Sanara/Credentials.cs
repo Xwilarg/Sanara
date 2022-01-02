@@ -10,8 +10,6 @@
         public string KitsuPassword;
         public string RavenKey;
         public string TopGgToken;
-        public string StatsWebsiteUrl;
-        public string StatsWebsiteToken;
         public string MyDramaListApiKey;
         public string UnsplashToken;
         public string DebugGuild;
