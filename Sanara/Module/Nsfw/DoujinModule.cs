@@ -25,7 +25,7 @@ namespace Sanara.Module.Doujin
                         Description = "Get a random DlSite work"
                     }.Build(),
                     callback: DlRandAsync,
-                    precondition: Precondition.None,
+                    precondition: Precondition.NsfwOnly,
                     needDefer: true
                 )
             };
