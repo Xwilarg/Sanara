@@ -1,8 +1,6 @@
 ﻿using BooruSharp.Booru;
 using Discord;
 using Discord.WebSocket;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
 using Newtonsoft.Json;
 using Sentry;
 using DiscordBotsList.Api;
@@ -118,10 +116,6 @@ namespace Sanara
         public static List<string> JavmostCategories { get; } = new();
 
         // ENTERTAINMENT MODULE
-        /// <summary>
-        /// YouTube instance
-        /// </summary>
-        public static YouTubeService? YouTube { set; get; }
         /// <summary>
         /// Auth used for kitsu.io requests (Anime search)
         /// </summary>
@@ -302,9 +296,9 @@ namespace Sanara
 
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 
-            if (credentials.RavenKey != null)
+            if (credentials.SentryKey != null)
             {
-                SentrySdk.Init(credentials.RavenKey);
+                SentrySdk.Init(credentials.SentryKey);
             }
 
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
@@ -399,14 +393,6 @@ namespace Sanara
             GM.Init();
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
-
-            if (credentials.YouTubeKey != null)
-            {
-                YouTube = new YouTubeService(new BaseClientService.Initializer
-                {
-                    ApiKey = credentials.YouTubeKey
-                });
-            }
 
             if (credentials.KitsuEmail != null)
             {

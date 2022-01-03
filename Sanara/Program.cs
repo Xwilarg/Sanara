@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using Sanara.CustomClass;
 using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module;
