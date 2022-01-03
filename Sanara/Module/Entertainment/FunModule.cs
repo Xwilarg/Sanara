@@ -3,10 +3,13 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara;
+using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using VndbSharp;
 using VndbSharp.Models;
 
@@ -60,6 +63,26 @@ public class FunModule : ISubmodule
                 callback: CompleteAsync,
                 precondition: Precondition.None,
                 needDefer: true
+            ),
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "photo",
+                    Description = "Find a photo given an optional query",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "query",
+                            Description = "Filter the serach given a term",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = false
+                        }
+                    }
+                }.Build(),
+                callback: PhotoAsync,
+                precondition: Precondition.None,
+                needDefer: false
             )
         };
     }
@@ -108,63 +131,38 @@ public class FunModule : ISubmodule
         embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
         await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
     }
-}
-/*
 
-namespace SanaraV3.Help
-{
-    public sealed partial class HelpPreload
+    public async Task PhotoAsync(SocketSlashCommand ctx)
     {
-        public void LoadFunHelp()
+        if (StaticObjects.UnsplashToken == null)
         {
-            _submoduleHelp.Add("Fun", "Various small entertainement commands");
-            _help.Add(("Entertainment", new Help("Fun", "Inspire", new Argument[0], "Get a random 'inspirational' quote using machine learning.", new string[0], Restriction.None, null)));
-            _help.Add(("Entertainment", new Help("Fun", "Complete", new[] { new Argument(ArgumentType.OPTIONAL, "sentence") }, "Complete the given sentence using machine learning.", new string[0], Restriction.None, "Complete Why can't cats just")));
-            _help.Add(("Entertainment", new Help("Fun", "Photo", new[] { new Argument(ArgumentType.OPTIONAL, "query") }, "Get a photo given some search terms, if none is provided, get a random one.", new string[0], Restriction.None, "Photo France")));
-            _help.Add(("Entertainment", new Help("Fun", "VNQuote", new Argument[0], "Get a quote from a random Visual Novel.", new string[0], Restriction.Nsfw, null)));
-        }
-    }
-}
-
-namespace SanaraV3.Module.Entertainment
-{
-
-    /// <summary>
-    /// All "Fun" commands that have no real purposes
-    /// </summary>
-    public sealed class FunModule : ModuleBase
-    {
-        [Command("Photo", RunMode = RunMode.Async)]
-        public async Task PhotoAsync()
-        {
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://api.unsplash.com/photos/random?client_id=" + StaticObjects.UnsplashToken));
-            await PhotoAsync(json);
+            throw new CommandFailed("Photo token is not available");
         }
 
-        [Command("Photo", RunMode = RunMode.Async)]
-        public async Task PhotoAsync([Remainder]string query)
+        string? query = (string?)ctx.Data.Options.FirstOrDefault(x => x.Name == "query")?.Value;
+
+        JObject json;
+        if (query == null)
+        {
+            json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://api.unsplash.com/photos/random?client_id=" + StaticObjects.UnsplashToken));
+        }
+        else
         {
             var resp = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.unsplash.com/photos/random?query=" + HttpUtility.UrlEncode(query) + "&client_id=" + StaticObjects.UnsplashToken));
             if (resp.StatusCode == HttpStatusCode.NotFound)
                 throw new CommandFailed("There is no result with these search terms.");
-            var json = JsonConvert.DeserializeObject<JObject>(await resp.Content.ReadAsStringAsync());
-            await PhotoAsync(json);
+            json = JsonConvert.DeserializeObject<JObject>(await resp.Content.ReadAsStringAsync());
         }
-
-        private async Task PhotoAsync(JToken json)
+        await ctx.RespondAsync(embed: new EmbedBuilder
         {
-            await ReplyAsync(embed: new EmbedBuilder
+            Title = "By " + json["user"]["name"].Value<string>(),
+            Url = json["links"]["html"].Value<string>(),
+            ImageUrl = json["urls"]["full"].Value<string>(),
+            Footer = new EmbedFooterBuilder
             {
-                Title = "By " + json["user"]["name"].Value<string>(),
-                Url = json["links"]["html"].Value<string>(),
-                ImageUrl = json["urls"]["full"].Value<string>(),
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = json["description"].Value<string>()
-                },
-                Color = Color.Blue
-            }.Build());
-        }
+                Text = json["description"].Value<string>()
+            },
+            Color = Color.Blue
+        }.Build());
     }
 }
-*/

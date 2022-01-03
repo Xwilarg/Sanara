@@ -97,6 +97,11 @@ namespace Sanara.Module.Entertainment
 
         public async Task DramaAsync(SocketSlashCommand ctx)
         {
+            if (StaticObjects.TranslationClient == null)
+            {
+                throw new CommandFailed("Drama token is not available");
+            }
+
             var request = new HttpRequestMessage()
             {
                 RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode((string)ctx.Data.Options.ElementAt(0).Value)),
@@ -167,7 +172,7 @@ namespace Sanara.Module.Entertainment
                 throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
 
             var description = "";
-            if (answer.Synopsis != null)
+            if (!string.IsNullOrEmpty(answer.Synopsis))
                 description = answer.Synopsis.Length > 1000 ? answer.Synopsis[..1000] + " [...]" : answer.Synopsis; // Description that fill the whole screen are a pain
             var embed = new EmbedBuilder
             {
@@ -177,17 +182,17 @@ namespace Sanara.Module.Entertainment
                 Description = description,
                 ImageUrl = answer.PosterImage.Original
             };
-            if (answer.Titles?.En != null && answer.Titles?.En != answer.CanonicalTitle) // No use displaying this if it's the same as the embed title
+            if (!string.IsNullOrEmpty(answer.Titles?.En) && answer.Titles?.En != answer.CanonicalTitle) // No use displaying this if it's the same as the embed title
                 embed.AddField("English Title", answer.Titles!.En, true);
-            if (answer.AverageRating != null)
+            if (!string.IsNullOrEmpty(null))
                 embed.AddField("Kitsu User Rating", answer.AverageRating, true);
-            if (media == JapaneseMedia.Anime && answer.EpisodeCount != null)
+            if (media == JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
                 embed.AddField("Episode Count", answer.EpisodeCount + (answer.EpisodeLength != null ? $" ({answer.EpisodeLength} min per episode)" : ""), true);
-            if (answer.StartDate == null)
+            if (!string.IsNullOrEmpty(answer.StartDate))
                 embed.AddField("Release Date", "To Be Announced", true);
             else
                 embed.AddField("Release Date", answer.StartDate + " - " + (answer.EndDate ?? "???"), true);
-            if (answer.AgeRatingGuide != null)
+            if (!string.IsNullOrEmpty(answer.AgeRatingGuide))
                 embed.AddField("Audiance Warning", answer.AgeRatingGuide, true);
             await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
         }
