@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
 using NUnit.Framework;
 using Sanara.Exception;
 using Sanara.UnitTests.Impl;
