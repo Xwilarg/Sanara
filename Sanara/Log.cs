@@ -31,7 +31,7 @@ namespace Sanara
             if (ctx != null)
             {
                 var button = new ComponentBuilder()
-                        .WithButton("More information", ctx.Id.ToString());
+                        .WithButton("More information", $"error-{ctx.Id}");
 
                 StaticObjects.Errors.Add(ctx.Id.ToString(), e);
                 var embed = new EmbedBuilder

@@ -55,7 +55,7 @@ namespace Sanara.Module.Administration
 
         public async Task GdprAsync(SocketSlashCommand ctx)
         {
-            await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```");
+            await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```", ephemeral: true);
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)

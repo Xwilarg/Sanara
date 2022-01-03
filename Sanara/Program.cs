@@ -90,10 +90,6 @@ namespace Sanara
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
             StaticObjects.Client.ButtonExecuted += ButtonExecuted;
 
-            // Add readers
-            _commands.AddTypeReader(typeof(IMessage), new TypeReader.IMessageReader());
-            _commands.AddTypeReader(typeof(ImageLink), new TypeReader.ImageLinkReader());
-
             // Discord modules
             await _commands.AddModuleAsync<DeprecationNotice>(null);
 
