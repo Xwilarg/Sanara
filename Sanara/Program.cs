@@ -216,6 +216,10 @@ namespace Sanara
 #endif
                         )
                         {
+                            if (c.Precondition != Precondition.None)
+                            {
+                                c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
+                            }
                             if (debugGuild != null)
                             {
                                 await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);

@@ -22,7 +22,7 @@ namespace Sanara.Module.Doujin
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "dlrand",
-                        Description = "Get a random DlSite work"
+                        Description = "Get a random DLSite work"
                     }.Build(),
                     callback: DlRandAsync,
                     precondition: Precondition.NsfwOnly,
