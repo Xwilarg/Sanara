@@ -6,6 +6,9 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class BooruFillPreload : IPreload
     {
+        public void Init()
+        { }
+
         public ReadOnlyCollection<IPreloadResult> Load()
             => null;
 

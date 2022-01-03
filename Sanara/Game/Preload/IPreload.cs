@@ -5,6 +5,7 @@ namespace Sanara.Game.Preload
 {
     public interface IPreload
     {
+        public void Init();
         /// <summary>
         /// Load the game dictionary
         /// </summary>

@@ -2,13 +2,12 @@
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Result;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Sanara.Game.Preload.Impl
 {
     public sealed class ShiritoriHardPreload : IPreload
     {
-        public ShiritoriHardPreload()
+        public void Init()
         {
             _preload = Static.Shiritori.GetWords().Where(x => Shiritori.IsLongEnough(x.Word, 3)).ToArray();
         }
@@ -32,6 +31,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly ShiritoriPreloadResult[] _preload;
+        private ShiritoriPreloadResult[] _preload;
     }
 }

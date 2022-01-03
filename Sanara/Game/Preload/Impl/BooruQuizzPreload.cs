@@ -7,7 +7,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class BooruQuizzPreload : IPreload
     {
-        public BooruQuizzPreload()
+        public void Init()
         {
             if (!File.Exists("Saves/Game/QuizzTags.txt"))
                 File.WriteAllBytes("Saves/Game/QuizzTags.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
@@ -40,6 +40,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => false;
 
-        private readonly BooruQuizzPreloadResult[] _preload;
+        private BooruQuizzPreloadResult[] _preload;
     }
 }

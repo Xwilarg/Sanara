@@ -7,7 +7,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class ShiritoriPreload : IPreload
     {
-        public ShiritoriPreload()
+        public void Init()
         {
             _preload = Static.Shiritori.GetWords().ToArray();
         }
@@ -31,6 +31,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly ShiritoriPreloadResult[] _preload;
+        private ShiritoriPreloadResult[] _preload;
     }
 }

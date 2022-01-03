@@ -9,7 +9,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class GirlsFrontlinePreload : IPreload
     {
-        public GirlsFrontlinePreload()
+        public void Init()
         {
             var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
             // Item1 is name to be used in URL
@@ -57,6 +57,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly QuizzPreloadResult[] _preload;
+        private QuizzPreloadResult[] _preload;
     }
 }

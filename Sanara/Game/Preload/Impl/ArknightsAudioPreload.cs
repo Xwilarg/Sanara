@@ -9,7 +9,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class ArknightsAudioPreload : IPreload
     {
-        public ArknightsAudioPreload()
+        public void Init()
         {
             _preload = Arknights.GetOperators().Select((x) =>
             {
@@ -35,6 +35,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly QuizzPreloadResult[] _preload;
+        private QuizzPreloadResult[] _preload;
     }
 }

@@ -17,6 +17,9 @@ namespace Sanara.Game.Preload.Impl
             _rules = "Custom game:\n" + (string.IsNullOrWhiteSpace(_game.Rules) ? "No rules set" : _game.Rules);
         }
 
+        public void Init()
+        { }
+
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 

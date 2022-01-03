@@ -9,7 +9,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class KancollePreload : IPreload
     {
-        public KancollePreload()
+        public void Init()
         {
             var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
             foreach (string name in Kancolle.GetShips())
@@ -55,6 +55,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly QuizzPreloadResult[] _preload;
+        private QuizzPreloadResult[] _preload;
     }
 }

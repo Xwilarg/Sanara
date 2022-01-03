@@ -9,7 +9,7 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class AzurLanePreload : IPreload
     {
-        public AzurLanePreload()
+        public void Init()
         {
             var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
             foreach (var elem in AzurLane.GetShips())
@@ -64,6 +64,6 @@ namespace Sanara.Game.Preload.Impl
         public bool IsSafe()
             => true;
 
-        private readonly QuizzPreloadResult[] _preload;
+        private QuizzPreloadResult[] _preload;
     }
 }
