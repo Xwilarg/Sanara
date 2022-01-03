@@ -1,4 +1,98 @@
-﻿/*
+﻿using Discord;
+using Discord.WebSocket;
+using Sanara.Help;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Web;
+
+namespace Sanara.Module.Doujin
+{
+    public class DoujinModule : ISubmodule
+    {
+        public SubmoduleInfo GetInfo()
+        {
+            return new("Doujin", "Get self published work");
+        }
+
+        public CommandInfo[] GetCommands()
+        {
+            return new[]
+            {
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "dlrand",
+                        Description = "Get a random DlSite work"
+                    }.Build(),
+                    callback: DlRandAsync,
+                    precondition: Precondition.None,
+                    needDefer: true
+                )
+            };
+        }
+
+        public async Task DlRandAsync(SocketSlashCommand ctx)
+        {
+            var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
+            var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
+
+            var html = await StaticObjects.HttpClient.GetStringAsync(url);
+            int maxId = int.Parse(Regex.Match(html, "RJ([0-9]+)\\.html").Groups[1].Value) + 1;
+            int id;
+            string doujinUrl;
+            HttpResponseMessage msg;
+
+            do
+            {
+                id = StaticObjects.Random.Next(1, maxId);
+                doujinUrl = "https://www.dlsite.com/maniax/work/=/product_id/RJ" + id + ".html";
+                msg = await StaticObjects.HttpClient.GetAsync(doujinUrl);
+            } while (msg.StatusCode == HttpStatusCode.NotFound);
+            html = await msg.Content.ReadAsStringAsync();
+
+            var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
+            title = HttpUtility.HtmlDecode(title[0..^9]);
+            var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
+            var description = HttpUtility.HtmlDecode(Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value);
+            var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
+            var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
+            html = html.Contains("main_genre") ?
+                html.Split(new[] { "main_genre" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]
+                : "";
+            var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Title = title,
+                Url = doujinUrl,
+                ImageUrl = imageUrl,
+                Description = description,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Type",
+                        Value = type,
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Price",
+                        Value = price + " ¥",
+                        IsInline = true
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Tags: {string.Join(", ", tags)}"
+                }
+            }.Build());
+        }
+    }
+}
+
+/*
 
 namespace SanaraV3.Help
 {
@@ -204,66 +298,6 @@ namespace SanaraV3.Module.Nsfw
                     Text = $"Do the 'Download doujinshi' command with the id '{result.id}' to download the doujinshi."
                 }
             }.Build();
-        }
-
-        [Command("Dlrand", RunMode = RunMode.Async), RequireNsfw]
-        public async Task Dlrand()
-        {
-            var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
-            var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
-
-            var html = await StaticObjects.HttpClient.GetStringAsync(url);
-            int maxId = int.Parse(Regex.Match(html, "RJ([0-9]+)\\.html").Groups[1].Value) + 1;
-            int id;
-            string doujinUrl;
-            HttpResponseMessage msg;
-
-            do
-            {
-                id = StaticObjects.Random.Next(1, maxId);
-                doujinUrl = "https://www.dlsite.com/maniax/work/=/product_id/RJ" + id + ".html";
-                msg = await StaticObjects.HttpClient.GetAsync(doujinUrl);
-            } while (msg.StatusCode == HttpStatusCode.NotFound);
-            html = await msg.Content.ReadAsStringAsync();
-
-            var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
-            title = HttpUtility.HtmlDecode(title[0..^9]);
-            var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
-            var description = HttpUtility.HtmlDecode(Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value);
-            var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
-            var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
-            html = html.Contains("main_genre") ?
-                html.Split(new[] { "main_genre" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]
-                : "";
-            var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
-
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = new Color(255, 20, 147),
-                Title = title,
-                Url = doujinUrl,
-                ImageUrl = imageUrl,
-                Description = description,
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Type",
-                        Value = type,
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Price",
-                        Value = price + " ¥",
-                        IsInline = true
-                    }
-                },
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Tags: {string.Join(", ", tags)}"
-                }
-            }.Build());
         }
 
         [Command("Dlsite", RunMode = RunMode.Async), RequireNsfw]

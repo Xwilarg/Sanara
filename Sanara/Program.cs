@@ -6,6 +6,7 @@ using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module;
 using Sanara.Module.Administration;
+using Sanara.Module.Doujin;
 using Sanara.Module.Entertainment;
 using Sanara.Module.Nsfw;
 using System.Diagnostics;
@@ -194,8 +195,10 @@ namespace Sanara
                     _submodules.Add(new BooruModule());
                     _submodules.Add(new FunModule());
                     _submodules.Add(new LanguageModule());
+                    _submodules.Add(new DoujinModule());
 
                     StaticObjects.Help = new(_submodules);
+                    File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(StaticObjects.Help.Data));
 
                     SocketGuild? debugGuild = null;
                     if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)

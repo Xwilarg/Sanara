@@ -19,6 +19,6 @@ namespace Sanara.Help
             }).ToArray();
         }
 
-        public Serialization.Submodule[] Data;
+        public Serialization.Submodule[] Data { private set; get; }
     }
 }
