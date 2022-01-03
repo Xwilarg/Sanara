@@ -33,7 +33,7 @@ namespace Sanara
                 var button = new ComponentBuilder()
                         .WithButton("More information", $"error-{ctx.Id}");
 
-                StaticObjects.Errors.Add(ctx.Id.ToString(), e);
+                StaticObjects.Errors.Add($"error-{ctx.Id}", e);
                 var embed = new EmbedBuilder
                 {
                     Color = Color.Red,
