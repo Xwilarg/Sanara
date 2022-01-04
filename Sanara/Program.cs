@@ -255,6 +255,8 @@ namespace Sanara
 
                 // The bot is now really ready to interact with people
                 StaticObjects.Started = DateTime.UtcNow;
+
+                await StaticObjects.Db.UpdateGuildCountAsync();
             });
 
 #if NSFW_BUILD

@@ -14,7 +14,7 @@ namespace Sanara.Module.Nsfw
         {
             int redirectCounter = 0;
             string html;
-            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), url);
+            HttpRequestMessage request = new(new HttpMethod("GET"), url);
             do
             {
                 request.Headers.Add("Host", "www5.javmost.com");
