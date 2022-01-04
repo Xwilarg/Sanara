@@ -1,11 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Google;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sanara;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module;
 using System.Text;
+using System.Web;
 
 public class LanguageModule : ISubmodule
 {
@@ -44,6 +47,27 @@ public class LanguageModule : ISubmodule
                 callback: TranslateAsync,
                 precondition: Precondition.None,
                 needDefer: false
+            ),
+
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "urban",
+                    Description = "Get the slang definition of a word",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "word",
+                            Description = "Word to get the meaning of",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = true
+                        }
+                    }
+                }.Build(),
+                callback: UrbanAsync,
+                precondition: Precondition.None,
+                needDefer: false
             )
         };
     }
@@ -80,6 +104,62 @@ public class LanguageModule : ISubmodule
         }
     }
 
+    public async Task UrbanAsync(SocketSlashCommand ctx)
+    {
+        var word = (string)ctx.Data.Options.First(x => x.Name == "word").Value;
+
+        var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(word)));
+        if (json["list"].Value<JArray>().Count == 0)
+            throw new CommandFailed("There is no definition for this query.");
+
+        int up = json["list"][0]["thumbs_up"].Value<int>();
+        int down = json["list"][0]["thumbs_down"].Value<int>();
+
+        if (up <= down)
+        {
+            throw new CommandFailed("There is no definition having a positive vote ratio for this query");
+        }
+
+        int GCD(int a, int b)
+        {
+            return b == 0 ? Math.Abs(a) : GCD(b, a % b);
+        }
+        int gcd = GCD(up, down);
+
+        string definition = json["list"][0]["definition"].Value<string>();
+        if (definition.Length > 1000)
+            definition = definition.Substring(0, 1000) + " [...]";
+        string example = json["list"][0]["example"].Value<string>();
+        if (example.Length > 1000)
+            example = example.Substring(0, 1000) + " [...]";
+
+        var outWord = json["list"][0]["word"].Value<string>();
+
+        await ctx.RespondAsync(embed: new EmbedBuilder
+        {
+            Color = Color.Blue,
+            Title = Utils.ToWordCase(outWord),
+            Url = json["list"][0]["permalink"].Value<string>(),
+            Fields = new()
+            {
+                new EmbedFieldBuilder
+                {
+                    Name = "Definition",
+                    Value = definition
+                },
+                new EmbedFieldBuilder
+                {
+                    Name = "Example",
+                    Value = example
+                }
+            },
+            Footer = new EmbedFooterBuilder
+            {
+                Text = $"Up/Down vote ratio: {up / gcd} : {down / gcd}"
+            }
+        }.Build());
+    }
+
     public static string ToRomaji(string entry)
         => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
 
@@ -94,7 +174,7 @@ public class LanguageModule : ISubmodule
     /// <param name="doubleChar">Character to use when a character is here twice, like remplace kko by っこ</param>
     public static string ConvertLanguage(string entry, Dictionary<string, string> dictionary, char doubleChar)
     {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new();
         var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
         bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
         bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
@@ -111,16 +191,15 @@ public class LanguageModule : ISubmodule
             if (entry[0] == 'ァ' || entry[0] == 'ィ' || entry[0] == 'ゥ' || entry[0] == 'ェ' || entry[0] == 'ォ')
             {
                 result.Remove(result.Length - 1, 1);
-                char tmp;
-                switch (entry[0])
+                var tmp = entry[0] switch
                 {
-                    case 'ァ': tmp = 'a'; break;
-                    case 'ィ': tmp = 'i'; break;
-                    case 'ゥ': tmp = 'u'; break;
-                    case 'ェ': tmp = 'e'; break;
-                    case 'ォ': tmp = 'o'; break;
-                    default: throw new ArgumentException("Invalid katakana " + entry[0]);
-                }
+                    'ァ' => 'a',
+                    'ィ' => 'i',
+                    'ゥ' => 'u',
+                    'ェ' => 'e',
+                    'ォ' => 'o',
+                    _ => throw new ArgumentException("Invalid katakana " + entry[0]),
+                };
                 result.Append(tmp);
                 entry = entry[1..];
                 continue;
@@ -173,69 +252,7 @@ public class LanguageModule : ISubmodule
 //_help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.Mandatory, "kanji") }, "Get information about a kanji.", Array.Empty<string>(), Restriction.None, "Kanji 艦")));
 //_help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the urban definition of a word.", Array.Empty<string>(), Restriction.Nsfw, "Urban bunny hop")));
 //_help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
-/*
 
-namespace Sanara.Module.Tool
-{
-    public sealed class LanguageNsfwModule : ModuleBase
-    {
-
-        [Command("Urban", RunMode = RunMode.Async), RequireNsfw]
-        public async Task UrbanAsync([Remainder] string query)
-        {
-            var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(query)));
-            if (json["list"].Value<JArray>().Count == 0)
-                throw new CommandFailed("There is no definition for this query.");
-
-            int up = json["list"][0]["thumbs_up"].Value<int>();
-            int down = json["list"][0]["thumbs_down"].Value<int>();
-
-            if (up <= down)
-            {
-                throw new CommandFailed("There is no definition having a positive vote ratio for this query");
-            }
-
-            int GCD(int a, int b)
-            {
-                return b == 0 ? Math.Abs(a) : GCD(b, a % b);
-            }
-            int gcd = GCD(up, down);
-
-            string definition = json["list"][0]["definition"].Value<string>();
-            if (definition.Length > 1000)
-                definition = definition.Substring(0, 1000) + " [...]";
-            string example = json["list"][0]["example"].Value<string>();
-            if (example.Length > 1000)
-                example = example.Substring(0, 1000) + " [...]";
-
-            var word = json["list"][0]["word"].Value<string>();
-
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = char.ToUpper(word[0]) + string.Concat(word.Skip(1)),
-                Url = json["list"][0]["permalink"].Value<string>(),
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Definition",
-                        Value = definition
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Example",
-                        Value = example
-                    }
-                },
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Up/Down vote ratio: {up / gcd} : {down / gcd}"
-                }
-            }.Build());
-        }
-    }
-*/
     /*
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
