@@ -36,9 +36,9 @@
 
         public async Task AddNewCommandAsync(string name)
         {
-            await InsertOrAddAsync("NbMessages", Daily, StaticObjects.BotName);
+            await InsertOrAddAsync("NbMessages", Hourly, StaticObjects.BotName);
             await InsertOrAddAsync("Errors", Daily, "OK");
-            await InsertOrAddAsync("Commands", Daily, name);
+            await InsertOrAddAsync("Commands", Hourly, name);
         }
 
         public async Task AddErrorAsync(System.Exception e)
