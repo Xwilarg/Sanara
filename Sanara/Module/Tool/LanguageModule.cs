@@ -66,7 +66,7 @@ public class LanguageModule : ISubmodule
                     }
                 }.Build(),
                 callback: UrbanAsync,
-                precondition: Precondition.None,
+                precondition: Precondition.NsfwOnly,
                 needDefer: false
             )
         };
@@ -108,7 +108,19 @@ public class LanguageModule : ISubmodule
     {
         var word = (string)ctx.Data.Options.First(x => x.Name == "word").Value;
 
-        var json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(word)));
+        JObject json;
+        try
+        {
+            json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(word)));
+        }
+        catch (HttpRequestException re)
+        {
+            if (re.StatusCode == System.Net.HttpStatusCode.InternalServerError) // Somehow for some invalid query urbandictionary throws a 500
+            {
+                throw new CommandFailed("There is no definition for this query.");
+            }
+            throw;
+        }
         if (json["list"].Value<JArray>().Count == 0)
             throw new CommandFailed("There is no definition for this query.");
 
@@ -134,8 +146,7 @@ public class LanguageModule : ISubmodule
             example = example.Substring(0, 1000) + " [...]";
 
         var outWord = json["list"][0]["word"].Value<string>();
-
-        await ctx.RespondAsync(embed: new EmbedBuilder
+        var embed = new EmbedBuilder
         {
             Color = Color.Blue,
             Title = Utils.ToWordCase(outWord),
@@ -146,18 +157,18 @@ public class LanguageModule : ISubmodule
                 {
                     Name = "Definition",
                     Value = definition
-                },
-                new EmbedFieldBuilder
-                {
-                    Name = "Example",
-                    Value = example
                 }
             },
             Footer = new EmbedFooterBuilder
             {
                 Text = $"Up/Down vote ratio: {up / gcd} : {down / gcd}"
             }
-        }.Build());
+        };
+        if (example != "")
+        {
+            embed.AddField("Example", example);
+        }
+        await ctx.RespondAsync(embed: embed.Build());
     }
 
     public static string ToRomaji(string entry)
