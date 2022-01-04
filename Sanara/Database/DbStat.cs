@@ -5,7 +5,6 @@
         public async Task InitStatsAsync()
         {
             await CreateIfDontExistsAsync(_statDbName, "GuildCount");
-            await CreateIfDontExistsAsync(_statDbName, "NbMessages");
             await CreateIfDontExistsAsync(_statDbName, "Errors");
             await CreateIfDontExistsAsync(_statDbName, "Commands");
             await CreateIfDontExistsAsync(_statDbName, "Games");
@@ -36,7 +35,6 @@
 
         public async Task AddNewCommandAsync(string name)
         {
-            await InsertOrAddAsync("NbMessages", Hourly, StaticObjects.BotName);
             await InsertOrAddAsync("Errors", Daily, "OK");
             await InsertOrAddAsync("Commands", Hourly, name);
         }
