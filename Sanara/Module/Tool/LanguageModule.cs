@@ -8,6 +8,7 @@ using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 public class LanguageModule : ISubmodule
@@ -17,7 +18,7 @@ public class LanguageModule : ISubmodule
         return new("Language", "Get various information related to others languages");
     }
 
-    public Sanara.Module.CommandInfo[] GetCommands()
+    public CommandInfo[] GetCommands()
     {
         return new[]
         {
@@ -48,7 +49,6 @@ public class LanguageModule : ISubmodule
                 precondition: Precondition.None,
                 needDefer: false
             ),
-
             new CommandInfo(
                 slashCommand: new SlashCommandBuilder()
                 {
@@ -68,7 +68,47 @@ public class LanguageModule : ISubmodule
                 callback: UrbanAsync,
                 precondition: Precondition.NsfwOnly,
                 needDefer: false
-            )
+            ),
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "kanji",
+                    Description = "Get information about a kanji",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "kanji",
+                            Description = "Kanji to get information about",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = true
+                        }
+                    }
+                }.Build(),
+                callback: KanjiAsync,
+                precondition: Precondition.None,
+                needDefer: false
+            ),
+            new CommandInfo(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "japanese",
+                    Description = "Get the definition of a word (Japanese only)",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "word",
+                            Description = "Word to get the definition of",
+                            Type = ApplicationCommandOptionType.String,
+                            IsRequired = true
+                        }
+                    }
+                }.Build(),
+                callback: JapaneseAsync,
+                precondition: Precondition.None,
+                needDefer: false
+            ),
         };
     }
 
@@ -140,10 +180,10 @@ public class LanguageModule : ISubmodule
 
         string definition = json["list"][0]["definition"].Value<string>();
         if (definition.Length > 1000)
-            definition = definition.Substring(0, 1000) + " [...]";
+            definition = definition[..1000] + " [...]";
         string example = json["list"][0]["example"].Value<string>();
         if (example.Length > 1000)
-            example = example.Substring(0, 1000) + " [...]";
+            example = example[..1000] + " [...]";
 
         var outWord = json["list"][0]["word"].Value<string>();
         var embed = new EmbedBuilder
@@ -167,6 +207,135 @@ public class LanguageModule : ISubmodule
         if (example != "")
         {
             embed.AddField("Example", example);
+        }
+        await ctx.RespondAsync(embed: embed.Build());
+    }
+
+
+    public async Task KanjiAsync(SocketSlashCommand ctx)
+    {
+        var kanji = (string)ctx.Data.Options.First(x => x.Name == "kanji").Value;
+
+        JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(kanji)));
+        if (json["data"].Value<JArray>().Count == 0 || json["data"][0]["japanese"][0]["word"] == null)
+            throw new CommandFailed("I didn't find any kanji with this query.");
+
+        char? finalKanji = null;
+
+        // If player input is a kanji
+        char playerChar = kanji[0];
+        foreach (var elem in json["data"].Value<JArray>())
+        {
+            foreach (var elem2 in elem["japanese"].Value<JArray>())
+            {
+                if (elem2["word"] != null && elem2["word"].Value<string>() == playerChar.ToString())
+                {
+                    finalKanji = playerChar;
+                }
+            }
+        }
+
+        // Else we take the first result we got on our Jisho search
+        if (!finalKanji.HasValue)
+            finalKanji = json["data"][0]["japanese"][0]["word"].Value<string>()[0];
+
+        string url = "https://jisho.org/search/" + finalKanji + "%20%23kanji";
+        string html = await StaticObjects.HttpClient.GetStringAsync(url);
+
+        // Radical of the kanji
+        var radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
+
+        // Kanji meaning in english
+        var meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
+
+        // All parts composing the kanji
+        Dictionary<string, string> parts = new Dictionary<string, string>();
+        foreach (var match in Regex.Matches(html, "<a href=\"(\\/\\/jisho\\.org\\/search\\/[^k]+kanji)\">([^<]+)<\\/a>").Cast<Match>())
+        {
+            string name = match.Groups[2].Value;
+            if (name[0] == finalKanji.Value)
+                parts.Add(name, meaning);
+            else
+                parts.Add(name, Regex.Match(await StaticObjects.HttpClient.GetStringAsync("https:" + match.Groups[1].Value), "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim());
+        }
+
+        // Onyomi and kunyomi (ways to read the kanji)
+        Dictionary<string, string> onyomi = new();
+        Dictionary<string, string> kunyomi = new();
+        if (html.Contains("<dt>On:"))
+            foreach (var match in Regex.Matches(html.Split(new[] { "<dt>On:" }, StringSplitOptions.None)[1]
+                .Split(new[] { "</dd>" }, StringSplitOptions.None)[0],
+                "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+        if (html.Contains("<dt>Kun:"))
+            foreach (var match in Regex.Matches(html.Split(new[] { "<dt>Kun:" }, StringSplitOptions.None)[1]
+                .Split(new string[] { "</dd>" }, StringSplitOptions.None)[0],
+            "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
+                kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
+
+        await ctx.RespondAsync(embed: new EmbedBuilder
+        {
+            Title = finalKanji.Value.ToString(),
+            // Url = url, // TODO: https://github.com/dotnet/runtime/issues/21626 , .NET said they will fix that in a next release
+            Description = meaning,
+            ImageUrl = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)finalKanji.Value + "_frames.png",
+            Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Radical",
+                        Value = radicalMatch.Groups[2].Value.Trim() + ": " + radicalMatch.Groups[1].Value.Trim()
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Parts",
+                        Value = string.Join("\n", parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value))
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Onyomi",
+                        Value = onyomi.Count == 0 ? "None" : string.Join("\n", onyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Kunyomi",
+                        Value = kunyomi.Count == 0 ? "None" : string.Join("\n", kunyomi.Select(x => x.Key + " (" + x.Value + ")"))
+                    },
+                }
+        }.Build());
+    }
+
+    public async Task JapaneseAsync(SocketSlashCommand ctx)
+    {
+        var word = (string)ctx.Data.Options.First(x => x.Name == "word").Value;
+
+        JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword="
+            + HttpUtility.UrlEncode(word)));
+        var data = ((JArray)json["data"]).Select(x => x).ToArray();
+        if (data.Length == 0)
+            throw new CommandFailed("There is no result with this term search.");
+        if (data.Length > 4)
+            data = data.Take(5).ToArray();
+        var embed = new EmbedBuilder
+        {
+            Color = Color.Blue,
+            Title = word,
+            Url = "https://jisho.org/search/" + HttpUtility.UrlEncode(word)
+        };
+        foreach (var elem in data)
+        {
+            string title = string.Join(", ", elem["senses"][0]["english_definitions"].Value<JArray>().Select(x => x.Value<string>()));
+            string content = string.Join('\n', elem["japanese"].Value<JArray>().Select(x =>
+            {
+                var word = x["word"];
+                var reading = x["reading"];
+                if (word == null)
+                    return reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
+                if (reading == null)
+                    return word.Value<string>();
+                return word.Value<string>() + " - " + reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
+            }));
+            embed.AddField(title, content);
         }
         await ctx.RespondAsync(embed: embed.Build());
     }
@@ -259,9 +428,6 @@ public class LanguageModule : ISubmodule
 }
 
 //_submoduleHelp.Add("Language", "Get various information related to others languages");
-//_help.Add(("Tool", new Help("Language", "Japanese", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the meaning of a Japanese word, will also translate your word if you give it in english.", Array.Empty<string>(), Restriction.None, "Japanese submarine")));
-//_help.Add(("Tool", new Help("Language", "Kanji", new[] { new Argument(ArgumentType.Mandatory, "kanji") }, "Get information about a kanji.", Array.Empty<string>(), Restriction.None, "Kanji 艦")));
-//_help.Add(("Tool", new Help("Language", "Urban", new[] { new Argument(ArgumentType.Mandatory, "word") }, "Get the urban definition of a word.", Array.Empty<string>(), Restriction.Nsfw, "Urban bunny hop")));
 //_help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
 
     /*
@@ -333,128 +499,4 @@ public class LanguageModule : ISubmodule
             }
         }
 
-        [Command("Kanji", RunMode = RunMode.Async)]
-        public async Task KanjiAsync(string kanji)
-        {
-            JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(kanji)));
-            if (json["data"].Value<JArray>().Count == 0 || json["data"][0]["japanese"][0]["word"] == null)
-                throw new CommandFailed("I didn't find any kanji with this query.");
-
-            char? finalKanji = null;
-
-            // If player input is a kanji
-            char playerChar = kanji[0];
-            foreach (var elem in json["data"].Value<JArray>())
-            {
-                foreach (var elem2 in elem["japanese"].Value<JArray>())
-                {
-                    if (elem2["word"] != null && elem2["word"].Value<string>() == playerChar.ToString())
-                    {
-                        finalKanji = playerChar;
-                    }
-                }
-            }
-
-            // Else we take the first result we got on our Jisho search
-            if (!finalKanji.HasValue)
-                finalKanji = json["data"][0]["japanese"][0]["word"].Value<string>()[0];
-
-            string url = "https://jisho.org/search/" + finalKanji + "%20%23kanji";
-            string html = await StaticObjects.HttpClient.GetStringAsync(url);
-
-            // Radical of the kanji
-            var radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
-
-            // Kanji meaning in english
-            var meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
-
-            // All parts composing the kanji
-            Dictionary<string, string> parts = new Dictionary<string, string>();
-            foreach (var match in Regex.Matches(html, "<a href=\"(\\/\\/jisho\\.org\\/search\\/[^k]+kanji)\">([^<]+)<\\/a>").Cast<Match>())
-            {
-                string name = match.Groups[2].Value;
-                if (name[0] == finalKanji.Value)
-                    parts.Add(name, meaning);
-                else
-                    parts.Add(name, Regex.Match(await StaticObjects.HttpClient.GetStringAsync("https:" + match.Groups[1].Value), "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim());
-            }
-
-            // Onyomi and kunyomi (ways to read the kanji)
-            Dictionary<string, string> onyomi = new Dictionary<string, string>();
-            Dictionary<string, string> kunyomi = new Dictionary<string, string>();
-            if (html.Contains("<dt>On:"))
-                foreach (var match in Regex.Matches(html.Split(new[] { "<dt>On:" }, StringSplitOptions.None)[1]
-                    .Split(new[] { "</dd>" }, StringSplitOptions.None)[0],
-                    "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
-                    onyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
-            if (html.Contains("<dt>Kun:"))
-                foreach (var match in Regex.Matches(html.Split(new[] { "<dt>Kun:" }, StringSplitOptions.None)[1]
-                    .Split(new string[] { "</dd>" }, StringSplitOptions.None)[0],
-                "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
-                    kunyomi.Add(match.Groups[1].Value, ToRomaji(match.Groups[1].Value));
-
-            await ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = finalKanji.Value.ToString(),
-                // Url = url, // TODO: https://github.com/dotnet/runtime/issues/21626 , Discord.NET said they will fix that in a next release
-                Description = meaning,
-                ImageUrl = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)finalKanji.Value + "_frames.png",
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Radical",
-                        Value = radicalMatch.Groups[2].Value.Trim() + ": " + radicalMatch.Groups[1].Value.Trim()
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Parts",
-                        Value = string.Join("\n", parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value))
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Onyomi",
-                        Value = onyomi.Count == 0 ? "None" : string.Join("\n", onyomi.Select(x => x.Key + " (" + x.Value + ")"))
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Kunyomi",
-                        Value = kunyomi.Count == 0 ? "None" : string.Join("\n", kunyomi.Select(x => x.Key + " (" + x.Value + ")"))
-                    },
-                }
-            }.Build());
-        }
-
-        [Command("Japanese", RunMode = RunMode.Async)]
-        public async Task JapaneseAsync([Remainder]string str)
-        {
-            JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword="
-                + HttpUtility.UrlEncode(string.Join("%20", str))));
-            var data = ((JArray)json["data"]).Select(x => x).ToArray();
-            if (data.Length == 0)
-                throw new CommandFailed("There is no result with this term search.");
-            if (data.Length > 4)
-                data = data.Take(5).ToArray();
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue,
-                Title = str,
-                Url = "https://jisho.org/search/" + HttpUtility.UrlEncode(str)
-            };
-            foreach (var elem in data)
-            {
-                string title = string.Join(", ", elem["senses"][0]["english_definitions"].Value<JArray>().Select(x => x.Value<string>()));
-                string content = string.Join('\n', elem["japanese"].Value<JArray>().Select(x =>
-                {
-                    var word = x["word"];
-                    var reading = x["reading"];
-                    if (word == null)
-                        return reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
-                    if (reading == null)
-                        return word.Value<string>();
-                    return word.Value<string>() + " - " + reading.Value<string>() + $" ({ToRomaji(reading.Value<string>())})";
-                }));
-                embed.AddField(title, content);
-            }
-            await ReplyAsync(embed: embed.Build());
-        }*/
+*/

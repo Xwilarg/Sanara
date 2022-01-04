@@ -70,7 +70,7 @@ namespace Sanara.Module.Entertainment
                     }.Build(),
                     callback: AnimeAsync,
                     precondition: Precondition.None,
-                    needDefer: true
+                    needDefer: false
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -90,7 +90,7 @@ namespace Sanara.Module.Entertainment
                     }.Build(),
                     callback: DramaAsync,
                     precondition: Precondition.None,
-                    needDefer: true
+                    needDefer: false
                 )
             };
         }
@@ -146,7 +146,7 @@ namespace Sanara.Module.Entertainment
                 embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
             }
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.RespondAsync(embed: embed.Build());
         }
 
         public static async Task<JObject> GetDramaAsync(int id)
@@ -194,7 +194,7 @@ namespace Sanara.Module.Entertainment
                 embed.AddField("Release Date", answer.StartDate + " - " + (answer.EndDate ?? "???"), true);
             if (!string.IsNullOrEmpty(answer.AgeRatingGuide))
                 embed.AddField("Audiance Warning", answer.AgeRatingGuide, true);
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.RespondAsync(embed: embed.Build());
         }
 
         public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
