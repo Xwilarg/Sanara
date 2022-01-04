@@ -15,7 +15,7 @@
 
         private string GetStatKey(string format)
         {
-            return DateTime.Now.ToString(format);
+            return DateTime.UtcNow.ToString(format);
         }
 
         private async Task InsertOrAddAsync(string table, string key, string field)
