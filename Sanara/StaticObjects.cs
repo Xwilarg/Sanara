@@ -70,6 +70,7 @@ namespace Sanara
         /// List of all errors that occured
         /// </summary>
         public static Dictionary<string, System.Exception> Errors { get; } = new();
+        public static List<string> Cosplays { get; } = new();
         /// <summary>
         /// Authentification token for discordbotlist.com
         /// </summary>

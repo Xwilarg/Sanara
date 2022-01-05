@@ -24,7 +24,7 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task LogErrorAsync(System.Exception e, SocketSlashCommand? ctx, bool needDefer = false)
+        public static async Task LogErrorAsync(System.Exception e, IDiscordInteraction? ctx, bool needDefer = false)
         {
             await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
 

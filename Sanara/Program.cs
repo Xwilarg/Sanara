@@ -103,16 +103,32 @@ namespace Sanara
 
         private async Task ButtonExecuted(SocketMessageComponent ctx)
         {
-            if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+            _ = Task.Run(async () =>
             {
-                var e = StaticObjects.Errors[ctx.Data.CustomId];
-                await ctx.RespondAsync(embed: new EmbedBuilder
+                try
                 {
-                    Color = Color.Red,
-                    Title = e.GetType().ToString(),
-                    Description = e.Message
-                }.Build(), ephemeral: true);
-            }
+                    if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+                    {
+                        var e = StaticObjects.Errors[ctx.Data.CustomId];
+                        await ctx.RespondAsync(embed: new EmbedBuilder
+                        {
+                            Color = Color.Red,
+                            Title = e.GetType().ToString(),
+                            Description = e.Message
+                        }.Build(), ephemeral: true);
+                    }
+                    else if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
+                    {
+                        StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
+                        var id = ctx.Data.CustomId.Split('/');
+                        await CosplayModule.DownloadCosplayAsync(ctx, id[1], id[2]);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    await Log.LogErrorAsync(ex, ctx, false);
+                }
+            });
         }
 
         private async Task SlashCommandExecuted(SocketSlashCommand ctx)
