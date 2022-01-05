@@ -129,7 +129,7 @@ namespace Sanara.Module.Administration
                 );
 
             await ctx.RespondAsync(embed: embed.Build(), ephemeral: true);
-
+#if NSFW_BUILD
             // Get latests commits
             str = new();
             var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
@@ -141,6 +141,7 @@ namespace Sanara.Module.Administration
             embed.AddField("Latest changes", str.ToString());
 
             await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+#endif
         }
     }
 }
