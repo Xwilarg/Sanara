@@ -19,13 +19,6 @@
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Module\Administration\" />
-    <Folder Include="Module\Game\" />
-    <Folder Include="Module\Nsfw\" />
-    <Folder Include="Module\Tool\" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;NSFW_BUILD</DefineConstants>
   </PropertyGroup>

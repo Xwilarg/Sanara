@@ -6,6 +6,7 @@ using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
+using Sanara.Module.Utility;
 using System.Web;
 
 namespace Sanara.Game.Impl
@@ -62,7 +63,7 @@ namespace Sanara.Game.Impl
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = LanguageModule.ToHiragana(answer.Content.ToLower());
+            string hiraganaAnswer = Language.ToHiragana(answer.Content.ToLower());
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
@@ -93,7 +94,7 @@ namespace Sanara.Game.Impl
                     var readingObj = jp["reading"];
                     if (readingObj == null)
                         continue;
-                    reading = LanguageModule.ToHiragana(readingObj.Value<string>());
+                    reading = Language.ToHiragana(readingObj.Value<string>());
                     if (reading == hiraganaAnswer)
                     {
                         isCorrect = true;
@@ -118,7 +119,7 @@ namespace Sanara.Game.Impl
                 throw new InvalidGameAnswer("This word doesn't exist.");
             var ending = GetWordEnding(_currWord);
             if (!hiraganaAnswer.StartsWith(ending))
-                throw new InvalidGameAnswer($"Your word must begin by {ending} ({LanguageModule.ToRomaji(ending)}).");
+                throw new InvalidGameAnswer($"Your word must begin by {ending} ({Language.ToRomaji(ending)}).");
             if (_alreadySaid.Contains(hiraganaAnswer))
                 throw new GameLost("This word was already said.");
             if (!isNoun)
@@ -131,7 +132,7 @@ namespace Sanara.Game.Impl
                 _words.Remove(_words.Where(x => x.Word == hiraganaAnswer).First());
             _alreadySaid.Add(hiraganaAnswer);
             _currWord = hiraganaAnswer;
-            _lastUserChoice = _currWord + $" ({LanguageModule.ToRomaji(_currWord)}) - Meaning: {string.Join(", ", meanings)}";
+            _lastUserChoice = _currWord + $" ({Language.ToRomaji(_currWord)}) - Meaning: {string.Join(", ", meanings)}";
         }
 
         protected override string GetAnswer()

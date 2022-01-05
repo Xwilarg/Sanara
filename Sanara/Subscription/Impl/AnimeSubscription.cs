@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
+using Sanara.Module.Utility;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -20,7 +21,7 @@ namespace Sanara.Subscription.Impl
                 string description = "";
                 try
                 {
-                    var result = await Module.Entertainment.JapaneseModule.SearchMediaAsync(Module.Entertainment.JapaneseMedia.Anime, animeName, true);
+                    var result = await Module.Command.Impl.JapaneseMedia.SearchMediaAsync(JapaneseMedia.Anime, animeName, true);
                     if (result.Attributes.Synopsis != null)
                         description = result.Attributes.Synopsis.Length > 1000 ? result.Attributes.Synopsis[..1000] + " [...]" : result.Attributes.Synopsis;
                 }

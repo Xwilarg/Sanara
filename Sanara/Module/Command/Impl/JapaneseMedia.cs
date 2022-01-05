@@ -1,10 +1,16 @@
-﻿using Discord;
+﻿using BooruSharp.Booru;
+using BooruSharp.Search;
+using BooruSharp.Search.Post;
+using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
 using Sanara.Help;
+using Sanara.Module.Utility;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Web;
 
 
@@ -14,13 +20,13 @@ using System.Web;
 //            _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.Mandatory, "image") }, "Get the source of an image.", Array.Empty<string>(), Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
 
 
-namespace Sanara.Module.Entertainment
+namespace Sanara.Module.Command.Impl
 {
-    public sealed class JapaneseModule : ISubmodule
+    public sealed class JapaneseMedia : ISubmodule
     {
         public SubmoduleInfo GetInfo()
         {
-            return new("Japanese", "Commands related to Japanese culture");
+            return new("Japanese Media", "Entertainement commands related to Japanese culture");
         }
 
         public CommandInfo[] GetCommands()
@@ -52,17 +58,17 @@ namespace Sanara.Module.Entertainment
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Anime",
-                                        Value = (int)JapaneseMedia.Anime
+                                        Value = (int)Utility.JapaneseMedia.Anime
                                     },
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Manga",
-                                        Value = (int)JapaneseMedia.Manga
+                                        Value = (int)Utility.JapaneseMedia.Manga
                                     },
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Light Novel",
-                                        Value = (int)JapaneseMedia.LightNovel
+                                        Value = (int)Utility.JapaneseMedia.LightNovel
                                     }
                                 }
                             }
@@ -91,8 +97,297 @@ namespace Sanara.Module.Entertainment
                     callback: DramaAsync,
                     precondition: Precondition.None,
                     needDefer: false
+                ),
+
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "booru",
+                        Description = "Get an anime image",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tags",
+                                Description = "Tags of the search, separated by an empty space",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "source",
+                                Description = "Where the image is coming from",
+                                Type = ApplicationCommandOptionType.Integer,
+                                IsRequired = true,
+                                Choices = new()
+                                {
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Safebooru (SFW)",
+                                        Value = (int)BooruType.Safebooru
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "E926 (SFW, furry)",
+                                        Value = (int)BooruType.E926
+                                    },
+#if NSFW_BUILD
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Gelbooru (NSFW)",
+                                        Value = (int)BooruType.Gelbooru
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "E621 (NSFW, furry)",
+                                        Value = (int)BooruType.E621
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Rule34 (NSFW, more variety of content)",
+                                        Value = (int)BooruType.Rule34
+                                    },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Konachan (NSFW, wallpaper format)",
+                                        Value = (int)BooruType.Konachan
+                                    }
+#endif
+                                }
+                            }
+                        }
+                    }.Build(),
+                    callback: BooruAsync,
+                    precondition: Precondition.None,
+                    needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "cosplay",
+                        Description = "Get a cosplay",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tags",
+                                Description = "Tags of the search, separated by an empty space",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            }
+                        }
+                    }.Build(),
+                    callback: CosplayAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "dlrand",
+                        Description = "Get a random DLSite work"
+                    }.Build(),
+                    callback: DlRandAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: true
                 )
             };
+        }
+
+        public async Task DlRandAsync(SocketSlashCommand ctx)
+        {
+            var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
+            var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
+
+            var html = await StaticObjects.HttpClient.GetStringAsync(url);
+            int maxId = int.Parse(Regex.Match(html, "RJ([0-9]+)\\.html").Groups[1].Value) + 1;
+            int id;
+            string doujinUrl;
+            HttpResponseMessage msg;
+
+            do
+            {
+                id = StaticObjects.Random.Next(1, maxId);
+                doujinUrl = "https://www.dlsite.com/maniax/work/=/product_id/RJ" + id + ".html";
+                msg = await StaticObjects.HttpClient.GetAsync(doujinUrl);
+            } while (msg.StatusCode == HttpStatusCode.NotFound);
+            html = await msg.Content.ReadAsStringAsync();
+
+            var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
+            title = HttpUtility.HtmlDecode(title[0..^9]);
+            var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
+            var description = HttpUtility.HtmlDecode(Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value);
+            var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
+            var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
+            html = html.Contains("main_genre") ?
+                html.Split(new[] { "main_genre" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]
+                : "";
+            var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Title = title,
+                Url = doujinUrl,
+                ImageUrl = imageUrl,
+                Description = description,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Type",
+                        Value = type,
+                        IsInline = true
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Price",
+                        Value = price + " ¥",
+                        IsInline = true
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Tags: {string.Join(", ", tags)}"
+                }
+            }.Build());
+        }
+
+        public async Task CosplayAsync(SocketSlashCommand ctx)
+        {
+            var tags = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "");
+
+            // 959 means we only take cosplays
+            string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags);
+            string html = await StaticObjects.HttpClient.GetStringAsync(url);
+            Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
+
+            if (!m.Success)
+                throw new CommandFailed("There is no cosplay with these tags");
+
+            int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
+            html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
+            var sM = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/([a-z0-9]+)\\/([a-z0-9]+)\\/)\"")[rand % 25];
+            string finalUrl = sM.Groups[1].Value;
+            html = await StaticObjects.HttpClient.GetStringAsync(finalUrl);
+
+            // Getting tags
+            List<string> allTags = new();
+            string htmlTags = html.Split(new[] { "taglist" }, StringSplitOptions.None)[1].Split(new[] { "Showing" }, StringSplitOptions.None)[0];
+            foreach (Match match in Regex.Matches(htmlTags, ">([^<]+)<\\/a><\\/div>"))
+                allTags.Add(match.Groups[1].Value);
+
+            // To get the cover image, we first must go the first image of the gallery then we get it
+            string htmlCover = await StaticObjects.HttpClient.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
+            string imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
+
+            // Getting rating
+            string rating = Regex.Match(html, "average_rating = ([0-9.]+)").Groups[1].Value;
+
+            var token = $"cosplay-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}";
+            StaticObjects.Cosplays.Add(token);
+            var button = new ComponentBuilder()
+                .WithButton("Download", token);
+
+            await ctx.ModifyOriginalResponseAsync(x =>
+            {
+                x.Embed = new EmbedBuilder
+                {
+                    Color = new Color(255, 20, 147),
+                    Description = string.Join(", ", allTags),
+                    Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
+                    Url = finalUrl,
+                    ImageUrl = imageUrl,
+                    Fields = new List<EmbedFieldBuilder>
+                    {
+                        new EmbedFieldBuilder
+                        {
+                            Name = "Rating",
+                            Value = rating,
+                            IsInline = true
+                        }
+                    }
+                }.Build();
+                x.Components = button.Build();
+            });
+        }
+
+        public async Task BooruAsync(SocketSlashCommand ctx)
+        {
+            var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
+            var type = (BooruType)(long)ctx.Data.Options.First(x => x.Name == "source").Value;
+
+            ABooru booru = type switch
+            {
+                BooruType.Safebooru => StaticObjects.Safebooru,
+                BooruType.Gelbooru => StaticObjects.Gelbooru,
+                BooruType.E621 => StaticObjects.E621,
+                BooruType.E926 => StaticObjects.E926,
+                BooruType.Rule34 => StaticObjects.Rule34,
+                BooruType.Konachan => StaticObjects.Konachan,
+                _ => throw new NotImplementedException($"Invalid booru type {type}")
+            };
+
+            if (!booru.IsSafe && ctx.Channel is ITextChannel tChan && !tChan.IsNsfw)
+            {
+                throw new CommandFailed("This booru is only available in NSFW channels");
+            }
+
+            SearchResult post;
+            List<string> newTags = new();
+            try
+            {
+                post = await booru.GetRandomPostAsync(tags);
+            }
+            catch (InvalidTags)
+            {
+                // On invalid tags we try to get guess which one the user wanted to use
+                newTags = new List<string>();
+                foreach (string s in tags)
+                {
+                    var related = await StaticObjects.Konachan.GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
+                    if (related.Length == 0)
+                        throw new CommandFailed("There is no image with those tags.");
+                    newTags.Add(related.OrderBy(x => Utils.GetStringDistance(x.Name, s)).First().Name);
+                }
+                try
+                {
+                    // Once we got our new tags, we try doing a new search with them
+                    post = await booru.GetRandomPostAsync(newTags.ToArray());
+                }
+                catch (InvalidTags)
+                {
+                    // Might happens if the Konachan tags don't exist in the current booru
+                    throw new CommandFailed("There is no image with those tags");
+                }
+            }
+
+            int id = int.Parse("" + (int)type + post.ID);
+            StaticObjects.Tags.AddTag(id, booru, post);
+
+            if (post.FileUrl == null)
+                throw new CommandFailed("A post was found but no image was available.");
+
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
+            {
+                Color = post.Rating switch
+                {
+                    Rating.Safe => Color.Green,
+                    Rating.Questionable => new Color(255, 255, 0), // Yellow
+                    Rating.Explicit => Color.Red,
+                    _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
+                },
+                ImageUrl = post.FileUrl.AbsoluteUri,
+                Url = post.PostUrl.AbsoluteUri,
+                Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
+                        $"Do the 'Tags' command with then id '{id}' to have more information about this image."
+                }
+            }.Build());
+
+            await StaticObjects.Db.AddBooruAsync(type.ToString());
         }
 
         public async Task DramaAsync(SocketSlashCommand ctx)
@@ -165,7 +460,7 @@ namespace Sanara.Module.Entertainment
         public async Task AnimeAsync(SocketSlashCommand ctx)
         {
             var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
-            var media = (JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
+            var media = (Utility.JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
             var answer = (await SearchMediaAsync(media, name)).Attributes;
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
@@ -178,7 +473,7 @@ namespace Sanara.Module.Entertainment
             {
                 Title = answer.CanonicalTitle,
                 Color = answer.Nsfw ? new Color(255, 20, 147) : Color.Green,
-                Url = "https://kitsu.io/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
+                Url = "https://kitsu.io/" + (media == Utility.JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
                 Description = description,
                 ImageUrl = answer.PosterImage.Original
             };
@@ -186,7 +481,7 @@ namespace Sanara.Module.Entertainment
                 embed.AddField("English Title", answer.Titles!.En, true);
             if (!string.IsNullOrEmpty(null))
                 embed.AddField("Kitsu User Rating", answer.AverageRating, true);
-            if (media == JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
+            if (media == Utility.JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
                 embed.AddField("Episode Count", answer.EpisodeCount + (answer.EpisodeLength != null ? $" ({answer.EpisodeLength} min per episode)" : ""), true);
             if (!string.IsNullOrEmpty(answer.StartDate))
                 embed.AddField("Release Date", "To Be Announced", true);
@@ -197,7 +492,7 @@ namespace Sanara.Module.Entertainment
             await ctx.RespondAsync(embed: embed.Build());
         }
 
-        public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
+        public static async Task<AnimeInfo> SearchMediaAsync(Utility.JapaneseMedia media, string query, bool onlyExactMatch = false)
         {
             // Authentification is required to see NSFW content
             if (StaticObjects.KitsuAuth != null)
@@ -230,7 +525,7 @@ namespace Sanara.Module.Entertainment
 
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
+                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == Utility.JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
                 Method = HttpMethod.Get
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", StaticObjects.KitsuAccessToken);
@@ -242,9 +537,9 @@ namespace Sanara.Module.Entertainment
 
             // Filter data depending of wanted media
             AnimeInfo[] allData;
-            if (media == JapaneseMedia.Manga)
+            if (media == Utility.JapaneseMedia.Manga)
                 allData = data.Where(x => x.Attributes.Subtype != "novel").ToArray();
-            else if (media == JapaneseMedia.LightNovel)
+            else if (media == Utility.JapaneseMedia.LightNovel)
                 allData = data.Where(x => x.Attributes.Subtype == "novel").ToArray();
             else
                 allData = data.ToArray();
@@ -282,7 +577,7 @@ namespace Sanara.Module.Entertainment
                 {
                     // We would rather find the episodes and not some OVA/ONA
                     // We don't filter them before so we can fallback on them if we find nothing else
-                    if (media == JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
+                    if (media == Utility.JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
                         continue;
 
                     return elem;

@@ -1,4 +1,4 @@
-﻿namespace Sanara.Module.Nsfw
+﻿namespace Sanara.Module.Utility
 {
     public enum BooruType
     {

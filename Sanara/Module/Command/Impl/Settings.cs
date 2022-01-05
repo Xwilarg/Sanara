@@ -7,13 +7,13 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Sanara.Module.Administration
+namespace Sanara.Module.Command.Impl
 {
-    public class InformationModule : ISubmodule
+    public class Settings : ISubmodule
     {
         public SubmoduleInfo GetInfo()
         {
-            return new("Information", "Get important information about the bot");
+            return new("Settings", "Configure and get information about the bot");
         }
 
         public CommandInfo[] GetCommands()

@@ -1,4 +1,4 @@
-﻿namespace Sanara.Module
+﻿namespace Sanara.Module.Command
 {
     [Flags]
     public enum Precondition

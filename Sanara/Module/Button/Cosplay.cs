@@ -1,0 +1,76 @@
+﻿using Discord;
+using Discord.WebSocket;
+using Sanara.Exception;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
+
+namespace Sanara.Module.Button
+{
+    public class Cosplay
+    {
+        public static async Task DownloadCosplayAsync(SocketMessageComponent ctx, string idFirst, string idSecond)
+        {
+            string html;
+            int nbPages;
+            int limitPages;
+            html = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond);
+            var m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of ([0-9]+) images");
+            if (!m.Success)
+                throw new CommandFailed("There is no cosplay with this id.");
+            limitPages = int.Parse(m.Groups[1].Value);
+            nbPages = int.Parse(m.Groups[2].Value);
+
+            await ctx.DeferLoadingAsync();
+
+            var id = Guid.NewGuid();
+            string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
+
+            Directory.CreateDirectory("Saves/Download/" + path);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
+            int nextPage = 1;
+            for (int i = 1; i <= nbPages; i++)
+            {
+                var imageMatch = Regex.Match(html, "<a href=\"https:\\/\\/e-hentai.org\\/s\\/([a-z0-9]+)\\/" + idFirst + "-" + i + "\">");
+                string html2 = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/s/" + imageMatch.Groups[1].Value + "/" + idFirst + "-" + i);
+                m = Regex.Match(html2, "<img id=\"img\" src=\"([^\"]+)\"");
+                string url = m.Groups[1].Value;
+                string extension = "." + url.Split('.').Last();
+                File.WriteAllBytes($"Saves/Download/{path}/{id}/{i:D3}{extension}",
+                await StaticObjects.HttpClient.GetByteArrayAsync(url));
+                if (i == limitPages)
+                {
+                    html = await StaticObjects.HttpClient.GetStringAsync("https://e-hentai.org/g/" + idFirst + "/" + idSecond + "/?p=" + nextPage);
+                    m = Regex.Match(html, "Showing [0-9]+ - ([0-9]+) of [0-9]+ images");
+                    limitPages = int.Parse(m.Groups[1].Value);
+                    nextPage++;
+                }
+            }
+
+            string finalPath = "Saves/Download/" + path + "/" + id + ".zip";
+            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + id, finalPath);
+            for (int i = Directory.GetFiles("Saves/Download/" + path + "/" + id).Length - 1; i >= 0; i--)
+                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + id)[i]);
+            Directory.Delete("Saves/Download/" + path + "/" + id);
+
+            FileInfo fi = new(finalPath);
+            if (fi.Length < 8000000) // 8MB
+            {
+                await ctx.FollowupWithFileAsync(new FileAttachment(finalPath));
+            }
+            else
+            {
+                Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
+                File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                await ctx.FollowupAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(600000); // 10 minutes
+                    File.Delete(StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                    Directory.Delete(StaticObjects.UploadWebsiteLocation + path);
+                });
+            }
+            File.Delete(finalPath);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
+        }
+    }
+}

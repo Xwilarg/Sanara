@@ -1,4 +1,4 @@
-﻿namespace Sanara.Module.Entertainment
+﻿namespace Sanara.Module.Utility
 {
     public record AnimeInfo
     {

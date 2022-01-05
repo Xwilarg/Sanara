@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace Sanara.Module
+namespace Sanara.Module.Command
 {
     public record CommandInfo
     {

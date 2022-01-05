@@ -5,11 +5,9 @@ using Newtonsoft.Json;
 using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module;
-using Sanara.Module.Administration;
-using Sanara.Module.Cosplay;
-using Sanara.Module.Doujin;
-using Sanara.Module.Entertainment;
-using Sanara.Module.Nsfw;
+using Sanara.Module.Button;
+using Sanara.Module.Command;
+using Sanara.Module.Command.Impl;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -20,7 +18,7 @@ namespace Sanara
         private readonly CommandService _commands = new();
 
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
-        private readonly Dictionary<string, Module.CommandInfo> _commandsAssociations = new();
+        private readonly Dictionary<string, Module.Command.CommandInfo> _commandsAssociations = new();
 
         public static async Task Main()
         {
@@ -121,7 +119,7 @@ namespace Sanara
                     {
                         StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
                         var id = ctx.Data.CustomId.Split('/');
-                        await CosplayModule.DownloadCosplayAsync(ctx, id[1], id[2]);
+                        await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
                     }
                 }
                 catch (System.Exception ex)
@@ -207,13 +205,10 @@ namespace Sanara
                     List<ISubmodule> _submodules = new();
 
                     // Add submodules
-                    _submodules.Add(new InformationModule());
-                    _submodules.Add(new JapaneseModule());
-                    _submodules.Add(new BooruModule());
-                    _submodules.Add(new FunModule());
-                    _submodules.Add(new LanguageModule());
-                    _submodules.Add(new DoujinModule());
-                    _submodules.Add(new CosplayModule());
+                    _submodules.Add(new Entertainment());
+                    _submodules.Add(new JapaneseMedia());
+                    _submodules.Add(new Language());
+                    _submodules.Add(new Settings());
 
                     StaticObjects.Help = new(_submodules);
                     File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(StaticObjects.Help.Data));

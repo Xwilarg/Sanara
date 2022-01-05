@@ -1,4 +1,5 @@
 ﻿using Sanara.Game.Preload.Result;
+using Sanara.Module.Utility;
 
 namespace Sanara.Game.Preload.Impl.Static
 {
@@ -21,7 +22,7 @@ namespace Sanara.Game.Preload.Impl.Static
             {
                 string[] curr = l.Split('$');
                 string word = curr[0];
-                _words.Add(new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]));
+                _words.Add(new ShiritoriPreloadResult(word, Language.ToRomaji(word), curr[1]));
             }
             for (int i = 5; i >= 1; i--)
             {
@@ -35,7 +36,7 @@ namespace Sanara.Game.Preload.Impl.Static
                     var value = _words.Find(x => x.Word == word);
                     if (value == null)
                     {
-                        value = new ShiritoriPreloadResult(word, LanguageModule.ToRomaji(word), curr[1]);
+                        value = new ShiritoriPreloadResult(word, Language.ToRomaji(word), curr[1]);
                         _words.Add(value);
                     }
                     value.LearningLevels.Add(i);

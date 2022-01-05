@@ -1,4 +1,4 @@
-﻿using Sanara.Module;
+﻿using Sanara.Module.Command;
 
 namespace Sanara.Help
 {

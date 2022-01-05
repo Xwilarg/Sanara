@@ -1,8 +1,7 @@
 ﻿using BooruSharp.Booru;
 using BooruSharp.Search;
-using Sanara.Module.Nsfw;
 
-namespace Sanara
+namespace Sanara.Module.Utility
 {
     public class TagsManager
     {

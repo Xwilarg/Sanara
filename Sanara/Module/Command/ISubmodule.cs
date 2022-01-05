@@ -1,6 +1,6 @@
 ﻿using Sanara.Help;
 
-namespace Sanara.Module
+namespace Sanara.Module.Command
 {
     public interface ISubmodule
     {
