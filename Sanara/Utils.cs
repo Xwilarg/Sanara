@@ -1,4 +1,6 @@
-﻿namespace Sanara
+﻿using System.Text.RegularExpressions;
+
+namespace Sanara
 {
     public static class Utils
     {
@@ -83,5 +85,16 @@
             return matrix[source1Length, source2Length];
         }
 
+        public static string CleanHtml(string msg)
+        {
+            msg = Regex.Replace(msg, "<br *\\/>", "\n");
+            msg = Regex.Replace(msg, "<\\/br>", "\n");
+            msg = Regex.Replace(msg, "<b>([^<]+)<\\/b>", "**$1**");
+            msg = Regex.Replace(msg, "<strong>([^<]+)<\\/strong>", "**$1**");
+            msg = Regex.Replace(msg, "<a href=\"([^\"]+)\">([^<]+)<\\/a>", "[$2]($1)");
+            msg = Regex.Replace(msg, "<[^>]+>([^<]+)<\\/[^>]+>", "$1");
+            msg = Regex.Replace(msg, "<\\/?[^>]+>", "");
+            return msg;
+        }
     }
 }
