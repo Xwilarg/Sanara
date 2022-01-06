@@ -12,6 +12,9 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Web;
+using VndbSharp;
+using VndbSharp.Models;
+using VndbSharp.Models.VisualNovel;
 
 
 //            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
@@ -98,7 +101,26 @@ namespace Sanara.Module.Command.Impl
                     precondition: Precondition.None,
                     needDefer: false
                 ),
-
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "visualnovel",
+                        Description = "Get information about a visual novel",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "name",
+                                Description = "Name",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: VisualNovelAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -390,6 +412,103 @@ namespace Sanara.Module.Command.Impl
             await StaticObjects.Db.AddBooruAsync(type.ToString());
         }
 
+        public async Task VisualNovelAsync(SocketSlashCommand ctx)
+        {
+            var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
+            string originalName = name;
+            name = Utils.CleanWord(name);
+            HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + HttpUtility.UrlEncode(originalName).Replace("%20", "+"));
+            http.AllowAutoRedirect = false;
+
+            string html;
+            HttpWebResponse response;
+            // HttpClient doesn't really look likes to handle redirection properly
+            try
+            {
+                response = (HttpWebResponse)http.GetResponse();
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError)
+                    throw;
+
+                response = (HttpWebResponse)ex.Response;
+            }
+            using Stream stream = response.GetResponseStream();
+            using StreamReader reader = new(stream);
+            html = reader.ReadToEnd();
+
+            uint id = 0;
+            if (response.StatusCode == HttpStatusCode.OK) // Search succeed
+            {
+                // Parse HTML and go though every VN, check the original name and translated name to get the VN id
+                // TODO: Use string length for comparison
+                MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
+                foreach (Match match in matches)
+                {
+                    string titleName = Utils.CleanWord(match.Groups[3].Value);
+                    string titleNameBase = match.Groups[2].Value;
+                    if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
+                        id = uint.Parse(match.Groups[1].Value);
+                    if (titleName == name || titleNameBase == name)
+                    {
+                        id = uint.Parse(match.Groups[1].Value);
+                        break;
+                    }
+                }
+                // If no matching name, we take the first one in the search list, if none these NotFound
+                if (id == 0)
+                {
+                    if (matches.Count == 0)
+                        throw new CommandFailed("Nothing was found with this name.");
+                    id = uint.Parse(matches[0].Groups[1].Value);
+                }
+            }
+            else // Only one VN found, search is trying to redirect us
+            {
+                id = uint.Parse(response.Headers["Location"][2..]); // VN ID is the location which is in format /VXXXX, XXXX being our numbers
+            }
+
+
+            var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
+
+            var embed = new EmbedBuilder()
+            {
+                Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
+                Url = "https://vndb.org/v" + vn.Id,
+                ImageUrl = ctx.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg > 1 || vn.ImageRating.ViolenceAvg > 1) ? null : vn.Image,
+                Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description[0..1000] + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
+                Color = Color.Blue
+            };
+            embed.AddField("Available in english?", vn.Languages.Contains("en") ? "Yes" : "No", true);
+            embed.AddField("Available on Windows?", vn.Platforms.Contains("win") ? "Yes" : "No", true);
+            string length = "???";
+            switch (vn.Length)
+            {
+                case VisualNovelLength.VeryShort: length = "<2 Hours"; break;
+                case VisualNovelLength.Short: length = "2 - 10  Hours"; break;
+                case VisualNovelLength.Medium: length = "10 - 30 Hours"; break;
+                case VisualNovelLength.Long: length = "30 - 50 Hours"; break;
+                case VisualNovelLength.VeryLong: length = "\\> 50 Hours"; break;
+            }
+            embed.AddField("Length", length, true);
+            embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
+            string releaseDate;
+            if (vn.Released?.Year == null)
+                releaseDate = "TBA";
+            else
+            {
+                releaseDate = vn.Released.Year.Value.ToString();
+                if (!vn.Released.Month.HasValue)
+                    releaseDate = $"{vn.Released.Month.Value:D2}/{releaseDate}";
+                if (!vn.Released.Day.HasValue)
+                    releaseDate = $"{vn.Released.Day.Value:D2}/{releaseDate}";
+            }
+            embed.AddField("Release Date", releaseDate, true);
+            response.Dispose();
+            await ctx.RespondAsync(embed: embed.Build());
+        }
+
         public async Task DramaAsync(SocketSlashCommand ctx)
         {
             if (StaticObjects.TranslationClient == null)
@@ -641,111 +760,6 @@ public async Task UnsubscribeAnimeAsync()
    else
        await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "anime");
 }
-
-private HttpWebResponse GetHttpResponse(HttpWebRequest request)
-{
-   try
-   {
-       return (HttpWebResponse)request.GetResponse();
-   }
-   catch (WebException ex)
-   {
-       if (ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError)
-           throw;
-
-       return (HttpWebResponse)ex.Response;
-   }
-}
-
-[Command("Visual Novel"), Alias("VN")]
-public async Task VisualNovel([Remainder] string name)
-{
-   string originalName = name;
-   name = Utils.CleanWord(name);
-   HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + HttpUtility.UrlEncode(originalName).Replace("%20", "+"));
-   http.AllowAutoRedirect = false;
-
-   string html;
-   // HttpClient doesn't really look likes to handle redirection properly
-   using HttpWebResponse response = GetHttpResponse(http);
-   using Stream stream = response.GetResponseStream();
-   using StreamReader reader = new(stream);
-   html = reader.ReadToEnd();
-
-   uint id = 0;
-   if (response.StatusCode == HttpStatusCode.OK) // Search succeed
-   {
-       // Parse HTML and go though every VN, check the original name and translated name to get the VN id
-       // TODO: Use string length for comparison
-       MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
-       foreach (Match match in matches)
-       {
-           string titleName = Utils.CleanWord(match.Groups[3].Value);
-           string titleNameBase = match.Groups[2].Value;
-           if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
-               id = uint.Parse(match.Groups[1].Value);
-           if (titleName == name || titleNameBase == name)
-           {
-               id = uint.Parse(match.Groups[1].Value);
-               break;
-           }
-       }
-       // If no matching name, we take the first one in the search list, if none these NotFound
-       if (id == 0)
-       {
-           if (matches.Count == 0)
-               throw new CommandFailed("Nothing was found with this name.");
-           id = uint.Parse(matches[0].Groups[1].Value);
-       }
-   }
-   else // Only one VN found, search is trying to redirect us
-   {
-       id = uint.Parse(response.Headers["Location"][2..]); // VN ID is the location which is in format /VXXXX, XXXX being our numbers
-   }
-
-
-   var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
-
-   var embed = new EmbedBuilder()
-   {
-       Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
-       Url = "https://vndb.org/v" + vn.Id,
-       ImageUrl = Context.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg > 1 || vn.ImageRating.ViolenceAvg > 1) ? null : vn.Image,
-       Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description[0..1000]  + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
-       Color = Color.Blue
-   };
-   embed.AddField("Available in english?", vn.Languages.Contains("en") ? "Yes" : "No", true);
-   embed.AddField("Available on Windows?", vn.Platforms.Contains("win") ? "Yes" : "No", true);
-   string length = "???";
-   switch (vn.Length)
-   {
-       case VisualNovelLength.VeryShort: length = "<2 Hours"; break;
-       case VisualNovelLength.Short: length = "2 - 10  Hours"; break;
-       case VisualNovelLength.Medium: length = "10 - 30 Hours"; break;
-       case VisualNovelLength.Long: length = "30 - 50 Hours"; break;
-       case VisualNovelLength.VeryLong: length = "\\> 50 Hours"; break;
-   }
-   embed.AddField("Length", length, true);
-   embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
-   string releaseDate;
-   if (vn.Released?.Year == null)
-       releaseDate = "TBA";
-   else
-   {
-       releaseDate = vn.Released.Year.Value.ToString();
-       if (!vn.Released.Month.HasValue)
-           releaseDate = AddZero(vn.Released.Month.Value) + "/" + releaseDate;
-       if (!vn.Released.Day.HasValue)
-           releaseDate = AddZero(vn.Released.Day.Value) + "/" + releaseDate;
-   }
-   embed.AddField("Release Date", releaseDate, true);
-   await ReplyAsync(embed: embed.Build());
-}
-
-private string AddZero(uint val)
-   => val < 10 ? "0" + val : val.ToString();
-
-
 
 */
     }
