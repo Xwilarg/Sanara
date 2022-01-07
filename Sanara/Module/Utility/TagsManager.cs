@@ -8,15 +8,15 @@ namespace Sanara.Module.Utility
         /// <summary>
         /// Associate an id with a booru and a post
         /// </summary>
-        private readonly Dictionary<int, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new();
+        private readonly Dictionary<string, Tuple<ABooru, BooruSharp.Search.Post.SearchResult>> _tags = new();
 
-        public void AddTag(int id, ABooru booru, BooruSharp.Search.Post.SearchResult post)
+        public void AddTag(string id, ABooru booru, BooruSharp.Search.Post.SearchResult post)
         {
             if (!_tags.ContainsKey(id))
                 _tags.Add(id, new Tuple<ABooru, BooruSharp.Search.Post.SearchResult>(booru, post));
         }
 
-        public async Task<TagsSearch?> GetTagAsync(int id)
+        public async Task<TagsSearch?> GetTagAsync(string id)
         {
             if (!_tags.ContainsKey(id))
                 return null;

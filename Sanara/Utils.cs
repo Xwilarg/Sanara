@@ -49,6 +49,11 @@ namespace Sanara
             return $"<t:{secs}>";
         }
 
+        public static int GCD(int a, int b)
+        {
+            return b == 0 ? Math.Abs(a) : GCD(b, a % b);
+        }
+
         // From: https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560
         public static int GetStringDistance(string a, string b)
         {

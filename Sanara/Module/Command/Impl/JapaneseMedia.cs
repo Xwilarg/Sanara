@@ -405,30 +405,38 @@ namespace Sanara.Module.Command.Impl
                 }
             }
 
-            int id = int.Parse("" + (int)type + post.ID);
+            string id = $"{(int)type}{post.ID}";
             StaticObjects.Tags.AddTag(id, booru, post);
 
             if (post.FileUrl == null)
                 throw new CommandFailed("A post was found but no image was available.");
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
+            var token = $"cosplay-{Guid.NewGuid()}/{id}";
+            StaticObjects.Doujinshis.Add(token);
+            var button = new ComponentBuilder()
+                .WithButton("Tags info", token);
+            await ctx.ModifyOriginalResponseAsync(x =>
             {
-                Color = post.Rating switch
+                x.Embed = new EmbedBuilder
                 {
-                    Rating.Safe => Color.Green,
-                    Rating.Questionable => new Color(255, 255, 0), // Yellow
-                    Rating.Explicit => Color.Red,
-                    _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
-                },
-                ImageUrl = post.FileUrl.AbsoluteUri,
-                Url = post.PostUrl.AbsoluteUri,
-                Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
-                        $"Do the 'Tags' command with then id '{id}' to have more information about this image."
-                }
-            }.Build());
+                    Color = post.Rating switch
+                    {
+                        Rating.Safe => Color.Green,
+                        Rating.Questionable => new Color(255, 255, 0), // Yellow
+                        Rating.Explicit => Color.Red,
+                        _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
+                    },
+                    ImageUrl = post.FileUrl.AbsoluteUri,
+                    Url = post.PostUrl.AbsoluteUri,
+                    Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
+                    Footer = new EmbedFooterBuilder
+                    {
+                        Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
+                            $"Do the 'Tags' command with then id '{id}' to have more information about this image."
+                    }
+                }.Build();
+                x.Components = button.Build();
+            });
 
             await StaticObjects.Db.AddBooruAsync(type.ToString());
         }

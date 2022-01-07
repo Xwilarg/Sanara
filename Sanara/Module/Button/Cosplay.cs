@@ -20,8 +20,6 @@ namespace Sanara.Module.Button
             limitPages = int.Parse(m.Groups[1].Value);
             nbPages = int.Parse(m.Groups[2].Value);
 
-            await ctx.DeferLoadingAsync();
-
             var id = Guid.NewGuid();
             string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
 

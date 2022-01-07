@@ -171,11 +171,7 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("There is no definition having a positive vote ratio for this query");
             }
 
-            int GCD(int a, int b)
-            {
-                return b == 0 ? Math.Abs(a) : GCD(b, a % b);
-            }
-            int gcd = GCD(up, down);
+            int gcd = Utils.GCD(up, down);
 
             string definition = json["list"][0]["definition"].Value<string>();
             if (definition.Length > 1000)

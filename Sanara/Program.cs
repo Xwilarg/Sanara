@@ -101,32 +101,43 @@ namespace Sanara
 
         private async Task ButtonExecuted(SocketMessageComponent ctx)
         {
-            _ = Task.Run(async () =>
+            if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
             {
-                try
+                var e = StaticObjects.Errors[ctx.Data.CustomId];
+                await ctx.RespondAsync(embed: new EmbedBuilder
                 {
-                    if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+                    Color = Color.Red,
+                    Title = e.GetType().ToString(),
+                    Description = e.Message
+                }.Build(), ephemeral: true);
+            }
+            else
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
                     {
-                        var e = StaticObjects.Errors[ctx.Data.CustomId];
-                        await ctx.RespondAsync(embed: new EmbedBuilder
+                        if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
                         {
-                            Color = Color.Red,
-                            Title = e.GetType().ToString(),
-                            Description = e.Message
-                        }.Build(), ephemeral: true);
+                            StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
+                            await ctx.DeferLoadingAsync();
+                            var id = ctx.Data.CustomId.Split('/');
+                            await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
+                        }
+                        else if (StaticObjects.Doujinshis.Contains(ctx.Data.CustomId))
+                        {
+                            StaticObjects.Doujinshis.Remove(ctx.Data.CustomId);
+                            await ctx.DeferLoadingAsync();
+                            var id = ctx.Data.CustomId.Split('/').Last();
+                            await Doujinshi.GetTagsAsync(ctx, id);
+                        }
                     }
-                    else if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
+                    catch (System.Exception ex)
                     {
-                        StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
-                        var id = ctx.Data.CustomId.Split('/');
-                        await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
+                        await Log.LogErrorAsync(ex, ctx, false);
                     }
-                }
-                catch (System.Exception ex)
-                {
-                    await Log.LogErrorAsync(ex, ctx, false);
-                }
-            });
+                });
+            }
         }
 
         private async Task SlashCommandExecuted(SocketSlashCommand ctx)
