@@ -96,6 +96,7 @@ namespace Sanara
 
             // Interactions
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
+            StaticObjects.Client.AutocompleteExecuted += AutocompleteExecuted;
             StaticObjects.Client.ButtonExecuted += ButtonExecuted;
 
             // Discord modules
@@ -106,6 +107,31 @@ namespace Sanara
 
             // We keep the bot online
             await Task.Delay(-1);
+        }
+
+        private async Task AutocompleteExecuted(SocketAutocompleteInteraction arg)
+        {
+            var input = arg.Data.Current.Value;
+            if (arg.Data.CommandName == "adultvideo")
+            {
+                if ((string)input == string.Empty)
+                {
+                    await arg.RespondAsync(StaticObjects.JavmostCategories
+                           .Select(tag =>
+                           {
+                               return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
+                           }));
+                }
+                else
+                {
+                    await arg.RespondAsync(StaticObjects.JavmostCategories
+                        .Where(tag => tag.Item1.ToLowerInvariant().StartsWith((string)input))
+                        .Select(tag =>
+                        {
+                            return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
+                        }));
+                }
+            }
         }
 
         private async Task ButtonExecuted(SocketMessageComponent ctx)

@@ -16,7 +16,6 @@ using Sanara.Game;
 using Sanara.Game.PostMode;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Impl;
-using Sanara.Module.Nsfw;
 using Sanara.Module.Utility;
 
 namespace Sanara
@@ -116,7 +115,7 @@ namespace Sanara
         /// <summary>
         /// Categories for Javmost
         /// </summary>
-        public static List<string> JavmostCategories { get; } = new();
+        public static List<(string, int)> JavmostCategories { get; } = new();
 
         // ENTERTAINMENT MODULE
         /// <summary>
@@ -256,22 +255,27 @@ namespace Sanara
         private static async Task InitializeSubscriptions()
         {
             await SM.InitAsync();
-            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Subscription initialized"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Subscriptions initialized"));
         }
 
         private static async Task InitializeAV()
         {
-            List<string> newTags;
+            List<(string, int)> newTags;
             int page = 1;
             do
             {
                 newTags = new(); // We keep track of how many tags we found in this page
-                string html = await VideoModule.DoJavmostHttpRequestAsync("https://www5.javmost.com/allcategory/" + page);
-                foreach (Match m in Regex.Matches(html, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\">").Cast<Match>())
+                string html = await AdultVideo.DoJavmostHttpRequestAsync("https://www.javmost.xyz/allcategory/" + page);
+                foreach (Match m in Regex.Matches(html, "<h4>([^\\(]+)\\(([0-9+]+)\\)<\\/h4>").Cast<Match>())
                 {
                     string content = m.Groups[1].Value.Trim().ToLower();
-                    if (!JavmostCategories.Contains(content)) // Make sure to not add things twice
-                        newTags.Add(content);
+                    var count = int.Parse(m.Groups[2].Value);
+                    if (count <= 10) // We skip result that have too few videos
+                    {
+                        return;
+                    }
+                    if (!JavmostCategories.Any(x => x.Item1 == content)) // Make sure to not add things twice
+                        newTags.Add((content, count));
                 }
                 JavmostCategories.AddRange(newTags);
                 page++;
@@ -279,10 +283,11 @@ namespace Sanara
 
             if (JavmostCategories.Count == 0) // This mean we weren't able to load the other tags
             {
-                // There 2 tags aren't in the tag list so we add them manually
-                JavmostCategories.Add("censor");
-                JavmostCategories.Add("uncensor");
+                throw new NotImplementedException("Couldn't find any tag");
             }
+            JavmostCategories.Add(("censor", int.MaxValue));
+            JavmostCategories.Add(("uncensor", int.MaxValue));
+            JavmostCategories.OrderByDescending(x => x.Item2);
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
         }

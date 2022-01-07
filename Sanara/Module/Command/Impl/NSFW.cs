@@ -11,10 +11,8 @@ using System.Text.RegularExpressions;
 using System.Web;
 
 
-//            _help.Add(("Entertainment", new Help("Japanese", "Visual Novel", new[] { new Argument(ArgumentType.Mandatory, "name") }, "Get information about a visual novel.", new string[] { "VN" }, Restriction.None, "Visual novel katawa shoujo")));
 //            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
 //            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-//            _help.Add(("Entertainment", new Help("Japanese", "Source", new[] { new Argument(ArgumentType.Mandatory, "image") }, "Get the source of an image.", Array.Empty<string>(), Restriction.None, "Source https://sanara.zirk.eu/img/Gallery/001_01.jpg")));
 
 
 namespace Sanara.Module.Command.Impl
@@ -122,8 +120,72 @@ namespace Sanara.Module.Command.Impl
                     callback: DlRandAsync,
                     precondition: Precondition.NsfwOnly,
                     needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "adultvideo",
+                        Description = "Get a random adult video work",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tag",
+                                Description = "Tag of the search",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false,
+                                IsAutocomplete = true
+                            }
+                        }
+                    }.Build(),
+                    callback: AdultVideoAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: false
                 )
             };
+        }
+
+        public async Task AdultVideoAsync(SocketSlashCommand ctx)
+        {
+            if (StaticObjects.JavmostCategories.Count == 0)
+                throw new CommandFailed("Javmost categories aren't loaded yet, please retry later.");
+
+            var tag = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tag")?.Value ?? "all");
+
+            string url = "https://www5.javmost.com/category/" + tag;
+            string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
+            int perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
+            int total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
+            int page = StaticObjects.Random.Next(total / perPage);
+            if (page > 0) // If it's the first page, we already got the HTML
+            {
+                html = await AdultVideo.DoJavmostHttpRequestAsync(url + "/page/" + (page + 1));
+            }
+            var arr = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None).Skip(1).ToList(); // We remove things life header and stuff
+            Match videoMatch = null;
+            string[] videoTags = null;
+            string previewUrl = "";
+            while (arr.Count > 0) // That shouldn't fail
+            {
+                string currHtml = arr[StaticObjects.Random.Next(arr.Count)];
+                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.xyz\\/([^\\/]+)\\/)\"");
+                if (!videoMatch.Success)
+                    continue;
+                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.xyz\\/([^\\/]+)\\/)\"");
+                previewUrl = Regex.Match(currHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
+                if (previewUrl.StartsWith("//"))
+                    previewUrl = "https:" + previewUrl;
+                videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www\\.javmost\\.xyz\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                break;
+            }
+            await ctx.RespondAsync(embed: new EmbedBuilder()
+            {
+                Color = new Color(255, 20, 147),
+                Description = string.Join(", ", videoTags),
+                Title = videoMatch.Groups[2].Value,
+                Url = videoMatch.Groups[1].Value,
+                ImageUrl = previewUrl
+            }.Build());
         }
 
         public async Task DlRandAsync(SocketSlashCommand ctx)
