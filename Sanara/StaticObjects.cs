@@ -115,7 +115,7 @@ namespace Sanara
         /// <summary>
         /// Categories for Javmost
         /// </summary>
-        public static List<(string, int)> JavmostCategories { get; } = new();
+        public static List<(string Tag, int Count)> JavmostCategories { get; } = new();
 
         // ENTERTAINMENT MODULE
         /// <summary>
@@ -260,22 +260,28 @@ namespace Sanara
 
         private static async Task InitializeAV()
         {
+            List<string> alreadyDone = new();
             List<(string, int)> newTags;
             int page = 1;
             do
             {
                 newTags = new(); // We keep track of how many tags we found in this page
                 string html = await AdultVideo.DoJavmostHttpRequestAsync("https://www.javmost.xyz/allcategory/" + page);
-                foreach (Match m in Regex.Matches(html, "<h4>([^\\(]+)\\(([0-9+]+)\\)<\\/h4>").Cast<Match>())
+                foreach (Match m in Regex.Matches(html, "<a href=\"(https:\\/\\/www.javmost.xyz\\/category\\/[^\\/]+\\/)\">").Cast<Match>())
                 {
-                    string content = m.Groups[1].Value.Trim().ToLower();
-                    var count = int.Parse(m.Groups[2].Value);
-                    if (count <= 10) // We skip result that have too few videos
+                    string content = m.Groups[1].Value;
+                    if (!alreadyDone.Contains(content))
                     {
-                        return;
+                        alreadyDone.Add(content);
+                        var subHtml = await AdultVideo.DoJavmostHttpRequestAsync(content);
+                        var cM = Regex.Match(subHtml, "<h1 class=\"page-header\">Category <small>Name<\\/small> <strong>([^<]+)<small>\\( Result ([0-9]+)");
+                        var name = cM.Groups[1].Value.Trim();
+
+                        if (Utils.CleanWord(subHtml).Contains(Utils.CleanWord(name)))
+                        {
+                            newTags.Add((name, int.Parse(cM.Groups[2].Value)));
+                        }
                     }
-                    if (!JavmostCategories.Any(x => x.Item1 == content)) // Make sure to not add things twice
-                        newTags.Add((content, count));
                 }
                 JavmostCategories.AddRange(newTags);
                 page++;
@@ -285,9 +291,10 @@ namespace Sanara
             {
                 throw new NotImplementedException("Couldn't find any tag");
             }
-            JavmostCategories.Add(("censor", int.MaxValue));
-            JavmostCategories.Add(("uncensor", int.MaxValue));
-            JavmostCategories.OrderByDescending(x => x.Item2);
+            JavmostCategories.OrderByDescending(x => x.Count);
+            Console.WriteLine(string.Join("\n", JavmostCategories.Select(x => x.Tag + ": " + x.Count)));
+
+            File.WriteAllText("Saves/JavmostTags.json", JsonConvert.SerializeObject(JavmostCategories));
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
         }
@@ -395,7 +402,9 @@ namespace Sanara
             AllGameNames = allNames.ToArray();
 
             _ = Task.Run(async () => { try { await InitializeSubscriptions(); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
+#if NSFW_BUILD
             _ = Task.Run(async () => { try { await InitializeAV(); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
+#endif
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
             GM.Init();

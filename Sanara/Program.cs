@@ -117,10 +117,12 @@ namespace Sanara
                 if ((string)input == string.Empty)
                 {
                     await arg.RespondAsync(StaticObjects.JavmostCategories
-                           .Select(tag =>
-                           {
-                               return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
-                           }));
+                        .Select(tag =>
+                        {
+                            return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
+                        })
+                        .Take(25)
+                    );
                 }
                 else
                 {
@@ -129,7 +131,9 @@ namespace Sanara
                         .Select(tag =>
                         {
                             return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
-                        }));
+                        })
+                        .Take(25)
+                    );
                 }
             }
         }
