@@ -2,12 +2,9 @@
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sanara.Exception;
 using Sanara.Help;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using VndbSharp;
 using VndbSharp.Models;
 
@@ -24,67 +21,47 @@ namespace Sanara.Module.Command.Impl
         {
             return new[]
             {
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "inspire",
-                    Description = "Get a random \"inspirational\" quote"
-                }.Build(),
-                callback: InspireAsync,
-                precondition: Precondition.None,
-                needDefer: false
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "vnquote",
-                    Description = "Get a quote from a random Visual Novel"
-                }.Build(),
-                callback: VNQuoteAsync,
-                precondition: Precondition.NsfwOnly,
-                needDefer: false
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "complete",
-                    Description = "Complete the given sentence using machine learning",
-                    Options = new()
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
-                        {
-                            Name = "sentence",
-                            Description = "Start of the sentence",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = false
-                        }
-                    }
-                }.Build(),
-                callback: CompleteAsync,
-                precondition: Precondition.None,
-                needDefer: true
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "photo",
-                    Description = "Find a photo given an optional query",
-                    Options = new()
+                        Name = "inspire",
+                        Description = "Get a random \"inspirational\" quote"
+                    }.Build(),
+                    callback: InspireAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
+                        Name = "vnquote",
+                        Description = "Get a quote from a random Visual Novel"
+                    }.Build(),
+                    callback: VNQuoteAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "complete",
+                        Description = "Complete the given sentence using machine learning",
+                        Options = new()
                         {
-                            Name = "query",
-                            Description = "Filter the serach given a term",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = false
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "sentence",
+                                Description = "Start of the sentence",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            }
                         }
-                    }
-                }.Build(),
-                callback: PhotoAsync,
-                precondition: Precondition.None,
-                needDefer: false
-            )
-        };
+                    }.Build(),
+                    callback: CompleteAsync,
+                    precondition: Precondition.None,
+                    needDefer: true
+                )
+            };
         }
 
         public async Task InspireAsync(SocketSlashCommand ctx)
@@ -130,40 +107,6 @@ namespace Sanara.Module.Command.Impl
             var json = await resp.Content.ReadAsStringAsync();
             embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
             await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
-        }
-
-        public async Task PhotoAsync(SocketSlashCommand ctx)
-        {
-            if (StaticObjects.UnsplashToken == null)
-            {
-                throw new CommandFailed("Photo token is not available");
-            }
-
-            string? query = (string?)ctx.Data.Options.FirstOrDefault(x => x.Name == "query")?.Value;
-
-            JObject json;
-            if (query == null)
-            {
-                json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://api.unsplash.com/photos/random?client_id=" + StaticObjects.UnsplashToken));
-            }
-            else
-            {
-                var resp = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.unsplash.com/photos/random?query=" + HttpUtility.UrlEncode(query) + "&client_id=" + StaticObjects.UnsplashToken));
-                if (resp.StatusCode == HttpStatusCode.NotFound)
-                    throw new CommandFailed("There is no result with these search terms.");
-                json = JsonConvert.DeserializeObject<JObject>(await resp.Content.ReadAsStringAsync());
-            }
-            await ctx.RespondAsync(embed: new EmbedBuilder
-            {
-                Title = "By " + json["user"]["name"].Value<string>(),
-                Url = json["links"]["html"].Value<string>(),
-                ImageUrl = json["urls"]["full"].Value<string>(),
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = json["description"].Value<string>()
-                },
-                Color = Color.Blue
-            }.Build());
         }
     }
 }
