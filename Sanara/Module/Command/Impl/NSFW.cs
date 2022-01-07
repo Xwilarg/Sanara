@@ -140,7 +140,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: AdultVideoAsync,
                     precondition: Precondition.NsfwOnly,
-                    needDefer: false
+                    needDefer: true
                 )
             };
         }
@@ -178,7 +178,7 @@ namespace Sanara.Module.Command.Impl
                 videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www\\.javmost\\.xyz\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
                 break;
             }
-            await ctx.RespondAsync(embed: new EmbedBuilder()
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder()
             {
                 Color = new Color(255, 20, 147),
                 Description = string.Join(", ", videoTags),

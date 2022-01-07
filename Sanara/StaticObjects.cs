@@ -115,7 +115,7 @@ namespace Sanara
         /// <summary>
         /// Categories for Javmost
         /// </summary>
-        public static List<(string Tag, int Count)> JavmostCategories { get; } = new();
+        public static List<(string Tag, int Count)> JavmostCategories { set; get; } = new();
 
         // ENTERTAINMENT MODULE
         /// <summary>
@@ -260,6 +260,19 @@ namespace Sanara
 
         private static async Task InitializeAV()
         {
+            if (File.Exists("Saves/JavmostTags.json"))
+            {
+                JavmostCategories = JsonConvert.DeserializeObject<List<(string, int)>>(File.ReadAllText("Saves/JavmostTags.json"));
+            }
+            if (JavmostCategories == null)
+            {
+                JavmostCategories = new();
+            }
+            if (JavmostCategories.Count > 0)
+            {
+                await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", $"AV initialized from cache ({JavmostCategories.Count} tags)"));
+                return;
+            }
             List<string> alreadyDone = new();
             List<(string, int)> newTags;
             int page = 1;
@@ -277,7 +290,7 @@ namespace Sanara
                         var cM = Regex.Match(subHtml, "<h1 class=\"page-header\">Category <small>Name<\\/small> <strong>([^<]+)<small>\\( Result ([0-9]+)");
                         var name = cM.Groups[1].Value.Trim();
 
-                        if (Utils.CleanWord(subHtml).Contains(Utils.CleanWord(name)))
+                        if (Regex.Match(subHtml, "<a href=\"https:\\/\\/www.javmost.xyz\\/category\\/[^\\/]+\\/\"[^>]+>" + name + "<\\/a>").Success)
                         {
                             newTags.Add((name, int.Parse(cM.Groups[2].Value)));
                         }
@@ -291,12 +304,11 @@ namespace Sanara
             {
                 throw new NotImplementedException("Couldn't find any tag");
             }
-            JavmostCategories.OrderByDescending(x => x.Count);
-            Console.WriteLine(string.Join("\n", JavmostCategories.Select(x => x.Tag + ": " + x.Count)));
+            JavmostCategories = JavmostCategories.OrderByDescending(x => x.Count).ToList();
 
             File.WriteAllText("Saves/JavmostTags.json", JsonConvert.SerializeObject(JavmostCategories));
 
-            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "AV initialized"));
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", $"AV initialized ({JavmostCategories.Count} tags)"));
         }
 
         public static async Task InitializeAsync(Credentials credentials)

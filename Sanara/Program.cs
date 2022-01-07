@@ -114,26 +114,36 @@ namespace Sanara
             var input = arg.Data.Current.Value;
             if (arg.Data.CommandName == "adultvideo")
             {
-                if ((string)input == string.Empty)
+                if (arg.Channel is ITextChannel tChan && !tChan.IsNsfw)
                 {
-                    await arg.RespondAsync(StaticObjects.JavmostCategories
-                        .Select(tag =>
-                        {
-                            return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
-                        })
-                        .Take(25)
-                    );
+                    await arg.RespondAsync(new[]
+                    {
+                        new AutocompleteResult("This command must be done in a NSFW channel", string.Empty)
+                    });
                 }
                 else
                 {
-                    await arg.RespondAsync(StaticObjects.JavmostCategories
-                        .Where(tag => tag.Item1.ToLowerInvariant().StartsWith((string)input))
-                        .Select(tag =>
-                        {
-                            return new AutocompleteResult(tag.Item1, tag.Item1.ToLowerInvariant());
-                        })
-                        .Take(25)
-                    );
+                    if ((string)input == string.Empty)
+                    {
+                        await arg.RespondAsync(StaticObjects.JavmostCategories
+                            .Select(tag =>
+                            {
+                                return new AutocompleteResult(tag.Tag, tag.Tag.ToLowerInvariant());
+                            })
+                            .Take(25)
+                        );
+                    }
+                    else
+                    {
+                        await arg.RespondAsync(StaticObjects.JavmostCategories
+                            .Where(tag => tag.Item1.ToLowerInvariant().StartsWith((string)input))
+                            .Select(tag =>
+                            {
+                                return new AutocompleteResult(tag.Tag, tag.Tag.ToLowerInvariant());
+                            })
+                            .Take(25)
+                        );
+                    }
                 }
             }
         }
