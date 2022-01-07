@@ -156,6 +156,10 @@ namespace Sanara.Module.Command.Impl
             string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
             int perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
             int total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
+            if (total == 0)
+            {
+                throw new CommandFailed("There is nothing with this tag");
+            }
             int page = StaticObjects.Random.Next(total / perPage);
             if (page > 0) // If it's the first page, we already got the HTML
             {
