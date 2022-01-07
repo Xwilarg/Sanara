@@ -21,7 +21,7 @@ namespace Sanara.Subscription.Impl
                 string description = "";
                 try
                 {
-                    var result = await Module.Command.Impl.JapaneseMedia.SearchMediaAsync(JapaneseMedia.Anime, animeName, true);
+                    var result = await Module.Command.Impl.NSFW.SearchMediaAsync(JapaneseMedia.Anime, animeName, true);
                     if (result.Attributes.Synopsis != null)
                         description = result.Attributes.Synopsis.Length > 1000 ? result.Attributes.Synopsis[..1000] + " [...]" : result.Attributes.Synopsis;
                 }

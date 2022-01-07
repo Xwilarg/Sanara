@@ -76,16 +76,25 @@ namespace Sanara
             });
 
             // Discord callbacks
+
+            // DEPRECATED
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
-            StaticObjects.Client.Connected += ConnectedAsync;
             StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
-            //StaticObjects.Client.ReactionAdded += Module.Tool.LanguageModule.ReactionAddedAsync;
+
+            // Ready the bot
+            StaticObjects.Client.Connected += ConnectedAsync;
+            StaticObjects.Client.Ready += Ready;
+            StaticObjects.Client.Disconnected += Disconnected;
+
+            // Db
             StaticObjects.Client.GuildAvailable += GuildJoined;
             StaticObjects.Client.JoinedGuild += GuildJoined;
+
+            // Guild count
             StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
             StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
-            StaticObjects.Client.Disconnected += Disconnected;
-            StaticObjects.Client.Ready += Ready;
+
+            // Interactions
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
             StaticObjects.Client.ButtonExecuted += ButtonExecuted;
 
@@ -217,9 +226,10 @@ namespace Sanara
 
                     // Add submodules
                     _submodules.Add(new Entertainment());
-                    _submodules.Add(new JapaneseMedia());
+                    _submodules.Add(new NSFW());
                     _submodules.Add(new Language());
                     _submodules.Add(new Settings());
+                    _submodules.Add(new Tool());
 
                     StaticObjects.Help = new(_submodules);
                     File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(StaticObjects.Help.Data));

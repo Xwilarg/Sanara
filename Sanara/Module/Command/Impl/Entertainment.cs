@@ -14,7 +14,7 @@ namespace Sanara.Module.Command.Impl
     {
         public SubmoduleInfo GetInfo()
         {
-            return new("Entertainment", "Commands which main aim is to entertain");
+            return new("Entertainment", "A collection of fun silly stuffs");
         }
 
         public CommandInfo[] GetCommands()
