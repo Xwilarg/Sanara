@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (string name in Kancolle.GetShips())
             {
                 if (!cache.Any(x => x.id == name))
@@ -24,7 +24,7 @@ namespace Sanara.Game.Preload.Impl
 
                         // TODO: There are some issues for ships like Imuya that are called I-168 by the wikia (even if it's her "real" name we need to accept both)
                         var result = new QuizzPreloadResult(Regex.Match(html, "https:\\/\\/[^\\/]+\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/" + name + "_Full\\.png").Value, new[] { name });
-                        StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -40,11 +40,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "kancolle", "kc", "kantaicollection" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "KanColle";
+        public string Description => "Find the name of a Kantai Collection character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

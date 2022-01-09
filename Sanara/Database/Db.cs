@@ -126,6 +126,7 @@ namespace Sanara.Database
 
         public async Task SetCacheAsync(string name, QuizzPreloadResult value)
         {
+            name = Utils.CleanWord(name);
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
                 await _r.Db(_dbName).TableCreate("Cache_" + name).RunAsync(_conn);
             await _r.Db(_dbName).Table("Cache_" + name).Insert(value).RunAsync(_conn);
@@ -133,7 +134,7 @@ namespace Sanara.Database
 
         public async Task<bool> DeleteCacheAsync(string name)
         {
-            name = name.ToLower();
+            name = Utils.CleanWord(name);
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
                 return false;
             await _r.Db(_dbName).Table("Cache_" + name).Delete().RunAsync(_conn);

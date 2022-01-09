@@ -19,11 +19,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "arknights", "ak" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Arknights Audio";
+        public string Description => "Find the name of an Arknights character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

@@ -15,11 +15,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "shiritori" };
-
-        public string GetNameArg()
-            => "hard";
+        public string Name => "Shiritori (Hard)";
+        public string Description => "Say a Japanese word starting with the last syllable of the previous one, must be at least 2 syllables long";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Shiritori(chan, user, this, settings, 3);

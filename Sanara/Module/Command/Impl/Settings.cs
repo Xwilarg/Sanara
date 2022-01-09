@@ -83,16 +83,15 @@ namespace Sanara.Module.Command.Impl
             List<string> gameNames = new();
             foreach (var elem in StaticObjects.Preloads)
             {
-                string name = elem.GetGameNames()[0];
                 // We only get games once so we skip when we get the "others" versions (like audio)
-                if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
-                    continue;
-                var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
+                //if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
+                //    continue;
+                // var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
                 var loadInfo = elem.Load();
                 if (loadInfo != null)
-                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: {elem.Load().Count} words.");
+                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: {elem.Load().Count} words.");
                 else // Get information at runtime
-                    str.AppendLine($"**{char.ToUpper(fullName[0]) + string.Join("", fullName.Skip(1)).ToLower()}**: None");
+                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: None");
             }
             embed.AddField("Games", str.ToString());
 

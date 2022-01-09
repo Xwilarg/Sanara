@@ -151,9 +151,47 @@ namespace Sanara.Module.Command.Impl
                     callback: VisualNovelAsync,
                     precondition: Precondition.None,
                     needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "qrcode",
+                        Description = "Generate a QR code",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "input",
+                                Description = "Text hidden behind the QR Code",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: QrcodeAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
                 )
             };
         }
+
+        public async Task QrcodeAsync(SocketSlashCommand ctx)
+        {
+            var input = (string)ctx.Data.Options.First(x => x.Name == "input").Value;
+            await ctx.RespondWithFileAsync(
+                fileStream: await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(input)),
+                fileName: "qrcode.png",
+                text: "",
+                embeds: null,
+                isTTS: false,
+                ephemeral: false,
+                allowedMentions: null,
+                components: null,
+                embed: null,
+                options: null
+            );
+        }
+
 
         public async Task SourceAsync(SocketSlashCommand ctx)
         {

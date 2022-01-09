@@ -25,11 +25,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "booruquizz", "booru" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Booru Quizz";
+        public string Description => "Find the common tag between 3 images";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new QuizzBooruTags(chan, user, this, settings);

@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             // Item1 is name to be used in URL
             // Item2 is answer name
             foreach (var tDoll in GirlsFrontline.GetTDolls())
@@ -26,7 +26,7 @@ namespace Sanara.Game.Preload.Impl
                         Match m = Regex.Match(html, "src=\"(\\/images\\/thumb\\/[^\"]+)\"");
 
                         var result = new QuizzPreloadResult("http://iopwiki.com" + m.Groups[1].Value, new[] { tDoll.Item2 }); // Not sure if the Replace is necessary but it was here in the V2
-                        StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -42,11 +42,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "girlsfrontline", "gf" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Girls Frontline";
+        public string Description => "Find the name of an Girls Frontline character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

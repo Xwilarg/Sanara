@@ -10,14 +10,8 @@ namespace Sanara.Game.Preload
         /// Load the game dictionary
         /// </summary>
         public ReadOnlyCollection<IPreloadResult> Load();
-        /// <summary>
-        /// Get the names used to launch the game
-        /// </summary>
-        public string[] GetGameNames();
-        /// <summary>
-        /// If need a special argument to be played
-        /// </summary>
-        public string GetNameArg();
+        public string Name { get; }
+        public string Description { get; }
         /// <summary>
         /// Create a new instance of a game and return it
         /// </summary>

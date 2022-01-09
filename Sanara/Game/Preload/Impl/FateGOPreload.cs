@@ -12,7 +12,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var tmp in FateGO.GetCharacters())
             {
                 string elem = tmp;
@@ -55,7 +55,7 @@ namespace Sanara.Game.Preload.Impl
 
                         var result = new QuizzPreloadResult(Regex.Match(html.Split(new[] { "pi-image-collection-tab-content current" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0],
                             allAnswer.ToArray());
-                        StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -71,11 +71,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "fatego", "fate", "fgo" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "FateGO";
+        public string Description => "Find the name of a FateGO character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

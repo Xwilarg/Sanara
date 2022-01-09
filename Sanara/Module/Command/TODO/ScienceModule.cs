@@ -193,12 +193,6 @@ namespace SanaraV3.Module.Tool
             }.Build());
         }
 
-        [Command("Qrcode"), Alias("Qr")]
-        public async Task QrcodeAsync([Remainder]string content)
-        {
-            await Context.Channel.SendFileAsync(await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(content)), "qrcode.png");
-        }
-
         [Command("Color"), Priority(-1)]
         public async Task ColorAsync([Remainder]string color)
         {

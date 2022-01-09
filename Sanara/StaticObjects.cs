@@ -393,9 +393,8 @@ namespace Sanara
             {
                 if (p != null)
                 {
-                    var name = p.GetGameNames()[0];
-                    var option = p.GetNameArg();
-                    allNames.Add(name + (option == null ? "" : "-" + option));
+                    var name = p.Name;
+                    allNames.Add(name);// TODO: + (option == null ? "" : "-" + option));
                     _ = Task.Run( async() =>
                     {
                         try

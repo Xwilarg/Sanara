@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var elem in AzurLane.GetShips())
             {
                 if (!cache.Any(x => x.id == elem.Item2))
@@ -33,7 +33,7 @@ namespace Sanara.Game.Preload.Impl
                             names.Add(escapeName);
 
                         var result = new QuizzPreloadResult("https://azurlane.koumakan.jp" + htmlValue, names.ToArray());
-                        StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -49,11 +49,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "azurlane", "al" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Arknights Audio";
+        public string Description => "Find the name of an Azur Lane character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

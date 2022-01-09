@@ -23,11 +23,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-               => new[] { _gameName };
-
-        public string GetNameArg()
-            => null;
+        public string Name => _gameName;
+        public string Description => null;
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings, StaticObjects.ModeText, false);

@@ -22,8 +22,8 @@ namespace Sanara.Game
             _lobby = settings.Lobby;
             _isCustomGame = settings.IsCustomGame;
 
-            _gameName = preload.GetGameNames()[0];
-            _argument = preload.GetNameArg();
+            _gameName = preload.Name;
+            _argument = null;// preload.GetNameArg();
 
             textChan.SendMessageAsync(preload.GetRules() +
                 (_lobby != null ? "\n*Multiplayer rules:* " + _multiplayerMode.GetRules() : "") +

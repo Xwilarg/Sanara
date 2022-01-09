@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(GetGameNames()[0]).GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var elem in Pokemon.GetPokemons())
             {
                 if (!cache.Any(x => x.id == elem))
@@ -25,7 +25,7 @@ namespace Sanara.Game.Preload.Impl
                         string german = Regex.Match(html, "<th>German<\\/th>[^<]*<td>([^<]+)<\\/td>").Groups[1].Value;
 
                         var result = new QuizzPreloadResult("https://img.pokemondb.net/artwork/" + elem + ".jpg", new[] { elem, french, japanese, german });
-                        StaticObjects.Db.SetCacheAsync(GetGameNames()[0], result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -41,11 +41,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "pokemon" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Pokemon";
+        public string Description => "Find the name of a Pokemon character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

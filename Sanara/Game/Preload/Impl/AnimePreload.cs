@@ -25,11 +25,8 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string[] GetGameNames()
-            => new[] { "anime" };
-
-        public string GetNameArg()
-            => null;
+        public string Name => "Anime";
+        public string Description => "Find the name of an anime given a small clip";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new QuizzBooruAnime(chan, user, this, settings);
