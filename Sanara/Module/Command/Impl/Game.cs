@@ -1,4 +1,40 @@
-﻿
+﻿using Discord;
+using Discord.WebSocket;
+using Sanara.Help;
+
+namespace Sanara.Module.Command.Impl
+{
+    public class Game : ISubmodule
+    {
+        public SubmoduleInfo GetInfo()
+        {
+            return new("Game", "Play various games directly on Discord");
+        }
+
+        public CommandInfo[] GetCommands()
+        {
+            return new[]
+            {
+                new CommandInfo(
+                   slashCommand: new SlashCommandBuilder()
+                   {
+                       Name = "translate",
+                       Description = "Translate a sentence"
+                   }.Build(),
+                   callback: CancelAsync,
+                   precondition: Precondition.None,
+                   needDefer: false
+               ),
+            };
+        }
+
+        public async Task CancelAsync(SocketSlashCommand ctx)
+        {
+            var game = StaticObjects.Games.Find(x => x.IsMyGame(ctx.Channel.Id));
+            await game.CancelAsync();
+        }
+    }
+}
 /*
 namespace SanaraV3.Help
 {

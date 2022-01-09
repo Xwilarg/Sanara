@@ -21,94 +21,94 @@ namespace Sanara.Module.Command.Impl
         {
             return new[]
             {
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "translate",
-                    Description = "Translate a sentence",
-                    Options = new()
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
+                        Name = "translate",
+                        Description = "Translate a sentence",
+                        Options = new()
                         {
-                            Name = "language",
-                            Description = "Target language (ISO 639-1)",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
-                        },
-                        new SlashCommandOptionBuilder()
-                        {
-                            Name = "sentence",
-                            Description = "Sentence to translate",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "language",
+                                Description = "Target language (ISO 639-1)",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "sentence",
+                                Description = "Sentence to translate",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
                         }
-                    }
-                }.Build(),
-                callback: TranslateAsync,
-                precondition: Precondition.None,
-                needDefer: false
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "urban",
-                    Description = "Get the slang definition of a word",
-                    Options = new()
+                    }.Build(),
+                    callback: TranslateAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
+                        Name = "urban",
+                        Description = "Get the slang definition of a word",
+                        Options = new()
                         {
-                            Name = "word",
-                            Description = "Word to get the meaning of",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "word",
+                                Description = "Word to get the meaning of",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
                         }
-                    }
-                }.Build(),
-                callback: UrbanAsync,
-                precondition: Precondition.NsfwOnly,
-                needDefer: false
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "kanji",
-                    Description = "Get information about a kanji",
-                    Options = new()
+                    }.Build(),
+                    callback: UrbanAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
+                        Name = "kanji",
+                        Description = "Get information about a kanji",
+                        Options = new()
                         {
-                            Name = "kanji",
-                            Description = "Kanji to get information about",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "kanji",
+                                Description = "Kanji to get information about",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
                         }
-                    }
-                }.Build(),
-                callback: KanjiAsync,
-                precondition: Precondition.None,
-                needDefer: false
-            ),
-            new CommandInfo(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "japanese",
-                    Description = "Get the definition of a word (Japanese only)",
-                    Options = new()
+                    }.Build(),
+                    callback: KanjiAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
                     {
-                        new SlashCommandOptionBuilder()
+                        Name = "japanese",
+                        Description = "Get the definition of a word (Japanese only)",
+                        Options = new()
                         {
-                            Name = "word",
-                            Description = "Word to get the definition of",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "word",
+                                Description = "Word to get the definition of",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
                         }
-                    }
-                }.Build(),
-                callback: JapaneseAsync,
-                precondition: Precondition.None,
-                needDefer: false
-            ),
-        };
+                    }.Build(),
+                    callback: JapaneseAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
+            };
         }
 
         public async Task TranslateAsync(SocketSlashCommand ctx)

@@ -161,7 +161,24 @@ namespace Sanara
         /// <summary>
         /// Preload data for games
         /// </summary>
-        public static IPreload?[] Preloads { set; get; } = Array.Empty<IPreload>();
+        public static IPreload[] Preloads { set; get; } = new IPreload[]
+        {
+            new ArknightsAudioPreload(),
+            new KancolleAudioPreload(),
+
+            new ShiritoriHardPreload(),
+
+            new ShiritoriPreload(),
+            new ArknightsPreload(),
+            new KancollePreload(),
+            new GirlsFrontlinePreload(),
+            new AzurLanePreload(),
+            new FateGOPreload(),
+            new PokemonPreload(),
+            new AnimePreload(),
+            new BooruQuizzPreload(),
+            new BooruFillPreload()
+        };
         /// <summary>
         /// List of all game names available
         /// </summary>
@@ -353,62 +370,30 @@ namespace Sanara
             }
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Loading game preload (might take several minutes if this is the first time)"));
-            Type[] types = new[]
-            {
-                // AUDIO
-                typeof(ArknightsAudioPreload),
-                typeof(KancolleAudioPreload),
-
-                // HARD
-                typeof(ShiritoriHardPreload),
-
-                // OTHERS
-                typeof(ShiritoriPreload),
-                typeof(ArknightsPreload),
-                typeof(KancollePreload),
-                typeof(GirlsFrontlinePreload),
-                typeof(AzurLanePreload),
-                typeof(FateGOPreload),
-                typeof(PokemonPreload),
-                typeof(AnimePreload),
-                typeof(BooruQuizzPreload),
-                typeof(BooruFillPreload)
-            };
-            var preloads = new List<IPreload>();
-            for (int i = 0; i < types.Length; i++)
-            {
-                var p = (IPreload)Activator.CreateInstance(types[i])!;
-#if !NSFW_BUILD
-                if (!p.IsSafe())
-                {
-                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", types[i].ToString().Split('.').Last()[0..^7] + " was skipped"));
-                    continue;
-                }
-#endif
-                preloads.Add(p);
-            }
-            Preloads = preloads.ToArray();
             List<string> allNames = new();
             foreach (var p in Preloads)
             {
-                if (p != null)
+#if !NSFW_BUILD
+                if (!p.IsSafe())
                 {
-                    var name = p.Name;
-                    allNames.Add(name);// TODO: + (option == null ? "" : "-" + option));
-                    _ = Task.Run( async() =>
-                    {
-                        try
-                        {
-                            p.Init();
-                            await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.GetType().ToString().Split('.').Last()[0..^7] + " successfully loaded"));
-                        }
-                        catch (System.Exception e)
-                        {
-                            await Log.LogErrorAsync(e, null);
-                            await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.GetType().ToString().Split('.').Last()[0..^7] + " failed to load"));
-                        }
-                    });
+                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " was skipped"));
+                    continue;
                 }
+#endif
+                allNames.Add(p.Name);// TODO: + (option == null ? "" : "-" + option));
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        p.Init();
+                        await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " successfully loaded"));
+                    }
+                    catch (System.Exception e)
+                    {
+                        await Log.LogErrorAsync(e, null);
+                        await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " failed to load"));
+                    }
+                });
             }
             AllGameNames = allNames.ToArray();
 
