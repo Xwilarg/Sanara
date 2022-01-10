@@ -266,8 +266,9 @@ namespace Sanara
 
                     // Add submodules
                     _submodules.Add(new Entertainment());
-                    _submodules.Add(new NSFW());
+                    _submodules.Add(new Module.Command.Impl.Game());
                     _submodules.Add(new Language());
+                    _submodules.Add(new NSFW());
                     _submodules.Add(new Settings());
                     _submodules.Add(new Tool());
 

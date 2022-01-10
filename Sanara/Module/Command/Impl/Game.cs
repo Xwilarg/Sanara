@@ -13,18 +13,46 @@ namespace Sanara.Module.Command.Impl
 
         public CommandInfo[] GetCommands()
         {
+            List<SlashCommandOptionBuilder> games = new();
+            for (int i = 0; i < StaticObjects.Preloads.Length; i++)
+            {
+                var game = StaticObjects.Preloads[i];
+#if !NSFW_BUILD
+                if (!game.IsSafe())
+                {
+                    continue;
+                }
+#endif
+                games.Add(new()
+                {
+                    Name = game.Name,
+                    Description = (!game.IsSafe() ? "(NSFW) " : "") + game.Description
+                });
+            }
+
             return new[]
             {
                 new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
                    {
-                       Name = "translate",
-                       Description = "Translate a sentence"
+                       Name = "play",
+                       Description = "Start a game",
+                       Options = games
                    }.Build(),
                    callback: CancelAsync,
                    precondition: Precondition.None,
                    needDefer: false
                ),
+                new CommandInfo(
+                   slashCommand: new SlashCommandBuilder()
+                   {
+                       Name = "cancel",
+                       Description = "Stop the current game"
+                   }.Build(),
+                   callback: CancelAsync,
+                   precondition: Precondition.None,
+                   needDefer: false
+               )
             };
         }
 
