@@ -41,7 +41,7 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string Name => "Pokemon";
+        public string Name => "Pokemon Quizz";
         public string Description => "Find the name of a Pokemon character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)

@@ -13,7 +13,7 @@ namespace Sanara.Module.Command.Impl
 
         public CommandInfo[] GetCommands()
         {
-            List<SlashCommandOptionBuilder> games = new();
+            List<ApplicationCommandOptionChoiceProperties> games = new();
             for (int i = 0; i < StaticObjects.Preloads.Length; i++)
             {
                 var game = StaticObjects.Preloads[i];
@@ -25,8 +25,8 @@ namespace Sanara.Module.Command.Impl
 #endif
                 games.Add(new()
                 {
-                    Name = game.Name,
-                    Description = (!game.IsSafe() ? "(NSFW) " : "") + game.Description
+                    Name = (!game.IsSafe() ? "(NSFW) " : "") + game.Name,
+                    Value = i
                 });
             }
 
@@ -37,7 +37,17 @@ namespace Sanara.Module.Command.Impl
                    {
                        Name = "play",
                        Description = "Start a game",
-                       Options = games
+                       Options = new()
+                       {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "game",
+                                Description = "Game you want to play",
+                                Type = ApplicationCommandOptionType.Integer,
+                                IsRequired = true,
+                                Choices = games
+                            }
+                       }
                    }.Build(),
                    callback: CancelAsync,
                    precondition: Precondition.None,

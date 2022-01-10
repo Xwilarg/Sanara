@@ -39,7 +39,7 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string Name => "KanColle Audio";
+        public string Name => "KanColle Audio Quizz";
         public string Description => "Find the name of a Kantai Collection character from a voice clip";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)

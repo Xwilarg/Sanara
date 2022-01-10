@@ -42,7 +42,7 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string Name => "Girls Frontline";
+        public string Name => "Girls Frontline Quizz";
         public string Description => "Find the name of an Girls Frontline character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)

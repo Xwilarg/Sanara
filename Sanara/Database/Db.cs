@@ -25,6 +25,10 @@ namespace Sanara.Database
         public async Task InitAsync()
         {
             _conn = await _r.Connection().ConnectAsync();
+            if (_conn == null)
+            {
+                throw new InvalidOperationException("Failed to connect to db, make sure rethinkdb is started");
+            }
 
             // Creating dbs
             if (!await _r.DbList().Contains(_dbName).RunAsync<bool>(_conn))

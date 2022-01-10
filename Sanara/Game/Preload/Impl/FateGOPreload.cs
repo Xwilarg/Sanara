@@ -71,7 +71,7 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string Name => "FateGO";
+        public string Name => "FateGO Quizz";
         public string Description => "Find the name of a FateGO character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)

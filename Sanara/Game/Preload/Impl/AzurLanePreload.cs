@@ -49,7 +49,7 @@ namespace Sanara.Game.Preload.Impl
         public ReadOnlyCollection<IPreloadResult> Load()
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
-        public string Name => "Arknights Audio";
+        public string Name => "Azur Lane Audio Quizz";
         public string Description => "Find the name of an Azur Lane character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
