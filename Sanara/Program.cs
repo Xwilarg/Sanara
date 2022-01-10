@@ -360,22 +360,14 @@ namespace Sanara
         {
             if (arg.Author.IsBot || arg is not SocketUserMessage msg) return; // The message received isn't a message we can deal with
 
-            ITextChannel? textChan = msg.Channel as ITextChannel;
 
             // Deprecation warning
             int pos = 0;
-            var prefix = textChan == null ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
+            var prefix = msg.Channel is not ITextChannel textChan ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
             if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
             {
                 var context = new SocketCommandContext(StaticObjects.Client, msg);
                 await _commands.ExecuteAsync(context, pos, null);
-            }
-
-            // TODO: What about commands?
-            if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#")) // "Comment" message to ignore game parsing
-            {
-                var game = StaticObjects.Games.Find(x => x.IsMyGame(msg.Channel.Id));
-                game?.AddAnswer(msg);
             }
         }
 

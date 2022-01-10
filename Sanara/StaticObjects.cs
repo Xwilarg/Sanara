@@ -143,10 +143,6 @@ namespace Sanara
 
         // GAME MODULE
         /// <summary>
-        /// List of ongoing games
-        /// </summary>
-        public static List<AGame> Games { get; } = new();
-        /// <summary>
         /// Upload mode where game just send a message in a textual channel
         /// </summary>
         public static TextMode ModeText { get; } = new();
@@ -186,7 +182,7 @@ namespace Sanara
         /// <summary>
         /// Object managing games
         /// </summary>
-        private static GameManager GM { get; } = new();
+        public static GameManager GameManager { get; } = new();
         public static Dictionary<string, BooruSharp.Search.Tag.TagType> QuizzTagsCache { get; } = new();
         public static Dictionary<string, BooruSharp.Search.Tag.TagType> GelbooruTags { get; } = new();
 
@@ -403,7 +399,7 @@ namespace Sanara
 #endif
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing Game Manager"));
-            GM.Init();
+            GameManager.Init();
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
 

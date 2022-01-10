@@ -1,4 +1,8 @@
-﻿namespace Sanara.Game
+﻿using Discord;
+using Sanara.Exception;
+using Sanara.Game.Preload;
+
+namespace Sanara.Game
 {
     public sealed class GameManager
     {
@@ -16,18 +20,31 @@
         {
             while (Thread.CurrentThread.IsAlive)
             {
-                foreach (var game in StaticObjects.Games)
+                foreach (var game in _games)
                 {
                     _ = Task.Run(() => { game.CheckAnswersAsync().GetAwaiter().GetResult(); });
                     game.CheckTimerAsync().GetAwaiter().GetResult();
                 }
-                foreach (var g in StaticObjects.Games.Where(x => x.AsLost()))
+                foreach (var g in _games.Where(x => x.AsLost()))
                     g.Dispose();
-                StaticObjects.Games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
+                _games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
                 Thread.Sleep(200);
             }
         }
 
+        public AGame? GetGame(IChannel chan)
+            => _games.FirstOrDefault(x => x.IsMyGame(chan.Id));
+
+        public string CreateGame(AGame game)
+        {
+            var id = Guid.NewGuid().ToString();
+            _pendingGames.Add(id, game);
+            return id;
+        }
+
         private readonly Thread thread;
+
+        private Dictionary<string, AGame> _pendingGames = new();
+        private List<AGame> _games { get; } = new();
     }
 }

@@ -58,7 +58,7 @@ namespace Sanara.Module.Command.Impl
                 new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
                    {
-                       Name = "cancel",
+                       Name = "gamesettings",
                        Description = "Stop the current game"
                    }.Build(),
                    callback: CancelAsync,
@@ -70,7 +70,7 @@ namespace Sanara.Module.Command.Impl
 
         public async Task PlayAsync(SocketSlashCommand ctx)
         {
-            if (StaticObjects.Games.Any(x => x.IsMyGame(ctx.Channel.Id)))
+            if (StaticObjects.GameManager.GetGame(ctx.Channel) != null)
                 throw new CommandFailed("A game is already running in this channel.");
             /*if (gameName.ToUpperInvariant() == "CUSTOM")
             {
@@ -102,13 +102,34 @@ namespace Sanara.Module.Command.Impl
                 var preload = StaticObjects.Preloads[(int)index];
                 if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                     throw new CommandFailed("This game can only be launched in a NSFW channel.");
-                preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User), false));
+                var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User), false));
+                var embed = new EmbedBuilder
+                {
+                    Description = ctx.User.ToString() + " (Host)"
+                };
+                embed.AddField("Rules", preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
+                embed.AddField("Cooperation Rules (only if **1 player** in the lobby)", "Any player in the server can cooperate to give an answer");
+                embed.AddField("Versus Rules (only if **more than 1 player** in the lobby)", game.MultiplayerRules);
+
+                var id = StaticObjects.GameManager.CreateGame(game);
+
+                var buttons = new ComponentBuilder()
+                    .WithButton(label: "Start", customId: $"game-{id}-start", style: ButtonStyle.Success)
+                    .WithButton(label: "Join/Leave", customId: $"game-{id}-join")
+                    .WithButton(label: "Cancel", customId: $"game-{id}-cancel", style: ButtonStyle.Danger);
+
+                await ctx.RespondAsync(embed: embed.Build(), components: buttons.Build());
             }
         }
 
         public async Task CancelAsync(SocketSlashCommand ctx)
         {
-            var game = StaticObjects.Games.Find(x => x.IsMyGame(ctx.Channel.Id));
+            var game = StaticObjects.GameManager.GetGame(ctx.Channel);
+
+            if (game == null)
+            {
+                throw new CommandFailed("There is no game running in this channel");
+            }
             await game.CancelAsync();
         }
     }

@@ -24,15 +24,6 @@ namespace Sanara.Game
 
             _gameName = preload.Name;
             _argument = null;// preload.GetNameArg();
-
-            textChan.SendMessageAsync(preload.GetRules() +
-                (_lobby != null ? "\n*Multiplayer rules:* " + _multiplayerMode.GetRules() : "") +
-                $"\n\nYou will loose if you don't answer after {GetGameTime()} seconds\n\n" +
-                "If the game break, you can use the 'Cancel' command to cancel it.\n" +
-                "You can cooperate with other players to find the answers." +
-                (_postMode is AudioMode ? "\nYou can listen again to the audio using the 'Replay' command." : "") +
-                (_lobby != null ? "\n\n**You can join the lobby for the game by doing the 'Join' command**\nThe game will automatically start in " + _lobbyTimer + " seconds, you can start it right away using the 'Start' command" : "")).GetAwaiter().GetResult();
-
             _messages = new List<SocketUserMessage>();
 
             _contributors = new List<ulong>();
@@ -54,6 +45,8 @@ namespace Sanara.Game
         {
             DisposeInternal();
         }
+
+        public string MultiplayerRules => _multiplayerMode.GetRules();
 
         public bool IsMultiplayerGame()
             => _lobby != null;
