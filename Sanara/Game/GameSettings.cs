@@ -2,13 +2,13 @@
 {
     public struct GameSettings
     {
-        public GameSettings(MultiplayerLobby lobby, bool isCustomGame)
+        public GameSettings(Lobby lobby, bool isCustomGame)
         {
             Lobby = lobby;
             IsCustomGame = isCustomGame;
         }
 
-        public MultiplayerLobby Lobby { get; }
+        public Lobby Lobby { get; }
         public bool IsCustomGame { get; }
     }
 }

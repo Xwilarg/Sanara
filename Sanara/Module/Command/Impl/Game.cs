@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Sanara.Exception;
+using Sanara.Game;
 using Sanara.Help;
 
 namespace Sanara.Module.Command.Impl
@@ -49,7 +51,7 @@ namespace Sanara.Module.Command.Impl
                             }
                        }
                    }.Build(),
-                   callback: CancelAsync,
+                   callback: PlayAsync,
                    precondition: Precondition.None,
                    needDefer: false
                ),
@@ -64,6 +66,44 @@ namespace Sanara.Module.Command.Impl
                    needDefer: false
                )
             };
+        }
+
+        public async Task PlayAsync(SocketSlashCommand ctx)
+        {
+            if (StaticObjects.Games.Any(x => x.IsMyGame(ctx.Channel.Id)))
+                throw new CommandFailed("A game is already running in this channel.");
+            /*if (gameName.ToUpperInvariant() == "CUSTOM")
+            {
+                if (Context.Message.Attachments.Count == 0)
+                    throw new CommandFailed("You must attach the file containing game answers");
+
+                var url = Context.Message.Attachments.ToArray()[0].Url;
+                using WebClient wc = new WebClient();
+                byte[] buffer = wc.DownloadData(url);
+                var content = Encoding.Default.GetString(buffer);
+                Console.WriteLine(content);
+                CustomPreload preload;
+                try
+                {
+                    preload = new CustomPreload(JsonConvert.DeserializeObject<CustomGame>(content));
+                }
+                catch (JsonException)
+                {
+                    throw new CommandFailed("The JSON given can't be parsed");
+                }
+                var lobby = modes.Contains("multi") || modes.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
+                var game = preload.CreateGame(Context.Channel, Context.User, new GameSettings(lobby, true));
+                StaticObjects.Games.Add(game);
+                await game.StartWhenReadyAsync();
+            }
+            else*/
+            {
+                var index = (long)ctx.Data.Options.First(x => x.Name == "game").Value;
+                var preload = StaticObjects.Preloads[(int)index];
+                if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
+                    throw new CommandFailed("This game can only be launched in a NSFW channel.");
+                preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User), false));
+            }
         }
 
         public async Task CancelAsync(SocketSlashCommand ctx)
@@ -137,46 +177,6 @@ namespace SanaraV3.Module.Game
             await ReplyAsync(embed: embed.Build());
         }
 
-        [Command("Play", RunMode = RunMode.Async)]
-        public async Task PlayAsync(string gameName, params string[] modes)
-        {
-            if (StaticObjects.Games.Any(x => x.IsMyGame(Context.Channel.Id)))
-                await ReplyAsync("A game is already running in this channel.");
-            if (gameName.ToUpperInvariant() == "CUSTOM")
-            {
-                if (Context.Message.Attachments.Count == 0)
-                    throw new CommandFailed("You must attach the file containing game answers");
-
-                var url = Context.Message.Attachments.ToArray()[0].Url;
-                using WebClient wc = new WebClient();
-                byte[] buffer = wc.DownloadData(url);
-                var content = Encoding.Default.GetString(buffer);
-                Console.WriteLine(content);
-                CustomPreload preload;
-                try
-                {
-                    preload = new CustomPreload(JsonConvert.DeserializeObject<CustomGame>(content));
-                } catch (JsonException) {
-                    throw new CommandFailed("The JSON given can't be parsed");
-                }
-                var lobby = modes.Contains("multi") || modes.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                var game = preload.CreateGame(Context.Channel, Context.User, new GameSettings(lobby, true));
-                StaticObjects.Games.Add(game);
-                await game.StartWhenReadyAsync();
-            }
-            else
-            {
-                var game = LoadGame(gameName.ToLowerInvariant(), Context.Channel, Context.User, modes);
-                if (game == null)
-                    await ReplyAsync("There is no game with this name.");
-                else
-                {
-                    StaticObjects.Games.Add(game);
-                    await game.StartWhenReadyAsync();
-                }
-            }
-        }
-
         [Command("Cancel", RunMode = RunMode.Async), RequireRunningGame]
         public async Task CancelAsync()
         {
@@ -217,21 +217,6 @@ namespace SanaraV3.Module.Game
                 await ReplyAsync("You are already in the lobby.");
             else
                 await ReplyAsync("You joined the lobby.");
-        }
-
-        public AGame LoadGame(string gameName, IMessageChannel textChan, IUser user, string[] arguments)
-        {
-            foreach (var preload in StaticObjects.Preloads)
-            {
-                if (preload.GetGameNames().Contains(gameName) && (preload.GetNameArg() == null || arguments.Contains(preload.GetNameArg())))
-                {
-                    if (Context.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
-                        throw new CommandFailed("This game can only be launched in a NSFW channel.");
-                    var lobby = arguments.Contains("multi") || arguments.Contains("multiplayer") ? new MultiplayerLobby(Context.User) : null;
-                    return preload.CreateGame(textChan, user, new GameSettings(lobby, false));
-                }
-            }
-            return null;
         }
     }
 }

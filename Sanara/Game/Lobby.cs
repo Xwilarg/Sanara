@@ -2,9 +2,9 @@
 
 namespace Sanara.Game
 {
-    public sealed class MultiplayerLobby
+    public sealed class Lobby
     {
-        public MultiplayerLobby(IUser host)
+        public Lobby(IUser host)
         {
             _users = new() { host };
             _lobbyOwner = host;

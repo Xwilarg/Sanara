@@ -60,27 +60,13 @@ namespace Sanara.Game
 
         public async Task ReplayAsync()
         {
-            if (!(_postMode is AudioMode))
+            if (_postMode is not AudioMode)
                 throw new CommandFailed("Replay can only be done on audio games.");
             await _postMode.PostAsync(_textChan, _current, this);
         }
 
         public GameState GetState()
             => _state;
-
-        public async Task StartWhenReadyAsync()
-        {
-            if (_lobby != null) // Multiplayer game
-            {
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(_lobbyTimer * 1000);
-                    await StartAsync();
-                });
-            }
-            else
-                await StartAsync();
-        }
 
         public bool Join(IUser user)
         {
@@ -164,7 +150,7 @@ namespace Sanara.Game
                     }
                     else
                     {
-                        if (!(_postMode is TextMode) && introMsg != null)
+                        if (_postMode is not TextMode && introMsg != null)
                             await _textChan.SendMessageAsync(introMsg);
                         foreach (var tmp in post)
                         {
@@ -180,7 +166,7 @@ namespace Sanara.Game
                                 await _postMode.PostAsync(_textChan, _current, this);
                         }
                     }
-                    if (!(_postMode is TextMode))
+                    if (_postMode is not TextMode)
                     {
                         if (postContent != "")
                             await _textChan.SendMessageAsync(postContent);
@@ -398,7 +384,7 @@ namespace Sanara.Game
         private bool _isCustomGame;
 
         // MULTIPLAYER
-        protected MultiplayerLobby _lobby;
+        protected Lobby _lobby;
         private const int _lobbyTimer = 30;
         protected IMultiplayerMode _multiplayerMode;
     }
