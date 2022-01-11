@@ -38,6 +38,8 @@ namespace Sanara.Game
         public bool IsHost(IUser user)
             => user == _lobbyOwner;
 
+        public bool IsMultiplayer => GetUserCount() > 1;
+
         private readonly List<IUser> _users;
         private readonly IUser _lobbyOwner;
     }

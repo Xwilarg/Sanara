@@ -188,7 +188,7 @@ namespace Sanara
                                 switch (id[2])
                                 {
                                     case "start":
-                                        await StaticObjects.GameManager.StartGameAsync(id[1]);
+                                        await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
                                         break;
 
                                     default:

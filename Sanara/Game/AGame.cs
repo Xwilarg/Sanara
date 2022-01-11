@@ -49,7 +49,7 @@ namespace Sanara.Game
         public string MultiplayerRules => _multiplayerMode.GetRules();
 
         public bool IsMultiplayerGame()
-            => _lobby != null;
+            => _lobby.IsMultiplayer;
 
         public async Task ReplayAsync()
         {
@@ -72,31 +72,21 @@ namespace Sanara.Game
         public bool IsLobbyOwner(IUser user)
             => _lobby.IsHost(user);
 
-        public async Task StartAsync()
+        public async Task StartAsync(SocketMessageComponent ctx)
         {
             if (_state != GameState.Prepare)
                 return;
 
-            string introMsg = null;
-
-            if (_lobby != null) // Multiplayer game
+            if (_lobby.IsMultiplayer) // Multiplayer game
             {
-                if (_lobby.GetUserCount() < 2)
-                {
-                    _state = GameState.Lost;
-                    await _textChan.SendMessageAsync("The game was cancelled because there wasn't enough players (at least 2 are required)");
-                    return;
-                }
                 _multiplayerMode.Init(_lobby.GetUsers());
-                introMsg = string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.";
-
-                await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
             }
-            else
-                await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, 1);
+            await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
 
             _state = GameState.Ready;
-            await PostAsync(introMsg);
+
+            await ctx.RespondAsync(string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.");
+            await PostAsync(null);
         }
 
         private string GetPostContent()
@@ -104,7 +94,7 @@ namespace Sanara.Game
             string str = "";
             if (GetHelp() != null)
                str += "\n" + GetHelp();
-            if (_lobby != null)
+            if (_lobby.IsMultiplayer)
             {
                 var multiInfo = _multiplayerMode.PrePost();
                 if (multiInfo != null)
@@ -128,7 +118,7 @@ namespace Sanara.Game
             int nbTries = 0;
             do
             {
-                string[] currentPostDebug = new string[0]; // We save the current post here to send it to Sentry if an exception occurs
+                string[] currentPostDebug = Array.Empty<string>(); // We save the current post here to send it to Sentry if an exception occurs
                 try
                 {
                     _messages.Clear();
@@ -211,7 +201,7 @@ namespace Sanara.Game
                     {
                         var task = Task.Run(() =>
                         {
-                            if (_lobby != null)
+                            if (_lobby.IsMultiplayer)
                                 _multiplayerMode.PreAnswerCheck(msg.User);
                             CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
                         });
@@ -226,7 +216,7 @@ namespace Sanara.Game
                                 if (_state == GameState.Lost)
                                     _state = GameState.Running;
                                 _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
-                                if (_lobby != null)
+                                if (_lobby.IsMultiplayer)
                                     _multiplayerMode.AnswerIsCorrect(msg.User);
                                 break; // Good answer found, no need to check the others ones
                             }
@@ -293,7 +283,7 @@ namespace Sanara.Game
         /// <returns></returns>
         private async Task LooseAsync(string reason, bool bypassMultiplayerCheck)
         {
-            if (_lobby != null) // Multiplayer games
+            if (_lobby.IsMultiplayer) // Multiplayer games
             {
                 string msg;
                 bool canLoose = _multiplayerMode.CanLooseAuto();
@@ -321,7 +311,7 @@ namespace Sanara.Game
                 return;
 
             string scoreSentence = "";
-            if (_lobby == null && !_isCustomGame) // Score aren't saved in multiplayer games
+            if (!_lobby.IsMultiplayer && !_isCustomGame) // Score aren't saved in multiplayer games
             {
                 int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
