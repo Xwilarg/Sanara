@@ -180,9 +180,9 @@ namespace Sanara
                             var id = ctx.Data.CustomId.Split('/').Last();
                             await Doujinshi.GetTagsAsync(ctx, id);
                         }
-                        else if (ctx.Data.CustomId.StartsWith("game-"))
+                        else if (ctx.Data.CustomId.StartsWith("game/"))
                         {
-                            var id = ctx.Data.CustomId.Split('-');
+                            var id = ctx.Data.CustomId.Split('/');
                             if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
                             {
                                 switch (id[2])

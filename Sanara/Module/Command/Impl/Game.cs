@@ -147,9 +147,9 @@ namespace Sanara.Module.Command.Impl
                 var id = StaticObjects.GameManager.CreateGame(game);
 
                 var buttons = new ComponentBuilder()
-                    .WithButton(label: "Start", customId: $"game-{id}-start", style: ButtonStyle.Success)
-                    .WithButton(label: "Join/Leave", customId: $"game-{id}-join")
-                    .WithButton(label: "Cancel", customId: $"game-{id}-cancel", style: ButtonStyle.Danger);
+                    .WithButton(label: "Start", customId: $"game/{id}/start", style: ButtonStyle.Success)
+                    .WithButton(label: "Join/Leave", customId: $"game/{id}/join")
+                    .WithButton(label: "Cancel", customId: $"game/{id}/cancel", style: ButtonStyle.Danger);
 
                 await ctx.RespondAsync(embed: embed.Build(), components: buttons.Build());
             }
