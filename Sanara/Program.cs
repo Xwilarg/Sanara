@@ -180,6 +180,22 @@ namespace Sanara
                             var id = ctx.Data.CustomId.Split('/').Last();
                             await Doujinshi.GetTagsAsync(ctx, id);
                         }
+                        else if (ctx.Data.CustomId.StartsWith("game-"))
+                        {
+                            var id = ctx.Data.CustomId.Split('-');
+                            if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
+                            {
+                                switch (id[2])
+                                {
+                                    case "start":
+                                        await StaticObjects.GameManager.StartGameAsync(id[1]);
+                                        break;
+
+                                    default:
+                                        throw new NotImplementedException("Invalid id " + id[2]);
+                                }
+                            }
+                        }
                     }
                     catch (System.Exception ex)
                     {

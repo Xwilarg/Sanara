@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Sanara.Exception;
-using Sanara.Game.Preload;
 
 namespace Sanara.Game
 {
@@ -40,6 +38,17 @@ namespace Sanara.Game
             var id = Guid.NewGuid().ToString();
             _pendingGames.Add(id, game);
             return id;
+        }
+
+        public bool DoesLobbyExists(string id)
+        {
+            return _pendingGames.ContainsKey(id);
+        }
+
+        public async Task StartGameAsync(string id)
+        {
+            await _pendingGames[id].StartAsync();
+            _pendingGames.Remove(id);
         }
 
         private readonly Thread thread;

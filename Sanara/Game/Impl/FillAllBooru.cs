@@ -33,9 +33,9 @@ namespace Sanara.Game.Impl
             return new[] { post.FileUrl.AbsoluteUri };
         }
 
-        protected override Task CheckAnswerInternalAsync(SocketUserMessage answer)
+        protected override Task CheckAnswerInternalAsync(SocketSlashCommand answer)
         {
-            string userAnswer = Utils.CleanWord(answer.Content);
+            string userAnswer = Utils.CleanWord((string)answer.Data.Options.First(x => x.Name == "answer").Value);
             var foundTag = _allTags.Where(x => Utils.CleanWord(x) == userAnswer).FirstOrDefault();
             if (foundTag == null)
                 throw new InvalidGameAnswer("");
@@ -45,11 +45,11 @@ namespace Sanara.Game.Impl
 
             if (_lobby != null)
             {
-                _multiplayerMode.AnswerIsCorrect(answer.Author);
+                _multiplayerMode.AnswerIsCorrect(answer.User);
             }
 
             if (_nbNeed != _foundTags.Count)
-                throw new InvalidGameAnswer($"{(_lobby == null ? "You" : answer.Author.Username)} found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
+                throw new InvalidGameAnswer($"{(_lobby == null ? "You" : answer.User.Username)} found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
             return Task.CompletedTask;
         }
 

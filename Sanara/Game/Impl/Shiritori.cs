@@ -59,11 +59,11 @@ namespace Sanara.Game.Impl
             }
         }
 
-        protected override async Task CheckAnswerInternalAsync(SocketUserMessage answer)
+        protected override async Task CheckAnswerInternalAsync(SocketSlashCommand answer)
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = Language.ToHiragana(answer.Content.ToLower());
+            string hiraganaAnswer = Language.ToHiragana(((string)answer.Data.Options.First(x => x.Name == "answer").Value).ToLowerInvariant());
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");

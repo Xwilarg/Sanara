@@ -24,7 +24,7 @@ namespace Sanara.Game
 
             _gameName = preload.Name;
             _argument = null;// preload.GetNameArg();
-            _messages = new List<SocketUserMessage>();
+            _messages = new List<SocketSlashCommand>();
 
             _contributors = new List<ulong>();
             _score = 0;
@@ -33,7 +33,7 @@ namespace Sanara.Game
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
-        protected abstract Task CheckAnswerInternalAsync(SocketUserMessage answer); // Check if user answer is right
+        protected abstract Task CheckAnswerInternalAsync(SocketSlashCommand answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
@@ -188,7 +188,7 @@ namespace Sanara.Game
             _state = GameState.Running;
         }
 
-        public void AddAnswer(SocketUserMessage msg)
+        public void AddAnswer(SocketSlashCommand msg)
         {
             lock (_messages)
             {
@@ -212,29 +212,29 @@ namespace Sanara.Game
                         var task = Task.Run(() =>
                         {
                             if (_lobby != null)
-                                _multiplayerMode.PreAnswerCheck(msg.Author);
+                                _multiplayerMode.PreAnswerCheck(msg.User);
                             CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
                         });
                         try
                         {
                             if (task.Wait(5000)) // Not supposed to timeout, but we just put a timer of 5s to be sure
                             {
-                                string introMsg = GetSuccessMessage(msg.Author);
-                                if (!_contributors.Contains(msg.Author.Id))
-                                    _contributors.Add(msg.Author.Id);
+                                string introMsg = GetSuccessMessage(msg.User);
+                                if (!_contributors.Contains(msg.User.Id))
+                                    _contributors.Add(msg.User.Id);
                                 _score++;
                                 if (_state == GameState.Lost)
                                     _state = GameState.Running;
                                 _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
                                 if (_lobby != null)
-                                    _multiplayerMode.AnswerIsCorrect(msg.Author);
+                                    _multiplayerMode.AnswerIsCorrect(msg.User);
                                 break; // Good answer found, no need to check the others ones
                             }
                             else
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await msg.AddReactionAsync(new Emoji("❔"));
+                                    await msg.ModifyOriginalResponseAsync(x => x.Content = "Timed out");
                                 });
                             }
                         }
@@ -251,9 +251,9 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     if (e.InnerException.Message.Length == 0)
-                                        await msg.AddReactionAsync(new Emoji("❌"));
+                                        await msg.ModifyOriginalResponseAsync(x => x.Content = "Wrong answer");
                                     else
-                                        _textChan.SendMessageAsync(e.InnerException.Message).GetAwaiter().GetResult();
+                                        await msg.ModifyOriginalResponseAsync(x => x.Content = e.InnerException.Message);
                                 });
                             }
                             else
@@ -261,7 +261,7 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     await Log.LogErrorAsync(e, null);
-                                    await msg.AddReactionAsync(new Emoji("🕷"));
+                                    await msg.ModifyOriginalResponseAsync(x => x.Content = e.Message);
                                 });
                             }
                         }
@@ -369,7 +369,7 @@ namespace Sanara.Game
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private string _current; // Current value, used for Replay command
 
-        List<SocketUserMessage> _messages;
+        List<SocketSlashCommand> _messages;
 
         // SCORES
         private List<ulong> _contributors; // Users that contributed

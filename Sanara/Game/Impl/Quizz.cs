@@ -39,9 +39,9 @@ namespace Sanara.Game.Impl
             return new[] { _current.ImageUrl };
         }
 
-        protected override Task CheckAnswerInternalAsync(SocketUserMessage answer)
+        protected override Task CheckAnswerInternalAsync(SocketSlashCommand answer)
         {
-            string userAnswer = Utils.CleanWord(answer.Content);
+            string userAnswer = Utils.CleanWord((string)answer.Data.Options.First(x => x.Name == "answer").Value);
             if (!_allValidNames.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer(""); // We just add a reaction to the message to not spam the text channel
             if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))

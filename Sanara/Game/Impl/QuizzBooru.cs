@@ -16,9 +16,9 @@ namespace Sanara.Game.Impl
             _allowedFormats = info.AllowedFormats;
         }
 
-        protected override Task CheckAnswerInternalAsync(SocketUserMessage answer)
+        protected override Task CheckAnswerInternalAsync(SocketSlashCommand answer)
         {
-            string userAnswer = Utils.CleanWord(answer.Content);
+            string userAnswer = Utils.CleanWord((string)answer.Data.Options.First(x => x.Name == "answer").Value);
             if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer("");
             return Task.CompletedTask;

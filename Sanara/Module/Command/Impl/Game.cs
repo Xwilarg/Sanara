@@ -55,10 +55,30 @@ namespace Sanara.Module.Command.Impl
                    precondition: Precondition.None,
                    needDefer: false
                ),
+               new CommandInfo(
+                   slashCommand: new SlashCommandBuilder()
+                   {
+                       Name = "a",
+                       Description = "Give an answer in the current game",
+                       Options = new()
+                       {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "answer",
+                                Description = "Your answer",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                       }
+                   }.Build(),
+                   callback: CancelAsync,
+                   precondition: Precondition.None,
+                   needDefer: true
+               ),
                 new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
                    {
-                       Name = "gamesettings",
+                       Name = "cancel",
                        Description = "Stop the current game"
                    }.Build(),
                    callback: CancelAsync,
@@ -66,6 +86,19 @@ namespace Sanara.Module.Command.Impl
                    needDefer: false
                )
             };
+        }
+
+        public async Task AnswerAsync(SocketSlashCommand ctx)
+        {
+            await ctx.DeferAsync();
+            var game = StaticObjects.GameManager.GetGame(ctx.Channel);
+
+            if (game == null)
+            {
+                throw new CommandFailed("There is no game running in this channel");
+            }
+
+            game.AddAnswer(ctx);
         }
 
         public async Task PlayAsync(SocketSlashCommand ctx)
