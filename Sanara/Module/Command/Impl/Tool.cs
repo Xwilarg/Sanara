@@ -92,17 +92,17 @@ namespace Sanara.Module.Command.Impl
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Anime",
-                                        Value = (int)Utility.JapaneseMedia.Anime
+                                        Value = (int)JapaneseMedia.Anime
                                     },
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Manga",
-                                        Value = (int)Utility.JapaneseMedia.Manga
+                                        Value = (int)JapaneseMedia.Manga
                                     },
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
                                         Name = "Light Novel",
-                                        Value = (int)Utility.JapaneseMedia.LightNovel
+                                        Value = (int)JapaneseMedia.LightNovel
                                     }
                                 }
                             }
@@ -419,7 +419,7 @@ namespace Sanara.Module.Command.Impl
         public async Task AnimeAsync(SocketSlashCommand ctx)
         {
             var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
-            var media = (Utility.JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
+            var media = (JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
             var answer = (await SearchMediaAsync(media, name)).Attributes;
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
@@ -432,7 +432,7 @@ namespace Sanara.Module.Command.Impl
             {
                 Title = answer.CanonicalTitle,
                 Color = answer.Nsfw ? new Color(255, 20, 147) : Color.Green,
-                Url = "https://kitsu.io/" + (media == Utility.JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
+                Url = "https://kitsu.io/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
                 Description = description,
                 ImageUrl = answer.PosterImage.Original
             };
@@ -440,7 +440,7 @@ namespace Sanara.Module.Command.Impl
                 embed.AddField("English Title", answer.Titles!.En, true);
             if (!string.IsNullOrEmpty(null))
                 embed.AddField("Kitsu User Rating", answer.AverageRating, true);
-            if (media == Utility.JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
+            if (media == JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
                 embed.AddField("Episode Count", answer.EpisodeCount + (answer.EpisodeLength != null ? $" ({answer.EpisodeLength} min per episode)" : ""), true);
             if (!string.IsNullOrEmpty(answer.StartDate))
                 embed.AddField("Release Date", "To Be Announced", true);
@@ -451,7 +451,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.RespondAsync(embed: embed.Build());
         }
 
-        public static async Task<AnimeInfo> SearchMediaAsync(Utility.JapaneseMedia media, string query, bool onlyExactMatch = false)
+        public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
         {
             // Authentification is required to see NSFW content
             if (StaticObjects.KitsuAuth != null)
@@ -484,7 +484,7 @@ namespace Sanara.Module.Command.Impl
 
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == Utility.JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
+                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
                 Method = HttpMethod.Get
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", StaticObjects.KitsuAccessToken);
@@ -496,9 +496,9 @@ namespace Sanara.Module.Command.Impl
 
             // Filter data depending of wanted media
             AnimeInfo[] allData;
-            if (media == Utility.JapaneseMedia.Manga)
+            if (media == JapaneseMedia.Manga)
                 allData = data.Where(x => x.Attributes.Subtype != "novel").ToArray();
-            else if (media == Utility.JapaneseMedia.LightNovel)
+            else if (media == JapaneseMedia.LightNovel)
                 allData = data.Where(x => x.Attributes.Subtype == "novel").ToArray();
             else
                 allData = data.ToArray();
@@ -536,7 +536,7 @@ namespace Sanara.Module.Command.Impl
                 {
                     // We would rather find the episodes and not some OVA/ONA
                     // We don't filter them before so we can fallback on them if we find nothing else
-                    if (media == Utility.JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
+                    if (media == JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
                         continue;
 
                     return elem;

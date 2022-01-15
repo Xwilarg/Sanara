@@ -286,6 +286,7 @@ namespace Sanara
                     _submodules.Add(new Language());
                     _submodules.Add(new NSFW());
                     _submodules.Add(new Settings());
+                    _submodules.Add(new Module.Command.Impl.Subscription());
                     _submodules.Add(new Tool());
 
                     StaticObjects.Help = new(_submodules);

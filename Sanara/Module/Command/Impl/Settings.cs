@@ -43,19 +43,39 @@ namespace Sanara.Module.Command.Impl
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
-                        Name = "gdpr",
-                        Description = "Display all the data saved about your guild"
+                        Name = "configure",
+                        Description = "Configure the bot for the current guild"
                     }.Build(),
-                    callback: GdprAsync,
+                    callback: ConfigureAsync,
                     precondition: Precondition.AdminOnly | Precondition.GuildOnly,
                     needDefer: false
                 )
             };
         }
 
-        public async Task GdprAsync(SocketSlashCommand ctx)
+        public async Task ConfigureAsync(SocketSlashCommand ctx)
         {
-            await ctx.RespondAsync("```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```", ephemeral: true);
+            var guild = ((ITextChannel)ctx.Channel).Guild;
+            var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
+            var mySubs = subs?.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention));
+            await ctx.RespondAsync(embed: new EmbedBuilder
+            {
+                Title = guild.ToString(),
+                Color = Color.Purple,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Subscriptions",
+                        Value = subs == null ? "Not yet initialized" : (mySubs.Any() ?  string.Join("\n", mySubs) : "None")
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        Name = "Database dumb",
+                        Value = "```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```"
+                    }
+                }
+            }.Build(), ephemeral: true);
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)
