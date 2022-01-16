@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
 using Sanara.Subscription.Tags;
@@ -76,13 +77,18 @@ namespace Sanara.Module.Command.Impl
             var type = (SubscriptionType)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
             var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
 
+            if (type == SubscriptionType.Doujinshi && !channel.IsNsfw)
+                throw new CommandFailed("Doujinshi subscription channel must be NSFW");
+
             await StaticObjects.Db.SetSubscriptionAsync(channel.GuildId, type switch
             {
                 SubscriptionType.Anime => "anime",
+                SubscriptionType.Doujinshi => "nhentai",
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             }, channel, type switch
             {
                 SubscriptionType.Anime => new AnimeTags(tags, true),
+                SubscriptionType.Doujinshi => new NHentaiTags(tags, true),
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             });
             await ctx.RespondAsync($"You subscribed for {type} to {channel.Mention}.");

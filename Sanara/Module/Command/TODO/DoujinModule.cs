@@ -21,14 +21,6 @@ namespace SanaraV3.Module.Nsfw
 {
     public sealed class DoujinModule : ModuleBase
     {
-        [Command("Subscribe doujinshi"), Alias("Subscribe doujin", "Subscribe nhentai"), RequireNsfw, RequireAdmin]
-        public async Task SubscribeDoujinshiAsync(ITextChannel chan, params string[] tags)
-        {
-            if (!chan.IsNsfw)
-                throw new CommandFailed("Destination channel must be NSFW.");
-            await StaticObjects.Db.SetSubscriptionAsync(Context.Guild.Id, "nhentai", chan, new NHentaiTags(tags, true));
-            await ReplyAsync($"You subscribed for doujinshi to {chan.Mention}.");
-        }
 
         [Command("Unsubscribe doujinshi"), Alias("Unsubscribe doujin", "Unsubscribe nhentai"), RequireNsfw, RequireAdmin]
         public async Task UnsubscribeDoujinshiAsync()
@@ -38,28 +30,6 @@ namespace SanaraV3.Module.Nsfw
             else
                 await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
         }
-
-        /// <summary>
-        /// Return a number on a 3 character string (pad with 0)
-        /// </summary>
-        public static string Get3DigitNumber(string nb) // TODO: Move this function elsewhere since it's also used by CosplayModule
-        {
-            if (nb.Length == 3)
-                return nb;
-            if (nb.Length == 2)
-                return "0" + nb;
-            return "00" + nb;
-        }
-
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin", "NHentai")]
-        public async Task GetDoujinshiAsync() // Doujin search with no tags
-        {
-            var result = await SearchClient.SearchAsync();
-            int page = StaticObjects.Random.Next(0, result.numPages) + 1;
-            result = await SearchClient.SearchAsync(page);
-            await ReplyAsync(embed: FormatDoujinshi(result.elements[StaticObjects.Random.Next(0, result.elements.Length)]));
-        }
-
         [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
         public async Task PopularityAsync()
         {
