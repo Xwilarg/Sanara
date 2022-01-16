@@ -21,7 +21,7 @@ namespace Sanara.Module.Button
             nbPages = int.Parse(m.Groups[2].Value);
 
             var id = Guid.NewGuid();
-            string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
+            string path = id + "_" + DateTime.Now.ToString("HHmmssff");
 
             Directory.CreateDirectory("Saves/Download/" + path);
             Directory.CreateDirectory("Saves/Download/" + path + "/" + id);

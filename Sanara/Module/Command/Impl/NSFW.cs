@@ -3,6 +3,9 @@ using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
 using Discord.WebSocket;
+using NHentaiSharp.Core;
+using NHentaiSharp.Exception;
+using NHentaiSharp.Search;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
@@ -141,8 +144,83 @@ namespace Sanara.Module.Command.Impl
                     callback: AdultVideoAsync,
                     precondition: Precondition.NsfwOnly,
                     needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "doujinshi",
+                        Description = "Get a random doujinshi",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tags",
+                                Description = "Either the tags of your search, or a 6 digit number",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            }
+                        }
+                    }.Build(),
+                    callback: DoujinshiAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: true
                 )
             };
+        }
+
+        public async Task DoujinshiAsync(SocketSlashCommand ctx)
+        {
+            var tags = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "");
+
+            if (!string.IsNullOrEmpty(tags) && int.TryParse(tags, out int id))
+            {
+                try
+                {
+                    await FormatDoujinshiAsync(ctx, await SearchClient.SearchByIdAsync(id));
+                }
+                catch (InvalidArgumentException)
+                {
+                    throw new CommandFailed("These is no doujin with this id");
+                }
+            }
+
+            // Somehow the API return invalid values depending of the country we are doing the request from
+            // To avoid that, we parse the HTML instead
+            string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
+            var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
+            if (!m.Success)
+            {
+                throw new CommandFailed("There is no doujin with these tags");
+            }
+            int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
+            html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
+            var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
+            var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
+            await FormatDoujinshiAsync(ctx, result);
+        }
+
+        private async Task FormatDoujinshiAsync(SocketSlashCommand ctx, GalleryElement result)
+        {
+
+            var token = $"doujinshi-{Guid.NewGuid()}/{result.id}";
+            StaticObjects.Doujinshis.Add(token);
+            var button = new ComponentBuilder()
+                .WithButton("Download", token);
+
+            var embed = new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Description = string.Join(", ", result.tags.Select(x => x.name)),
+                Title = result.prettyTitle,
+                Url = result.url.AbsoluteUri,
+                ImageUrl = result.pages[0].imageUrl.AbsoluteUri
+            }.Build();
+
+            await ctx.ModifyOriginalResponseAsync(x =>
+            {
+                x.Embed = embed;
+                x.Components = button.Build();
+            });
         }
 
         public async Task AdultVideoAsync(SocketSlashCommand ctx)
@@ -331,7 +409,7 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("This booru is only available in NSFW channels");
             }
 
-            SearchResult post;
+            BooruSharp.Search.Post.SearchResult post;
             List<string> newTags = new();
             try
             {

@@ -1,55 +1,68 @@
-﻿using BooruSharp.Search.Post;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
+using NHentaiSharp.Core;
+using NHentaiSharp.Exception;
+using NHentaiSharp.Search;
 using Sanara.Exception;
+using System.IO.Compression;
 
 namespace Sanara.Module.Button
 {
     public class Doujinshi
     {
-        public static async Task GetTagsAsync(SocketMessageComponent ctx, string id)
+        public static async Task DownloadDoujinshiAsync(SocketMessageComponent ctx, string id)
         {
-            var info = await StaticObjects.Tags.GetTagAsync(id);
-            if (!info.HasValue)
-                throw new CommandFailed("There is no post with this id.");
-
-            var res = info.Value;
-
-            int gcd = Utils.GCD(res.Post.Width, res.Post.Height);
-
-            var embed = new EmbedBuilder
+            string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
+            Directory.CreateDirectory("Saves/Download/" + path); // Folder that contains the ZIP
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + id); // Folder that will inside the ZIP
+            GalleryElement elem;
+            try
             {
-                Url = res.Post.PostUrl.AbsoluteUri,
-                Color = res.Post.Rating switch
-                {
-                    Rating.Safe => Color.Green,
-                    Rating.Questionable => new Color(255, 255, 0), // Yellow
-                    Rating.Explicit => Color.Red,
-                    _ => throw new NotImplementedException($"Invalid rating {res.Post.Rating}")
-                },
-                Title = "From " + Utils.ToWordCase(res.Booru.ToString().Split('.').Last()),
-                Description = res.Post.Width + " x " + res.Post.Height + "(" + (res.Post.Width / gcd) + ":" + (res.Post.Height / gcd) + ")",
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Artists",
-                        Value = res.Artists.Count == 0 ? "Unkown" : "`" + string.Join(", ", res.Artists) + "`"
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Characters",
-                        Value = res.Characters.Count == 0 ? "Unkown" : "`" + string.Join(", ", res.Characters) + "`"
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Sources",
-                        Value = res.Sources.Count == 0 ? "Unkown" : "`" + string.Join(", ", res.Sources) + "`"
-                    }
-                }
-            };
+                elem = await SearchClient.SearchByIdAsync(int.Parse(id));
+            }
+            catch (InvalidArgumentException)
+            {
+                throw new CommandFailed("There is no doujinshi with this id.");
+            }
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            int i = 1;
+            foreach (var page in elem.pages)
+            {
+                string extension = "." + page.format.ToString().ToLower();
+                // Write each page in the folder
+                File.WriteAllBytes($"Saves/Download/{path}/{id}/{i:D3}{extension}",
+                    await StaticObjects.HttpClient.GetByteArrayAsync("https://i.nhentai.net/galleries/" + elem.mediaId + "/" + i + extension));
+                i++;
+            }
+            string finalPath = "Saves/Download/" + path + "/" + id + ".zip";
+            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + id, "Saves/Download/" + path + "/" + id + ".zip");
+
+            // Delete all files
+            for (i = Directory.GetFiles("Saves/Download/" + path + "/" + id).Length - 1; i >= 0; i--)
+                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + id)[i]);
+
+            // Delete folder
+            Directory.Delete("Saves/Download/" + path + "/" + id);
+
+            FileInfo fi = new(finalPath);
+            if (fi.Length < 8000000) // 8MB
+            {
+                await ctx.FollowupWithFileAsync(new FileAttachment(finalPath));
+            }
+            else
+            {
+                Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
+                File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                await ctx.FollowupAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(600000); // 10 minutes
+                    File.Delete(StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
+                    Directory.Delete(StaticObjects.UploadWebsiteLocation + path);
+                });
+            }
+            File.Delete(finalPath);
+            Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
         }
     }
 }

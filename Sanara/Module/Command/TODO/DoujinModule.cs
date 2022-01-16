@@ -39,64 +39,6 @@ namespace SanaraV3.Module.Nsfw
                 await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
         }
 
-        [Command("Download doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Download doujin", "Download nhentai", "dl doujinshi", "dl doujin", "dl nhentai", "dldj")]
-        public async Task GetDownloadDoujinshiAsync(int id)
-        {
-            string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
-            Directory.CreateDirectory("Saves/Download/" + path); // Folder that contains the ZIP
-            Directory.CreateDirectory("Saves/Download/" + path + "/" + id); // Folder that will inside the ZIP
-            GalleryElement elem;
-            try
-            {
-                elem = await SearchClient.SearchByIdAsync(id);
-            }
-            catch (InvalidArgumentException)
-            {
-                throw new CommandFailed("There is no doujinshi with this id.");
-            }
-
-            await ReplyAsync("Preparing download... This might take some time.");
-
-            int i = 1;
-            foreach (var page in elem.pages)
-            {
-                string extension = "." + page.format.ToString().ToLower();
-                // Write each page in the folder
-                File.WriteAllBytes("Saves/Download/" + path + "/" + id + "/" + Get3DigitNumber(i.ToString()) + extension,
-                    await StaticObjects.HttpClient.GetByteArrayAsync("https://i.nhentai.net/galleries/" + elem.mediaId + "/" + i + extension));
-                i++;
-            }
-            string finalPath = "Saves/Download/" + path + "/" + id + ".zip";
-            ZipFile.CreateFromDirectory("Saves/Download/" + path + "/" + id, "Saves/Download/" + path + "/" + id + ".zip");
-
-            // Delete all files
-            for (i = Directory.GetFiles("Saves/Download/" + path + "/" + id).Length - 1; i >= 0; i--)
-                File.Delete(Directory.GetFiles("Saves/Download/" + path + "/" + id)[i]);
-
-            // Delete folder
-            Directory.Delete("Saves/Download/" + path + "/" + id);
-
-            FileInfo fi = new(finalPath);
-            if (fi.Length < 8000000) // 8MB
-            {
-                await Context.Channel.SendFileAsync(finalPath);
-            }
-            else
-            {
-                Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
-                File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
-                await ReplyAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(600000); // 10 minutes
-                    File.Delete(StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
-                    Directory.Delete(StaticObjects.UploadWebsiteLocation + path);
-                });
-            }
-            File.Delete(finalPath);
-            Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
-        }
-
         /// <summary>
         /// Return a number on a 3 character string (pad with 0)
         /// </summary>
@@ -116,38 +58,6 @@ namespace SanaraV3.Module.Nsfw
             int page = StaticObjects.Random.Next(0, result.numPages) + 1;
             result = await SearchClient.SearchAsync(page);
             await ReplyAsync(embed: FormatDoujinshi(result.elements[StaticObjects.Random.Next(0, result.elements.Length)]));
-        }
-
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Alias("Doujin", "NHentai")]
-        public async Task GetDoujinshiAsync([Remainder]string tags) // Doujin search with tags given
-        {
-            // Somehow the API return invalid values depending of the country we are doing the request from
-            // To avoid that, we parse the HTML instead
-            string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
-            var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
-            if (!m.Success)
-            {
-                throw new CommandFailed("There is no doujin with these tags");
-            }
-            int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
-            html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
-            var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
-            var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
-            await ReplyAsync(embed: FormatDoujinshi(result));
-        }
-
-        [Command("Doujinshi", RunMode = RunMode.Async), RequireNsfw, Priority(1), Alias("Doujin", "NHentai")]
-        public async Task GetDoujinshiAsync(int id)
-        {
-            try
-            {
-                var result = await SearchClient.SearchByIdAsync(id);
-                await ReplyAsync(embed: FormatDoujinshi(result));
-            }
-            catch (InvalidArgumentException)
-            {
-                throw new CommandFailed("These is no doujin with this id");
-            }
         }
 
         [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
@@ -187,22 +97,6 @@ namespace SanaraV3.Module.Nsfw
             var msg = await ReplyAsync(embed: Diaporama.ReactionManager.Post(elems[0], 1, elems.Count));
             StaticObjects.Diaporamas.Add(msg.Id, new Diaporama.Diaporama(elems.ToArray()));
             await msg.AddReactionsAsync(new[] { new Emoji("⏪"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏩") });
-        }
-
-        private Embed FormatDoujinshi(GalleryElement result)
-        {
-            return new EmbedBuilder
-            {
-                Color = new Color(255, 20, 147),
-                Description = string.Join(", ", result.tags.Select(x => x.name)),
-                Title = result.prettyTitle,
-                Url = result.url.AbsoluteUri,
-                ImageUrl = result.pages[0].imageUrl.AbsoluteUri,
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Do the 'Download doujinshi' command with the id '{result.id}' to download the doujinshi."
-                }
-            }.Build();
         }
 
         [Command("Dlsite", RunMode = RunMode.Async), RequireNsfw]

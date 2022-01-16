@@ -178,7 +178,7 @@ namespace Sanara
                             StaticObjects.Doujinshis.Remove(ctx.Data.CustomId);
                             await ctx.DeferLoadingAsync();
                             var id = ctx.Data.CustomId.Split('/').Last();
-                            await Doujinshi.GetTagsAsync(ctx, id);
+                            await Booru.GetTagsAsync(ctx, id);
                         }
                         else if (ctx.Data.CustomId.StartsWith("game/"))
                         {
