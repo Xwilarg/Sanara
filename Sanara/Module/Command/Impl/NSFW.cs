@@ -172,7 +172,14 @@ namespace Sanara.Module.Command.Impl
         {
             var tags = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "");
 
-            if (!string.IsNullOrEmpty(tags) && int.TryParse(tags, out int id))
+            if (string.IsNullOrEmpty(tags))
+            {
+                var result = await SearchClient.SearchAsync();
+                int page = StaticObjects.Random.Next(0, result.numPages) + 1;
+                result = await SearchClient.SearchAsync(page);
+                await FormatDoujinshiAsync(ctx, result.elements[StaticObjects.Random.Next(0, result.elements.Length)]);
+            }
+            else if (int.TryParse(tags, out int id))
             {
                 try
                 {
@@ -183,20 +190,22 @@ namespace Sanara.Module.Command.Impl
                     throw new CommandFailed("These is no doujin with this id");
                 }
             }
-
-            // Somehow the API return invalid values depending of the country we are doing the request from
-            // To avoid that, we parse the HTML instead
-            string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
-            var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
-            if (!m.Success)
+            else
             {
-                throw new CommandFailed("There is no doujin with these tags");
+                // Somehow the API return invalid values depending of the country we are doing the request from
+                // To avoid that, we parse the HTML instead
+                string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
+                var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
+                if (!m.Success)
+                {
+                    throw new CommandFailed("There is no doujin with these tags");
+                }
+                int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
+                html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
+                var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
+                var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
+                await FormatDoujinshiAsync(ctx, result);
             }
-            int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
-            html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
-            var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
-            var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
-            await FormatDoujinshiAsync(ctx, result);
         }
 
         private async Task FormatDoujinshiAsync(SocketSlashCommand ctx, GalleryElement result)
