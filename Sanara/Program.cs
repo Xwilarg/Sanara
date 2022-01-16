@@ -150,7 +150,11 @@ namespace Sanara
 
         private async Task ButtonExecuted(SocketMessageComponent ctx)
         {
-            if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+            if (ctx.Data.CustomId == "dump")
+            {
+                await Module.Button.Settings.DatabaseDump(ctx);
+            }
+            else if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
             {
                 var e = StaticObjects.Errors[ctx.Data.CustomId];
                 await ctx.RespondAsync(embed: new EmbedBuilder
@@ -285,7 +289,7 @@ namespace Sanara
                     _submodules.Add(new Module.Command.Impl.Game());
                     _submodules.Add(new Language());
                     _submodules.Add(new NSFW());
-                    _submodules.Add(new Settings());
+                    _submodules.Add(new Module.Command.Impl.Settings());
                     _submodules.Add(new Module.Command.Impl.Subscription());
                     _submodules.Add(new Tool());
 

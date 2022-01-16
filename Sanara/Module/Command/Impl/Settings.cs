@@ -58,6 +58,8 @@ namespace Sanara.Module.Command.Impl
             var guild = ((ITextChannel)ctx.Channel).Guild;
             var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
             var mySubs = subs?.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention));
+            var button = new ComponentBuilder()
+                .WithButton("Database dump", "dump");
             await ctx.RespondAsync(embed: new EmbedBuilder
             {
                 Title = guild.ToString(),
@@ -68,14 +70,9 @@ namespace Sanara.Module.Command.Impl
                     {
                         Name = "Subscriptions",
                         Value = subs == null ? "Not yet initialized" : (mySubs.Any() ?  string.Join("\n", mySubs) : "None")
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Database dumb",
-                        Value = "```json\n" + (await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id)).Replace("\n", "").Replace("\r", "") + "\n```"
                     }
                 }
-            }.Build(), ephemeral: true);
+            }.Build(), ephemeral: true, components: button.Build());
         }
 
         public async Task PingAsync(SocketSlashCommand ctx)

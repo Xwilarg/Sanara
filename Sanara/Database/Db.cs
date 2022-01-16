@@ -6,6 +6,7 @@ using RethinkDb.Driver.Net;
 using Sanara.Game.Preload.Result;
 using Sanara.Subscription;
 using Sanara.Subscription.Tags;
+using System.Text.Json;
 
 namespace Sanara.Database
 {
@@ -254,7 +255,10 @@ namespace Sanara.Database
 
         public async Task<string> DumpAsync(ulong guildId)
         {
-            return ((object)await _r.Db(_dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(_conn)).ToString();
+            return JsonSerializer.Serialize(JsonSerializer.Deserialize<object>(((object)await _r.Db(_dbName).Table("Guilds").Get(guildId.ToString()).RunAsync(_conn)).ToString()), new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            });
         }
 
         // SCORES
