@@ -26,7 +26,7 @@ namespace Sanara.Module.Button
             }
             else
             {
-                await StaticObjects.Db.RemoveSubscriptionAsync(, key);
+                await StaticObjects.Db.RemoveSubscriptionAsync(guildId, key);
                 await ctx.RespondAsync($"{ctx.User.Mention} removed a subscription");
             }
         }
