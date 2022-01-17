@@ -150,7 +150,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: VisualNovelAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -346,7 +346,7 @@ namespace Sanara.Module.Command.Impl
             }
             embed.AddField("Release Date", releaseDate, true);
             response.Dispose();
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
         }
 
         public async Task DramaAsync(SocketSlashCommand ctx)

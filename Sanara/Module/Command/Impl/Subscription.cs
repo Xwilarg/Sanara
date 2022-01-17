@@ -91,7 +91,7 @@ namespace Sanara.Module.Command.Impl
                 SubscriptionType.Doujinshi => new NHentaiTags(tags, true),
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             });
-            await ctx.RespondAsync($"You subscribed for {type} to {channel.Mention}.");
+            await ctx.RespondAsync($"You subscribed for {type} in {channel.Mention}, use the configure command to remove it");
         }
     }
 }
