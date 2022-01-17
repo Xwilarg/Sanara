@@ -24,7 +24,7 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task LogErrorAsync(System.Exception e, IDiscordInteraction? ctx, bool needDefer = false)
+        public static async Task LogErrorAsync(System.Exception e, IDiscordInteraction? ctx)
         {
             await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
 
@@ -41,7 +41,7 @@ namespace Sanara
                     Description = "The error was automatically reported. If the error persist, please contact the bot owner."
                 }.Build();
 
-                if (needDefer)
+                if (ctx.HasResponded)
                 {
                     await ctx.ModifyOriginalResponseAsync(x =>
                     {

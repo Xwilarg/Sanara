@@ -13,11 +13,6 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 
-
-//            _help.Add(("Entertainment", new Help("Japanese", "Subscribe anime", new[] { new Argument(ArgumentType.Mandatory, "text channel") }, "Get information on all new anime in to a channel.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-//            _help.Add(("Entertainment", new Help("Japanese", "Unsubscribe anime", Array.Empty<Argument>(), "Remove an anime subscription.", Array.Empty<string>(), Restriction.AdminOnly, null)));
-
-
 namespace Sanara.Module.Command.Impl
 {
     public sealed class NSFW : ISubmodule
@@ -482,38 +477,5 @@ namespace Sanara.Module.Command.Impl
 
             await StaticObjects.Db.AddBooruAsync(type.ToString());
         }
-        /*
-[Command("Source", RunMode = RunMode.Async)]
-public async Task SourceAsync(ImageLink img)
-{
-   await ParseSourceAsync(img.Link);
-}
-
-[Command("Source", RunMode = RunMode.Async)]
-public async Task SourceAsync()
-{
-   if (Context.Message.Attachments.Count > 0 && Utils.IsImage(Path.GetExtension(Context.Message.Attachments.First().Url)))
-       await ParseSourceAsync(Context.Message.Attachments.First().Url);
-   else
-       throw new CommandFailed("This command have some invalid parameters.");
-}
-
-[Command("Subscribe anime"), RequireAdmin]
-public async Task SubscribeAnimeAsync(ITextChannel chan, params string[] tags)
-{
-   await StaticObjects.Db.SetSubscriptionAsync(Context.Guild.Id, "anime", chan, new AnimeTags(tags, true));
-   await ReplyAsync($"You subscribed for anime to {chan.Mention}.");
-}
-
-[Command("Unsubscribe anime"), RequireAdmin]
-public async Task UnsubscribeAnimeAsync()
-{
-   if (!await StaticObjects.Db.HasSubscriptionExistAsync(Context.Guild.Id, "anime"))
-       await ReplyAsync("There is no active anime subscription.");
-   else
-       await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "anime");
-}
-
-*/
     }
 }

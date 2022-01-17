@@ -150,62 +150,73 @@ namespace Sanara
 
         private async Task ButtonExecuted(SocketMessageComponent ctx)
         {
-            if (ctx.Data.CustomId == "dump")
+            try
             {
-                await Module.Button.Settings.DatabaseDump(ctx);
-            }
-            else if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
-            {
-                var e = StaticObjects.Errors[ctx.Data.CustomId];
-                await ctx.RespondAsync(embed: new EmbedBuilder
+                if (ctx.Data.CustomId == "dump")
                 {
-                    Color = Color.Red,
-                    Title = e.GetType().ToString(),
-                    Description = e.Message
-                }.Build(), ephemeral: true);
-            }
-            else
-            {
-                _ = Task.Run(async () =>
+                    await Module.Button.Settings.DatabaseDump(ctx);
+                }
+                else if (ctx.Data.CustomId.StartsWith("delSub-"))
                 {
-                    try
+                    await Module.Button.Settings.RemoveSubscription(ctx, ctx.Data.CustomId[7..]);
+                }
+                else if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+                {
+                    var e = StaticObjects.Errors[ctx.Data.CustomId];
+                    await ctx.RespondAsync(embed: new EmbedBuilder
                     {
-                        if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
+                        Color = Color.Red,
+                        Title = e.GetType().ToString(),
+                        Description = e.Message
+                    }.Build(), ephemeral: true);
+                }
+                else
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
                         {
-                            StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
-                            await ctx.DeferLoadingAsync();
-                            var id = ctx.Data.CustomId.Split('/');
-                            await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
-                        }
-                        else if (StaticObjects.Doujinshis.Contains(ctx.Data.CustomId))
-                        {
-                            StaticObjects.Doujinshis.Remove(ctx.Data.CustomId);
-                            await ctx.DeferLoadingAsync();
-                            var id = ctx.Data.CustomId.Split('/').Last();
-                            await Booru.GetTagsAsync(ctx, id);
-                        }
-                        else if (ctx.Data.CustomId.StartsWith("game/"))
-                        {
-                            var id = ctx.Data.CustomId.Split('/');
-                            if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
+                            if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
                             {
-                                switch (id[2])
+                                StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
+                                await ctx.DeferLoadingAsync();
+                                var id = ctx.Data.CustomId.Split('/');
+                                await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
+                            }
+                            else if (StaticObjects.Doujinshis.Contains(ctx.Data.CustomId))
+                            {
+                                StaticObjects.Doujinshis.Remove(ctx.Data.CustomId);
+                                await ctx.DeferLoadingAsync();
+                                var id = ctx.Data.CustomId.Split('/').Last();
+                                await Booru.GetTagsAsync(ctx, id);
+                            }
+                            else if (ctx.Data.CustomId.StartsWith("game/"))
+                            {
+                                var id = ctx.Data.CustomId.Split('/');
+                                if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
                                 {
-                                    case "start":
-                                        await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
-                                        break;
+                                    switch (id[2])
+                                    {
+                                        case "start":
+                                            await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
+                                            break;
 
-                                    default:
-                                        throw new NotImplementedException("Invalid id " + id[2]);
+                                        default:
+                                            throw new NotImplementedException("Invalid id " + id[2]);
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (System.Exception ex)
-                    {
-                        await Log.LogErrorAsync(ex, ctx, false);
-                    }
-                });
+                        catch (System.Exception ex)
+                        {
+                            await Log.LogErrorAsync(ex, ctx);
+                        }
+                    });
+                }
+            }
+            catch (System.Exception ex)
+            {
+                await Log.LogErrorAsync(ex, ctx);
             }
         }
 
@@ -253,7 +264,7 @@ namespace Sanara
                 {
                     if (e is CommandFailed)
                     {
-                        if (cmd.NeedDefer)
+                        if (ctx.HasResponded)
                         {
                             await ctx.ModifyOriginalResponseAsync(x => x.Content = e.Message);
                         }
@@ -264,7 +275,7 @@ namespace Sanara
                     }
                     else
                     {
-                        await Log.LogErrorAsync(e, ctx, cmd.NeedDefer);
+                        await Log.LogErrorAsync(e, ctx);
                     }
                 }
             });

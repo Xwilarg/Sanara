@@ -57,9 +57,19 @@ namespace Sanara.Module.Command.Impl
         {
             var guild = ((ITextChannel)ctx.Channel).Guild;
             var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
-            var mySubs = subs?.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + (x.Value == null ? "None" : x.Value.Mention));
-            var button = new ComponentBuilder()
-                .WithButton("Database dump", "dump");
+            var mySubs = subs?.Select(x => $"**{Utils.ToWordCase(x.Key)}**: {(x.Value == null ? "None" : x.Value.Mention)}");
+            var button = new ComponentBuilder();
+            if (subs != null)
+            {
+                foreach (var sub in subs)
+                {
+                    if (sub.Value != null)
+                    {
+                        button.WithButton($"Remove {sub.Key} subscription", $"delSub-{sub.Key}", style: ButtonStyle.Danger);
+                    }
+                }
+            }
+            button.WithButton("Database dump", "dump", style: ButtonStyle.Secondary);
             await ctx.RespondAsync(embed: new EmbedBuilder
             {
                 Title = guild.ToString(),
