@@ -11,18 +11,18 @@ namespace Sanara.Module.Command.Context
         public MessageCommandContext(IMessage message, string arguments, CommandInfo command)
         {
             _message = message;
-            var matches = Regex.Match(arguments, @"[\""].+?[\""]|[^ ]+").Groups;
+            var matches = Regex.Matches(arguments, @"[\""].+?[\""]|[^ ]+");
             List<string>? argsArray;
-            if (matches.Count > 1)
+            if (matches.Count > 0)
             {
-                argsArray = matches.Cast<Group>().Skip(1).Select(x => x.Value).ToList();
+                argsArray = matches.Cast<Match>().Select(x => x.Value).ToList();
             }
             else
             {
-                argsArray = null;
+                argsArray = new();
             }
 
-            if (command.SlashCommand.Options.IsSpecified && argsArray != null)
+            if (command.SlashCommand.Options.IsSpecified)
             {
                 foreach (var arg in command.SlashCommand.Options.Value)
                 {

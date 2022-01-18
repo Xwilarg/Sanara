@@ -391,18 +391,40 @@ namespace Sanara
                 if (_commandsAssociations.ContainsKey(commandStr))
                 {
                     var command = _commandsAssociations[commandStr];
-                    var context = new MessageCommandContext(msg, content[commandStr.Length..].TrimStart(), command);
-                    _ = Task.Run(async () =>
+                    try
                     {
-                        try
+                        var context = new MessageCommandContext(msg, content[commandStr.Length..].TrimStart(), command);
+                        _ = Task.Run(async () =>
                         {
-                            await command.Callback(context);
-                        }
-                        catch (System.Exception e)
+                            try
+                            {
+                                await command.Callback(context);
+                            }
+                            catch (System.Exception e)
+                            {
+                                if (e is CommandFailed)
+                                {
+                                    await context.ReplyAsync(e.Message);
+                                }
+                                else
+                                {
+                                    await Log.LogErrorAsync(e, context);
+                                }
+                            }
+                        });
+                    }
+                    catch (System.Exception e)
+                    {
+
+                        if (e is CommandFailed)
                         {
-                            await Log.LogErrorAsync(e, context);
+                            await msg.Channel.SendMessageAsync(e.Message, messageReference: new MessageReference(msg.Id));
                         }
-                    });
+                        else
+                        {
+                            await Log.LogErrorAsync(e, null);
+                        }
+                    }
                 }
                 //await _commands.ExecuteAsync(context, pos, null);
             }
