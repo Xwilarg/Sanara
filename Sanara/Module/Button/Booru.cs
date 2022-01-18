@@ -2,12 +2,13 @@
 using Discord;
 using Discord.WebSocket;
 using Sanara.Exception;
+using Sanara.Module.Command;
 
 namespace Sanara.Module.Button
 {
     public class Booru
     {
-        public static async Task GetTagsAsync(SocketMessageComponent ctx, string id)
+        public static async Task GetTagsAsync(ICommandContext ctx, string id)
         {
             var info = await StaticObjects.Tags.GetTagAsync(id);
             if (!info.HasValue)
@@ -49,7 +50,7 @@ namespace Sanara.Module.Button
                 }
             };
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
     }
 }

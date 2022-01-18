@@ -16,6 +16,8 @@ namespace Sanara.Module.Utility
                 _tags.Add(id, new Tuple<ABooru, BooruSharp.Search.Post.SearchResult>(booru, post));
         }
 
+        public bool ContainsTag(string id) => _tags.ContainsKey(id);
+
         public async Task<TagsSearch?> GetTagAsync(string id)
         {
             if (!_tags.ContainsKey(id))
@@ -26,6 +28,7 @@ namespace Sanara.Module.Utility
             List<string> sources = new();
 
             var post = _tags[id];
+            _tags.Remove(id);
 
             foreach (string s in post.Item2.Tags)
             {

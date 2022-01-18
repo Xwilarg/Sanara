@@ -172,7 +172,12 @@ namespace Sanara
                     {
                         try
                         {
-                            if (StaticObjects.Cosplays.Contains(arg.Data.CustomId))
+                            if (StaticObjects.Tags.ContainsTag(arg.Data.CustomId))
+                            {
+                                await arg.DeferLoadingAsync();
+                                await Booru.GetTagsAsync(ctx, arg.Data.CustomId);
+                            }
+                            else if (StaticObjects.Cosplays.Contains(arg.Data.CustomId))
                             {
                                 StaticObjects.Cosplays.Remove(arg.Data.CustomId);
                                 await arg.DeferLoadingAsync();

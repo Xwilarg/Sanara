@@ -2,7 +2,6 @@
 using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
-using Discord.WebSocket;
 using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
@@ -433,16 +432,14 @@ namespace Sanara.Module.Command.Impl
                 }
             }
 
-            string id = $"{(int)type}{post.ID}";
+            string id = $"tags-{(int)type}{post.ID}";
             StaticObjects.Tags.AddTag(id, booru, post);
 
             if (post.FileUrl == null)
                 throw new CommandFailed("A post was found but no image was available.");
 
-            var token = $"cosplay-{Guid.NewGuid()}/{id}";
-            StaticObjects.Doujinshis.Add(token);
             var button = new ComponentBuilder()
-                .WithButton("Tags info", token);
+                .WithButton("Tags info", id);
             await ctx.ReplyAsync(embed: new EmbedBuilder
                 {
                     Color = post.Rating switch
@@ -454,12 +451,7 @@ namespace Sanara.Module.Command.Impl
                     },
                     ImageUrl = post.FileUrl.AbsoluteUri,
                     Url = post.PostUrl.AbsoluteUri,
-                    Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
-                    Footer = new EmbedFooterBuilder
-                    {
-                        Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
-                            $"Do the 'Tags' command with then id '{id}' to have more information about this image."
-                    }
+                    Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last())
                 }.Build(), components: button.Build());
 
             await StaticObjects.Db.AddBooruAsync(type.ToString());
