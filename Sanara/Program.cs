@@ -143,18 +143,28 @@ namespace Sanara
             }
         }
 
+        private List<ulong> _pendingRequests = new();
+
         private async Task ButtonExecuted(SocketMessageComponent arg)
         {
             var ctx = new ComponentCommandContext(arg);
+            if (_pendingRequests.Contains(arg.User.Id))
+            {
+                await ctx.ReplyAsync("A component request is already being treated for you, please retry afterward", ephemeral: true);
+                return;
+            }
+            _pendingRequests.Add(arg.User.Id);
             try
             {
                 if (arg.Data.CustomId == "dump")
                 {
                     await Module.Button.Settings.DatabaseDump(ctx);
+                    _pendingRequests.Remove(arg.User.Id);
                 }
                 else if (arg.Data.CustomId.StartsWith("delSub-"))
                 {
                     await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                    _pendingRequests.Remove(arg.User.Id);
                 }
                 else if (StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
                 {
@@ -165,6 +175,7 @@ namespace Sanara
                         Title = e.GetType().ToString(),
                         Description = e.Message
                     }.Build(), ephemeral: true);
+                    _pendingRequests.Remove(arg.User.Id);
                 }
                 else
                 {
@@ -207,10 +218,16 @@ namespace Sanara
                                     }
                                 }
                             }
+                            else
+                            {
+                                await ctx.ReplyAsync("There is no data associated to this button, that probably mean it was already requested");
+                            }
+                            _pendingRequests.Remove(arg.User.Id);
                         }
                         catch (System.Exception ex)
                         {
                             await Log.LogErrorAsync(ex, ctx);
+                            _pendingRequests.Remove(arg.User.Id);
                         }
                     });
                 }
@@ -218,6 +235,7 @@ namespace Sanara
             catch (System.Exception ex)
             {
                 await Log.LogErrorAsync(ex, ctx);
+                _pendingRequests.Remove(arg.User.Id);
             }
         }
 
