@@ -34,7 +34,7 @@ namespace Sanara
 #endif
         public static DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
         {
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.GuildMessages
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages
         });
         /// <summary>
         /// To display uptime
@@ -159,13 +159,13 @@ namespace Sanara
         /// </summary>
         public static IPreload[] Preloads { set; get; } = new IPreload[]
         {
-            new ArknightsAudioPreload(),
+            /*new ArknightsAudioPreload(),
             new KancolleAudioPreload(),
 
-            new ShiritoriHardPreload(),
+            new ShiritoriHardPreload(),*/
 
             new ShiritoriPreload(),
-            new ArknightsPreload(),
+            /*new ArknightsPreload(),
             new KancollePreload(),
             new GirlsFrontlinePreload(),
             new AzurLanePreload(),
@@ -173,7 +173,7 @@ namespace Sanara
             new PokemonPreload(),
             new AnimePreload(),
             new BooruQuizzPreload(),
-            new BooruFillPreload()
+            new BooruFillPreload()*/
         };
         /// <summary>
         /// List of all game names available
