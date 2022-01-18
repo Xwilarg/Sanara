@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
+using Sanara.Module.Command;
 
 namespace Sanara.Game.Impl
 {
@@ -16,9 +17,9 @@ namespace Sanara.Game.Impl
             _allowedFormats = info.AllowedFormats;
         }
 
-        protected override Task CheckAnswerInternalAsync(SocketSlashCommand answer)
+        protected override Task CheckAnswerInternalAsync(ICommandContext answer)
         {
-            string userAnswer = Utils.CleanWord((string)answer.Data.Options.First(x => x.Name == "answer").Value);
+            string userAnswer = Utils.CleanWord(answer.GetArgument<string>("answer"));
             if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer("");
             return Task.CompletedTask;

@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sanara.Diaporama;
 using Sanara.Exception;
-using Sanara.Module;
 using Sanara.Module.Button;
 using Sanara.Module.Command;
 using Sanara.Module.Command.Impl;
@@ -15,8 +14,6 @@ namespace Sanara
 {
     public sealed class Program
     {
-        private readonly CommandService _commands = new();
-
         private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
         private readonly Dictionary<string, Module.Command.CommandInfo> _commandsAssociations = new();
 
@@ -98,9 +95,6 @@ namespace Sanara
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
             StaticObjects.Client.AutocompleteExecuted += AutocompleteExecuted;
             StaticObjects.Client.ButtonExecuted += ButtonExecuted;
-
-            // Discord modules
-            await _commands.AddModuleAsync<DeprecationNotice>(null);
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
@@ -254,7 +248,7 @@ namespace Sanara
                             await ctx.DeferAsync();
                         }
 
-                        await cmd.Callback(ctx);
+                        await cmd.Callback(new SocketSlashCommandContext(ctx));
                         StaticObjects.LastMessage = DateTime.UtcNow;
 
                         await StaticObjects.Db.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
@@ -399,7 +393,7 @@ namespace Sanara
             if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
             {
                 var context = new SocketCommandContext(StaticObjects.Client, msg);
-                await _commands.ExecuteAsync(context, pos, null);
+                //await _commands.ExecuteAsync(context, pos, null);
             }
         }
 

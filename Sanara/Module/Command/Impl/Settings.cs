@@ -53,7 +53,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task ConfigureAsync(SocketSlashCommand ctx)
+        public async Task ConfigureAsync(ICommandContext ctx)
         {
             var guild = ((ITextChannel)ctx.Channel).Guild;
             var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
@@ -70,7 +70,7 @@ namespace Sanara.Module.Command.Impl
                 }
             }
             button.WithButton("Database dump", "dump", style: ButtonStyle.Secondary);
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Title = guild.ToString(),
                 Color = Color.Purple,
@@ -85,15 +85,15 @@ namespace Sanara.Module.Command.Impl
             }.Build(), ephemeral: true, components: button.Build());
         }
 
-        public async Task PingAsync(SocketSlashCommand ctx)
+        public async Task PingAsync(ICommandContext ctx)
         {
             var content = ":ping_pong: Pong!";
-            await ctx.RespondAsync(content);
-            var orMsg = await ctx.GetOriginalResponseAsync();
-            await ctx.ModifyOriginalResponseAsync(x => x.Content = orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
+            await ctx.ReplyAsync(content);
+            var orMsg = await ctx.GetOriginalAnswerAsync();
+            await ctx.ReplyAsync(orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
         }
 
-        public async Task BotInfoAsync(SocketSlashCommand ctx)
+        public async Task BotInfoAsync(ICommandContext ctx)
         {
             var embed = new EmbedBuilder
             {
@@ -161,7 +161,7 @@ namespace Sanara.Module.Command.Impl
 #endif // TODO: Can prob use current pfp for SFW version
                 );
 
-            await ctx.RespondAsync(embed: embed.Build(), ephemeral: true);
+            await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
 #if NSFW_BUILD
             // Get latests commits
             str = new();
@@ -173,7 +173,7 @@ namespace Sanara.Module.Command.Impl
             }
             embed.AddField("Latest changes", str.ToString());
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
 #endif
         }
     }

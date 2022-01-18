@@ -45,7 +45,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: PhotoAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -65,7 +65,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: SourceAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -110,7 +110,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: AnimeAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -130,7 +130,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: DramaAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -170,32 +170,22 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: QrcodeAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 )
             };
         }
 
-        public async Task QrcodeAsync(SocketSlashCommand ctx)
+        public async Task QrcodeAsync(ICommandContext ctx)
         {
-            var input = (string)ctx.Data.Options.First(x => x.Name == "input").Value;
-            await ctx.RespondWithFileAsync(
-                fileStream: await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(input)),
-                fileName: "qrcode.png",
-                text: "",
-                embeds: null,
-                isTTS: false,
-                ephemeral: false,
-                allowedMentions: null,
-                components: null,
-                embed: null,
-                options: null
-            );
+            var input = ctx.GetArgument<string>("input");
+            await ctx.ReplyAsync(file: await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(input)),
+                fileName: "qrcode.png");
         }
 
 
-        public async Task SourceAsync(SocketSlashCommand ctx)
+        public async Task SourceAsync(ICommandContext ctx)
         {
-            var image = (string)ctx.Data.Options.First(x => x.Name == "image").Value;
+            var image = ctx.GetArgument<string>("image");
 
             var html = await StaticObjects.HttpClient.GetStringAsync("https://saucenao.com/search.php?db=999&url=" + Uri.EscapeDataString(image));
             if (!html.Contains("<div id=\"middle\">"))
@@ -206,7 +196,7 @@ namespace Sanara.Module.Command.Impl
             var content = Utils.CleanHtml(subHtml.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]);
             var url = Regex.Match(html, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value;
 
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 ImageUrl = url,
                 Description = content,
@@ -218,14 +208,14 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task PhotoAsync(SocketSlashCommand ctx)
+        public async Task PhotoAsync(ICommandContext ctx)
         {
             if (StaticObjects.UnsplashToken == null)
             {
                 throw new CommandFailed("Photo token is not available");
             }
 
-            string? query = (string?)ctx.Data.Options.FirstOrDefault(x => x.Name == "query")?.Value;
+            string? query = ctx.GetArgument<string>("query");
 
             JObject json;
             if (query == null)
@@ -239,7 +229,7 @@ namespace Sanara.Module.Command.Impl
                     throw new CommandFailed("There is no result with these search terms.");
                 json = JsonConvert.DeserializeObject<JObject>(await resp.Content.ReadAsStringAsync());
             }
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Title = "By " + json["user"]["name"].Value<string>(),
                 Url = json["links"]["html"].Value<string>(),
@@ -252,9 +242,9 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task VisualNovelAsync(SocketSlashCommand ctx)
+        public async Task VisualNovelAsync(ICommandContext ctx)
         {
-            var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
+            var name = ctx.GetArgument<string>("name");
             string originalName = name;
             name = Utils.CleanWord(name);
             HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + HttpUtility.UrlEncode(originalName).Replace("%20", "+"));
@@ -346,10 +336,10 @@ namespace Sanara.Module.Command.Impl
             }
             embed.AddField("Release Date", releaseDate, true);
             response.Dispose();
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
-        public async Task DramaAsync(SocketSlashCommand ctx)
+        public async Task DramaAsync(ICommandContext ctx)
         {
             if (StaticObjects.TranslationClient == null)
             {
@@ -358,7 +348,7 @@ namespace Sanara.Module.Command.Impl
 
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode((string)ctx.Data.Options.ElementAt(0).Value)),
+                RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode(ctx.GetArgument<string>("name"))),
                 Method = HttpMethod.Post
             };
             request.Headers.Add("mdl-api-key", StaticObjects.MyDramaListApiKey);
@@ -400,7 +390,7 @@ namespace Sanara.Module.Command.Impl
                 embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
             }
 
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
         public static async Task<JObject> GetDramaAsync(int id)
@@ -416,10 +406,10 @@ namespace Sanara.Module.Command.Impl
             return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task AnimeAsync(SocketSlashCommand ctx)
+        public async Task AnimeAsync(ICommandContext ctx)
         {
-            var name = (string)ctx.Data.Options.First(x => x.Name == "name").Value;
-            var media = (JapaneseMedia)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
+            var name = ctx.GetArgument<string>("name");
+            var media = (JapaneseMedia)ctx.GetArgument<long>("type");
             var answer = (await SearchMediaAsync(media, name)).Attributes;
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
@@ -448,7 +438,7 @@ namespace Sanara.Module.Command.Impl
                 embed.AddField("Release Date", answer.StartDate + " - " + (answer.EndDate ?? "???"), true);
             if (!string.IsNullOrEmpty(answer.AgeRatingGuide))
                 embed.AddField("Audiance Warning", answer.AgeRatingGuide, true);
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
         public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)

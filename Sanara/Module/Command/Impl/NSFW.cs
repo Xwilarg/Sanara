@@ -163,9 +163,9 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task DoujinshiAsync(SocketSlashCommand ctx)
+        public async Task DoujinshiAsync(ICommandContext ctx)
         {
-            var tags = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "");
+            var tags = ctx.GetArgument<string>("tags");
 
             if (string.IsNullOrEmpty(tags))
             {
@@ -203,9 +203,8 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
-        private async Task FormatDoujinshiAsync(SocketSlashCommand ctx, GalleryElement result)
+        private async Task FormatDoujinshiAsync(ICommandContext ctx, GalleryElement result)
         {
-
             var token = $"doujinshi-{Guid.NewGuid()}/{result.id}";
             StaticObjects.Doujinshis.Add(token);
             var button = new ComponentBuilder()
@@ -220,19 +219,15 @@ namespace Sanara.Module.Command.Impl
                 ImageUrl = result.pages[0].imageUrl.AbsoluteUri
             }.Build();
 
-            await ctx.ModifyOriginalResponseAsync(x =>
-            {
-                x.Embed = embed;
-                x.Components = button.Build();
-            });
+            await ctx.ReplyAsync(embed: embed, components: button.Build());
         }
 
-        public async Task AdultVideoAsync(SocketSlashCommand ctx)
+        public async Task AdultVideoAsync(ICommandContext ctx)
         {
             if (StaticObjects.JavmostCategories.Count == 0)
                 throw new CommandFailed("Javmost categories aren't loaded yet, please retry later.");
 
-            var tag = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tag")?.Value ?? "all");
+            var tag = ctx.GetArgument<string>("tags") ?? "all";
 
             string url = "https://www5.javmost.com/category/" + tag;
             string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
@@ -264,7 +259,7 @@ namespace Sanara.Module.Command.Impl
                 videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www\\.javmost\\.xyz\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
                 break;
             }
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder()
+            await ctx.ReplyAsync(embed: new EmbedBuilder()
             {
                 Color = new Color(255, 20, 147),
                 Description = string.Join(", ", videoTags),
@@ -274,7 +269,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task DlRandAsync(SocketSlashCommand ctx)
+        public async Task DlRandAsync(ICommandContext ctx)
         {
             var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
             var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
@@ -304,7 +299,7 @@ namespace Sanara.Module.Command.Impl
                 : "";
             var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
 
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Color = new Color(255, 20, 147),
                 Title = title,
@@ -333,9 +328,9 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task CosplayAsync(SocketSlashCommand ctx)
+        public async Task CosplayAsync(ICommandContext ctx)
         {
-            var tags = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "");
+            var tags = ctx.GetArgument<string>("tags") ?? "";
 
             // 959 means we only take cosplays
             string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags);
@@ -369,16 +364,14 @@ namespace Sanara.Module.Command.Impl
             var button = new ComponentBuilder()
                 .WithButton("Download", token);
 
-            await ctx.ModifyOriginalResponseAsync(x =>
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
-                x.Embed = new EmbedBuilder
-                {
-                    Color = new Color(255, 20, 147),
-                    Description = string.Join(", ", allTags),
-                    Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
-                    Url = finalUrl,
-                    ImageUrl = imageUrl,
-                    Fields = new List<EmbedFieldBuilder>
+                Color = new Color(255, 20, 147),
+                Description = string.Join(", ", allTags),
+                Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
+                Url = finalUrl,
+                ImageUrl = imageUrl,
+                Fields = new List<EmbedFieldBuilder>
                     {
                         new EmbedFieldBuilder
                         {
@@ -387,15 +380,13 @@ namespace Sanara.Module.Command.Impl
                             IsInline = true
                         }
                     }
-                }.Build();
-                x.Components = button.Build();
-            });
+            }.Build(), components: button.Build());
         }
 
-        public async Task BooruAsync(SocketSlashCommand ctx)
+        public async Task BooruAsync(ICommandContext ctx)
         {
-            var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
-            var type = (BooruType)(long)ctx.Data.Options.First(x => x.Name == "source").Value;
+            var tags = (ctx.GetArgument<string>("tags") ?? "").Split(' ');
+            var type = (BooruType)ctx.GetArgument<long>("source");
 
             ABooru booru = type switch
             {
@@ -452,9 +443,7 @@ namespace Sanara.Module.Command.Impl
             StaticObjects.Doujinshis.Add(token);
             var button = new ComponentBuilder()
                 .WithButton("Tags info", token);
-            await ctx.ModifyOriginalResponseAsync(x =>
-            {
-                x.Embed = new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
                 {
                     Color = post.Rating switch
                     {
@@ -471,9 +460,7 @@ namespace Sanara.Module.Command.Impl
                         Text = (newTags.Any() ? $"Some of your tags were invalid, the current search was done with: {string.Join(", ", newTags)}\n" : "") +
                             $"Do the 'Tags' command with then id '{id}' to have more information about this image."
                     }
-                }.Build();
-                x.Components = button.Build();
-            });
+                }.Build(), components: button.Build());
 
             await StaticObjects.Db.AddBooruAsync(type.ToString());
         }

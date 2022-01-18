@@ -5,7 +5,7 @@ namespace Sanara.Module.Command
 {
     public record CommandInfo
     {
-        public CommandInfo(SlashCommandProperties slashCommand, Func<SocketSlashCommand, Task> callback, Precondition precondition, bool needDefer)
+        public CommandInfo(SlashCommandProperties slashCommand, Func<ICommandContext, Task> callback, Precondition precondition, bool needDefer)
             => (SlashCommand, Callback, Precondition, NeedDefer) = (slashCommand, callback, precondition, needDefer);
 
         /// <summary>
@@ -15,7 +15,7 @@ namespace Sanara.Module.Command
         /// <summary>
         /// Method to be called to execute the command
         /// </summary>
-        public Func<SocketSlashCommand, Task> Callback { private init; get; }
+        public Func<ICommandContext, Task> Callback { private init; get; }
         /// <summary>
         /// Requirements for the command to be launched
         /// </summary>

@@ -4,6 +4,7 @@ using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
 using Sanara.Game.Preload;
+using Sanara.Module.Command;
 
 namespace Sanara.Game
 {
@@ -24,7 +25,7 @@ namespace Sanara.Game
 
             _gameName = preload.Name;
             _argument = null;// preload.GetNameArg();
-            _messages = new List<SocketSlashCommand>();
+            _messages = new List<ICommandContext>();
 
             _contributors = new List<ulong>();
             _score = 0;
@@ -33,7 +34,7 @@ namespace Sanara.Game
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
-        protected abstract Task CheckAnswerInternalAsync(SocketSlashCommand answer); // Check if user answer is right
+        protected abstract Task CheckAnswerInternalAsync(ICommandContext answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
@@ -178,7 +179,7 @@ namespace Sanara.Game
             _state = GameState.Running;
         }
 
-        public void AddAnswer(SocketSlashCommand msg)
+        public void AddAnswer(ICommandContext msg)
         {
             lock (_messages)
             {
@@ -224,7 +225,7 @@ namespace Sanara.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await msg.ModifyOriginalResponseAsync(x => x.Content = "Timed out");
+                                    await msg.ReplyAsync("Timed out");
                                 });
                             }
                         }
@@ -241,9 +242,9 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     if (e.InnerException.Message.Length == 0)
-                                        await msg.ModifyOriginalResponseAsync(x => x.Content = "Wrong answer");
+                                        await msg.ReplyAsync("Wrong answer");
                                     else
-                                        await msg.ModifyOriginalResponseAsync(x => x.Content = e.InnerException.Message);
+                                        await msg.ReplyAsync(e.InnerException.Message);
                                 });
                             }
                             else
@@ -251,7 +252,7 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     await Log.LogErrorAsync(e, null);
-                                    await msg.ModifyOriginalResponseAsync(x => x.Content = e.Message);
+                                    await msg.ReplyAsync(e.Message);
                                 });
                             }
                         }
@@ -359,7 +360,7 @@ namespace Sanara.Game
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private string _current; // Current value, used for Replay command
 
-        List<SocketSlashCommand> _messages;
+        List<ICommandContext> _messages;
 
         // SCORES
         private List<ulong> _contributors; // Users that contributed

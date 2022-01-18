@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Discord;
+using System.Text.RegularExpressions;
 
 namespace Sanara
 {
@@ -26,6 +27,19 @@ namespace Sanara
             if (extension[0] == '.') extension = extension[1..];
             return (extension.StartsWith("gif") || extension.StartsWith("png") || extension.StartsWith("jpg")
                 || extension.StartsWith("jpeg"));
+        }
+
+        public static async Task<(IMessage Message, string Url)?> GetLatestAttachmentAsync(ITextChannel chan)
+        {
+            var msgs = await chan.GetMessagesAsync(10).FlattenAsync();
+            foreach (var msg in msgs)
+            {
+                if (msg.Attachments.Any())
+                {
+                    return (msg, msg.Attachments.ElementAt(0).Url);
+                }
+            }
+            return null;
         }
 
         public enum TimestampInfo

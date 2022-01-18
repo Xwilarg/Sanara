@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Google;
+using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
@@ -38,7 +39,7 @@ namespace Sanara.Module.Command.Impl
                             new SlashCommandOptionBuilder()
                             {
                                 Name = "sentence",
-                                Description = "Sentence to translate",
+                                Description = "Sentence to translate or \"^\" to translate latest image sent",
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
@@ -46,7 +47,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: TranslateAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -66,7 +67,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: UrbanAsync,
                     precondition: Precondition.NsfwOnly,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -86,7 +87,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: KanjiAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -106,20 +107,20 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: JapaneseAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
             };
         }
 
-        public async Task TranslateAsync(SocketSlashCommand ctx)
+        public async Task TranslateAsync(ICommandContext ctx)
         {
             if (StaticObjects.TranslationClient == null)
             {
                 throw new CommandFailed("Translation client is not available");
             }
 
-            var language = (string)ctx.Data.Options.First(x => x.Name == "language").Value;
-            var sentence = (string)ctx.Data.Options.First(x => x.Name == "sentence").Value;
+            var language = ctx.GetArgument<string>("language");
+            var sentence = ctx.GetArgument<string>("sentence");
 
             if (StaticObjects.ISO639Reverse.ContainsKey(language))
                 language = StaticObjects.ISO639Reverse[language];
@@ -127,10 +128,43 @@ namespace Sanara.Module.Command.Impl
             if (language.Length != 2)
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
+            if (sentence == "^")
+            {
+                if (StaticObjects.VisionClient == null)
+                {
+                    throw new CommandFailed("Vision client is not available");
+                }
+                var att = await Utils.GetLatestAttachmentAsync((ITextChannel)ctx.Channel);
+                if (att == null)
+                {
+                    throw new CommandFailed("No attachment found in the lasts messages");
+                }
+                try
+                {
+                    var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(att.Value.Url);
+                    TextAnnotation response;
+                    try
+                    {
+                        response = await StaticObjects.VisionClient.DetectDocumentTextAsync(image);
+                    }
+                    catch (AnnotateImageException)
+                    {
+                        throw new CommandFailed("The file given isn't a valid image.");
+                    }
+                    if (response == null)
+                        throw new CommandFailed("There is no text on the image.");
+                    sentence = response.Text;
+                }
+                catch (GoogleApiException)
+                {
+                    throw new CommandFailed("The language you provided is invalid.");
+                }
+            }
+
             try
             {
                 var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
-                await ctx.RespondAsync(embed: new EmbedBuilder
+                await ctx.ReplyAsync(embed: new EmbedBuilder
                 {
                     Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
                     Description = translation.TranslatedText,
@@ -143,9 +177,9 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
-        public async Task UrbanAsync(SocketSlashCommand ctx)
+        public async Task UrbanAsync(ICommandContext ctx)
         {
-            var word = (string)ctx.Data.Options.First(x => x.Name == "word").Value;
+            var word = ctx.GetArgument<string>("word");
 
             JObject json;
             try
@@ -203,13 +237,13 @@ namespace Sanara.Module.Command.Impl
             {
                 embed.AddField("Example", example);
             }
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
 
-        public async Task KanjiAsync(SocketSlashCommand ctx)
+        public async Task KanjiAsync(ICommandContext ctx)
         {
-            var kanji = (string)ctx.Data.Options.First(x => x.Name == "kanji").Value;
+            var kanji = ctx.GetArgument<string>("kanji");
 
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("https://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(kanji)));
             if (json["data"].Value<JArray>().Count == 0 || json["data"][0]["japanese"][0]["word"] == null)
@@ -268,7 +302,7 @@ namespace Sanara.Module.Command.Impl
                 "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
                     kunyomi.Add(match.Groups[1].Value, Utility.Language.ToRomaji(match.Groups[1].Value));
 
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Title = finalKanji.Value.ToString(),
                 // Url = url, // TODO: https://github.com/dotnet/runtime/issues/21626 , .NET said they will fix that in a next release
@@ -300,9 +334,9 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task JapaneseAsync(SocketSlashCommand ctx)
+        public async Task JapaneseAsync(ICommandContext ctx)
         {
-            var word = (string)ctx.Data.Options.First(x => x.Name == "word").Value;
+            var word = ctx.GetArgument<string>("word");
 
             JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword="
                 + HttpUtility.UrlEncode(word)));
@@ -332,7 +366,7 @@ namespace Sanara.Module.Command.Impl
                 }));
                 embed.AddField(title, content);
             }
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
     }
 
@@ -358,53 +392,6 @@ namespace Sanara.Module.Command.Impl
                         Color = Color.Blue
                     }.Build());
                 }
-            }
-        }
-
-        //TODO
-        /*
-        [Command("Translate", RunMode = RunMode.Async)]
-        public async Task TranslateAsync(string language)
-        {
-            if (StaticObjects.ISO639Reverse.ContainsKey(language))
-                language = StaticObjects.ISO639Reverse[language];
-
-            if (language.Length != 2)
-                throw new CommandFailed("The language given must be in format ISO 639-1.");
-
-
-            if (Context.Message.Attachments.Count == 0)
-                throw new CommandFailed("No text or image was attached.");
-
-            if (!Utils.IsImage(Path.GetExtension(Context.Message.Attachments.First().Url)))
-                throw new CommandFailed("The file attached was not an image");
-
-            try
-            {
-                var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(Context.Message.Attachments.ElementAt(0).Url);
-                TextAnnotation response;
-                try
-                {
-                    response = await StaticObjects.VisionClient.DetectDocumentTextAsync(image);
-                }
-                catch (AnnotateImageException)
-                {
-                    throw new CommandFailed("The file given isn't a valid image.");
-                }
-                if (response == null)
-                    throw new CommandFailed("There is no text on the image.");
-
-                var translation = await StaticObjects.TranslationClient.TranslateTextAsync(response.Text, language);
-                await ReplyAsync(embed: new EmbedBuilder
-                {
-                    Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                    Description = translation.TranslatedText,
-                    Color = Color.Blue
-                }.Build());
-            }
-            catch (GoogleApiException)
-            {
-                throw new CommandFailed("The language you provided is invalid.");
             }
         }
 

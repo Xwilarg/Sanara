@@ -71,11 +71,11 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task SubscribeAsync(SocketSlashCommand ctx)
+        public async Task SubscribeAsync(ICommandContext ctx)
         {
-            var channel = (ITextChannel)ctx.Data.Options.First(x => x.Name == "channel").Value;
-            var type = (SubscriptionType)(long)ctx.Data.Options.First(x => x.Name == "type").Value;
-            var tags = ((string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "tags")?.Value ?? "")).Split(' ');
+            var channel = ctx.GetArgument<ITextChannel>("channel");
+            var type = (SubscriptionType)ctx.GetArgument<long>("type");
+            var tags = (ctx.GetArgument<string>("tags") ?? "").Split(' ');
 
             if (type == SubscriptionType.Doujinshi && !channel.IsNsfw)
                 throw new CommandFailed("Doujinshi subscription channel must be NSFW");
@@ -91,7 +91,7 @@ namespace Sanara.Module.Command.Impl
                 SubscriptionType.Doujinshi => new NHentaiTags(tags, true),
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             });
-            await ctx.RespondAsync($"You subscribed for {type} in {channel.Mention}, use the configure command to remove it");
+            await ctx.ReplyAsync($"You subscribed for {type} in {channel.Mention}, use the configure command to remove it");
         }
     }
 }

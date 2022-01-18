@@ -88,9 +88,8 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task AnswerAsync(SocketSlashCommand ctx)
+        public async Task AnswerAsync(ICommandContext ctx)
         {
-            await ctx.DeferAsync();
             var game = StaticObjects.GameManager.GetGame(ctx.Channel);
 
             if (game == null)
@@ -101,7 +100,7 @@ namespace Sanara.Module.Command.Impl
             game.AddAnswer(ctx);
         }
 
-        public async Task PlayAsync(SocketSlashCommand ctx)
+        public async Task PlayAsync(ICommandContext ctx)
         {
             if (StaticObjects.GameManager.GetGame(ctx.Channel) != null)
                 throw new CommandFailed("A game is already running in this channel.");
@@ -131,7 +130,7 @@ namespace Sanara.Module.Command.Impl
             }
             else*/
             {
-                var index = (long)ctx.Data.Options.First(x => x.Name == "game").Value;
+                var index = ctx.GetArgument<long>("game");
                 var preload = StaticObjects.Preloads[(int)index];
                 if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                     throw new CommandFailed("This game can only be launched in a NSFW channel.");
@@ -151,11 +150,11 @@ namespace Sanara.Module.Command.Impl
                     .WithButton(label: "Join/Leave", customId: $"game/{id}/join")
                     .WithButton(label: "Cancel", customId: $"game/{id}/cancel", style: ButtonStyle.Danger);
 
-                await ctx.RespondAsync(embed: embed.Build(), components: buttons.Build());
+                await ctx.ReplyAsync(embed: embed.Build(), components: buttons.Build());
             }
         }
 
-        public async Task CancelAsync(SocketSlashCommand ctx)
+        public async Task CancelAsync(ICommandContext ctx)
         {
             var game = StaticObjects.GameManager.GetGame(ctx.Channel);
 

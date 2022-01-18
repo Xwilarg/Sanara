@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.Preload;
+using Sanara.Module.Command;
 using System.Web;
 
 namespace Sanara.Game.Impl
@@ -33,9 +34,9 @@ namespace Sanara.Game.Impl
             return new[] { post.FileUrl.AbsoluteUri };
         }
 
-        protected override Task CheckAnswerInternalAsync(SocketSlashCommand answer)
+        protected override Task CheckAnswerInternalAsync(ICommandContext answer)
         {
-            string userAnswer = Utils.CleanWord((string)answer.Data.Options.First(x => x.Name == "answer").Value);
+            string userAnswer = answer.GetArgument<string>("answer");
             var foundTag = _allTags.Where(x => Utils.CleanWord(x) == userAnswer).FirstOrDefault();
             if (foundTag == null)
                 throw new InvalidGameAnswer("");

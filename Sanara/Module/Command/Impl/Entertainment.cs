@@ -29,7 +29,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: InspireAsync,
                     precondition: Precondition.None,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -39,7 +39,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: VNQuoteAsync,
                     precondition: Precondition.NsfwOnly,
-                    needDefer: false
+                    needDefer: true
                 ),
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
@@ -64,22 +64,22 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task InspireAsync(SocketSlashCommand ctx)
+        public async Task InspireAsync(ICommandContext ctx)
         {
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Color = Color.Blue,
                 ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
             }.Build());
         }
 
-        public async Task VNQuoteAsync(SocketSlashCommand ctx)
+        public async Task VNQuoteAsync(ICommandContext ctx)
         {
             var html = await StaticObjects.HttpClient.GetStringAsync("https://vndb.org");
             var match = Regex.Match(html, "footer\">\"<a href=\"\\/v([0-9]+)\"[^>]+>([^<]+)+<");
             var id = match.Groups[1].Value;
             var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id)), VndbFlags.FullVisualNovel)).ToArray()[0];
-            await ctx.RespondAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Title = "From " + vn.Name,
                 Url = "https://vndb.org/v" + id,
@@ -88,9 +88,9 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task CompleteAsync(SocketSlashCommand ctx)
+        public async Task CompleteAsync(ICommandContext ctx)
         {
-            var sentence = (string)(ctx.Data.Options.FirstOrDefault(x => x.Name == "sentence")?.Value ?? "");
+            var sentence = ctx.GetArgument<string>("sentence");
 
             var embed = new EmbedBuilder
             {
@@ -106,7 +106,7 @@ namespace Sanara.Module.Command.Impl
             };
             var json = await resp.Content.ReadAsStringAsync();
             embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
-            await ctx.ModifyOriginalResponseAsync(x => x.Embed = embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build());
         }
     }
 }
