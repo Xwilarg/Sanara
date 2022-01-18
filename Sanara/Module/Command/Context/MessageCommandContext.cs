@@ -30,7 +30,12 @@ namespace Sanara.Module.Command.Context
                     {
                         if (arg.IsRequired.Value)
                         {
-                            throw new CommandFailed("Missing required argument " + arg.Name);
+                            var errorMsg = $"Missing required argument {arg.Name} of type {arg.Type}";
+                            if (arg.Choices.Any())
+                            {
+                                errorMsg += $"\n\nAvailable choices:\n{string.Join("\n", arg.Choices.Select(x => $"{x.Value}: {x.Name}"))}";
+                            }
+                            throw new CommandFailed(errorMsg);
                         }
                     }
                     else
