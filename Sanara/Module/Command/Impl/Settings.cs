@@ -114,11 +114,18 @@ namespace Sanara.Module.Command.Impl
                 //if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
                 //    continue;
                 // var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
-                var loadInfo = elem.Load();
-                if (loadInfo != null)
-                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: {elem.Load().Count} words.");
-                else // Get information at runtime
-                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: None");
+                try
+                {
+                    var loadInfo = elem.Load();
+                    if (loadInfo != null)
+                        str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: {elem.Load().Count} words.");
+                    else // Get information at runtime
+                        str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: None");
+                }
+                catch (System.Exception e)
+                {
+                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: Failed to load: {e.GetType().ToString()}");
+                }
             }
             embed.AddField("Games", str.ToString());
 

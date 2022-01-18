@@ -54,8 +54,21 @@ namespace Sanara
                     await ctx.RespondAsync(embed: embed, components: button.Build());
                 }
 
+                string data;
+                if (ctx is SocketMessageComponent smc)
+                {
+                    data = $"button interaction {smc.Data.CustomId}";
+                }
+                else if (ctx is SocketSlashCommand ssc)
+                {
+                    data = $"slash command {ssc.Data.Name} with {string.Join(", ", ssc.Data.Options.Select(x => $"{x.Name}: {x.Value}"))}";
+                }
+                else
+                {
+                    data = $"Unknown";
+                }
                 if (SentrySdk.IsEnabled)
-                    SentrySdk.CaptureException(new System.Exception($"Error while processing {ctx}", e));
+                    SentrySdk.CaptureException(new System.Exception($"Error while processing {data}", new System.Exception($"Command {ctx.Data} failed", e)));
             }
             else
             {
