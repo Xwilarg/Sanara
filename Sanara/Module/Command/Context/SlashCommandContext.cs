@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace Sanara.Module.Command
+namespace Sanara.Module.Command.Context
 {
-    public class SocketSlashCommandContext : ICommandContext
+    public class SlashCommandContext : ICommandContext
     {
-        public SocketSlashCommandContext(SocketSlashCommand ctx)
+        public SlashCommandContext(SocketSlashCommand ctx)
             => _ctx = ctx;
 
         private SocketSlashCommand _ctx;
@@ -55,6 +55,11 @@ namespace Sanara.Module.Command
         public async Task<IMessage> GetOriginalAnswerAsync()
         {
             return await _ctx.GetOriginalResponseAsync();
+        }
+
+        public override string ToString()
+        {
+            return $"{_ctx.Data.Name} {string.Join(", ", _ctx.Data.Options.Select(x => $"{x.Name}: {x.Value}"))}";
         }
     }
 }

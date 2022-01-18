@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Sanara.Module.Command;
 using Sentry;
 
 namespace Sanara
@@ -24,16 +25,17 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task LogErrorAsync(System.Exception e, IDiscordInteraction? ctx)
+        public static async Task LogErrorAsync(System.Exception e, ICommandContext ctx)
         {
             await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
 
             if (ctx != null)
             {
+                var id = Guid.NewGuid();
                 var button = new ComponentBuilder()
-                        .WithButton("More information", $"error-{ctx.Id}");
+                        .WithButton("More information", $"error-{id}");
 
-                StaticObjects.Errors.Add($"error-{ctx.Id}", e);
+                StaticObjects.Errors.Add($"error-{id}", e);
                 var embed = new EmbedBuilder
                 {
                     Color = Color.Red,
@@ -41,34 +43,10 @@ namespace Sanara
                     Description = "The error was automatically reported. If the error persist, please contact the bot owner."
                 }.Build();
 
-                if (ctx.HasResponded)
-                {
-                    await ctx.ModifyOriginalResponseAsync(x =>
-                    {
-                        x.Embed = embed;
-                        x.Components = button.Build();
-                    });
-                }
-                else
-                {
-                    await ctx.RespondAsync(embed: embed, components: button.Build());
-                }
+                await ctx.ReplyAsync(embed: embed, components: button.Build());
 
-                string data;
-                if (ctx is SocketMessageComponent smc)
-                {
-                    data = $"button interaction {smc.Data.CustomId}";
-                }
-                else if (ctx is SocketSlashCommand ssc)
-                {
-                    data = $"slash command {ssc.Data.Name} with {string.Join(", ", ssc.Data.Options.Select(x => $"{x.Name}: {x.Value}"))}";
-                }
-                else
-                {
-                    data = $"Unknown";
-                }
                 if (SentrySdk.IsEnabled)
-                    SentrySdk.CaptureException(new System.Exception($"Error while processing {data}", new System.Exception($"Command {ctx.Data} failed", e)));
+                    SentrySdk.CaptureException(new System.Exception($"Command {ctx} failed", e));
             }
             else
             {

@@ -1,16 +1,15 @@
-﻿using Discord;
-using Discord.WebSocket;
-using NHentaiSharp.Core;
+﻿using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
 using Sanara.Exception;
+using Sanara.Module.Command;
 using System.IO.Compression;
 
 namespace Sanara.Module.Button
 {
     public class Doujinshi
     {
-        public static async Task DownloadDoujinshiAsync(SocketMessageComponent ctx, string id)
+        public static async Task DownloadDoujinshiAsync(ICommandContext ctx, string id)
         {
             string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
             Directory.CreateDirectory("Saves/Download/" + path); // Folder that contains the ZIP
@@ -47,13 +46,13 @@ namespace Sanara.Module.Button
             FileInfo fi = new(finalPath);
             if (fi.Length < 8000000) // 8MB
             {
-                await ctx.FollowupWithFileAsync(new FileAttachment(finalPath));
+                await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), fi.Name);
             }
             else
             {
                 Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
                 File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
-                await ctx.FollowupAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
+                await ctx.ReplyAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(600000); // 10 minutes

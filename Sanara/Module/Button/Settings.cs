@@ -1,33 +1,33 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Sanara.Module.Command;
 
 namespace Sanara.Module.Button
 {
     public class Settings
     {
-        public static async Task DatabaseDump(SocketMessageComponent ctx)
+        public static async Task DatabaseDump(ICommandContext ctx)
         {
-            await ctx.RespondAsync("```json\n" +
+            await ctx.ReplyAsync("```json\n" +
                 await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id) +
                 "\n```", ephemeral: true);
         }
 
-        public static async Task RemoveSubscription(SocketMessageComponent ctx, string key)
+        public static async Task RemoveSubscription(ICommandContext ctx, string key)
         {
             var guildId = ((ITextChannel)ctx.Channel).Guild.Id;
             var subs = await StaticObjects.GetSubscriptionsAsync(guildId);
             if (subs == null)
             {
-                await ctx.RespondAsync("Subscription system is not ready yet", ephemeral: true);
+                await ctx.ReplyAsync("Subscription system is not ready yet", ephemeral: true);
             }
             else if (subs[key] == null)
             {
-                await ctx.RespondAsync("This subscription was already removed", ephemeral: true);
+                await ctx.ReplyAsync("This subscription was already removed", ephemeral: true);
             }
             else
             {
                 await StaticObjects.Db.RemoveSubscriptionAsync(guildId, key);
-                await ctx.RespondAsync($"{ctx.User.Mention} removed a subscription");
+                await ctx.ReplyAsync($"{ctx.User.Mention} removed a subscription");
             }
         }
     }

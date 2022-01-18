@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Sanara.Module.Command;
 
 namespace Sanara.Game
 {
@@ -46,7 +47,7 @@ namespace Sanara.Game
             return _pendingGames.ContainsKey(id);
         }
 
-        public async Task StartGameAsync(SocketMessageComponent ctx, string id)
+        public async Task StartGameAsync(ICommandContext ctx, string id)
         {
             await _pendingGames[id].StartAsync(ctx);
             _games.Add(_pendingGames[id]);

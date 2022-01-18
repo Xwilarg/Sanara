@@ -1,6 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Sanara.Exception;
+﻿using Sanara.Exception;
+using Sanara.Module.Command;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 
@@ -8,7 +7,7 @@ namespace Sanara.Module.Button
 {
     public class Cosplay
     {
-        public static async Task DownloadCosplayAsync(SocketMessageComponent ctx, string idFirst, string idSecond)
+        public static async Task DownloadCosplayAsync(ICommandContext ctx, string idFirst, string idSecond)
         {
             string html;
             int nbPages;
@@ -53,13 +52,13 @@ namespace Sanara.Module.Button
             FileInfo fi = new(finalPath);
             if (fi.Length < 8000000) // 8MB
             {
-                await ctx.FollowupWithFileAsync(new FileAttachment(finalPath));
+                await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), fi.Name);
             }
             else
             {
                 Directory.CreateDirectory(StaticObjects.UploadWebsiteLocation + path);
                 File.Copy(finalPath, StaticObjects.UploadWebsiteLocation + path + "/" + id + ".zip");
-                await ctx.FollowupAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
+                await ctx.ReplyAsync(StaticObjects.UploadWebsiteUrl + path + "/" + id + ".zip" + Environment.NewLine + "You file will be deleted after 10 minutes.");
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(600000); // 10 minutes

@@ -73,7 +73,7 @@ namespace Sanara.Game
         public bool IsLobbyOwner(IUser user)
             => _lobby.IsHost(user);
 
-        public async Task StartAsync(SocketMessageComponent ctx)
+        public async Task StartAsync(ICommandContext ctx)
         {
             if (_state != GameState.Prepare)
                 return;
@@ -86,7 +86,7 @@ namespace Sanara.Game
 
             _state = GameState.Ready;
 
-            await ctx.RespondAsync(string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.");
+            await ctx.ReplyAsync(string.Join(", ", _lobby.GetAllMentions()) + " the game is starting.");
             await PostAsync(null);
         }
 

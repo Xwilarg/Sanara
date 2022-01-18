@@ -6,6 +6,7 @@ using Sanara.Diaporama;
 using Sanara.Exception;
 using Sanara.Module.Button;
 using Sanara.Module.Command;
+using Sanara.Module.Command.Context;
 using Sanara.Module.Command.Impl;
 using System.Diagnostics;
 using System.Globalization;
@@ -142,22 +143,23 @@ namespace Sanara
             }
         }
 
-        private async Task ButtonExecuted(SocketMessageComponent ctx)
+        private async Task ButtonExecuted(SocketMessageComponent arg)
         {
+            var ctx = new ComponentCommandContext(arg);
             try
             {
-                if (ctx.Data.CustomId == "dump")
+                if (arg.Data.CustomId == "dump")
                 {
                     await Module.Button.Settings.DatabaseDump(ctx);
                 }
-                else if (ctx.Data.CustomId.StartsWith("delSub-"))
+                else if (arg.Data.CustomId.StartsWith("delSub-"))
                 {
-                    await Module.Button.Settings.RemoveSubscription(ctx, ctx.Data.CustomId[7..]);
+                    await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
                 }
-                else if (StaticObjects.Errors.ContainsKey(ctx.Data.CustomId))
+                else if (StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
                 {
-                    var e = StaticObjects.Errors[ctx.Data.CustomId];
-                    await ctx.RespondAsync(embed: new EmbedBuilder
+                    var e = StaticObjects.Errors[arg.Data.CustomId];
+                    await ctx.ReplyAsync(embed: new EmbedBuilder
                     {
                         Color = Color.Red,
                         Title = e.GetType().ToString(),
@@ -170,23 +172,23 @@ namespace Sanara
                     {
                         try
                         {
-                            if (StaticObjects.Cosplays.Contains(ctx.Data.CustomId))
+                            if (StaticObjects.Cosplays.Contains(arg.Data.CustomId))
                             {
-                                StaticObjects.Cosplays.Remove(ctx.Data.CustomId);
-                                await ctx.DeferLoadingAsync();
-                                var id = ctx.Data.CustomId.Split('/');
+                                StaticObjects.Cosplays.Remove(arg.Data.CustomId);
+                                await arg.DeferLoadingAsync();
+                                var id = arg.Data.CustomId.Split('/');
                                 await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
                             }
-                            else if (StaticObjects.Doujinshis.Contains(ctx.Data.CustomId))
+                            else if (StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
                             {
-                                StaticObjects.Doujinshis.Remove(ctx.Data.CustomId);
-                                await ctx.DeferLoadingAsync();
-                                var id = ctx.Data.CustomId.Split('/').Last();
-                                await Booru.GetTagsAsync(ctx, id);
+                                StaticObjects.Doujinshis.Remove(arg.Data.CustomId);
+                                await arg.DeferLoadingAsync();
+                                var id = arg.Data.CustomId.Split('/').Last();
+                                await Doujinshi.DownloadDoujinshiAsync(ctx, id);
                             }
-                            else if (ctx.Data.CustomId.StartsWith("game/"))
+                            else if (arg.Data.CustomId.StartsWith("game/"))
                             {
-                                var id = ctx.Data.CustomId.Split('/');
+                                var id = arg.Data.CustomId.Split('/');
                                 if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
                                 {
                                     switch (id[2])
@@ -214,13 +216,14 @@ namespace Sanara
             }
         }
 
-        private async Task SlashCommandExecuted(SocketSlashCommand ctx)
+        private async Task SlashCommandExecuted(SocketSlashCommand arg)
         {
-            if (!_commandsAssociations.ContainsKey(ctx.CommandName.ToUpperInvariant()))
+            if (!_commandsAssociations.ContainsKey(arg.CommandName.ToUpperInvariant()))
             {
-                throw new NotImplementedException($"Unknown command {ctx.CommandName}");
+                throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
-            var cmd = _commandsAssociations[ctx.CommandName.ToUpperInvariant()];
+            var ctx = new Module.Command.Context.SlashCommandContext(arg);
+            var cmd = _commandsAssociations[arg.CommandName.ToUpperInvariant()];
             _ = Task.Run(async () =>
             {
                 try
@@ -229,43 +232,36 @@ namespace Sanara
                     if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
                         tChan != null && !tChan.IsNsfw)
                     {
-                        await ctx.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
+                        await arg.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
                     }
                     else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
                         tChan != null && tChan.Guild.OwnerId != ctx.User.Id && !((IGuildUser)ctx.User).GuildPermissions.ManageGuild)
                     {
-                        await ctx.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
+                        await arg.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
                     }
                     else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
                         tChan == null)
                     {
-                        await ctx.RespondAsync("This command can only be done in a guild", ephemeral: true);
+                        await arg.RespondAsync("This command can only be done in a guild", ephemeral: true);
                     }
                     else
                     {
                         if (cmd.NeedDefer)
                         {
-                            await ctx.DeferAsync();
+                            await arg.DeferAsync();
                         }
 
-                        await cmd.Callback(new SocketSlashCommandContext(ctx));
+                        await cmd.Callback(ctx);
                         StaticObjects.LastMessage = DateTime.UtcNow;
 
-                        await StaticObjects.Db.AddNewCommandAsync(ctx.CommandName.ToUpperInvariant());
+                        await StaticObjects.Db.AddNewCommandAsync(arg.CommandName.ToUpperInvariant());
                     }
                 }
                 catch (System.Exception e)
                 {
                     if (e is CommandFailed)
                     {
-                        if (ctx.HasResponded)
-                        {
-                            await ctx.ModifyOriginalResponseAsync(x => x.Content = e.Message);
-                        }
-                        else
-                        {
-                            await ctx.RespondAsync(e.Message, ephemeral: true);
-                        }
+                        ctx.ReplyAsync(e.Message);
                     }
                     else
                     {
@@ -384,15 +380,30 @@ namespace Sanara
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot || arg is not SocketUserMessage msg) return; // The message received isn't a message we can deal with
-
+            if (arg.Author.IsBot || arg is not SocketUserMessage msg || msg.Content == "") return; // The message received isn't one we can deal with
 
             // Deprecation warning
             int pos = 0;
-            var prefix = msg.Channel is not ITextChannel textChan ? "s." : StaticObjects.Db.GetGuild(textChan.GuildId).Prefix;
-            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos) || msg.HasStringPrefix(prefix, ref pos))
+            if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos))
             {
-                var context = new SocketCommandContext(StaticObjects.Client, msg);
+                var content = msg.Content[pos..];
+                var commandStr = content.Split(' ')[0].ToUpperInvariant();
+                if (_commandsAssociations.ContainsKey(commandStr))
+                {
+                    var command = _commandsAssociations[commandStr];
+                    var context = new MessageCommandContext(msg, content[commandStr.Length..].TrimStart(), command);
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await command.Callback(context);
+                        }
+                        catch (System.Exception e)
+                        {
+                            await Log.LogErrorAsync(e, context);
+                        }
+                    });
+                }
                 //await _commands.ExecuteAsync(context, pos, null);
             }
         }

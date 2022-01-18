@@ -36,13 +36,6 @@ namespace Sanara.Module.Command.Impl
                         {
                             new SlashCommandOptionBuilder()
                             {
-                                Name = "tags",
-                                Description = "Tags of the search, separated by an empty space",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
-                            },
-                            new SlashCommandOptionBuilder()
-                            {
                                 Name = "source",
                                 Description = "Where the image is coming from",
                                 Type = ApplicationCommandOptionType.Integer,
@@ -82,6 +75,13 @@ namespace Sanara.Module.Command.Impl
                                     }
 #endif
                                 }
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "tags",
+                                Description = "Tags of the search, separated by an empty space",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
                             }
                         }
                     }.Build(),
