@@ -210,7 +210,6 @@ namespace Sanara.Game
                         });
                         try
                         {
-                            Console.WriteLine("Ok, looking at answer");
                             if (task.Wait(5000)) // Not supposed to timeout, but we just put a timer of 5s to be sure
                             {
                                 string introMsg = GetSuccessMessage(msg.User);
