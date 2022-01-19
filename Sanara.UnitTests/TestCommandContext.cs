@@ -47,5 +47,10 @@ namespace Sanara.UnitTests
         {
             throw new NotImplementedException();
         }
+
+        public Task AddReactionAsync(IEmote emote)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
