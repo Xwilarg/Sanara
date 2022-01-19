@@ -39,7 +39,7 @@ namespace Sanara.Module.Command.Impl
                             new SlashCommandOptionBuilder()
                             {
                                 Name = "sentence",
-                                Description = "Sentence to translate or \"^\" to translate latest image sent",
+                                Description = "Sentence to translate or URL to an image",
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
@@ -119,8 +119,8 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("Translation client is not available");
             }
 
-            var language = ctx.GetArgument<string>("language");
-            var sentence = ctx.GetArgument<string>("sentence");
+            var language = ctx.GetArgument<string>("language")!;
+            var sentence = ctx.GetArgument<string>("sentence")!;
 
             if (StaticObjects.ISO639Reverse.ContainsKey(language))
                 language = StaticObjects.ISO639Reverse[language];
@@ -128,20 +128,15 @@ namespace Sanara.Module.Command.Impl
             if (language.Length != 2)
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
-            if (sentence == "^")
+            if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && sentence.Trim().Count(x => x == ' ') == 0)
             {
                 if (StaticObjects.VisionClient == null)
                 {
                     throw new CommandFailed("Vision client is not available");
                 }
-                var att = await Utils.GetLatestAttachmentAsync((ITextChannel)ctx.Channel);
-                if (att == null)
-                {
-                    throw new CommandFailed("No attachment found in the lasts messages");
-                }
                 try
                 {
-                    var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(att.Value.Url);
+                    var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(sentence);
                     TextAnnotation response;
                     try
                     {

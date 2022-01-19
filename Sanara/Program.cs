@@ -416,7 +416,12 @@ namespace Sanara
                     var command = _commandsAssociations[commandStr];
                     try
                     {
-                        var context = new MessageCommandContext(msg, content[commandStr.Length..].TrimStart(), command);
+                        var newContent = content[commandStr.Length..].TrimStart();
+                        if (msg.Attachments.Any())
+                        {
+                            newContent += " " + msg.Attachments.ElementAt(0).Url;
+                        }
+                        var context = new MessageCommandContext(msg, newContent, command);
                         _ = Task.Run(async () =>
                         {
                             try

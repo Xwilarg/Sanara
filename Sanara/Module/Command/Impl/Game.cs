@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game;
 using Sanara.Help;

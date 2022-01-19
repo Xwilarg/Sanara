@@ -1,5 +1,4 @@
-﻿using Discord;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Sanara
 {
@@ -11,35 +10,12 @@ namespace Sanara
         public static string ToWordCase(string word)
             => char.ToUpper(word[0]) + string.Join("", word.Skip(1)).ToLower();
 
-        public static async Task<bool> IsLinkValid(string url)
-        {
-            if (url.StartsWith("http://") || url.StartsWith("https://"))
-            {
-                var response = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
-                return response.IsSuccessStatusCode;
-            }
-            return false;
-        }
-
         public static bool IsImage(string extension)
         {
             extension = extension.ToLowerInvariant();
             if (extension[0] == '.') extension = extension[1..];
             return (extension.StartsWith("gif") || extension.StartsWith("png") || extension.StartsWith("jpg")
                 || extension.StartsWith("jpeg"));
-        }
-
-        public static async Task<(IMessage Message, string Url)?> GetLatestAttachmentAsync(ITextChannel chan)
-        {
-            var msgs = await chan.GetMessagesAsync(10).FlattenAsync();
-            foreach (var msg in msgs)
-            {
-                if (msg.Attachments.Any())
-                {
-                    return (msg, msg.Attachments.ElementAt(0).Url);
-                }
-            }
-            return null;
         }
 
         public enum TimestampInfo
