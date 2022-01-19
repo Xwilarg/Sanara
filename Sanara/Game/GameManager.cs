@@ -42,6 +42,11 @@ namespace Sanara.Game
             return id;
         }
 
+        public bool RemoveLobby(string id)
+        {
+            return _pendingGames.Remove(id);
+        }
+
         public bool DoesLobbyExists(string id)
         {
             return _pendingGames.ContainsKey(id);

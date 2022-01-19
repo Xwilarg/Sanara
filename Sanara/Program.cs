@@ -213,6 +213,11 @@ namespace Sanara
                                             await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
                                             break;
 
+                                        case "cancel":
+                                            StaticObjects.GameManager.RemoveLobby(id[1]);
+                                            await arg.Message.DeleteAsync();
+                                            break;
+
                                         default:
                                             throw new NotImplementedException("Invalid id " + id[2]);
                                     }
@@ -245,7 +250,7 @@ namespace Sanara
             {
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
-            var ctx = new Module.Command.Context.SlashCommandContext(arg);
+            var ctx = new SlashCommandContext(arg);
             var cmd = _commandsAssociations[arg.CommandName.ToUpperInvariant()];
             _ = Task.Run(async () =>
             {
