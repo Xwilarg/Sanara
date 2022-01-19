@@ -274,10 +274,10 @@ namespace Sanara
                             await arg.DeferAsync();
                         }
 
-                        await cmd.Callback(ctx);
-                        StaticObjects.LastMessage = DateTime.UtcNow;
-
                         await StaticObjects.Db.AddNewCommandAsync(arg.CommandName.ToUpperInvariant());
+                        StaticObjects.LastMessage = DateTime.UtcNow;
+                        await cmd.Callback(ctx);
+                        await StaticObjects.Db.AddCommandSucceed();
                     }
                 }
                 catch (System.Exception e)
@@ -426,7 +426,10 @@ namespace Sanara
                         {
                             try
                             {
+                                await StaticObjects.Db.AddNewCommandAsync(commandStr.ToUpperInvariant());
+                                StaticObjects.LastMessage = DateTime.UtcNow;
                                 await command.Callback(context);
+                                await StaticObjects.Db.AddCommandSucceed();
                             }
                             catch (System.Exception e)
                             {

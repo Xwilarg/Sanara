@@ -35,8 +35,12 @@
 
         public async Task AddNewCommandAsync(string name)
         {
-            await InsertOrAddAsync("Errors", Daily, "OK");
             await InsertOrAddAsync("Commands", Hourly, name);
+        }
+
+        public async Task AddCommandSucceed()
+        {
+            await InsertOrAddAsync("Errors", Daily, "OK");
         }
 
         public async Task AddErrorAsync(System.Exception e)
