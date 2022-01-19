@@ -62,7 +62,7 @@ namespace Sanara.Module.Utility
                     if (entry.Length == 0)
                         continue;
                 }
-                // Iterate on biggest to 1 (We assume that 3 is the max number of character)
+                // Iterate on biggest to 1 to max size
                 // We then test for each entry if we can convert
                 // We begin with the biggest, if we don't do so, we would find ん (n) before な (na)
                 for (int i = biggest; i > 0; i--)
@@ -75,7 +75,7 @@ namespace Sanara.Module.Utility
                             if (doubleNext)
                                 result.Append(dictionary[value][0]);
                             result.Append(dictionary[value]);
-                            entry = entry[1..];
+                            entry = entry[i..];
                             goto found;
                         }
                     }

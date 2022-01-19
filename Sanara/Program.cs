@@ -459,6 +459,15 @@ namespace Sanara
                 }
                 //await _commands.ExecuteAsync(context, pos, null);
             }
+            else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
+            {
+                var context = new GameCommandContext(msg);
+                var game = StaticObjects.GameManager.GetGame(msg.Channel);
+                if (game != null && game.CanPlay(msg.Author))
+                {
+                    game.AddAnswer(context);
+                }
+            }
         }
 
         private async Task ConnectedAsync()

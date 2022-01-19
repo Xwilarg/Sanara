@@ -110,5 +110,10 @@ namespace Sanara.Module.Command.Context
         {
             return _message.Content;
         }
+
+        public async Task AddReactionAsync(IEmote emote)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

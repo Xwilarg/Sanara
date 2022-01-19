@@ -61,5 +61,10 @@ namespace Sanara.Module.Command.Context
         {
             return $"{_ctx.Data.CustomId}";
         }
+
+        public Task AddReactionAsync(IEmote emote)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -57,26 +57,6 @@ namespace Sanara.Module.Command.Impl
                new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
                    {
-                       Name = "a",
-                       Description = "Give an answer in the current game",
-                       Options = new()
-                       {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "answer",
-                                Description = "Your answer",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = true
-                            }
-                       }
-                   }.Build(),
-                   callback: CancelAsync,
-                   precondition: Precondition.None,
-                   needDefer: true
-               ),
-                new CommandInfo(
-                   slashCommand: new SlashCommandBuilder()
-                   {
                        Name = "cancel",
                        Description = "Stop the current game"
                    }.Build(),
@@ -85,18 +65,6 @@ namespace Sanara.Module.Command.Impl
                    needDefer: false
                )
             };
-        }
-
-        public async Task AnswerAsync(ICommandContext ctx)
-        {
-            var game = StaticObjects.GameManager.GetGame(ctx.Channel);
-
-            if (game == null)
-            {
-                throw new CommandFailed("There is no game running in this channel");
-            }
-
-            game.AddAnswer(ctx);
         }
 
         public async Task PlayAsync(ICommandContext ctx)
@@ -139,14 +107,14 @@ namespace Sanara.Module.Command.Impl
                     Description = ctx.User.ToString() + " (Host)"
                 };
                 embed.AddField("Rules", preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
-                embed.AddField("Cooperation Rules (only if **1 player** in the lobby)", "Any player in the server can cooperate to give an answer");
-                embed.AddField("Versus Rules (only if **more than 1 player** in the lobby)", game.MultiplayerRules);
+                embed.AddField("Multiplayer Rules (only if **more than 1 player** in the lobby)", "TODO");
 
                 var id = StaticObjects.GameManager.CreateGame(game);
 
                 var buttons = new ComponentBuilder()
                     .WithButton(label: "Start", customId: $"game/{id}/start", style: ButtonStyle.Success)
                     .WithButton(label: "Join/Leave", customId: $"game/{id}/join")
+                    .WithButton(label: "Switch multiplayer mode", customId: $"game/{id}/multi")
                     .WithButton(label: "Cancel", customId: $"game/{id}/cancel", style: ButtonStyle.Danger);
 
                 await ctx.ReplyAsync(embed: embed.Build(), components: buttons.Build());

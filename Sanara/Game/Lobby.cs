@@ -12,19 +12,14 @@ namespace Sanara.Game
 
         public bool AddUser(IUser user)
         {
-            if (_users.Contains(user))
+            if (_users.Any(x => x.Id == user.Id))
                 return false;
             _users.Add(user);
             return true;
         }
 
-        public bool RemoveUser(IUser user)
-        {
-            if (!_users.Contains(user))
-                return false;
-            _users.Add(user);
-            return true;
-        }
+        public bool ContainsUser(IUser user)
+            => _users.Any(x => x.Id == user.Id);
 
         public string[] GetAllMentions()
             => _users.Select(x => x.Mention).ToArray();

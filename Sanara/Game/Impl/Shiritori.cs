@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
@@ -137,7 +136,7 @@ namespace Sanara.Game.Impl
 
         protected override string GetAnswer()
         {
-            if (_lobby != null && _lastUserChoice == null)
+            if (_lobby.IsMultiplayer && _lastUserChoice == null)
                 return "Your first word must be しりとり (shiritori)";
             ShiritoriPreloadResult word = null;
             var ending = GetWordEnding(_currWord);

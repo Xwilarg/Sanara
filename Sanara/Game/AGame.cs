@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -51,6 +50,9 @@ namespace Sanara.Game
 
         public bool IsMultiplayerGame()
             => _lobby.IsMultiplayer;
+
+        public bool CanPlay(IUser user)
+            => _lobby.ContainsUser(user);
 
         public async Task ReplayAsync()
         {
@@ -208,6 +210,7 @@ namespace Sanara.Game
                         });
                         try
                         {
+                            Console.WriteLine("Ok, looking at answer");
                             if (task.Wait(5000)) // Not supposed to timeout, but we just put a timer of 5s to be sure
                             {
                                 string introMsg = GetSuccessMessage(msg.User);
@@ -225,7 +228,7 @@ namespace Sanara.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await msg.ReplyAsync("Timed out");
+                                    await msg.AddReactionAsync(new Emoji("❔"));
                                 });
                             }
                         }
@@ -242,7 +245,7 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     if (e.InnerException.Message.Length == 0)
-                                        await msg.ReplyAsync("Wrong answer");
+                                        await msg.AddReactionAsync(new Emoji("❌"));
                                     else
                                         await msg.ReplyAsync(e.InnerException.Message);
                                 });
@@ -252,7 +255,7 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     await Log.LogErrorAsync(e, null);
-                                    await msg.ReplyAsync(e.Message);
+                                    await msg.AddReactionAsync(new Emoji("🕷️"));
                                 });
                             }
                         }

@@ -61,5 +61,10 @@ namespace Sanara.Module.Command.Context
         {
             return $"{_ctx.Data.Name} {string.Join(", ", _ctx.Data.Options.Select(x => $"{x.Name}: {x.Value}"))}";
         }
+
+        public Task AddReactionAsync(IEmote emote)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
