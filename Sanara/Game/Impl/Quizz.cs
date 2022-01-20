@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;

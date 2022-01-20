@@ -23,6 +23,14 @@ namespace Sanara.Game
         public bool ContainsUser(IUser user)
             => _users.Any(x => x.Id == user.Id);
 
+        public void AddUser(IUser user)
+        {
+            if (!ContainsUser(user))
+            {
+                _users.Add(user);
+            }
+        }
+
         /// <returns>True is joined, false if leaved</returns>
         public bool ToggleUser(IUser user)
         {
@@ -34,6 +42,9 @@ namespace Sanara.Game
             _users.Add(user);
             return true;
         }
+
+        public void SetMultiplayerMode(MultiplayerType type) => _multiType = type;
+        public MultiplayerType GetMultiplayerMode() => _multiType;
 
         public void ToggleMultiplayerMode()
         {
@@ -58,6 +69,8 @@ namespace Sanara.Game
 
         public bool IsHost(IUser user)
             => user.Id == _lobbyOwner.Id;
+
+        public IUser Host => _lobbyOwner;
 
         public Embed GetIntroEmbed()
         {

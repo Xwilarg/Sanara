@@ -25,6 +25,7 @@ namespace Sanara.Game
             _gameName = preload.Name;
             _argument = null;// preload.GetNameArg();
             _messages = new List<ICommandContext>();
+            _preload = preload;
 
             _contributors = new List<ulong>();
             _score = 0;
@@ -296,6 +297,7 @@ namespace Sanara.Game
                 {
                     await PostAsync(msg + (!canLoose ? "\n" + GetAnswer() : "") + "\n");
                 }
+                CreateReplayLobbyAsync();
                 return;
             }
             _state = GameState.Lost;
@@ -325,6 +327,17 @@ namespace Sanara.Game
                 }
             }
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
+            CreateReplayLobbyAsync();
+        }
+
+        private async Task CreateReplayLobbyAsync()
+        {
+            var replayLobby = StaticObjects.GameManager.AddReplayLobby(_textChan, _preload, _lobby);
+
+            var buttons = new ComponentBuilder()
+                .WithButton(label: "Ready/Unready", customId: $"replay/start", style: ButtonStyle.Success)
+                .WithButton(label: "Delete", customId: $"replay/delete", style: ButtonStyle.Danger);
+            replayLobby.Message = await _textChan.SendMessageAsync(embed: replayLobby.GetEmbed(), components: buttons.Build());
         }
 
         public async Task CheckTimerAsync()
@@ -353,6 +366,7 @@ namespace Sanara.Game
         private readonly IPostMode _postMode; // How things should be posted
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private string _current; // Current value, used for Replay command
+        private IPreload _preload;
 
         List<ICommandContext> _messages;
 

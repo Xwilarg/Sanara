@@ -104,13 +104,13 @@ namespace Sanara.Module.Command.Impl
                 var lobby = new Lobby(ctx.User, preload);
                 var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(lobby, false));
 
-                var id = StaticObjects.GameManager.CreateGame(game);
+                await StaticObjects.GameManager.CreateGameAsync(ctx.Channel, game);
 
                 var buttons = new ComponentBuilder()
-                    .WithButton(label: "Start", customId: $"game/{id}/start", style: ButtonStyle.Success)
-                    .WithButton(label: "Join/Leave", customId: $"game/{id}/join")
-                    .WithButton(label: "Switch multiplayer mode", customId: $"game/{id}/multi")
-                    .WithButton(label: "Cancel", customId: $"game/{id}/cancel", style: ButtonStyle.Danger);
+                    .WithButton(label: "Start", customId: $"game/start", style: ButtonStyle.Success)
+                    .WithButton(label: "Join/Leave", customId: $"game/join")
+                    .WithButton(label: "Switch multiplayer mode", customId: $"game/multi")
+                    .WithButton(label: "Cancel", customId: $"game/cancel", style: ButtonStyle.Danger);
 
                 await ctx.ReplyAsync(embed: lobby.GetIntroEmbed(), components: buttons.Build());
             }
@@ -204,34 +204,6 @@ namespace SanaraV3.Module.Game
         {
             var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
             await game.ReplayAsync();
-        }
-
-        [Command("Start"), RequireRunningGame]
-        public async Task StartAsync()
-        {
-            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
-            if (!game.IsMultiplayerGame())
-                await ReplyAsync("This command can only be done on multiplayer games");
-            else if (game.GetState() != GameState.PREPARE)
-                await ReplyAsync("The game in this channel is already running.");
-            else if (!game.IsLobbyOwner(Context.User))
-                await ReplyAsync("Only the lobby owner can use this command");
-            else
-                await game.StartAsync();
-        }
-
-        [Command("Join"), RequireRunningGame]
-        public async Task JoinAsync()
-        {
-            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
-            if (!game.IsMultiplayerGame())
-                await ReplyAsync("This command can only be done on multiplayer games");
-            else if (game.GetState() != GameState.PREPARE)
-                await ReplyAsync("The game in this channel is already running.");
-            else if (!game.Join(Context.User))
-                await ReplyAsync("You are already in the lobby.");
-            else
-                await ReplyAsync("You joined the lobby.");
         }
     }
 }

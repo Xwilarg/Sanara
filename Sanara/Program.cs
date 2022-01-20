@@ -202,22 +202,49 @@ namespace Sanara
                                 var id = arg.Data.CustomId.Split('/').Last();
                                 await Doujinshi.DownloadDoujinshiAsync(ctx, id);
                             }
+                            else if (arg.Data.CustomId.StartsWith("ready/"))
+                            {
+                                var id = arg.Data.CustomId[6..];
+                                var chanId = ctx.Channel.Id.ToString();
+                                switch (id)
+                                {
+                                    case "ready":
+                                        if (await StaticObjects.GameManager.ToggleReadyLobbyAsync(ctx.Channel, ctx.User))
+                                        {
+                                            await ctx.ReplyAsync("Ready state changed", ephemeral: true);
+                                        }
+                                        else
+                                        {
+                                            await ctx.ReplyAsync("You are not in the game", ephemeral: true); // TODO
+                                        }
+                                        break;
+
+                                    case "delete":
+                                        await StaticObjects.GameManager.DeleteReadyLobbyAsync(ctx.Channel);
+                                        await ctx.ReplyAsync("Replay lobby deleted", ephemeral: true);
+                                        break;
+
+                                    default:
+                                        throw new NotImplementedException("Invalid id " + id);
+                                }
+                            }
                             else if (arg.Data.CustomId.StartsWith("game/"))
                             {
-                                var id = arg.Data.CustomId.Split('/');
-                                var lobby = StaticObjects.GameManager.GetLobby(id[1]);
+                                var id = arg.Data.CustomId[5..];
+                                var chanId = ctx.Channel.Id.ToString();
+                                var lobby = StaticObjects.GameManager.GetLobby(chanId);
                                 if (lobby == null)
                                 {
                                     await ctx.ReplyAsync("This lobby is closed", ephemeral: true);
                                 }
                                 else
                                 {
-                                    switch (id[2])
+                                    switch (id)
                                     {
                                         case "start":
                                             if (lobby.IsHost(ctx.User))
                                             {
-                                                await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
+                                                await StaticObjects.GameManager.StartGameAsync(ctx);
                                             }
                                             else
                                             {
@@ -254,7 +281,7 @@ namespace Sanara
                                         case "cancel":
                                             if (lobby.IsHost(ctx.User))
                                             {
-                                                StaticObjects.GameManager.RemoveLobby(id[1]);
+                                                StaticObjects.GameManager.RemoveLobby(chanId);
                                                 await arg.Message.DeleteAsync();
                                                 await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
                                             }
@@ -265,7 +292,7 @@ namespace Sanara
                                             break;
 
                                         default:
-                                            throw new NotImplementedException("Invalid id " + id[2]);
+                                            throw new NotImplementedException("Invalid id " + id);
                                     }
                                 }
                             }
