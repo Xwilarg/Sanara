@@ -1,17 +1,17 @@
 ﻿using Discord;
-using Sanara.Game.MultiplayerMode;
 using Sanara.Game.Preload;
 
 namespace Sanara.Game
 {
     public sealed class Lobby
     {
-        public Lobby(IUser host, IPreload preload)
+        public Lobby(IUser host, IPreload preload, string versusRules)
         {
             _users = new() { host };
             _lobbyOwner = host;
             _preload = preload;
             _multiType = MultiplayerType.VERSUS;
+            _versusRules = versusRules;
         }
 
         public MultiplayerType MultiplayerType
@@ -66,13 +66,29 @@ namespace Sanara.Game
             embed.AddField($"Multiplayer Rules{(_users.Count > 1 ? "" : "(only if **more than 1 player** in the lobby)")}",
                 _multiType == MultiplayerType.COOPERATION ?
                 "All the player in the lobby can collaborate to find the answers" :
-                "TODO");
+                _versusRules);
             return embed.Build();
         }
 
+        /// <summary>
+        /// List of users in the lobby
+        /// </summary>
         private readonly List<IUser> _users;
+        /// <summary>
+        /// User that created the lobby
+        /// </summary>
         private readonly IUser _lobbyOwner;
+        /// <summary>
+        /// Game preload information
+        /// </summary>
         private readonly IPreload _preload;
+        /// <summary>
+        /// Is the game cooperation or versus
+        /// </summary>
         private MultiplayerType _multiType;
+        /// <summary>
+        /// If we are versus, the current rules
+        /// </summary>
+        private readonly string _versusRules;
     }
 }

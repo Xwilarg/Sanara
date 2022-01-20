@@ -46,6 +46,8 @@ namespace Sanara.Game
             DisposeInternal();
         }
 
+        public string VersusRules => _versusMode.GetRules();
+
         public Lobby? GetLobby()
         {
             if (_state == GameState.Prepare)
@@ -244,7 +246,7 @@ namespace Sanara.Game
                                 _ = Task.Run(async () =>
                                 {
                                     await Log.LogErrorAsync(e, null);
-                                    await msg.AddReactionAsync(new Emoji("🕷️"));
+                                    await msg.AddReactionAsync(new Emoji("🕷"));
                                 });
                             }
                         }
