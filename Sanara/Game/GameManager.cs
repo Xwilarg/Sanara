@@ -47,8 +47,9 @@ namespace Sanara.Game
             var chanId = channel.Id.ToString();
             if (_replayLobby.ContainsKey(chanId))
             {
+                var lobby = _replayLobby[chanId];
                 _replayLobby.Remove(chanId);
-                await _replayLobby[chanId].Message.DeleteAsync();
+                await lobby.Message.DeleteAsync();
             }
             _pendingGames.Add(chanId, game);
         }
@@ -67,25 +68,33 @@ namespace Sanara.Game
             return _pendingGames[id].GetLobby();
         }
 
-        public async Task<bool> ToggleReadyLobbyAsync(IChannel chan, IUser user)
+        /// <returns>Updated embed or null if user not in lobby</returns>
+        public Embed? ToggleReadyLobby(IChannel chan, IUser user)
         {
             var rLobby = _replayLobby[chan.Id.ToString()];
             var result = rLobby.ToggleReady(user);
-            if (result && rLobby.IsAllReady)
-            {
-                await DeleteReadyLobbyAsync(chan);
-                var lobby = rLobby.CreateLobby();
-                var game = rLobby.Preload.CreateGame((IMessageChannel)chan, rLobby.LastHost, new GameSettings(lobby, false));
-                _games.Add(game);
-            }
-            return result;
+            return result ? rLobby.GetEmbed() : null;
         }
 
-        public async Task DeleteReadyLobbyAsync(IChannel chan)
+        public async Task<bool> CheckRestartLobbyFullAsync(ICommandContext ctx)
+        {
+            var rLobby = _replayLobby[ctx.Channel.Id.ToString()];
+            if (rLobby.IsAllReady)
+            {
+                var lobby = rLobby.CreateLobby();
+                DeleteReadyLobby(ctx.Channel);
+                var game = rLobby.Preload.CreateGame((IMessageChannel)ctx.Channel, rLobby.LastHost, new GameSettings(lobby, false));
+                _games.Add(game);
+                await game.StartAsync(ctx);
+                return true;
+            }
+            return false;
+        }
+
+        public void DeleteReadyLobby(IChannel chan)
         {
             var chanId = chan.Id.ToString();
             _replayLobby.Remove(chanId);
-            await _replayLobby[chanId].Message.DeleteAsync();
         }
 
         public async Task StartGameAsync(ICommandContext ctx)
@@ -102,6 +111,9 @@ namespace Sanara.Game
             _replayLobby.Add(chan.Id.ToString(), rLobby);
             return rLobby;
         }
+
+        public bool IsChannelBusy(IChannel chan)
+            => GetGame(chan) != null || _pendingGames.ContainsKey(chan.Id.ToString());
 
         private readonly Thread thread;
 

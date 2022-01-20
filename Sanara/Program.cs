@@ -202,16 +202,25 @@ namespace Sanara
                                 var id = arg.Data.CustomId.Split('/').Last();
                                 await Doujinshi.DownloadDoujinshiAsync(ctx, id);
                             }
-                            else if (arg.Data.CustomId.StartsWith("ready/"))
+                            else if (arg.Data.CustomId.StartsWith("replay/"))
                             {
-                                var id = arg.Data.CustomId[6..];
+                                var id = arg.Data.CustomId[7..];
                                 var chanId = ctx.Channel.Id.ToString();
                                 switch (id)
                                 {
                                     case "ready":
-                                        if (await StaticObjects.GameManager.ToggleReadyLobbyAsync(ctx.Channel, ctx.User))
+                                        var embed = StaticObjects.GameManager.ToggleReadyLobby(ctx.Channel, ctx.User);
+                                        if (embed != null)
                                         {
                                             await ctx.ReplyAsync("Ready state changed", ephemeral: true);
+                                            if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
+                                            {
+                                                await arg.Message.DeleteAsync();
+                                            }
+                                            else
+                                            {
+                                                await arg.Message.ModifyAsync(x => x.Embed = embed);
+                                            }
                                         }
                                         else
                                         {
@@ -220,8 +229,9 @@ namespace Sanara
                                         break;
 
                                     case "delete":
-                                        await StaticObjects.GameManager.DeleteReadyLobbyAsync(ctx.Channel);
+                                        StaticObjects.GameManager.DeleteReadyLobby(ctx.Channel);
                                         await ctx.ReplyAsync("Replay lobby deleted", ephemeral: true);
+                                        await arg.Message.DeleteAsync();
                                         break;
 
                                     default:
@@ -245,6 +255,7 @@ namespace Sanara
                                             if (lobby.IsHost(ctx.User))
                                             {
                                                 await StaticObjects.GameManager.StartGameAsync(ctx);
+                                                await arg.Message.DeleteAsync();
                                             }
                                             else
                                             {

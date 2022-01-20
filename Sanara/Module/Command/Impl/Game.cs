@@ -69,7 +69,7 @@ namespace Sanara.Module.Command.Impl
 
         public async Task PlayAsync(ICommandContext ctx)
         {
-            if (StaticObjects.GameManager.GetGame(ctx.Channel) != null)
+            if (StaticObjects.GameManager.IsChannelBusy(ctx.Channel))
                 throw new CommandFailed("A game is already running in this channel.");
             /*if (gameName.ToUpperInvariant() == "CUSTOM")
             {

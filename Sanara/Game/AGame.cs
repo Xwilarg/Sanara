@@ -292,12 +292,12 @@ namespace Sanara.Game
                     string outro = _versusMode.GetOutroLoose();
                     await _textChan.SendMessageAsync(msg + (canLoose ? "\n" + GetAnswer() : "") + $"\n{_versusMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
                     _state = GameState.Lost;
+                    await CreateReplayLobbyAsync();
                 }
                 else
                 {
                     await PostAsync(msg + (!canLoose ? "\n" + GetAnswer() : "") + "\n");
                 }
-                CreateReplayLobbyAsync();
                 return;
             }
             _state = GameState.Lost;
@@ -327,7 +327,7 @@ namespace Sanara.Game
                 }
             }
             await _textChan.SendMessageAsync($"You lost: {reason}\n{GetAnswer()}\n\n" + scoreSentence);
-            CreateReplayLobbyAsync();
+            await CreateReplayLobbyAsync();
         }
 
         private async Task CreateReplayLobbyAsync()
@@ -335,7 +335,7 @@ namespace Sanara.Game
             var replayLobby = StaticObjects.GameManager.AddReplayLobby(_textChan, _preload, _lobby);
 
             var buttons = new ComponentBuilder()
-                .WithButton(label: "Ready/Unready", customId: $"replay/start", style: ButtonStyle.Success)
+                .WithButton(label: "Ready/Unready", customId: $"replay/ready", style: ButtonStyle.Success)
                 .WithButton(label: "Delete", customId: $"replay/delete", style: ButtonStyle.Danger);
             replayLobby.Message = await _textChan.SendMessageAsync(embed: replayLobby.GetEmbed(), components: buttons.Build());
         }

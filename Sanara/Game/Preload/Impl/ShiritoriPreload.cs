@@ -23,7 +23,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string GetRules()
             => Static.Shiritori.GetRules() +
-            "\nWords must be noun, must not end by a ん(n), must not have been already said an must be more than one syllabe.";
+            "\nWords must be noun, must not end by a ん(n), must not have been already said and must be more than one syllabe.";
 
         public bool IsSafe()
             => true;

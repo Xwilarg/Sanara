@@ -10,7 +10,8 @@ namespace Sanara.Game.Preload.Impl.Static
 
         public static string GetRules()
             => "Shiritori is a Japanese game where you must find a word starting by the last syllable of the previous one.\n" +
-            "For example if someone say りゅう (ryuu, dragon) you have to say a word starting by う (u), like うさぎ (usagi, rabbit).";
+            "For example if someone say りゅう (ryuu, dragon) you have to say a word starting by う (u), like うさぎ (usagi, rabbit).\n" +
+            "First player must start by saying しりとり (shiritori)";
 
         static Shiritori()
         {

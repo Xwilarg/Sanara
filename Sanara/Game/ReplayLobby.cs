@@ -20,7 +20,7 @@ namespace Sanara.Game
             return new EmbedBuilder
             {
                 Title = "Replay?",
-                Description = string.Join("\n", _users.Select(x => x.ToString() + " " + (_ready.Any(r => r.Id == x.Id) ? "Ready" : "Not ready"))),
+                Description = string.Join("\n", _users.Select(x => x.ToString() + ": " + (_ready.Any(r => r.Id == x.Id) ? "Ready" : "**Not ready**"))),
                 Color = Color.Orange
             }.Build();
         }
