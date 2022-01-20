@@ -143,7 +143,7 @@ namespace Sanara
             }
         }
 
-        private List<ulong> _pendingRequests = new();
+        private readonly List<ulong> _pendingRequests = new();
 
         private async Task ButtonExecuted(SocketMessageComponent arg)
         {
@@ -215,25 +215,53 @@ namespace Sanara
                                     switch (id[2])
                                     {
                                         case "start":
-                                            await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
+                                            if (lobby.IsHost(ctx.User))
+                                            {
+                                                await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
+                                            }
+                                            else
+                                            {
+                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                            }
                                             break;
 
                                         case "join":
-                                            var state = lobby.ToggleUser(ctx.User);
-                                            await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
-                                            await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            if (lobby.IsHost(ctx.User))
+                                            {
+                                                await ctx.ReplyAsync("You can't leave the lobby as the host, press the cancel button instead", ephemeral: true);
+                                            }
+                                            else
+                                            {
+                                                var state = lobby.ToggleUser(ctx.User);
+                                                await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
+                                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            }
                                             break;
 
                                         case "multi":
-                                            lobby.ToggleMultiplayerMode();
-                                            await ctx.ReplyAsync($"You changed the multiplayer type", ephemeral: true);
-                                            await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            if (lobby.IsHost(ctx.User))
+                                            {
+                                                lobby.ToggleMultiplayerMode();
+                                                await ctx.ReplyAsync("You changed the multiplayer type", ephemeral: true);
+                                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            }
+                                            else
+                                            {
+                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                            }
                                             break;
 
                                         case "cancel":
-                                            StaticObjects.GameManager.RemoveLobby(id[1]);
-                                            await arg.Message.DeleteAsync();
-                                            await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
+                                            if (lobby.IsHost(ctx.User))
+                                            {
+                                                StaticObjects.GameManager.RemoveLobby(id[1]);
+                                                await arg.Message.DeleteAsync();
+                                                await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
+                                            }
+                                            else
+                                            {
+                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                            }
                                             break;
 
                                         default:
