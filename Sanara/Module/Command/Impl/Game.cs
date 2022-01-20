@@ -122,9 +122,18 @@ namespace Sanara.Module.Command.Impl
 
             if (game == null)
             {
-                throw new CommandFailed("There is no game running in this channel");
+                if (StaticObjects.GameManager.RemoveLobby(ctx.Channel.Id.ToString()))
+                {
+                    await ctx.ReplyAsync("The lobby was cancelled");
+                    return;
+                }
+                else
+                {
+                    throw new CommandFailed("There is no game running in this channel");
+                }
             }
             await game.CancelAsync();
+            await ctx.ReplyAsync("The game was cancelled");
         }
     }
 }
