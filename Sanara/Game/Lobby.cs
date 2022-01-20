@@ -34,7 +34,14 @@ namespace Sanara.Game
 
         public void ToggleMultiplayerMode()
         {
-            _multiType &= MultiplayerType.COOPERATION;
+            if (_multiType == MultiplayerType.COOPERATION)
+            {
+                _multiType = MultiplayerType.VERSUS;
+            }
+            else
+            {
+                _multiType = MultiplayerType.COOPERATION;
+            }
         }
 
         public string[] GetAllMentions()
@@ -47,7 +54,7 @@ namespace Sanara.Game
             => _users;
 
         public bool IsHost(IUser user)
-            => user == _lobbyOwner;
+            => user.Id == _lobbyOwner.Id;
 
         public Embed GetIntroEmbed()
         {
