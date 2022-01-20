@@ -11,6 +11,7 @@ namespace Sanara.Game
             _lobbyOwner = host;
             _preload = preload;
             _multiType = MultiplayerType.VERSUS;
+            _creationTime = DateTime.Now;
         }
 
         public string InitVersusRules(string rules)
@@ -86,6 +87,8 @@ namespace Sanara.Game
             return embed.Build();
         }
 
+        public bool HasExpired => DateTime.Now.Subtract(_creationTime).TotalHours > 2;
+
         /// <summary>
         /// List of users in the lobby
         /// </summary>
@@ -106,5 +109,6 @@ namespace Sanara.Game
         /// If we are versus, the current rules
         /// </summary>
         private string _versusRules;
+        private DateTime _creationTime;
     }
 }

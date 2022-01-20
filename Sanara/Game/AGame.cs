@@ -340,7 +340,7 @@ namespace Sanara.Game
         /// Is the game lost
         /// </summary>
         public bool AsLost()
-            => _state == GameState.Lost;
+            => _state == GameState.Lost || (_state == GameState.Prepare && _lobby.HasExpired);
 
         public bool IsMyGame(ulong chanId)
             => _textChan.Id == chanId;
