@@ -46,7 +46,7 @@ namespace Sanara.Game.Impl
 
             if (_lobby != null)
             {
-                _multiplayerMode.AnswerIsCorrect(answer.User);
+                _versusMode.AnswerIsCorrect(answer.User);
             }
 
             if (_nbNeed != _foundTags.Count)

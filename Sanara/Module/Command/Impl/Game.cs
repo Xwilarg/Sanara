@@ -101,7 +101,7 @@ namespace Sanara.Module.Command.Impl
                 var preload = StaticObjects.Preloads[(int)index];
                 if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                     throw new CommandFailed("This game can only be launched in a NSFW channel.");
-                var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User), false));
+                var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User, preload), false));
                 var embed = new EmbedBuilder
                 {
                     Description = ctx.User.ToString() + " (Host)"

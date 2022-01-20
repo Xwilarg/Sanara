@@ -1,25 +1,41 @@
 ﻿using Discord;
+using Sanara.Game.MultiplayerMode;
+using Sanara.Game.Preload;
 
 namespace Sanara.Game
 {
     public sealed class Lobby
     {
-        public Lobby(IUser host)
+        public Lobby(IUser host, IPreload preload)
         {
             _users = new() { host };
             _lobbyOwner = host;
+            _preload = preload;
+            _multiType = MultiplayerType.COOPERATION;
         }
 
-        public bool AddUser(IUser user)
+        public MultiplayerType MultiplayerType
+            => _users.Count <= 1 ? MultiplayerType.COOPERATION : _multiType;
+
+        public bool ContainsUser(IUser user)
+            => _users.Any(x => x.Id == user.Id);
+
+        /// <returns>True is joined, false if leaved</returns>
+        public bool ToggleUser(IUser user)
         {
-            if (_users.Any(x => x.Id == user.Id))
+            if (ContainsUser(user))
+            {
+                _users.RemoveAll(x => x.Id == user.Id);
                 return false;
+            }
             _users.Add(user);
             return true;
         }
 
-        public bool ContainsUser(IUser user)
-            => _users.Any(x => x.Id == user.Id);
+        public void ToggleMultiplayerMode()
+        {
+            _multiType &= MultiplayerType.COOPERATION;
+        }
 
         public string[] GetAllMentions()
             => _users.Select(x => x.Mention).ToArray();
@@ -33,9 +49,23 @@ namespace Sanara.Game
         public bool IsHost(IUser user)
             => user == _lobbyOwner;
 
-        public bool IsMultiplayer => GetUserCount() > 1;
+        public Embed GetIntroEmbed()
+        {
+            var embed = new EmbedBuilder
+            {
+                Description = string.Join("\n", _users.Select(u => u + (IsHost(u) ? " (Host)": "")))
+            };
+            embed.AddField("Rules", _preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
+            embed.AddField($"Multiplayer Rules{(_users.Count > 1 ? "" : "(only if **more than 1 player** in the lobby)")}",
+                _multiType == MultiplayerType.COOPERATION ?
+                "All the player in the lobby can collaborate to find the answers" :
+                "TODO");
+            return embed.Build();
+        }
 
         private readonly List<IUser> _users;
         private readonly IUser _lobbyOwner;
+        private readonly IPreload _preload;
+        private MultiplayerType _multiType;
     }
 }

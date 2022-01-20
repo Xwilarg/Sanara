@@ -9,7 +9,7 @@ namespace Sanara.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode multiplayerMode, GameSettings settings)
+        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
         {
             _state = GameState.Prepare;
             _textChan = textChan;
@@ -18,7 +18,7 @@ namespace Sanara.Game
             else
                 throw new CommandFailed("Games are not yet available in private message."); // TODO!
             _postMode = postMode;
-            _multiplayerMode = multiplayerMode;
+            _versusMode = versusMode;
             _lobby = settings.Lobby;
             _isCustomGame = settings.IsCustomGame;
 
@@ -46,10 +46,14 @@ namespace Sanara.Game
             DisposeInternal();
         }
 
-        public string MultiplayerRules => _multiplayerMode.GetRules();
-
-        public bool IsMultiplayerGame()
-            => _lobby.IsMultiplayer;
+        public Lobby? GetLobby()
+        {
+            if (_state == GameState.Prepare)
+            {
+                return _lobby;
+            }
+            return null;
+        }
 
         public bool CanPlay(IUser user)
             => _lobby.ContainsUser(user);
@@ -61,28 +65,14 @@ namespace Sanara.Game
             await _postMode.PostAsync(_textChan, _current, this);
         }
 
-        public GameState GetState()
-            => _state;
-
-        public bool Join(IUser user)
-        {
-            if (_state != GameState.Prepare)
-                return false;
-
-            return _lobby.AddUser(user);
-        }
-
-        public bool IsLobbyOwner(IUser user)
-            => _lobby.IsHost(user);
-
         public async Task StartAsync(ICommandContext ctx)
         {
             if (_state != GameState.Prepare)
                 return;
 
-            if (_lobby.IsMultiplayer) // Multiplayer game
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
             {
-                _multiplayerMode.Init(_lobby.GetUsers());
+                _versusMode.Init(_lobby.GetUsers());
             }
             await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
 
@@ -97,9 +87,9 @@ namespace Sanara.Game
             string str = "";
             if (GetHelp() != null)
                str += "\n" + GetHelp();
-            if (_lobby.IsMultiplayer)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
             {
-                var multiInfo = _multiplayerMode.PrePost();
+                var multiInfo = _versusMode.PrePost();
                 if (multiInfo != null)
                     str += "\n" + multiInfo;
             }
@@ -204,8 +194,8 @@ namespace Sanara.Game
                     {
                         var task = Task.Run(() =>
                         {
-                            if (_lobby.IsMultiplayer)
-                                _multiplayerMode.PreAnswerCheck(msg.User);
+                            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
+                                _versusMode.PreAnswerCheck(msg.User);
                             CheckAnswerInternalAsync(msg).GetAwaiter().GetResult();
                         });
                         try
@@ -219,8 +209,8 @@ namespace Sanara.Game
                                 if (_state == GameState.Lost)
                                     _state = GameState.Running;
                                 _ = Task.Run(async () => { await PostAsync(introMsg); }); // We don't wait for the post to be sent to not block the whole world
-                                if (_lobby.IsMultiplayer)
-                                    _multiplayerMode.AnswerIsCorrect(msg.User);
+                                if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
+                                    _versusMode.AnswerIsCorrect(msg.User);
                                 break; // Good answer found, no need to check the others ones
                             }
                             else
@@ -286,18 +276,18 @@ namespace Sanara.Game
         /// <returns></returns>
         private async Task LooseAsync(string reason, bool bypassMultiplayerCheck)
         {
-            if (_lobby.IsMultiplayer) // Multiplayer games
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS) // Multiplayer games
             {
                 string msg;
-                bool canLoose = _multiplayerMode.CanLooseAuto();
+                bool canLoose = _versusMode.CanLooseAuto();
                 if (canLoose)
                     msg = $"You lost: {reason}";
                 else
                     msg = $"Nobody found the answer";
-                if (bypassMultiplayerCheck || (canLoose && !_multiplayerMode.Loose()))
+                if (bypassMultiplayerCheck || (canLoose && !_versusMode.Loose()))
                 {
-                    string outro = _multiplayerMode.GetOutroLoose();
-                    await _textChan.SendMessageAsync(msg + (canLoose ? "\n" + GetAnswer() : "") + $"\n{_multiplayerMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
+                    string outro = _versusMode.GetOutroLoose();
+                    await _textChan.SendMessageAsync(msg + (canLoose ? "\n" + GetAnswer() : "") + $"\n{_versusMode.GetWinner()} won" + (outro != null ? "\n" + outro : ""));
                     _state = GameState.Lost;
                 }
                 else
@@ -314,7 +304,7 @@ namespace Sanara.Game
                 return;
 
             string scoreSentence = "";
-            if (!_lobby.IsMultiplayer && !_isCustomGame) // Score aren't saved in multiplayer games
+            if (_lobby.MultiplayerType != MultiplayerType.VERSUS && !_isCustomGame) // Score aren't saved in multiplayer games
             {
                 int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
@@ -372,6 +362,6 @@ namespace Sanara.Game
         // MULTIPLAYER
         protected Lobby _lobby;
         private const int _lobbyTimer = 30;
-        protected IMultiplayerMode _multiplayerMode;
+        protected IMultiplayerMode _versusMode;
     }
 }

@@ -205,7 +205,12 @@ namespace Sanara
                             else if (arg.Data.CustomId.StartsWith("game/"))
                             {
                                 var id = arg.Data.CustomId.Split('/');
-                                if (StaticObjects.GameManager.DoesLobbyExists(id[1]))
+                                var lobby = StaticObjects.GameManager.GetLobby(id[1]);
+                                if (lobby == null)
+                                {
+                                    await ctx.ReplyAsync("This lobby is closed", ephemeral: true);
+                                }
+                                else
                                 {
                                     switch (id[2])
                                     {
@@ -213,9 +218,22 @@ namespace Sanara
                                             await StaticObjects.GameManager.StartGameAsync(ctx, id[1]);
                                             break;
 
+                                        case "join":
+                                            var state = lobby.ToggleUser(ctx.User);
+                                            await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
+                                            await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            break;
+
+                                        case "multi":
+                                            lobby.ToggleMultiplayerMode();
+                                            await ctx.ReplyAsync($"You changed the multiplayer type", ephemeral: true);
+                                            await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                            break;
+
                                         case "cancel":
                                             StaticObjects.GameManager.RemoveLobby(id[1]);
                                             await arg.Message.DeleteAsync();
+                                            await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
                                             break;
 
                                         default:

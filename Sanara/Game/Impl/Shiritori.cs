@@ -32,7 +32,7 @@ namespace Sanara.Game.Impl
 
         protected override string[] GetPostInternal()
         {
-            if (_lobby.IsMultiplayer)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
             {
                 if (_lastUserChoice == null)
                     return Array.Empty<string>();
@@ -67,7 +67,7 @@ namespace Sanara.Game.Impl
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
 
-            if (_lobby.IsMultiplayer && _lastUserChoice == null)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS && _lastUserChoice == null)
             {
                 if (hiraganaAnswer != "しりとり")
                     throw new InvalidGameAnswer("Your first word must be しりとり (shiritori)");
@@ -136,7 +136,7 @@ namespace Sanara.Game.Impl
 
         protected override string GetAnswer()
         {
-            if (_lobby.IsMultiplayer && _lastUserChoice == null)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS && _lastUserChoice == null)
                 return "Your first word must be しりとり (shiritori)";
             ShiritoriPreloadResult word = null;
             var ending = GetWordEnding(_currWord);

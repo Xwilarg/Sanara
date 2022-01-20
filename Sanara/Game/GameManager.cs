@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Sanara.Module.Command;
 
 namespace Sanara.Game
@@ -47,9 +46,13 @@ namespace Sanara.Game
             return _pendingGames.Remove(id);
         }
 
-        public bool DoesLobbyExists(string id)
+        public Lobby? GetLobby(string id)
         {
-            return _pendingGames.ContainsKey(id);
+            if (!_pendingGames.ContainsKey(id))
+            {
+                return null;
+            }
+            return _pendingGames[id].GetLobby();
         }
 
         public async Task StartGameAsync(ICommandContext ctx, string id)
