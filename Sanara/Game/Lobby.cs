@@ -5,14 +5,16 @@ namespace Sanara.Game
 {
     public sealed class Lobby
     {
-        public Lobby(IUser host, IPreload preload, string versusRules)
+        public Lobby(IUser host, IPreload preload)
         {
             _users = new() { host };
             _lobbyOwner = host;
             _preload = preload;
             _multiType = MultiplayerType.VERSUS;
-            _versusRules = versusRules;
         }
+
+        public string InitVersusRules(string rules)
+            => _versusRules = rules;
 
         public MultiplayerType MultiplayerType
             => _users.Count <= 1 ? MultiplayerType.COOPERATION : _multiType;
@@ -58,15 +60,29 @@ namespace Sanara.Game
 
         public Embed GetIntroEmbed()
         {
+            string multiRules;
+            if (_users.Count > 1)
+            {
+                if (_multiType == MultiplayerType.COOPERATION)
+                {
+                    multiRules = "All the player in the lobby can collaborate to find the answers";
+                }
+                else
+                {
+                    multiRules = _versusRules;
+                }
+            }
+            else
+            {
+                multiRules = "Only applicable if lobby has more than 1 player";
+            }
+
             var embed = new EmbedBuilder
             {
                 Description = string.Join("\n", _users.Select(u => u + (IsHost(u) ? " (Host)": "")))
             };
             embed.AddField("Rules", _preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
-            embed.AddField($"Multiplayer Rules{(_users.Count > 1 ? "" : "(only if **more than 1 player** in the lobby)")}",
-                _multiType == MultiplayerType.COOPERATION ?
-                "All the player in the lobby can collaborate to find the answers" :
-                _versusRules);
+            embed.AddField($"Multiplayer Rules", multiRules);
             return embed.Build();
         }
 
@@ -89,6 +105,6 @@ namespace Sanara.Game
         /// <summary>
         /// If we are versus, the current rules
         /// </summary>
-        private readonly string _versusRules;
+        private string _versusRules;
     }
 }

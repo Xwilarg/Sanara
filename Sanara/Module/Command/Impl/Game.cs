@@ -101,13 +101,8 @@ namespace Sanara.Module.Command.Impl
                 var preload = StaticObjects.Preloads[(int)index];
                 if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
                     throw new CommandFailed("This game can only be launched in a NSFW channel.");
-                var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(new Lobby(ctx.User, preload, game.VersusRules), false));
-                var embed = new EmbedBuilder
-                {
-                    Description = ctx.User.ToString() + " (Host)"
-                };
-                embed.AddField("Rules", preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
-                embed.AddField("Multiplayer Rules (only if **more than 1 player** in the lobby)", "TODO");
+                var lobby = new Lobby(ctx.User, preload);
+                var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(lobby, false));
 
                 var id = StaticObjects.GameManager.CreateGame(game);
 
@@ -117,7 +112,7 @@ namespace Sanara.Module.Command.Impl
                     .WithButton(label: "Switch multiplayer mode", customId: $"game/{id}/multi")
                     .WithButton(label: "Cancel", customId: $"game/{id}/cancel", style: ButtonStyle.Danger);
 
-                await ctx.ReplyAsync(embed: embed.Build(), components: buttons.Build());
+                await ctx.ReplyAsync(embed: lobby.GetIntroEmbed(), components: buttons.Build());
             }
         }
 

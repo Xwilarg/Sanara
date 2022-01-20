@@ -29,6 +29,8 @@ namespace Sanara.Game
             _contributors = new List<ulong>();
             _score = 0;
 
+            _lobby.InitVersusRules(_versusMode.GetRules());
+
             StaticObjects.Db.AddGameAsync(_isCustomGame ? "custom" : _gameName, _argument).GetAwaiter().GetResult();
         }
 
@@ -45,8 +47,6 @@ namespace Sanara.Game
         {
             DisposeInternal();
         }
-
-        public string VersusRules => _versusMode.GetRules();
 
         public Lobby? GetLobby()
         {
