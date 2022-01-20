@@ -30,7 +30,7 @@ namespace Sanara.Game.MultiplayerMode
 
         public void PreAnswerCheck(IUser user)
         {
-            if (_currentTurn >= _users.Count || _users[_currentTurn] != user)
+            if (_currentTurn >= _users.Count || _users[_currentTurn].Id != user.Id)
                 throw new InvalidGameAnswer("");
         }
 

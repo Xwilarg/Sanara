@@ -11,7 +11,7 @@ namespace Sanara.Game
             _users = new() { host };
             _lobbyOwner = host;
             _preload = preload;
-            _multiType = MultiplayerType.COOPERATION;
+            _multiType = MultiplayerType.VERSUS;
         }
 
         public MultiplayerType MultiplayerType
