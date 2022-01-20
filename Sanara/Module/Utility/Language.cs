@@ -5,10 +5,22 @@ namespace Sanara.Module.Utility
     public class Language
     {
         public static string ToRomaji(string entry)
-            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
+        {
+            if (entry.Any(x => !IsLatinLetter(x)))
+            {
+                return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
+            }
+            return entry;
+        }
 
         public static string ToHiragana(string entry)
-            => ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
+        {
+            if (entry.Any(x => IsLatinLetter(x)))
+            {
+                return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
+            }
+            return entry;
+        }
 
         /// <summary>
         /// Convert an entry from a language to another

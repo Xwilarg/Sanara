@@ -93,7 +93,7 @@ namespace Sanara.Game
 
             var embed = new EmbedBuilder
             {
-                Description = string.Join("\n", _users.Select(u => u + (IsHost(u) ? " (Host)": "")))
+                Description = string.Join("\n", _users.Select(u => $"**{u}**" + (IsHost(u) ? " (Host)": "")))
             };
             embed.AddField("Rules", _preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
             embed.AddField($"Multiplayer Rules", multiRules);
