@@ -5,7 +5,7 @@ namespace Sanara
     public static class Utils
     {
         public static string CleanWord(string word)
-            => string.Join("", word.Where(c => char.IsLetterOrDigit(c)));
+            => string.Join("", word.Where(c => char.IsLetterOrDigit(c))).ToLowerInvariant();
 
         public static string ToWordCase(string word)
             => char.ToUpper(word[0]) + string.Join("", word.Skip(1)).ToLower();

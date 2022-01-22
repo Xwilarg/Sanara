@@ -165,8 +165,8 @@ namespace Sanara
             new ShiritoriHardPreload(),*/
 
             new ShiritoriPreload(),
+            new KancollePreload()
             /*new ArknightsPreload(),
-            new KancollePreload(),
             new GirlsFrontlinePreload(),
             new AzurLanePreload(),
             new FateGOPreload(),

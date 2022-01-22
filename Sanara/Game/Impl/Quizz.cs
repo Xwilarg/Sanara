@@ -67,7 +67,7 @@ namespace Sanara.Game.Impl
         {
             if (!_doesCongratulate)
                 return null;
-            if (_lobby != null)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
                 return user.Username + " found the right answer.";
             return "Congratulations, you found the right answer." + ((_score + 1) % 10 == 0 ? $"\nAlready {_score + 1} out of {_allValidNames.Length} found!" : "");
         }

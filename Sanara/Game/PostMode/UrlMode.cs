@@ -10,7 +10,7 @@ namespace Sanara.Game.PostMode
             var result = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, text));
             var length = int.Parse(result.Content.Headers.GetValues("content-length").ElementAt(0));
             if (length < 8000000)
-                await chan.SendFileAsync(await StaticObjects.HttpClient.GetStreamAsync(text), "image" + Path.GetExtension(text));
+                await chan.SendFileAsync((await StaticObjects.HttpClient.GetAsync(text)).Content.ReadAsStream(), "image" + Path.GetExtension(text));
             else // Too big to be sent on Discord
                 await chan.SendMessageAsync(text);
         }
