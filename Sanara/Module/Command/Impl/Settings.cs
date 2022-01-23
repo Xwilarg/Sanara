@@ -30,6 +30,18 @@ namespace Sanara.Module.Command.Impl
                     precondition: Precondition.None,
                     needDefer: false
                 ),
+#if NSFW_BUILD
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "help",
+                        Description = "Get the list of commands"
+                    }.Build(),
+                    callback: HelpAsync,
+                    precondition: Precondition.None,
+                    needDefer: false
+                ),
+#endif
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -51,6 +63,11 @@ namespace Sanara.Module.Command.Impl
                     needDefer: false
                 )
             };
+        }
+
+        public async Task HelpAsync(ICommandContext ctx)
+        {
+            await ctx.ReplyAsync("Slash commands are now here! Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
         }
 
         public async Task ConfigureAsync(ICommandContext ctx)
