@@ -22,14 +22,6 @@ namespace SanaraV3.Module.Nsfw
     public sealed class DoujinModule : ModuleBase
     {
 
-        [Command("Unsubscribe doujinshi"), Alias("Unsubscribe doujin", "Unsubscribe nhentai"), RequireNsfw, RequireAdmin]
-        public async Task UnsubscribeDoujinshiAsync()
-        {
-            if (!await StaticObjects.Db.HasSubscriptionExistAsync(Context.Guild.Id, "nhentai"))
-                await ReplyAsync("There is no active doujinshi subscription.");
-            else
-                await StaticObjects.Db.RemoveSubscriptionAsync(Context.Guild.Id, "nhentai");
-        }
         [Command("Doujinshi popularity", RunMode = RunMode.Async), Priority(2), RequireNsfw, Alias("Doujinshi p", "Doujin popularity", "Doujin p", "Nhentai popularity", "Nhentai p")]
         public async Task PopularityAsync()
         {

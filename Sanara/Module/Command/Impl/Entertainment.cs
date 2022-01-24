@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Help;

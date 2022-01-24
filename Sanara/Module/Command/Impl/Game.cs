@@ -201,13 +201,6 @@ namespace SanaraV3.Module.Game
             await ReplyAsync(embed: embed.Build());
         }
 
-        [Command("Cancel", RunMode = RunMode.Async), RequireRunningGame]
-        public async Task CancelAsync()
-        {
-            var game = StaticObjects.Games.Find(x => x.IsMyGame(Context.Channel.Id));
-            await game.CancelAsync();
-        }
-
         [Command("Replay"), RequireRunningGame]
         public async Task ReplayAsync()
         {

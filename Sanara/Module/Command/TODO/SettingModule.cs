@@ -65,13 +65,6 @@ namespace SanaraV3.Module.Administration
             await ReplyAsync("Your current prefix is " + StaticObjects.Db.GetGuild(Context.Guild.Id).Prefix);
         }
 
-        [Command("Prefix"), RequireAdmin]
-        public async Task Prefix(string prefix)
-        {
-            await StaticObjects.Db.UpdatePrefixAsync(Context.Guild.Id, prefix);
-            await ReplyAsync("Your prefix was updated to " + prefix);
-        }
-
         [Command("Anonymize"), RequireAdmin]
         public async Task Anonymize()
         {
