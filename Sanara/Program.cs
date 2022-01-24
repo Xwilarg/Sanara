@@ -309,7 +309,7 @@ namespace Sanara
                             }
                             else
                             {
-                                await ctx.ReplyAsync("There is no data associated to this button, that probably mean it was already requested");
+                                await ctx.ReplyAsync("There is no data associated to this button, that probably mean it was already requested", ephemeral: true);
                             }
                             _pendingRequests.Remove(arg.User.Id);
                         }
