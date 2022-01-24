@@ -502,51 +502,69 @@ namespace Sanara
                 var commandStr = content.Split(' ')[0].ToUpperInvariant();
                 if (_commandsAssociations.ContainsKey(commandStr))
                 {
-                    var command = _commandsAssociations[commandStr];
-                    try
+                    var cmd = _commandsAssociations[commandStr];
+                    var tChan = msg.Channel as ITextChannel; // TODO: Dupplicated code
+                    if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
+                        tChan != null && !tChan.IsNsfw)
                     {
-                        var newContent = content[commandStr.Length..].TrimStart();
-                        if (msg.Attachments.Any())
-                        {
-                            newContent += " " + msg.Attachments.ElementAt(0).Url;
-                        }
-                        var context = new MessageCommandContext(msg, newContent, command);
-                        _ = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                await StaticObjects.Db.AddNewCommandAsync(commandStr.ToUpperInvariant());
-                                StaticObjects.LastMessage = DateTime.UtcNow;
-                                await command.Callback(context);
-                                await StaticObjects.Db.AddCommandSucceed();
-                            }
-                            catch (System.Exception e)
-                            {
-                                if (e is CommandFailed)
-                                {
-                                    await context.ReplyAsync(e.Message);
-                                }
-                                else
-                                {
-                                    await Log.LogErrorAsync(e, context);
-                                }
-                            }
-                        });
+                        await msg.ReplyAsync("This command can only be done in NSFW channels");
                     }
-                    catch (System.Exception e)
+                    else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
+                        tChan != null && tChan.Guild.OwnerId != msg.Author.Id && !((IGuildUser)msg.Author).GuildPermissions.ManageGuild)
                     {
-
-                        if (e is CommandFailed ce)
+                        await msg.ReplyAsync("This command can only be done by a guild administrator");
+                    }
+                    else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
+                        tChan == null)
+                    {
+                        await msg.ReplyAsync("This command can only be done in a guild");
+                    }
+                    else
+                    {
+                        try
                         {
-                            await msg.Channel.SendMessageAsync(e.Message, messageReference: new MessageReference(msg.Id));
+                            var newContent = content[commandStr.Length..].TrimStart();
+                            if (msg.Attachments.Any())
+                            {
+                                newContent += " " + msg.Attachments.ElementAt(0).Url;
+                            }
+                            var context = new MessageCommandContext(msg, newContent, cmd);
+                            _ = Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    await StaticObjects.Db.AddNewCommandAsync(commandStr.ToUpperInvariant());
+                                    StaticObjects.LastMessage = DateTime.UtcNow;
+                                    await cmd.Callback(context);
+                                    await StaticObjects.Db.AddCommandSucceed();
+                                }
+                                catch (System.Exception e)
+                                {
+                                    if (e is CommandFailed)
+                                    {
+                                        await context.ReplyAsync(e.Message);
+                                    }
+                                    else
+                                    {
+                                        await Log.LogErrorAsync(e, context);
+                                    }
+                                }
+                            });
                         }
-                        else
+                        catch (System.Exception e)
                         {
-                            await Log.LogErrorAsync(e, null);
+
+                            if (e is CommandFailed ce)
+                            {
+                                await msg.Channel.SendMessageAsync(e.Message, messageReference: new MessageReference(msg.Id));
+                            }
+                            else
+                            {
+                                await Log.LogErrorAsync(e, null);
+                            }
                         }
                     }
                 }
-                //await _commands.ExecuteAsync(context, pos, null);
             }
             else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
             {
