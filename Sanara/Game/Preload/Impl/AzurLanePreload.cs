@@ -22,17 +22,17 @@ namespace Sanara.Game.Preload.Impl
                         // Item2: name
 
                         // Get URL
-                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + elem.Item1 + ".png)").Groups[1].Value;
+                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(https:\\/\\/azurlane.netojuu.com\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + elem.Item1 + ".png)").Groups[1].Value;
 
                         // Names
-                        List<string> names = new List<string> { elem.Item2 };
+                        List<string> names = new() { elem.Item2 };
                         if (elem.Item2 == "HMS_Neptune" || elem.Item2 == "HDN_Neptune")
                             names.Add("Neptune"); // Both ship are named "Neptune" ingame
                         var escapeName = Common.RemoveAccents(elem.Item2);
                         if (escapeName != elem.Item2)
                             names.Add(escapeName);
 
-                        var result = new QuizzPreloadResult("https://azurlane.koumakan.jp" + htmlValue, names.ToArray());
+                        var result = new QuizzPreloadResult(htmlValue, names.ToArray());
                         StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }

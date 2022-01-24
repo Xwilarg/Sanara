@@ -467,7 +467,7 @@ namespace Sanara
             });
 
 #if NSFW_BUILD
-            await StaticObjects.Client.SetActivityAsync(new Discord.Game("https://sanara.zirk.eu", ActivityType.Watching));
+            await StaticObjects.Client.SetActivityAsync(new Discord.Game("Prefix are gone, please use slash commands!", ActivityType.Watching));
 #endif
         }
 
