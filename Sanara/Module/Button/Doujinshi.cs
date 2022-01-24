@@ -44,6 +44,7 @@ namespace Sanara.Module.Button
             Directory.Delete("Saves/Download/" + path + "/" + id);
 
             FileInfo fi = new(finalPath);
+            await StaticObjects.Db.AddDownloadDoujinshiAsync((int)(fi.Length / 1000));
             if (fi.Length < 8000000) // 8MB
             {
                 await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), fi.Name);

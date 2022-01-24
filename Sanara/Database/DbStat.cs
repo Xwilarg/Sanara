@@ -10,6 +10,7 @@
             await CreateIfDontExistsAsync(_statDbName, "Games");
             await CreateIfDontExistsAsync(_statDbName, "GamesPlayers");
             await CreateIfDontExistsAsync(_statDbName, "Booru");
+            await CreateIfDontExistsAsync(_statDbName, "Download");
         }
 
         private string GetStatKey(string format)
@@ -17,19 +18,19 @@
             return DateTime.UtcNow.ToString(format);
         }
 
-        private async Task InsertOrAddAsync(string table, string key, string field)
+        private async Task InsertOrAddAsync(string table, string key, string field, int value = 1)
         {
             if (await _r.Db(_statDbName).Table(table).GetAll(key).Count().Eq(0).RunAsync<bool>(_conn))
                 await _r.Db(_statDbName).Table(table).Insert(_r.HashMap("id", key)
-                        .With(field, 1)
+                        .With(field, value)
                     ).RunAsync(_conn);
             else if (!await _r.Db(_statDbName).Table(table).Get(key).HasFields(field).RunAsync<bool>(_conn))
                 await _r.Db(_statDbName).Table(table).Update(_r.HashMap("id", key)
-                        .With(field, 1)
+                        .With(field, value)
                     ).RunAsync(_conn);
             else
                 await _r.Db(_statDbName).Table(table).Update(_r.HashMap("id", key)
-                        .With(field, await _r.Db(_statDbName).Table(table).Get(key).GetField(field).Add(1).RunAsync(_conn))
+                        .With(field, await _r.Db(_statDbName).Table(table).Get(key).GetField(field).Add(value).RunAsync(_conn))
                     ).RunAsync(_conn);
         }
 
@@ -46,6 +47,16 @@
         public async Task AddErrorAsync(System.Exception e)
         {
             await InsertOrAddAsync("Errors", Daily, e.GetType().ToString());
+        }
+
+        public async Task AddDownloadDoujinshiAsync(int size)
+        {
+            await InsertOrAddAsync("Download", Daily, "Doujinshi", size);
+        }
+
+        public async Task AddDownloadCosplayAsync(int size)
+        {
+            await InsertOrAddAsync("Download", Daily, "Cosplay", size);
         }
 
         public async Task AddGameAsync(string name, string option)
