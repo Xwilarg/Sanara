@@ -166,16 +166,16 @@ namespace Sanara
 
             new ShiritoriPreload(),
             new KancollePreload(),
-            new BooruQuizzPreload(),
-            new BooruFillPreload()
-            /*new ArknightsPreload(),
+            new ArknightsPreload(),
             new GirlsFrontlinePreload(),
             new AzurLanePreload(),
             new FateGOPreload(),
             new PokemonPreload(),
             new AnimePreload(),
+#if NSFW_BUILD
             new BooruQuizzPreload(),
-            new BooruFillPreload()*/
+            new BooruFillPreload()
+#endif
         };
         /// <summary>
         /// List of all game names available

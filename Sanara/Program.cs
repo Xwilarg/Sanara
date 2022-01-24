@@ -492,7 +492,7 @@ namespace Sanara
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            if (arg.Author.IsBot || arg is not SocketUserMessage msg || msg.Content == "") return; // The message received isn't one we can deal with
+            if (arg.Author.IsBot || arg is not SocketUserMessage msg || msg.Content == null || msg.Content == "") return; // The message received isn't one we can deal with
 
             // Deprecation warning
             int pos = 0;

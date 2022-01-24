@@ -16,6 +16,7 @@ namespace Sanara.Game.Impl
             var gUser = user as IGuildUser;
             if (gUser == null)
                 throw new CommandFailed("This game must be played in a server.");
+            gUser = gUser.Guild.GetUserAsync(gUser.Id).GetAwaiter().GetResult();
             _voiceChan = gUser.VoiceChannel;
             if (_voiceChan == null)
                 throw new CommandFailed("You must be in a vocal channel to play this game.");

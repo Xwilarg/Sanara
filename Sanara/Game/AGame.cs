@@ -312,12 +312,12 @@ namespace Sanara.Game
             {
                 int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
 
-                if (_score < bestScore) scoreSentence = $"You didn't beat your best score of {bestScore} with your score of {_score}.";
-                else if (_score == bestScore) scoreSentence = $"You equalized your best score with a score of {bestScore}.";
+                if (_score < bestScore) scoreSentence = $"You didn't beat the guild best score of {bestScore} with your score of {_score}.";
+                else if (_score == bestScore) scoreSentence = $"You equalized the guild best score with a score of {bestScore}.";
                 else
                 {
                     await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
-                    scoreSentence = $"You have beat your best score of {bestScore} with a new score of {_score}!";
+                    scoreSentence = $"You have beat the guild best score of {bestScore} with a new score of {_score}!";
 
                     var guild = StaticObjects.Db.GetGuild(_guildId);
                     string fullName = _argument == null ? _gameName : (_gameName + "-" + _argument);

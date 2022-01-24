@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init()
         {
-            var cache = StaticObjects.Db.GetCacheAsync(Name + "_audio").GetAwaiter().GetResult().ToList();
+            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (string name in Kancolle.GetShips())
             {
                 if (!cache.Any(x => x.id == name))
@@ -23,7 +23,7 @@ namespace Sanara.Game.Preload.Impl
                         string html = StaticObjects.HttpClient.GetStringAsync(shipUrl).GetAwaiter().GetResult();
 
                         var result = new QuizzPreloadResult(Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/[^-]*-Battle_Start\\.ogg").Value, new[] { name });
-                        StaticObjects.Db.SetCacheAsync(Name + "_audio", result).GetAwaiter().GetResult();
+                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
