@@ -321,7 +321,7 @@ namespace Sanara.Game
 
                     var guild = StaticObjects.Db.GetGuild(_guildId);
                     string fullName = _argument == null ? _gameName : (_gameName + "-" + _argument);
-                    int myScore = guild.GetScore(fullName);
+                    int myScore = guild.GetScore(StaticObjects.Db.GetCacheName(fullName));
                     var scores = StaticObjects.Db.GetAllScores(fullName);
                     scoreSentence += "\nYou are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count;
                 }

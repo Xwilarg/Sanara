@@ -122,7 +122,7 @@ namespace Sanara.Database
 
         // CACHES
 
-        private string GetCacheName(string name)
+        public string GetCacheName(string name)
         {
             name = Utils.CleanWord(name);
             if (name.EndsWith("quizz"))
@@ -274,7 +274,7 @@ namespace Sanara.Database
 
         public int GetGameScore(ulong guildId, string name, string argument)
         {
-            string fullName = argument == null ? GetCacheName(name.ToLowerInvariant()) : (GetCacheName(name.ToLowerInvariant()) + "-" + argument);
+            string fullName = argument == null ? GetCacheName(name) : (GetCacheName(name) + "-" + argument);
             Guild g = _guilds[guildId];
             if (g.DoesContainsGame(fullName)) // Score already in cache
                 return g.GetScore(fullName);
@@ -283,7 +283,7 @@ namespace Sanara.Database
 
         public async Task SaveGameScoreAsync(ulong guildId, int score, List<ulong> contributors, string name, string argument)
         {
-            string fullName = argument == null ? GetCacheName(name.ToLowerInvariant()) : (GetCacheName(name.ToLowerInvariant()) + "-" + argument);
+            string fullName = argument == null ? GetCacheName(name) : (GetCacheName(name) + "-" + argument);
             _guilds[guildId].UpdateScore(fullName, score);
             await _r.Db(_dbName).Table("Guilds").Update(_r.HashMap("id", guildId.ToString())
                 .With(fullName, score + "|" + string.Join("|", contributors))
@@ -291,7 +291,7 @@ namespace Sanara.Database
         }
 
         public List<int> GetAllScores(string gameName)
-            => _guilds.Where(x => x.Value.DoesContainsGame(gameName)).Select(x => x.Value.GetScore(gameName)).ToList();
+            => _guilds.Where(x => x.Value.DoesContainsGame(GetCacheName(gameName))).Select(x => x.Value.GetScore(GetCacheName(gameName))).ToList();
 
         private readonly RethinkDB _r;
         private Connection _conn;
