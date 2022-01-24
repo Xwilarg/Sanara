@@ -125,6 +125,10 @@ namespace Sanara.Database
         public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
         {
             name = Utils.CleanWord(name);
+            if (name.EndsWith("quizz"))
+            {
+                name = name[..^5]; // Retro compatibility with V3
+            }
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
             {
                 await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} requested but is empty"));

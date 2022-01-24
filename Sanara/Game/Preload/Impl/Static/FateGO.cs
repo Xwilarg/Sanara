@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl.Static
             {
                 string html = StaticObjects.HttpClient.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + servantClass).GetAwaiter().GetResult();
                 html = html.Split(new[] { "navbox mw-collapsible" }, StringSplitOptions.None)[0]; // Remove useless things at ending
-                html = string.Join("", html.Split(new[] { "article-thumb tnone show-info-icon" }, StringSplitOptions.None).Skip(1));
+                html = string.Join("", html.Split(new[] { "<table class=\"wikitable\"" }, StringSplitOptions.None).Skip(1));
                 foreach (string s in html.Split(new[] { "<td>" }, StringSplitOptions.None))
                 {
                     Match match = Regex.Match(s, "<a href=\"\\/wiki\\/([^\"]+)\"( |\t)*title=\"[^\"]+\">");

@@ -53,7 +53,7 @@ namespace Sanara.Game.Preload.Impl
                             }
                         }
 
-                        var result = new QuizzPreloadResult(Regex.Match(html.Split(new[] { "pi-image-collection-tab-content current" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0],
+                        var result = new QuizzPreloadResult(Regex.Match(html.Split(new[] { "<figure class=\"pi-item pi-image\">" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0],
                             allAnswer.ToArray());
                         StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
