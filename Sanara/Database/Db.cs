@@ -122,13 +122,19 @@ namespace Sanara.Database
 
         // CACHES
 
-        public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
+        private string GetCacheName(string name)
         {
             name = Utils.CleanWord(name);
             if (name.EndsWith("quizz"))
             {
                 name = name[..^5]; // Retro compatibility with V3
             }
+            return name;
+        }
+
+        public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
+        {
+            name = GetCacheName(name);
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
             {
                 await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} requested but is empty"));
@@ -141,7 +147,7 @@ namespace Sanara.Database
 
         public async Task SetCacheAsync(string name, QuizzPreloadResult value)
         {
-            name = Utils.CleanWord(name);
+            name = GetCacheName(name);
             await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} updated, {value.Answers.Length} elements"));
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
                 await _r.Db(_dbName).TableCreate("Cache_" + name).RunAsync(_conn);
@@ -150,7 +156,7 @@ namespace Sanara.Database
 
         public async Task<bool> DeleteCacheAsync(string name)
         {
-            name = Utils.CleanWord(name);
+            name = GetCacheName(name);
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
                 return false;
             await _r.Db(_dbName).Table("Cache_" + name).Delete().RunAsync(_conn);
