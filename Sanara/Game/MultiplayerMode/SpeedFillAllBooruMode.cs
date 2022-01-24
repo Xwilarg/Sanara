@@ -8,9 +8,9 @@ namespace Sanara.Game.MultiplayerMode
     {
         public void Init(List<IUser> users)
         {
-            _scores = new Dictionary<IUser, int>();
+            _scores = new();
             foreach (var u in users)
-                _scores.Add(u, 0);
+                _scores.Add(u.Id, new(u));
             _isDone = false;
         }
 
@@ -27,7 +27,7 @@ namespace Sanara.Game.MultiplayerMode
 
         public void AnswerIsCorrect(IUser user)
         {
-            _scores[user]++;
+            _scores[user.Id].IncreaseScore();
         }
 
         public bool Loose()
@@ -37,9 +37,9 @@ namespace Sanara.Game.MultiplayerMode
 
         public string GetWinner()
         {
-            var best = _scores.Values.Max();
-            var names = _scores.Where(x => x.Value == best);
-            return string.Join(", ", names.Select(x => x.Key.Mention));
+            var best = _scores.Values.Max(x => x.Score);
+            var names = _scores.Where(x => x.Value.Score == best);
+            return string.Join(", ", names.Select(x => x.Value.User.Mention));
         }
 
         public bool CanLooseAuto()
@@ -50,14 +50,14 @@ namespace Sanara.Game.MultiplayerMode
 
         public string GetOutroLoose()
         {
-            StringBuilder str = new StringBuilder();
+            StringBuilder str = new();
             str.AppendLine("Final score:");
-            foreach (var s in _scores.OrderByDescending(x => x.Value))
-                str.AppendLine(Format.Sanitize(s.Key.Username) + ": " + s.Value);
+            foreach (var s in _scores.OrderByDescending(x => x.Value.Score))
+                str.AppendLine(Format.Sanitize(s.Value.User.Username) + ": " + s.Value.Score);
             return str.ToString();
         }
 
-        private Dictionary<IUser, int> _scores;
+        private Dictionary<ulong, ScoreUser> _scores;
         protected bool _isDone;
     }
 }

@@ -124,14 +124,21 @@ namespace Sanara.Database
 
         public async Task<QuizzPreloadResult[]> GetCacheAsync(string name)
         {
+            name = Utils.CleanWord(name);
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
+            {
+                await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} requested but is empty"));
                 return Array.Empty<QuizzPreloadResult>();
-            return ((Cursor<QuizzPreloadResult>)await _r.Db(_dbName).Table("Cache_" + name).RunAsync<QuizzPreloadResult>(_conn)).ToArray();
+            }
+            var cache = ((Cursor<QuizzPreloadResult>)await _r.Db(_dbName).Table("Cache_" + name).RunAsync<QuizzPreloadResult>(_conn)).ToArray();
+            await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} requested, {cache.Length} elements"));
+            return cache;
         }
 
         public async Task SetCacheAsync(string name, QuizzPreloadResult value)
         {
             name = Utils.CleanWord(name);
+            await Log.LogAsync(new(LogSeverity.Verbose, "Database", $"Cache of {name} updated, {value.Answers.Length} elements"));
             if (!await _r.Db(_dbName).TableList().Contains("Cache_" + name).RunAsync<bool>(_conn))
                 await _r.Db(_dbName).TableCreate("Cache_" + name).RunAsync(_conn);
             await _r.Db(_dbName).Table("Cache_" + name).Insert(value).RunAsync(_conn);

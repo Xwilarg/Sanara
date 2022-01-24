@@ -4,6 +4,22 @@ namespace Sanara
 {
     public static class Utils
     {
+        public static bool EasyCompare(string a, string b)
+        {
+            string va, vb;
+            if (a.Any(x => char.IsLetterOrDigit(x)) || b.Any(x => char.IsLetterOrDigit(x)))
+            {
+                va = CleanWord(a);
+                vb = CleanWord(b);
+            }
+            else
+            {
+                va = a;
+                vb = b;
+            }
+            return va == vb || (va[^1] == 's' && va[..^1] == vb) || (vb[^1] == 's' && vb[..^1] == va);
+        }
+
         public static string CleanWord(string word)
             => string.Join("", word.Where(c => char.IsLetterOrDigit(c))).ToLowerInvariant();
 

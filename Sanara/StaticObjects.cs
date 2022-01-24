@@ -165,7 +165,9 @@ namespace Sanara
             new ShiritoriHardPreload(),*/
 
             new ShiritoriPreload(),
-            new KancollePreload()
+            new KancollePreload(),
+            new BooruQuizzPreload(),
+            new BooruFillPreload()
             /*new ArknightsPreload(),
             new GirlsFrontlinePreload(),
             new AzurLanePreload(),

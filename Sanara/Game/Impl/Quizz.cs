@@ -39,14 +39,14 @@ namespace Sanara.Game.Impl
             return new[] { _current.ImageUrl };
         }
 
-        protected override Task CheckAnswerInternalAsync(ICommandContext answer)
+        protected override async Task CheckAnswerInternalAsync(ICommandContext answer)
         {
             string userAnswer = Utils.CleanWord(answer.GetArgument<string>("answer"));
             if (!_allValidNames.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer(""); // We just add a reaction to the message to not spam the text channel
             if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
                 throw new InvalidGameAnswer("No this is not " + answer + ".");
-            return Task.CompletedTask;
+            await answer.AddReactionAsync(new Emoji("✅"));
         }
 
         protected override string GetAnswer()

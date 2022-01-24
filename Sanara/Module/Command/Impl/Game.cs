@@ -100,7 +100,7 @@ namespace Sanara.Module.Command.Impl
                 var index = ctx.GetArgument<long>("game");
                 var preload = StaticObjects.Preloads[(int)index];
                 if (ctx.Channel is ITextChannel chan && !chan.IsNsfw && !preload.IsSafe())
-                    throw new CommandFailed("This game can only be launched in a NSFW channel.");
+                    throw new CommandFailed("This game can only be launched in a NSFW channel.", true);
                 var lobby = new Lobby(ctx.User, preload);
                 var game = preload.CreateGame(ctx.Channel, ctx.User, new GameSettings(lobby, false));
 

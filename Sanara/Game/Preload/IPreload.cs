@@ -11,7 +11,6 @@ namespace Sanara.Game.Preload
         /// </summary>
         public ReadOnlyCollection<IPreloadResult> Load();
         public string Name { get; }
-        public string Description { get; }
         /// <summary>
         /// Create a new instance of a game and return it
         /// </summary>

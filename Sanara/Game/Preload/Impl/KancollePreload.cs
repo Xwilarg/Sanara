@@ -41,7 +41,6 @@ namespace Sanara.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string Name => "KanColle Quizz";
-        public string Description => "Find the name of a Kantai Collection character from an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings);

@@ -371,9 +371,9 @@ namespace Sanara
                 }
                 catch (System.Exception e)
                 {
-                    if (e is CommandFailed)
+                    if (e is CommandFailed ce)
                     {
-                        ctx.ReplyAsync(e.Message);
+                        await ctx.ReplyAsync(e.Message, ephemeral: ce.Ephemeral);
                     }
                     else
                     {
@@ -536,7 +536,7 @@ namespace Sanara
                     catch (System.Exception e)
                     {
 
-                        if (e is CommandFailed)
+                        if (e is CommandFailed ce)
                         {
                             await msg.Channel.SendMessageAsync(e.Message, messageReference: new MessageReference(msg.Id));
                         }

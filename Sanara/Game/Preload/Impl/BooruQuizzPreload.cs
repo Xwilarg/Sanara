@@ -26,7 +26,6 @@ namespace Sanara.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string Name => "Booru Quizz";
-        public string Description => "Find the common tag between 3 images";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new QuizzBooruTags(chan, user, this, settings);

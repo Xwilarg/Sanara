@@ -24,7 +24,6 @@ namespace Sanara.Game.Preload.Impl
             => _preload.Cast<IPreloadResult>().ToList().AsReadOnly();
 
         public string Name => _gameName;
-        public string Description => null;
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new Quizz(chan, user, this, settings, StaticObjects.ModeText, false);

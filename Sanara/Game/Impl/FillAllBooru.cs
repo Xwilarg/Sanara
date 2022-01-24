@@ -29,27 +29,27 @@ namespace Sanara.Game.Impl
             });
             _allTags = tags.ToArray();
             _foundTags = new List<string>();
-            _nbNeed = _lobby == null ? (int)Math.Floor(_allTags.Length * 75.0 / 100) : _allTags.Length;
+            _nbNeed = _lobby.MultiplayerType != MultiplayerType.VERSUS ? (int)Math.Floor(_allTags.Length * 75.0 / 100) : _allTags.Length;
             return new[] { post.FileUrl.AbsoluteUri };
         }
 
         protected override Task CheckAnswerInternalAsync(ICommandContext answer)
         {
             string userAnswer = answer.GetArgument<string>("answer");
-            var foundTag = _allTags.Where(x => Utils.CleanWord(x) == userAnswer).FirstOrDefault();
+            var foundTag = _allTags.Where(x => Utils.EasyCompare(x, userAnswer)).FirstOrDefault();
             if (foundTag == null)
                 throw new InvalidGameAnswer("");
             if (_foundTags.Contains(foundTag))
                 throw new InvalidGameAnswer("This tag was already found.");
             _foundTags.Add(foundTag);
 
-            if (_lobby != null)
+            if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
             {
                 _versusMode.AnswerIsCorrect(answer.User);
             }
 
             if (_nbNeed != _foundTags.Count)
-                throw new InvalidGameAnswer($"{(_lobby == null ? "You" : answer.User.Username)} found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
+                throw new InvalidGameAnswer($"{(_lobby.MultiplayerType != MultiplayerType.VERSUS ? "You" : answer.User.Username)} found a tag!\n{_nbNeed - _foundTags.Count} remaining.");
             return Task.CompletedTask;
         }
 
@@ -62,10 +62,10 @@ namespace Sanara.Game.Impl
             => 60;
 
         protected override string GetSuccessMessage(IUser _)
-            => _lobby == null ? "You found at least 75% of the tags on the image!" : null;
+            => _lobby.MultiplayerType != MultiplayerType.VERSUS ? "You found at least 75% of the tags on the image!" : null;
 
         protected override string GetHelp()
-            => _lobby == null ? "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find." : "There are " + _allTags.Length + " tags on the image.";
+            => _lobby.MultiplayerType != MultiplayerType.VERSUS ? "You have " + _nbNeed + " tags out of " + _allTags.Length + " to find." : "There are " + _allTags.Length + " tags on the image.";
 
         private string[] _allTags;
         private List<string> _foundTags;

@@ -1,6 +1,5 @@
 ﻿using BooruSharp.Booru;
 using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
@@ -19,8 +18,8 @@ namespace Sanara.Game.Impl
 
         protected override Task CheckAnswerInternalAsync(ICommandContext answer)
         {
-            string userAnswer = Utils.CleanWord(answer.GetArgument<string>("answer"));
-            if (!_current.Answers.Any(x => Utils.CleanWord(x) == userAnswer))
+            string userAnswer = answer.GetArgument<string>("answer");
+            if (!_current.Answers.Any(x => Utils.EasyCompare(x, userAnswer)))
                 throw new InvalidGameAnswer("");
             return Task.CompletedTask;
         }

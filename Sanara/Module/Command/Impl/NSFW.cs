@@ -400,7 +400,7 @@ namespace Sanara.Module.Command.Impl
 
             if (!booru.IsSafe && ctx.Channel is ITextChannel tChan && !tChan.IsNsfw)
             {
-                throw new CommandFailed("This booru is only available in NSFW channels");
+                throw new CommandFailed("This booru is only available in NSFW channels", true);
             }
 
             BooruSharp.Search.Post.SearchResult post;

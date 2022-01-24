@@ -13,7 +13,6 @@ namespace Sanara.Game.Preload.Impl
             => null;
 
         public string Name => "Booru Fill";
-        public string Description => "Find the tags inside an image";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
             => new FillAllBooru(chan, user, this, settings);
