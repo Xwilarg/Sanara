@@ -44,7 +44,7 @@ jobs:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage.xml
     - name: Publish Sanara
-      run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE;NSFW_BUILD
+      run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=\"TRACE;NSFW_BUILD\"
     - name: Publish Sanara SFW version
       run: dotnet publish -c Release-SFW -r linux-x64 -o Release-SFW Sanara/Sanara.csproj /p:DefineConstants=TRACE
     - uses: actions/upload-artifact@v2
