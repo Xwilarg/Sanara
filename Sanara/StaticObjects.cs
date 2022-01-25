@@ -34,7 +34,7 @@ namespace Sanara
 #endif
         public static DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
         {
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages
         });
         /// <summary>
         /// To display uptime
