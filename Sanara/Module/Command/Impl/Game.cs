@@ -2,6 +2,7 @@
 using Sanara.Exception;
 using Sanara.Game;
 using Sanara.Help;
+using System.Text;
 
 namespace Sanara.Module.Command.Impl
 {
@@ -52,6 +53,16 @@ namespace Sanara.Module.Command.Impl
                    }.Build(),
                    callback: PlayAsync,
                    precondition: Precondition.None,
+                   needDefer: false
+               ),
+               new CommandInfo(
+                   slashCommand: new SlashCommandBuilder()
+                   {
+                       Name = "leaderboard",
+                       Description = "See the global leaderboard"
+                   }.Build(),
+                   callback: LeaderboardAsync,
+                   precondition: Precondition.GuildOnly,
                    needDefer: false
                ),
                new CommandInfo(
@@ -116,6 +127,43 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
+        public async Task LeaderboardAsync(ICommandContext ctx)
+        {
+            var guild = StaticObjects.Db.GetGuild(((ITextChannel)ctx.Channel).GuildId);
+            var embed = new EmbedBuilder
+            {
+                Title = "Scores",
+                Color = Color.Blue
+            };
+            float globalScore = 0;
+            foreach (string tmpS in StaticObjects.AllGameNames)
+            {
+                var s = StaticObjects.Db.GetCacheName(tmpS);
+                StringBuilder str = new();
+                if (!guild.DoesContainsGame(s))
+                    str.AppendLine("You are not ranked in this game");
+                else
+                {
+                    int myScore = guild.GetScore(s);
+                    var scores = StaticObjects.Db.GetAllScores(s);
+                    str.AppendLine("You are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count);
+                    str.AppendLine("Your score: " + myScore);
+                    var bestScores = scores.Where(x => x > myScore);
+                    if (bestScores.Any())
+                        str.AppendLine("Next score for rank up: " + bestScores.Min());
+                    str.AppendLine("Best score: " + (scores.Any() ? scores.Max() : "None"));
+                    if (scores.Any())
+                    {
+                        globalScore += myScore / scores.Max();
+                    }
+                }
+                str.AppendLine();
+                embed.AddField(s, str.ToString());
+            }
+            embed.Description = "Global Score: " + (globalScore / StaticObjects.AllGameNames.Length * 100f).ToString("0.00") + "%";
+            await ctx.ReplyAsync(embed: embed.Build());
+        }
+
         public async Task CancelAsync(ICommandContext ctx)
         {
             var game = StaticObjects.GameManager.GetGame(ctx.Channel);
@@ -165,40 +213,6 @@ namespace SanaraV3.Module.Game
                 await ReplyAsync("The cache for this game was deleted, please restart me so I can download it back.");
             else
                 await ReplyAsync("There is no cache loaded for this name.");
-        }
-
-        [Command("Score")]
-        public async Task ScoreAsync()
-        {
-            var guild = StaticObjects.Db.GetGuild(Context.Guild.Id);
-            var embed = new EmbedBuilder
-            {
-                Title = "Scores",
-                Color = Color.Blue
-            };
-            float globalScore = 0;
-            foreach (string s in StaticObjects.AllGameNames)
-            {
-                StringBuilder str = new StringBuilder();
-                if (!guild.DoesContainsGame(s))
-                    str.AppendLine("You are not ranked in this game");
-                else
-                {
-                    int myScore = guild.GetScore(s);
-                    var scores = StaticObjects.Db.GetAllScores(s);
-                    str.AppendLine("You are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count);
-                    str.AppendLine("Your score: " + myScore);
-                    var bestScores = scores.Where(x => x > myScore);
-                    if (bestScores.Count() > 0)
-                        str.AppendLine("Next score for rank up: " + bestScores.Min());
-                    str.AppendLine("Best score: " + scores.Max());
-                    globalScore += myScore / scores.Max();
-                }
-                str.AppendLine();
-                embed.AddField(s, str.ToString());
-            }
-            embed.Description = "Global Score: " + (globalScore / StaticObjects.AllGameNames.Length * 100f).ToString("0.00") + "%";
-            await ReplyAsync(embed: embed.Build());
         }
 
         [Command("Replay"), RequireRunningGame]

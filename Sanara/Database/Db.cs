@@ -81,7 +81,7 @@ namespace Sanara.Database
 
             // Get score
             var json = (JObject)await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync(_conn);
-            foreach (var name in StaticObjects.AllGameNames)
+            foreach (var name in StaticObjects.AllGameNames.Select(x => GetCacheName(x)))
             {
                 if (json[name] != null)
                 {
@@ -291,7 +291,10 @@ namespace Sanara.Database
         }
 
         public List<int> GetAllScores(string gameName)
-            => _guilds.Where(x => x.Value.DoesContainsGame(GetCacheName(gameName))).Select(x => x.Value.GetScore(GetCacheName(gameName))).ToList();
+        {
+            gameName = GetCacheName(gameName);
+            return _guilds.Where(x => x.Value.DoesContainsGame(gameName)).Select(x => x.Value.GetScore(gameName)).ToList();
+        }
 
         private readonly RethinkDB _r;
         private Connection _conn;
