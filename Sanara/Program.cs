@@ -166,7 +166,7 @@ namespace Sanara
                     await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
                     _pendingRequests.Remove(arg.User.Id);
                 }
-                else if (StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
+                else if (arg.Data.CustomId.StartsWith("error-") && StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
                 {
                     var e = StaticObjects.Errors[arg.Data.CustomId];
                     await ctx.ReplyAsync(embed: new EmbedBuilder
@@ -177,140 +177,14 @@ namespace Sanara
                     }.Build(), ephemeral: true);
                     _pendingRequests.Remove(arg.User.Id);
                 }
-                else
+                else if (arg.Data.CustomId.StartsWith("tags-") && StaticObjects.Tags.ContainsTag(arg.Data.CustomId))
                 {
+                    await arg.DeferLoadingAsync();
                     _ = Task.Run(async () =>
                     {
                         try
                         {
-                            if (StaticObjects.Tags.ContainsTag(arg.Data.CustomId))
-                            {
-                                await arg.DeferLoadingAsync();
-                                await Booru.GetTagsAsync(ctx, arg.Data.CustomId);
-                            }
-                            else if (StaticObjects.Cosplays.Contains(arg.Data.CustomId))
-                            {
-                                StaticObjects.Cosplays.Remove(arg.Data.CustomId);
-                                await arg.DeferLoadingAsync();
-                                var id = arg.Data.CustomId.Split('/');
-                                await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
-                            }
-                            else if (StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
-                            {
-                                StaticObjects.Doujinshis.Remove(arg.Data.CustomId);
-                                await arg.DeferLoadingAsync();
-                                var id = arg.Data.CustomId.Split('/').Last();
-                                await Doujinshi.DownloadDoujinshiAsync(ctx, id);
-                            }
-                            else if (arg.Data.CustomId.StartsWith("replay/"))
-                            {
-                                var id = arg.Data.CustomId[7..];
-                                var chanId = ctx.Channel.Id.ToString();
-                                switch (id)
-                                {
-                                    case "ready":
-                                        var embed = StaticObjects.GameManager.ToggleReadyLobby(ctx.Channel, ctx.User);
-                                        if (embed != null)
-                                        {
-                                            await ctx.ReplyAsync("Ready state changed", ephemeral: true);
-                                            if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
-                                            {
-                                                await arg.Message.DeleteAsync();
-                                            }
-                                            else
-                                            {
-                                                await arg.Message.ModifyAsync(x => x.Embed = embed);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            await ctx.ReplyAsync("You are not in the game", ephemeral: true); // TODO
-                                        }
-                                        break;
-
-                                    case "delete":
-                                        StaticObjects.GameManager.DeleteReadyLobby(ctx.Channel);
-                                        await ctx.ReplyAsync("Replay lobby deleted", ephemeral: true);
-                                        await arg.Message.DeleteAsync();
-                                        break;
-
-                                    default:
-                                        throw new NotImplementedException("Invalid id " + id);
-                                }
-                            }
-                            else if (arg.Data.CustomId.StartsWith("game/"))
-                            {
-                                var id = arg.Data.CustomId[5..];
-                                var chanId = ctx.Channel.Id.ToString();
-                                var lobby = StaticObjects.GameManager.GetLobby(chanId);
-                                if (lobby == null)
-                                {
-                                    await ctx.ReplyAsync("This lobby is closed", ephemeral: true);
-                                }
-                                else
-                                {
-                                    switch (id)
-                                    {
-                                        case "start":
-                                            if (lobby.IsHost(ctx.User))
-                                            {
-                                                await StaticObjects.GameManager.StartGameAsync(ctx);
-                                                await arg.Message.DeleteAsync();
-                                            }
-                                            else
-                                            {
-                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
-                                            }
-                                            break;
-
-                                        case "join":
-                                            if (lobby.IsHost(ctx.User))
-                                            {
-                                                await ctx.ReplyAsync("You can't leave the lobby as the host, press the cancel button instead", ephemeral: true);
-                                            }
-                                            else
-                                            {
-                                                var state = lobby.ToggleUser(ctx.User);
-                                                await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
-                                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
-                                            }
-                                            break;
-
-                                        case "multi":
-                                            if (lobby.IsHost(ctx.User))
-                                            {
-                                                lobby.ToggleMultiplayerMode();
-                                                await ctx.ReplyAsync("You changed the multiplayer type", ephemeral: true);
-                                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
-                                            }
-                                            else
-                                            {
-                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
-                                            }
-                                            break;
-
-                                        case "cancel":
-                                            if (lobby.IsHost(ctx.User))
-                                            {
-                                                StaticObjects.GameManager.RemoveLobby(chanId);
-                                                await arg.Message.DeleteAsync();
-                                                await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
-                                            }
-                                            else
-                                            {
-                                                await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
-                                            }
-                                            break;
-
-                                        default:
-                                            throw new NotImplementedException("Invalid id " + id);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                await ctx.ReplyAsync("There is no data associated to this button, that probably mean it was already requested", ephemeral: true);
-                            }
+                            await Booru.GetTagsAsync(ctx, arg.Data.CustomId);
                             _pendingRequests.Remove(arg.User.Id);
                         }
                         catch (System.Exception ex)
@@ -319,6 +193,156 @@ namespace Sanara
                             _pendingRequests.Remove(arg.User.Id);
                         }
                     });
+                }
+                else if (arg.Data.CustomId.StartsWith("cosplay-") && StaticObjects.Cosplays.Contains(arg.Data.CustomId))
+                {
+                    StaticObjects.Cosplays.Remove(arg.Data.CustomId);
+                    await arg.DeferLoadingAsync();
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var id = arg.Data.CustomId.Split('/');
+                            await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
+                            _pendingRequests.Remove(arg.User.Id);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            await Log.LogErrorAsync(ex, ctx);
+                            _pendingRequests.Remove(arg.User.Id);
+                        }
+                    });
+                }
+                else if (arg.Data.CustomId.StartsWith("doujinshi-") && StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
+                {
+                    StaticObjects.Doujinshis.Remove(arg.Data.CustomId);
+                    await arg.DeferLoadingAsync();
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var id = arg.Data.CustomId.Split('/').Last();
+                            await Doujinshi.DownloadDoujinshiAsync(ctx, id);
+                            _pendingRequests.Remove(arg.User.Id);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            await Log.LogErrorAsync(ex, ctx);
+                            _pendingRequests.Remove(arg.User.Id);
+                        }
+                    });
+                }
+                else if (arg.Data.CustomId.StartsWith("replay/"))
+                {
+                    var id = arg.Data.CustomId[7..];
+                    var chanId = ctx.Channel.Id.ToString();
+                    switch (id)
+                    {
+                        case "ready":
+                            var embed = StaticObjects.GameManager.ToggleReadyLobby(ctx.Channel, ctx.User);
+                            if (embed != null)
+                            {
+                                await ctx.ReplyAsync("Ready state changed", ephemeral: true);
+                                if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
+                                {
+                                    await arg.Message.DeleteAsync();
+                                }
+                                else
+                                {
+                                    await arg.Message.ModifyAsync(x => x.Embed = embed);
+                                }
+                            }
+                            else
+                            {
+                                await ctx.ReplyAsync("You are not in the game", ephemeral: true); // TODO
+                            }
+                            break;
+
+                        case "delete":
+                            StaticObjects.GameManager.DeleteReadyLobby(ctx.Channel);
+                            await ctx.ReplyAsync("Replay lobby deleted", ephemeral: true);
+                            await arg.Message.DeleteAsync();
+                            break;
+
+                        default:
+                            throw new NotImplementedException("Invalid id " + id);
+                    }
+                    _pendingRequests.Remove(arg.User.Id);
+                }
+                else if (arg.Data.CustomId.StartsWith("game/"))
+                {
+                    var id = arg.Data.CustomId[5..];
+                    var chanId = ctx.Channel.Id.ToString();
+                    var lobby = StaticObjects.GameManager.GetLobby(chanId);
+                    if (lobby == null)
+                    {
+                        await ctx.ReplyAsync("This lobby is closed", ephemeral: true);
+                    }
+                    else
+                    {
+                        switch (id)
+                        {
+                            case "start":
+                                if (lobby.IsHost(ctx.User))
+                                {
+                                    await StaticObjects.GameManager.StartGameAsync(ctx);
+                                    await arg.Message.DeleteAsync();
+                                }
+                                else
+                                {
+                                    await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                }
+                                break;
+
+                            case "join":
+                                if (lobby.IsHost(ctx.User))
+                                {
+                                    await ctx.ReplyAsync("You can't leave the lobby as the host, press the cancel button instead", ephemeral: true);
+                                }
+                                else
+                                {
+                                    var state = lobby.ToggleUser(ctx.User);
+                                    await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
+                                    await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                }
+                                break;
+
+                            case "multi":
+                                if (lobby.IsHost(ctx.User))
+                                {
+                                    lobby.ToggleMultiplayerMode();
+                                    await ctx.ReplyAsync("You changed the multiplayer type", ephemeral: true);
+                                    await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                }
+                                else
+                                {
+                                    await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                }
+                                break;
+
+                            case "cancel":
+                                if (lobby.IsHost(ctx.User))
+                                {
+                                    StaticObjects.GameManager.RemoveLobby(chanId);
+                                    await arg.Message.DeleteAsync();
+                                    await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
+                                }
+                                else
+                                {
+                                    await ctx.ReplyAsync("Only the host can do that", ephemeral: true);
+                                }
+                                break;
+
+                            default:
+                                throw new NotImplementedException("Invalid id " + id);
+                        }
+                    }
+                    _pendingRequests.Remove(arg.User.Id);
+                }
+                else
+                {
+                    await ctx.ReplyAsync("There is no data associated to this button, that probably mean it was already requested", ephemeral: true);
+                    _pendingRequests.Remove(arg.User.Id);
                 }
             }
             catch (System.Exception ex)
@@ -385,7 +409,6 @@ namespace Sanara
 
         private async Task Ready()
         {
-            // Commands already loaded
             if (_commandsAssociations.Count != 0)
             {
                 return;
