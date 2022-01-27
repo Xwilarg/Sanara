@@ -1,4 +1,6 @@
-﻿namespace Sanara.Database
+﻿using Sanara.Game;
+
+namespace Sanara.Database
 {
     public sealed partial class Db
     {
@@ -59,14 +61,9 @@
             await InsertOrAddAsync("Download", Daily, "Cosplay", size);
         }
 
-        public async Task AddGameAsync(string name, string option)
+        public async Task AddGamePlayerAsync(string name, string option, int playerCount, MultiplayerType type)
         {
-            await InsertOrAddAsync("Games", Daily, name + (option == null ? "" : "-" + option));
-        }
-
-        public async Task AddGamePlayerAsync(string name, string option, int playerCount)
-        {
-            await InsertOrAddAsync("GamesPlayers", Daily, name + (option == null ? "" : "-" + option) + ";" + playerCount.ToString());
+            await InsertOrAddAsync("GamesPlayers", Daily, name + (option == null ? "" : "-" + option) + ";" + playerCount.ToString() + ";" + type.ToString());
         }
 
         public async Task AddBooruAsync(string name)

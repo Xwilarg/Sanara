@@ -31,8 +31,6 @@ namespace Sanara.Game
             _score = 0;
 
             _lobby.InitVersusRules(_versusMode.GetRules());
-
-            StaticObjects.Db.AddGameAsync(_isCustomGame ? "custom" : _gameName, _argument).GetAwaiter().GetResult();
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
@@ -77,7 +75,7 @@ namespace Sanara.Game
             {
                 _versusMode.Init(_lobby.GetUsers());
             }
-            await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount());
+            await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount(), _lobby.MultiplayerType);
 
             _state = GameState.Ready;
 
