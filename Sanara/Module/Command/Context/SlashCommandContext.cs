@@ -33,18 +33,25 @@ namespace Sanara.Module.Command.Context
 
         public async Task ReplyAsync(Stream file, string fileName)
         {
-            await _ctx.RespondWithFileAsync(
-                fileStream: file,
-                fileName: fileName,
-                text: "",
-                embeds: null,
-                isTTS: false,
-                ephemeral: false,
-                allowedMentions: null,
-                components: null,
-                embed: null,
-                options: null
-            );
+            if (_ctx.HasResponded)
+            {
+                await _ctx.FollowupWithFileAsync(file, fileName);
+            }
+            else
+            {
+                await _ctx.RespondWithFileAsync(
+                    fileStream: file,
+                    fileName: fileName,
+                    text: "",
+                    embeds: null,
+                    isTTS: false,
+                    ephemeral: false,
+                    allowedMentions: null,
+                    components: null,
+                    embed: null,
+                    options: null
+                );
+            }
         }
 
         public T? GetArgument<T>(string key)
