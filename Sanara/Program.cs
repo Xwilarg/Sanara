@@ -104,6 +104,65 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
+        private async Task LaunchCommandAsync(Module.Command.CommandInfo cmd, IUser user, ITextChannel? tChan, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.ICommandContext>> ctxCreatorAsync)
+        {
+            if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
+                tChan != null && !tChan.IsNsfw)
+            {
+                await errorMsgAsync("This command can only be done in NSFW channels", true);
+            }
+            else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
+                tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild)
+            {
+                await errorMsgAsync("This command can only be done by a guild administrator", true);
+            }
+            else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
+                tChan == null)
+            {
+                await errorMsgAsync("This command can only be done in a guild", true);
+            }
+            else
+            {
+                try
+                {
+                    var context = await ctxCreatorAsync();
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await StaticObjects.Db.AddNewCommandAsync(cmd.SlashCommand.Name.Value.ToUpperInvariant());
+                            StaticObjects.LastMessage = DateTime.UtcNow;
+                            await cmd.Callback(context);
+                            await StaticObjects.Db.AddCommandSucceed();
+                        }
+                        catch (System.Exception e)
+                        {
+                            if (e is CommandFailed ce)
+                            {
+                                await errorMsgAsync(e.Message, ce.Ephemeral);
+                            }
+                            else
+                            {
+                                await Log.LogErrorAsync(e, context);
+                            }
+                        }
+                    });
+                }
+                catch (System.Exception e)
+                {
+
+                    if (e is CommandFailed ce)
+                    {
+                        await errorMsgAsync(e.Message, ce.Ephemeral);
+                    }
+                    else
+                    {
+                        await Log.LogErrorAsync(e, null);
+                    }
+                }
+            }
+        }
+
         private async Task AutocompleteExecuted(SocketAutocompleteInteraction arg)
         {
             var input = arg.Data.Current.Value;
@@ -358,52 +417,24 @@ namespace Sanara
             {
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
-            var ctx = new SlashCommandContext(arg);
             var cmd = _commandsAssociations[arg.CommandName.ToUpperInvariant()];
-            _ = Task.Run(async () =>
+            await LaunchCommandAsync(cmd, arg.User, arg.Channel as ITextChannel, async (string content, bool ephemeral) =>
             {
-                try
+                if (arg.HasResponded)
                 {
-                    var tChan = ctx.Channel as ITextChannel;
-                    if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
-                        tChan != null && !tChan.IsNsfw)
-                    {
-                        await arg.RespondAsync("This command can only be done in NSFW channels", ephemeral: true);
-                    }
-                    else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
-                        tChan != null && tChan.Guild.OwnerId != ctx.User.Id && !((IGuildUser)ctx.User).GuildPermissions.ManageGuild)
-                    {
-                        await arg.RespondAsync("This command can only be done by a guild administrator", ephemeral: true);
-                    }
-                    else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
-                        tChan == null)
-                    {
-                        await arg.RespondAsync("This command can only be done in a guild", ephemeral: true);
-                    }
-                    else
-                    {
-                        if (cmd.NeedDefer)
-                        {
-                            await arg.DeferAsync();
-                        }
-
-                        await StaticObjects.Db.AddNewCommandAsync(arg.CommandName.ToUpperInvariant());
-                        StaticObjects.LastMessage = DateTime.UtcNow;
-                        await cmd.Callback(ctx);
-                        await StaticObjects.Db.AddCommandSucceed();
-                    }
+                    await arg.ModifyOriginalResponseAsync(x => x.Content = content);
                 }
-                catch (System.Exception e)
+                else
                 {
-                    if (e is CommandFailed ce)
-                    {
-                        await ctx.ReplyAsync(e.Message, ephemeral: ce.Ephemeral);
-                    }
-                    else
-                    {
-                        await Log.LogErrorAsync(e, ctx);
-                    }
+                    await arg.RespondAsync(content, ephemeral: ephemeral);
                 }
+            }, async () =>
+            {
+                if (cmd.NeedDefer)
+                {
+                    await arg.DeferAsync();
+                }
+                return new SlashCommandContext(arg);
             });
         }
 
@@ -526,67 +557,18 @@ namespace Sanara
                 if (_commandsAssociations.ContainsKey(commandStr))
                 {
                     var cmd = _commandsAssociations[commandStr];
-                    var tChan = msg.Channel as ITextChannel; // TODO: Dupplicated code
-                    if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
-                        tChan != null && !tChan.IsNsfw)
+                    await LaunchCommandAsync(cmd, msg.Author, msg.Channel as ITextChannel, async (string content, bool ephemeral) =>
                     {
-                        await msg.ReplyAsync("This command can only be done in NSFW channels");
-                    }
-                    else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
-                        tChan != null && tChan.Guild.OwnerId != msg.Author.Id && !((IGuildUser)msg.Author).GuildPermissions.ManageGuild)
+                        await msg.ReplyAsync(content);
+                    }, async () =>
                     {
-                        await msg.ReplyAsync("This command can only be done by a guild administrator");
-                    }
-                    else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
-                        tChan == null)
-                    {
-                        await msg.ReplyAsync("This command can only be done in a guild");
-                    }
-                    else
-                    {
-                        try
+                        var newContent = content[commandStr.Length..].TrimStart();
+                        if (msg.Attachments.Any())
                         {
-                            var newContent = content[commandStr.Length..].TrimStart();
-                            if (msg.Attachments.Any())
-                            {
-                                newContent += " " + msg.Attachments.ElementAt(0).Url;
-                            }
-                            var context = new MessageCommandContext(msg, newContent, cmd);
-                            _ = Task.Run(async () =>
-                            {
-                                try
-                                {
-                                    await StaticObjects.Db.AddNewCommandAsync(commandStr.ToUpperInvariant());
-                                    StaticObjects.LastMessage = DateTime.UtcNow;
-                                    await cmd.Callback(context);
-                                    await StaticObjects.Db.AddCommandSucceed();
-                                }
-                                catch (System.Exception e)
-                                {
-                                    if (e is CommandFailed)
-                                    {
-                                        await context.ReplyAsync(e.Message);
-                                    }
-                                    else
-                                    {
-                                        await Log.LogErrorAsync(e, context);
-                                    }
-                                }
-                            });
+                            newContent += " " + msg.Attachments.ElementAt(0).Url;
                         }
-                        catch (System.Exception e)
-                        {
-
-                            if (e is CommandFailed ce)
-                            {
-                                await msg.Channel.SendMessageAsync(e.Message, messageReference: new MessageReference(msg.Id));
-                            }
-                            else
-                            {
-                                await Log.LogErrorAsync(e, null);
-                            }
-                        }
-                    }
+                        return new MessageCommandContext(msg, newContent, cmd);
+                    });
                 }
             }
             else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
