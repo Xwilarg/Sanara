@@ -4,6 +4,7 @@ using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Sanara.Game.Preload.Impl
 {
@@ -22,8 +23,12 @@ namespace Sanara.Game.Preload.Impl
                         // Item2: name
 
                         // Get URL
-                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(https:\\/\\/azurlane.netojuu.com\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + elem.Item1 + ".png)").Groups[1].Value;
-
+                        var regexData = elem.Item1[5..].Replace("(", "%28").Replace(")", "%29");
+                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(https:\\/\\/azurlane.netojuu.com\\/w\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + regexData + ".png)").Groups[1].Value;
+                        if (string.IsNullOrWhiteSpace(htmlValue))
+                        {
+                            throw new NullReferenceException("No image found in page");
+                        }
                         // Names
                         List<string> names = new() { elem.Item2 };
                         if (elem.Item2 == "HMS_Neptune" || elem.Item2 == "HDN_Neptune")
