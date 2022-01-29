@@ -9,7 +9,7 @@ namespace Sanara.Database
             await CreateIfDontExistsAsync(_statDbName, "GuildCount");
             await CreateIfDontExistsAsync(_statDbName, "Errors");
             await CreateIfDontExistsAsync(_statDbName, "Commands");
-            await CreateIfDontExistsAsync(_statDbName, "Games");
+            await CreateIfDontExistsAsync(_statDbName, "CommandsDaily");
             await CreateIfDontExistsAsync(_statDbName, "GamesPlayers");
             await CreateIfDontExistsAsync(_statDbName, "Booru");
             await CreateIfDontExistsAsync(_statDbName, "Download");
@@ -38,7 +38,9 @@ namespace Sanara.Database
 
         public async Task AddNewCommandAsync(string name, bool isSlashCommand)
         {
-            await InsertOrAddAsync("Commands", Hourly, $"{name};{(isSlashCommand ? 0 : 1)}");
+            var data = $"{name};{(isSlashCommand ? 0 : 1)}";
+            await InsertOrAddAsync("Commands", Hourly, data);
+            await InsertOrAddAsync("CommandsDaily", Daily, data);
         }
 
         public async Task AddCommandSucceed()
