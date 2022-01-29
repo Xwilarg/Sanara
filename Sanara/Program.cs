@@ -104,7 +104,7 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
-        private async Task LaunchCommandAsync(Module.Command.CommandInfo cmd, IUser user, ITextChannel? tChan, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.ICommandContext>> ctxCreatorAsync)
+        private async Task LaunchCommandAsync(Module.Command.CommandInfo cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.ICommandContext>> ctxCreatorAsync)
         {
             if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
                 tChan != null && !tChan.IsNsfw)
@@ -130,7 +130,7 @@ namespace Sanara
                     {
                         try
                         {
-                            await StaticObjects.Db.AddNewCommandAsync(cmd.SlashCommand.Name.Value.ToUpperInvariant());
+                            await StaticObjects.Db.AddNewCommandAsync(cmd.SlashCommand.Name.Value.ToUpperInvariant(), isSlashCommand);
                             StaticObjects.LastMessage = DateTime.UtcNow;
                             await cmd.Callback(context);
                             await StaticObjects.Db.AddCommandSucceed();
@@ -427,7 +427,7 @@ namespace Sanara
                 throw new NotImplementedException($"Unknown command {arg.CommandName}");
             }
             var cmd = _commandsAssociations[arg.CommandName.ToUpperInvariant()];
-            await LaunchCommandAsync(cmd, arg.User, arg.Channel as ITextChannel, async (string content, bool ephemeral) =>
+            await LaunchCommandAsync(cmd, arg.User, arg.Channel as ITextChannel, true, async (string content, bool ephemeral) =>
             {
                 if (arg.HasResponded)
                 {
@@ -566,7 +566,7 @@ namespace Sanara
                 if (_commandsAssociations.ContainsKey(commandStr))
                 {
                     var cmd = _commandsAssociations[commandStr];
-                    await LaunchCommandAsync(cmd, msg.Author, msg.Channel as ITextChannel, async (string content, bool ephemeral) =>
+                    await LaunchCommandAsync(cmd, msg.Author, msg.Channel as ITextChannel, false, async (string content, bool ephemeral) =>
                     {
                         await msg.ReplyAsync(content);
                     }, async () =>

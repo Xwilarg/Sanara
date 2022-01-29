@@ -36,9 +36,9 @@ namespace Sanara.Database
                     ).RunAsync(_conn);
         }
 
-        public async Task AddNewCommandAsync(string name)
+        public async Task AddNewCommandAsync(string name, bool isSlashCommand)
         {
-            await InsertOrAddAsync("Commands", Hourly, name);
+            await InsertOrAddAsync("Commands", Hourly, $"{name};{(isSlashCommand ? 0 : 1)}");
         }
 
         public async Task AddCommandSucceed()
