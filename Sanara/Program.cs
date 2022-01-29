@@ -75,9 +75,8 @@ namespace Sanara
 
             // Discord callbacks
 
-            // DEPRECATED
+            // Games
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
-            StaticObjects.Client.ReactionAdded += ReactionManager.ReactionAddedAsync;
 
             // Ready the bot
             StaticObjects.Client.Connected += ConnectedAsync;
@@ -96,6 +95,7 @@ namespace Sanara
             StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
             StaticObjects.Client.AutocompleteExecuted += AutocompleteExecuted;
             StaticObjects.Client.ButtonExecuted += ButtonExecuted;
+            StaticObjects.Client.SelectMenuExecuted += SelectMenuExecuted;
 
             await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
             await StaticObjects.Client.StartAsync();
@@ -203,6 +203,15 @@ namespace Sanara
         }
 
         private readonly List<ulong> _pendingRequests = new();
+
+        private async Task SelectMenuExecuted(SocketMessageComponent arg)
+        {
+            if (arg.Data.CustomId == "delCache")
+            {
+                await StaticObjects.Db.DeleteCacheAsync(arg.Data.Values.ElementAt(0));
+                await arg.RespondAsync("Cache deleted", ephemeral: true);
+            }
+        }
 
         private async Task ButtonExecuted(SocketMessageComponent arg)
         {

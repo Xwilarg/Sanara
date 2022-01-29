@@ -180,7 +180,13 @@ namespace Sanara.Module.Command.Impl
 #endif // TODO: Can prob use current pfp for SFW version
                 );
 
-            await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
+            var options = new ComponentBuilder();
+            if (StaticObjects.IsBotOwner(ctx.User))
+            {
+                options.WithSelectMenu("delCache", StaticObjects.AllGameNames.Select(x => new SelectMenuOptionBuilder(x, StaticObjects.Db.GetCacheName(x))).ToList(), placeholder: "Select a game cache to delete (require bot restart)");
+            }
+
+            await ctx.ReplyAsync(embed: embed.Build(), components: options.Build(), ephemeral: true);
 #if NSFW_BUILD
             // Get latests commits
             str = new();

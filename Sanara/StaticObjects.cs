@@ -26,7 +26,8 @@ namespace Sanara
     public static class StaticObjects
     {
 
-       public static string BotName { get; } =
+        public static bool IsBotOwner(IUser user) => user.Id == 144851584478740481;
+        public static string BotName { get; } =
 #if NSFW_BUILD
                 "Sanara";
 #else
