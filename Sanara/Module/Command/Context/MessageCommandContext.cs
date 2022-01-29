@@ -6,7 +6,7 @@ namespace Sanara.Module.Command.Context
 {
     public class MessageCommandContext : ICommandContext
     {
-        private Dictionary<string, string> argsDict = new();
+        private Dictionary<string, object> argsDict = new();
 
         public MessageCommandContext(IMessage message, string arguments, CommandInfo command)
         {
@@ -40,7 +40,52 @@ namespace Sanara.Module.Command.Context
                     }
                     else
                     {
-                        argsDict.Add(arg.Name, argsArray[0]);
+                        var data = argsArray[0];
+                        switch (arg.Type)
+                        {
+                            case ApplicationCommandOptionType.String:
+                                argsDict.Add(arg.Name, data);
+                                break;
+
+                            case ApplicationCommandOptionType.Integer:
+                                {
+                                    if (long.TryParse(data, out var value))
+                                    {
+                                        argsDict.Add(arg.Name, value);
+                                    }
+                                    else
+                                    {
+                                        var errorMsg = $"Argument {arg.Name} must be a number";
+                                        if (arg.Choices.Any())
+                                        {
+                                            errorMsg += $"\n\nAvailable choices:\n{string.Join("\n", arg.Choices.Select(x => $"{x.Value}: {x.Name}"))}";
+                                        }
+                                        throw new CommandFailed(errorMsg);
+                                    }
+                                }
+                                break;
+
+                            case ApplicationCommandOptionType.Channel:
+                                {
+                                    var guild = (_message.Channel as ITextChannel)?.Guild;
+                                    if (guild == null)
+                                    {
+                                        throw new CommandFailed("Command must be done is a guild");
+                                    }
+                                    if (ulong.TryParse(data, out var value))
+                                    {
+                                        argsDict.Add(arg.Name, guild.GetTextChannelAsync(value).GetAwaiter().GetResult());
+                                    }
+                                    else
+                                    {
+                                        throw new CommandFailed($"Argument {arg.Name} must be an ID to a text channel");
+                                    }
+                                }
+                                break;
+
+                            default:
+                                throw new NotImplementedException($"Unknown type {arg.Type}");
+                        }
                         argsArray.RemoveAt(0);
                     }
                 }
@@ -62,21 +107,7 @@ namespace Sanara.Module.Command.Context
             {
                 return default;
             }
-            var a = argsDict[key];
-            if (typeof(T) == typeof(string))
-            {
-                return (T)(object)a;
-            }
-            if (typeof(T) == typeof(long))
-            {
-                return (T)(object)long.Parse(a);
-            }
-            if (typeof(T) == typeof(ITextChannel))
-            {
-                var guild = ((ITextChannel)_message.Channel).Guild;
-                return (T)(object)guild.GetTextChannelAsync(ulong.Parse(a)).GetAwaiter().GetResult();
-            }
-            throw new NotImplementedException($"Unknown type {typeof(T)}");
+            return (T)argsDict[key];
         }
 
         public async Task<IMessage> GetOriginalAnswerAsync()
