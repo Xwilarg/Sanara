@@ -119,7 +119,14 @@ namespace Sanara.Module.Command.Context
         {
             if (_reply == null)
             {
-                _reply = await _message.Channel.SendMessageAsync(text, embed: embed, components: components, messageReference: new MessageReference(_message.Id));
+                if (Channel is ITextChannel tChan && !(await tChan.Guild.GetCurrentUserAsync()).GuildPermissions.ReadMessageHistory && !tChan.PermissionOverwrites.Any(x => x.Permissions.ReadMessageHistory == PermValue.Allow))
+                {
+                    _reply = await _message.Channel.SendMessageAsync(text, embed: embed, components: components);
+                }
+                else
+                {
+                    _reply = await _message.Channel.SendMessageAsync(text, embed: embed, components: components, messageReference: new MessageReference(_message.Id));
+                }
             }
             else
             {
