@@ -22,8 +22,9 @@ namespace Sanara.Module.Command.Context
                 argsArray = new();
             }
 
-            if (command.SlashCommand.Options.IsSpecified)
+            if (command.SlashCommand.Options.IsSpecified && command.SlashCommand.Options.Value.Any())
             {
+                var last = command.SlashCommand.Options.Value.Last().Name;
                 foreach (var arg in command.SlashCommand.Options.Value)
                 {
                     if (argsArray.Count == 0)
@@ -44,7 +45,14 @@ namespace Sanara.Module.Command.Context
                         switch (arg.Type)
                         {
                             case ApplicationCommandOptionType.String:
-                                argsDict.Add(arg.Name, data);
+                                if (last == arg.Name)
+                                {
+                                    argsDict.Add(arg.Name, string.Join(" ", argsArray));
+                                }
+                                else
+                                {
+                                    argsDict.Add(arg.Name, data);
+                                }
                                 break;
 
                             case ApplicationCommandOptionType.Integer:
