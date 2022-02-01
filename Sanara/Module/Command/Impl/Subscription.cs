@@ -66,7 +66,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: SubscribeAsync,
                     precondition: Precondition.GuildOnly | Precondition.AdminOnly,
-                    needDefer: false
+                    needDefer: true
                 )
             };
         }
