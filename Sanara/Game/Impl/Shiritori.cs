@@ -84,7 +84,7 @@ namespace Sanara.Game.Impl
 
             bool isCorrect = false, isNoun = false;
             string reading;
-            string[] meanings = new string[0];
+            string[] meanings = Array.Empty<string>();
             // For each answer we check if it match our answer
             foreach (var d in data)
             {

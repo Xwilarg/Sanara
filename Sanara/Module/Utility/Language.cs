@@ -6,20 +6,12 @@ namespace Sanara.Module.Utility
     {
         public static string ToRomaji(string entry)
         {
-            if (entry.Any(x => !IsLatinLetter(x)))
-            {
-                return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
-            }
-            return entry;
+            return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');
         }
 
         public static string ToHiragana(string entry)
         {
-            if (entry.Any(x => IsLatinLetter(x)))
-            {
-                return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
-            }
-            return entry;
+            return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.RomajiToHiragana, 'っ');
         }
 
         /// <summary>
@@ -32,7 +24,7 @@ namespace Sanara.Module.Utility
         {
             StringBuilder result = new();
             var biggest = dictionary.Keys.OrderByDescending(x => x.Length).First().Length;
-            bool isEntryRomaji = IsLatinLetter(dictionary.Keys.First()[0]);
+            bool isEntryRomaji = char.IsAscii(dictionary.Keys.First()[0]) && char.IsAscii(entry[0]);
             bool doubleNext; // If we find a doubleChar, the next character need to be doubled (っこ -> kko)
             while (entry.Length > 0)
             {
@@ -98,8 +90,5 @@ namespace Sanara.Module.Utility
             }
             return result.ToString();
         }
-
-        private static bool IsLatinLetter(char c)
-            => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 }
