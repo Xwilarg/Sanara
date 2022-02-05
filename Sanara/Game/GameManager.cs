@@ -68,10 +68,18 @@ namespace Sanara.Game
             return _pendingGames[id].GetLobby();
         }
 
-        /// <returns>Updated embed or null if user not in lobby</returns>
-        public Embed? ToggleReadyLobby(IChannel chan, IUser user)
+        public ReplayLobby? GetReplayLobby(IChannel chan)
         {
-            var rLobby = _replayLobby[chan.Id.ToString()];
+            if (_replayLobby.ContainsKey(chan.Id.ToString()))
+            {
+                return _replayLobby[chan.Id.ToString()];
+            }
+            return null;
+        }
+
+        /// <returns>Updated embed or null if user not in lobby</returns>
+        public Embed? ToggleReadyLobby(ReplayLobby rLobby, IUser user)
+        {
             var result = rLobby.ToggleReady(user);
             return result ? rLobby.GetEmbed() : null;
         }

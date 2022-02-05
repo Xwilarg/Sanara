@@ -306,22 +306,30 @@ namespace Sanara
                     switch (id)
                     {
                         case "ready":
-                            var embed = StaticObjects.GameManager.ToggleReadyLobby(ctx.Channel, ctx.User);
-                            if (embed != null)
+                            var rLobby = StaticObjects.GameManager.GetReplayLobby(ctx.Channel);
+                            if (rLobby == null)
                             {
-                                await ctx.ReplyAsync("Ready state changed", ephemeral: true);
-                                if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
-                                {
-                                    await arg.Message.DeleteAsync();
-                                }
-                                else
-                                {
-                                    await arg.Message.ModifyAsync(x => x.Embed = embed);
-                                }
+                                await ctx.ReplyAsync("This lobby expired, please create a new one with the play command", ephemeral: true);
                             }
                             else
                             {
-                                await ctx.ReplyAsync("You are not in the game", ephemeral: true); // TODO
+                                var embed = StaticObjects.GameManager.ToggleReadyLobby(rLobby, ctx.User);
+                                if (embed != null)
+                                {
+                                    await ctx.ReplyAsync("Ready state changed", ephemeral: true);
+                                    if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
+                                    {
+                                        await arg.Message.DeleteAsync();
+                                    }
+                                    else
+                                    {
+                                        await arg.Message.ModifyAsync(x => x.Embed = embed);
+                                    }
+                                }
+                                else
+                                {
+                                    await ctx.ReplyAsync("You are not in the lobby", ephemeral: true); // TODO
+                                }
                             }
                             break;
 
