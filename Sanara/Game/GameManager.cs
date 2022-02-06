@@ -30,9 +30,14 @@ namespace Sanara.Game
                 _games.RemoveAll(x => x.AsLost()); // Remove all the game that were lost
 
                 // Purge expired lobbies
-                foreach (var key in new List<string>(_replayLobby.Where(x => x.Value.HasExpired).Select(x => x.Key)))
+                for (int i = _replayLobby.Count - 1; i >= 0; i--)
                 {
-                    _replayLobby.Remove(key);
+                    var key = _replayLobby.Keys.ElementAt(i);
+                    var lobby = _replayLobby[key];
+                    if (lobby.HasExpired)
+                    {
+                        _replayLobby.Remove(key);
+                    }
                 }
 
                 Thread.Sleep(200);
