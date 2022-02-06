@@ -174,9 +174,7 @@ namespace Sanara.Module.Command.Impl
                 "With the help of [TheIndra](https://theindra.eu/)\n"
 #if NSFW_BUILD
                 +
-                "Profile Picture:\n" +
-                "    V4 (Current): [Uikoui](https://www.pixiv.net/en/users/11608780)\n" +
-                "    V2/V3 (Current): [BlankSensei](https://www.pixiv.net/en/users/23961764)"
+                "Profile Picture: [Uikoui](https://www.pixiv.net/en/users/11608780)"
 #endif // TODO: Can prob use current pfp for SFW version
                 );
 
