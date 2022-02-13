@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Help;
@@ -196,7 +195,7 @@ namespace Sanara.Module.Command.Impl
             }
             embed.AddField("Latest changes", str.ToString());
 
-            await ctx.ReplyAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build(), components: options.Build());
 #endif
         }
     }

@@ -103,15 +103,23 @@ namespace Sanara
             await Task.Delay(-1);
         }
 
+        private bool DoesFailNsfwOnlyPrecondition(ITextChannel? tChan)
+        {
+            return tChan != null && !tChan.IsNsfw;
+        }
+
+        private bool DoesFailAdminOnlyPrecondition(ITextChannel? tChan, IUser user)
+        {
+            return tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild;
+        }
+
         private async Task LaunchCommandAsync(Module.Command.CommandInfo cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.ICommandContext>> ctxCreatorAsync)
         {
-            if ((cmd.Precondition & Precondition.NsfwOnly) != 0 &&
-                tChan != null && !tChan.IsNsfw)
+            if ((cmd.Precondition & Precondition.NsfwOnly) != 0 && DoesFailNsfwOnlyPrecondition(tChan))
             {
                 await errorMsgAsync("This command can only be done in NSFW channels", true);
             }
-            else if ((cmd.Precondition & Precondition.AdminOnly) != 0 &&
-                tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild)
+            else if ((cmd.Precondition & Precondition.AdminOnly) != 0 && DoesFailAdminOnlyPrecondition(tChan, user))
             {
                 await errorMsgAsync("This command can only be done by a guild administrator", true);
             }
@@ -205,7 +213,7 @@ namespace Sanara
 
         private async Task SelectMenuExecuted(SocketMessageComponent arg)
         {
-            if (arg.Data.CustomId == "delCache")
+            if (arg.Data.CustomId == "delCache" && StaticObjects.IsBotOwner(arg.User))
             {
                 await StaticObjects.Db.DeleteCacheAsync(arg.Data.Values.ElementAt(0));
                 await arg.RespondAsync("Cache deleted", ephemeral: true);
@@ -230,7 +238,14 @@ namespace Sanara
                 }
                 else if (arg.Data.CustomId.StartsWith("delSub-"))
                 {
-                    await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                    if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                    {
+                        await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                    }
+                    else
+                    {
+                        throw new CommandFailed("You don't have the permissions to do this");
+                    }
                     _pendingRequests.Remove(arg.User.Id);
                 }
                 else if (arg.Data.CustomId.StartsWith("error-") && StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
