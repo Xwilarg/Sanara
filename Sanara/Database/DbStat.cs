@@ -83,6 +83,14 @@ namespace Sanara.Database
                 await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", Daily)
                     .With("count", StaticObjects.Client.Guilds.Count)
                 ).RunAsync(_conn);
+            if (await _r.Db(_statDbName).Table("GuildCount").GetAll("Latest").Count().Eq(0).RunAsync<bool>(_conn))
+                await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", "Latest")
+                    .With("count", StaticObjects.Client.Guilds.Count)
+                ).RunAsync(_conn);
+            else
+                await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", "Latest")
+                    .With("count", StaticObjects.Client.Guilds.Count)
+                ).RunAsync(_conn);
         }
 
         public string Daily => GetStatKey("yyyyMMdd");
