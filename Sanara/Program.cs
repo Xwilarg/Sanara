@@ -233,7 +233,14 @@ namespace Sanara
             {
                 if (arg.Data.CustomId == "dump")
                 {
-                    await Module.Button.Settings.DatabaseDump(ctx);
+                    if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                    {
+                        await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                    }
+                    else
+                    {
+                        await Module.Button.Settings.DatabaseDump(ctx);
+                    }
                     _pendingRequests.Remove(arg.User.Id);
                 }
                 else if (arg.Data.CustomId.StartsWith("delSub-"))
