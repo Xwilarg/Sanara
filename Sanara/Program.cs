@@ -74,6 +74,9 @@ namespace Sanara
 
             // Discord callbacks
 
+            // Reactions to messages
+            StaticObjects.Client.ReactionAdded += Module.Utility.Language.TranslateFromReactionAsync;
+
             // Games
             StaticObjects.Client.MessageReceived += HandleCommandAsync;
 
@@ -236,6 +239,23 @@ namespace Sanara
                     if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
                     {
                         await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                    }
+                    else
+                    {
+                        await Module.Button.Settings.DatabaseDump(ctx);
+                    }
+                    _pendingRequests.Remove(arg.User.Id);
+                }
+                else if (arg.Data.CustomId == "flag")
+                {
+                    if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                    {
+                        var tChan = (ITextChannel)ctx.Channel;
+                        var guildId = tChan.GuildId;
+                        var newValue = !StaticObjects.Db.GetGuild(guildId).TranslateUsingFlags;
+                        await StaticObjects.Db.UpdateFlagAsync(guildId, newValue);
+                        await ctx.ReplyAsync($"Translation from flag is now {(newValue ? "enabled" : "disabled")}", ephemeral: true);
+                        // TODO: Update display
                     }
                     else
                     {

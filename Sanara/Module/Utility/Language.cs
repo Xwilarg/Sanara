@@ -1,9 +1,36 @@
-﻿using System.Text;
+﻿using Discord;
+using Discord.WebSocket;
+using System.Text;
 
 namespace Sanara.Module.Utility
 {
     public class Language
     {
+        public static async Task TranslateFromReactionAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
+        {
+            if (StaticObjects.TranslationClient == null)
+            {
+                return;
+            }
+            string emote = react.Emote.ToString();
+            bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+            // If emote is not from the bot and is an arrow emote
+            if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
+            {
+                var gMsg = (await msg.GetOrDownloadAsync()).Content;
+                if (!string.IsNullOrEmpty(gMsg))
+                {
+                    var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
+                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: new EmbedBuilder
+                    {
+                        Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                        Description = translation.TranslatedText,
+                        Color = Color.Blue
+                    }.Build());
+                }
+            }
+        }
+
         public static string ToRomaji(string entry)
         {
             return ConvertLanguage(ConvertLanguage(entry, StaticObjects.KatakanaToRomaji, 'ッ'), StaticObjects.HiraganaToRomaji, 'っ');

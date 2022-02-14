@@ -364,31 +364,4 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: embed.Build());
         }
     }
-
-    //_submoduleHelp.Add("Language", "Get various information related to others languages");
-    //_help.Add(("Tool", new Help("Language", "Translate", new[] { new Argument(ArgumentType.Mandatory, "language"), new Argument(ArgumentType.Mandatory, "sentence/image") }, "Translate a sentence to the given language.", Array.Empty<string>(), Restriction.None, "Translate en 空は青いです")));
-
-    /*
-        public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
-        {
-            string emote = react.Emote.ToString();
-            bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
-            // If emote is not from the bot and is an arrow emote
-            if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
-            {
-                var gMsg = (await msg.GetOrDownloadAsync()).Content;
-                if (!string.IsNullOrEmpty(gMsg))
-                {
-                    var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
-                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: new EmbedBuilder
-                    {
-                        Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                        Description = translation.TranslatedText,
-                        Color = Color.Blue
-                    }.Build());
-                }
-            }
-        }
-
-    */
 }

@@ -72,33 +72,8 @@ namespace Sanara.Module.Command.Impl
         public async Task ConfigureAsync(ICommandContext ctx)
         {
             var guild = ((ITextChannel)ctx.Channel).Guild;
-            var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
-            var mySubs = subs?.Select(x => $"**{Utils.ToWordCase(x.Key)}**: {(x.Value == null ? "None" : x.Value.Mention)}");
-            var button = new ComponentBuilder();
-            if (subs != null)
-            {
-                foreach (var sub in subs)
-                {
-                    if (sub.Value != null)
-                    {
-                        button.WithButton($"Remove {sub.Key} subscription", $"delSub-{sub.Key}", style: ButtonStyle.Danger);
-                    }
-                }
-            }
-            button.WithButton("Database dump", "dump", style: ButtonStyle.Secondary);
-            await ctx.ReplyAsync(embed: new EmbedBuilder
-            {
-                Title = guild.ToString(),
-                Color = Color.Purple,
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Subscriptions",
-                        Value = subs == null ? "Not yet initialized" : (mySubs.Any() ?  string.Join("\n", mySubs) : "None")
-                    }
-                }
-            }.Build(), ephemeral: true, components: button.Build());
+            var data = await Utility.Settings.GetSettingsDisplayAsync(guild);
+            await ctx.ReplyAsync(embed: data.Embed, ephemeral: true, components: data.Components);
         }
 
         public async Task PingAsync(ICommandContext ctx)
