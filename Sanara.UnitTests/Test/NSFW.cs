@@ -19,5 +19,21 @@ namespace Sanara.UnitTests.Test
             Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
             Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
+
+        [Test]
+        public async Task DoujinshiTest()
+        {
+            var mod = new Module.Command.Impl.NSFW();
+            var ctx = new TestCommandContext(new()
+            {
+                { "tags", "touhou project" }
+            });
+            await mod.DoujinshiAsync(ctx);
+            Assert.NotNull(ctx.Result.Embed.Title);
+            Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
+            Assert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
+            Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
+            Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
+        }
     }
 }

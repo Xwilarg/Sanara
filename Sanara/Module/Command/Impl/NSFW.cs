@@ -2,6 +2,7 @@
 using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
+using Newtonsoft.Json;
 using NHentaiSharp.Core;
 using NHentaiSharp.Exception;
 using NHentaiSharp.Search;
@@ -158,8 +159,42 @@ namespace Sanara.Module.Command.Impl
                     callback: DoujinshiAsync,
                     precondition: Precondition.NsfwOnly,
                     needDefer: true
+                ),
+
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "wholesome",
+                        Description = "Get a random wholesome doujinshi"
+                    }.Build(),
+                    callback: WholesomeAsync,
+                    precondition: Precondition.NsfwOnly,
+                    needDefer: true
                 )
             };
+        }
+
+        public async Task WholesomeAsync(ICommandContext ctx)
+        {
+            var info = JsonConvert.DeserializeObject<WholesomeList>(await StaticObjects.HttpClient.GetStringAsync("https://wholesomelist.com/api/random")).entry;
+            var token = $"doujinshi-{Guid.NewGuid()}/{Regex.Match(info.link, "([0-9]+)").Groups[1].Value}";
+            StaticObjects.Doujinshis.Add(token);
+            var button = new ComponentBuilder()
+                .WithButton("Download", token);
+
+            var embed = new EmbedBuilder
+            {
+                Color = new Color(255, 20, 147),
+                Title = info.title,
+                Url = info.link,
+                ImageUrl = info.image
+            };
+            embed.AddField("Tags", string.Join(", ", info.tags), true);
+            embed.AddField("Parody", info.parody, true);
+            embed.AddField("Note", info.note, true);
+            embed.WithFooter($"Tier: {info.tier}");
+
+            await ctx.ReplyAsync(embed: embed.Build(), components: button.Build());
         }
 
         public async Task DoujinshiAsync(ICommandContext ctx)
