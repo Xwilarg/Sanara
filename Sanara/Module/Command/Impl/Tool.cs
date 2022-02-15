@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
@@ -170,8 +171,57 @@ namespace Sanara.Module.Command.Impl
                     callback: QrcodeAsync,
                     precondition: Precondition.None,
                     needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "ocr",
+                        Description = "Detect text on an image",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "url",
+                                Description = "URL to an image",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: OCRAsync,
+                    precondition: Precondition.None,
+                    needDefer: true
                 )
             };
+        }
+
+        public async Task OCRAsync(ICommandContext ctx)
+        {
+            var input = ctx.GetArgument<string>("url");
+            var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input);
+            TextAnnotation response;
+            try
+            {
+                response = await StaticObjects.VisionClient.DetectDocumentTextAsync(image);
+            }
+            catch (AnnotateImageException)
+            {
+                throw new CommandFailed("The file given isn't a valid image.");
+            }
+            if (response == null)
+                throw new CommandFailed("There is no text on the image.");
+            var embed = new EmbedBuilder();
+            foreach (var page in response.Pages)
+            {
+                foreach (var block in page.Blocks)
+                {
+                    foreach (var paragraph in block.Paragraphs)
+                    {
+                        embed.AddField($"Confidence: {(paragraph.Confidence * 100):0.0}%", string.Join(" ", paragraph.Words.Select(x => string.Join("", x.Symbols.Select(s => s.Text)))));
+                    }
+                }
+            }
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
         public async Task QrcodeAsync(ICommandContext ctx)
