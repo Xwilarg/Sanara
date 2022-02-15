@@ -1,7 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
-using Google;
-using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
@@ -128,48 +125,7 @@ namespace Sanara.Module.Command.Impl
             if (language.Length != 2)
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
-            if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && sentence.Trim().Count(x => x == ' ') == 0)
-            {
-                if (StaticObjects.VisionClient == null)
-                {
-                    throw new CommandFailed("Vision client is not available");
-                }
-                try
-                {
-                    var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(sentence);
-                    TextAnnotation response;
-                    try
-                    {
-                        response = await StaticObjects.VisionClient.DetectDocumentTextAsync(image);
-                    }
-                    catch (AnnotateImageException)
-                    {
-                        throw new CommandFailed("The file given isn't a valid image.");
-                    }
-                    if (response == null)
-                        throw new CommandFailed("There is no text on the image.");
-                    sentence = response.Text;
-                }
-                catch (GoogleApiException)
-                {
-                    throw new CommandFailed("The language you provided is invalid.");
-                }
-            }
-
-            try
-            {
-                var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
-                await ctx.ReplyAsync(embed: new EmbedBuilder
-                {
-                    Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                    Description = translation.TranslatedText,
-                    Color = Color.Blue
-                }.Build());
-            }
-            catch (GoogleApiException)
-            {
-                throw new CommandFailed("The language you provided is invalid.");
-            }
+            await ctx.ReplyAsync(embed: await Utility.Language.GetTranslationEmbedAsync(sentence, language));
         }
 
         public async Task UrbanAsync(ICommandContext ctx)

@@ -1,5 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Google;
+using Google.Cloud.Vision.V1;
+using Sanara.Exception;
 using System.Text;
 
 namespace Sanara.Module.Utility
@@ -13,21 +16,91 @@ namespace Sanara.Module.Utility
                 return;
             }
             string emote = react.Emote.ToString();
-            bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
-            // If emote is not from the bot and is an arrow emote
-            if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && StaticObjects.Flags.ContainsKey(emote))
+            if (StaticObjects.Flags.ContainsKey(emote))
             {
-                var gMsg = (await msg.GetOrDownloadAsync()).Content;
-                if (!string.IsNullOrEmpty(gMsg))
+                _ = Task.Run(async () =>
                 {
-                    var translation = await StaticObjects.TranslationClient.TranslateTextAsync(gMsg, StaticObjects.Flags[emote]);
-                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: new EmbedBuilder
+                    bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+                    // If emote is not from the bot and is an arrow emote
+                    if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId)
                     {
-                        Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
-                        Description = translation.TranslatedText,
-                        Color = Color.Blue
-                    }.Build());
+                        var dMsg = await msg.GetOrDownloadAsync();
+                        var gMsg = dMsg.Content;
+                        if (string.IsNullOrEmpty(gMsg) && dMsg.Attachments.Any())
+                        {
+                            gMsg = dMsg.Attachments.ElementAt(0).Url;
+                        }
+                        else if (string.IsNullOrEmpty(gMsg) && dMsg.Embeds.Any() && dMsg.Embeds.ElementAt(0).Image.HasValue)
+                        {
+                            gMsg = dMsg.Embeds.ElementAt(0).Image.Value.Url;
+                        }
+                        else if (string.IsNullOrEmpty(gMsg) && dMsg.Embeds.Any())
+                        {
+                            gMsg = dMsg.Embeds.ElementAt(0).Description;
+                        }
+                        if (!string.IsNullOrEmpty(gMsg))
+                        {
+                            try
+                            {
+                                await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await GetTranslationEmbedAsync(gMsg, StaticObjects.Flags[emote]), messageReference: new(dMsg.Id));
+                            }
+                            catch (CommandFailed ex)
+                            {
+                                await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: new EmbedBuilder
+                                {
+                                    Color = Color.Red,
+                                    Description = ex.Message
+                                }.Build(), messageReference: new(dMsg.Id));
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        public static async Task<Embed> GetTranslationEmbedAsync(string sentence, string language)
+        {
+            if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && sentence.Trim().Count(x => x == ' ') == 0)
+            {
+                if (StaticObjects.VisionClient == null)
+                {
+                    throw new CommandFailed("Vision client is not available");
                 }
+                try
+                {
+                    var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(sentence);
+                    TextAnnotation response;
+                    try
+                    {
+                        response = await StaticObjects.VisionClient.DetectDocumentTextAsync(image);
+                    }
+                    catch (AnnotateImageException)
+                    {
+                        throw new CommandFailed("The file given isn't a valid image.");
+                    }
+                    if (response == null)
+                        throw new CommandFailed("There is no text on the image.");
+                    sentence = response.Text;
+                }
+                catch (GoogleApiException)
+                {
+                    throw new CommandFailed("The language you provided is invalid.");
+                }
+            }
+
+            try
+            {
+                var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
+                return new EmbedBuilder
+                {
+                    Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
+                    Description = translation.TranslatedText,
+                    Color = Color.Blue
+                }.Build();
+            }
+            catch (GoogleApiException)
+            {
+                throw new CommandFailed("The language you provided is invalid.");
             }
         }
 
