@@ -5,6 +5,9 @@ using Newtonsoft.Json.Linq;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Processing;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
@@ -212,11 +215,8 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("There is no text on the image.");
 
             var embed = new EmbedBuilder();
-            using var bmp = new System.Drawing.Bitmap(await StaticObjects.HttpClient.GetStreamAsync(input));
-            using var grf = System.Drawing.Graphics.FromImage(bmp);
-            grf.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            grf.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            var pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2);
+            var img = SixLabors.ImageSharp.Image.Load(await StaticObjects.HttpClient.GetStreamAsync(input));
+            var pen = new Pen(SixLabors.ImageSharp.Color.Red, 2f);
 
             foreach (var page in response.Pages)
             {
@@ -227,19 +227,18 @@ namespace Sanara.Module.Command.Impl
                         embed.AddField($"Confidence: {(paragraph.Confidence * 100):0.0}%", string.Join(" ", paragraph.Words.Select(x => string.Join("", x.Symbols.Select(s => s.Text)))));
 
                         // Draw all lines
-                        grf.DrawLines(pen, paragraph.BoundingBox.Vertices.Select(v => new System.Drawing.Point(v.X, v.Y)).ToArray());
+                        var path = new PathBuilder();
+                        path.AddLines(paragraph.BoundingBox.Vertices.Select(v => new SixLabors.ImageSharp.PointF(v.X, v.Y)).ToArray());
+                        path.CloseFigure();
 
-                        // Missing the last one to close the box
-                        var f = paragraph.BoundingBox.Vertices.ElementAt(0);
-                        var l = paragraph.BoundingBox.Vertices.Last();
-                        grf.DrawLine(pen, new System.Drawing.Point(f.X, f.Y), new System.Drawing.Point(l.X, l.Y));
+                        img.Mutate(x => x.Draw(pen, path.Build()));
                     }
                 }
             }
 
             await ctx.ReplyAsync(embed: embed.Build());
             using var mStream = new MemoryStream();
-            bmp.Save(mStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            img.Save(mStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
             mStream.Position = 0;
             await ctx.ReplyAsync(mStream, "ocr.jpg");
         }
