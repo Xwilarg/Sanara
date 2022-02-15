@@ -17,6 +17,7 @@
     <PackageReference Include="NHentaiSharp" Version="1.1.1" />
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
     <PackageReference Include="Sentry" Version="3.13.0" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 

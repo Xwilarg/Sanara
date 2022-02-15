@@ -210,7 +210,14 @@ namespace Sanara.Module.Command.Impl
             }
             if (response == null)
                 throw new CommandFailed("There is no text on the image.");
+
             var embed = new EmbedBuilder();
+            using var bmp = new System.Drawing.Bitmap(await StaticObjects.HttpClient.GetStreamAsync(input));
+            using var grf = System.Drawing.Graphics.FromImage(bmp);
+            grf.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            grf.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            var pen = new System.Drawing.Pen(System.Drawing.Color.Red, 2);
+
             foreach (var page in response.Pages)
             {
                 foreach (var block in page.Blocks)
@@ -218,10 +225,23 @@ namespace Sanara.Module.Command.Impl
                     foreach (var paragraph in block.Paragraphs)
                     {
                         embed.AddField($"Confidence: {(paragraph.Confidence * 100):0.0}%", string.Join(" ", paragraph.Words.Select(x => string.Join("", x.Symbols.Select(s => s.Text)))));
+
+                        // Draw all lines
+                        grf.DrawLines(pen, paragraph.BoundingBox.Vertices.Select(v => new System.Drawing.Point(v.X, v.Y)).ToArray());
+
+                        // Missing the last one to close the box
+                        var f = paragraph.BoundingBox.Vertices.ElementAt(0);
+                        var l = paragraph.BoundingBox.Vertices.Last();
+                        grf.DrawLine(pen, new System.Drawing.Point(f.X, f.Y), new System.Drawing.Point(l.X, l.Y));
                     }
                 }
             }
+
             await ctx.ReplyAsync(embed: embed.Build());
+            using var mStream = new MemoryStream();
+            bmp.Save(mStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            mStream.Position = 0;
+            await ctx.ReplyAsync(mStream, "ocr.jpg");
         }
 
         public async Task QrcodeAsync(ICommandContext ctx)
