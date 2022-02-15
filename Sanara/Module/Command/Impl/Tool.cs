@@ -48,6 +48,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: PhotoAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -68,6 +69,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: SourceAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -113,6 +115,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: AnimeAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -133,6 +136,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: DramaAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -153,6 +157,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: VisualNovelAsync,
                     precondition: Precondition.None,
+                    aliases: new[] { "vn" },
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -173,6 +178,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: QrcodeAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -193,6 +199,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: OCRAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 )
             };

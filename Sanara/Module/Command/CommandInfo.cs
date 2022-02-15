@@ -1,12 +1,11 @@
 ﻿using Discord;
-using Discord.WebSocket;
 
 namespace Sanara.Module.Command
 {
     public record CommandInfo
     {
-        public CommandInfo(SlashCommandProperties slashCommand, Func<ICommandContext, Task> callback, Precondition precondition, bool needDefer)
-            => (SlashCommand, Callback, Precondition, NeedDefer) = (slashCommand, callback, precondition, needDefer);
+        public CommandInfo(SlashCommandProperties slashCommand, Func<ICommandContext, Task> callback, Precondition precondition, string[] aliases, bool needDefer)
+            => (SlashCommand, Callback, Precondition, Aliases, NeedDefer) = (slashCommand, callback, precondition, aliases.Select(x => x.ToUpperInvariant()).ToArray(), needDefer);
 
         /// <summary>
         /// Slash command info
@@ -25,5 +24,9 @@ namespace Sanara.Module.Command
         /// aka: may it takes more than 2 sec to run
         /// </summary>
         public bool NeedDefer { private set; get; }
+        /// <summary>
+        /// Other names that can be used instead of the command name
+        /// </summary>
+        public string[] Aliases { private init; get; }
     }
 }

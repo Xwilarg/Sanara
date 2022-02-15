@@ -612,9 +612,17 @@ namespace Sanara
             {
                 var content = msg.Content[pos..];
                 var commandStr = content.Split(' ')[0].ToUpperInvariant();
+                Module.Command.CommandInfo? cmd = null;
                 if (_commandsAssociations.ContainsKey(commandStr))
                 {
-                    var cmd = _commandsAssociations[commandStr];
+                    cmd = _commandsAssociations[commandStr];
+                }
+                if (cmd == null && _commandsAssociations.Any(x => x.Value.Aliases.Contains(commandStr)))
+                {
+                    cmd = _commandsAssociations.FirstOrDefault(x => x.Value.Aliases.Contains(commandStr)).Value;
+                }
+                if (cmd != null)
+                {
                     await LaunchCommandAsync(cmd, msg.Author, msg.Channel as ITextChannel, false, async (string content, bool ephemeral) =>
                     {
                         await msg.ReplyAsync(content);

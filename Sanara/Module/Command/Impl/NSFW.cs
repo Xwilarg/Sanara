@@ -87,6 +87,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: BooruAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -107,6 +108,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: CosplayAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -117,6 +119,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: DlRandAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -138,6 +141,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: AdultVideoAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: new[] { "av" },
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -158,6 +162,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: DoujinshiAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: new[] { "doujin", "nhentai" },
                     needDefer: true
                 ),
 
@@ -169,6 +174,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: WholesomeAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 )
             };

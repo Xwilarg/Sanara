@@ -44,6 +44,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: TranslateAsync,
                     precondition: Precondition.None,
+                    aliases: new[] { "tr" },
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -64,6 +65,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: UrbanAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -84,6 +86,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: KanjiAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -104,6 +107,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: JapaneseAsync,
                     precondition: Precondition.None,
+                    aliases: new[] { "ja" },
                     needDefer: true
                 ),
             };

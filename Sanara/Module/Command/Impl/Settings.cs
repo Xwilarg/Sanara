@@ -27,6 +27,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: PingAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: false
                 ),
 #if NSFW_BUILD
@@ -38,6 +39,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: HelpAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: false
                 ),
 #endif
@@ -49,6 +51,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: BotInfoAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: false
                 ),
                 new CommandInfo(
@@ -59,6 +62,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: ConfigureAsync,
                     precondition: Precondition.AdminOnly | Precondition.GuildOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: false
                 )
             };

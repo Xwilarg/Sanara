@@ -53,6 +53,7 @@ namespace Sanara.Module.Command.Impl
                    }.Build(),
                    callback: PlayAsync,
                    precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                    needDefer: false
                ),
                new CommandInfo(
@@ -63,6 +64,7 @@ namespace Sanara.Module.Command.Impl
                    }.Build(),
                    callback: LeaderboardAsync,
                    precondition: Precondition.GuildOnly,
+                    aliases: Array.Empty<string>(),
                    needDefer: false
                ),
                new CommandInfo(
@@ -73,6 +75,7 @@ namespace Sanara.Module.Command.Impl
                    }.Build(),
                    callback: CancelAsync,
                    precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                    needDefer: false
                )
             };

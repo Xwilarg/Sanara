@@ -28,6 +28,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: InspireAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -38,6 +39,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: VNQuoteAsync,
                     precondition: Precondition.NsfwOnly,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
                 new CommandInfo(
@@ -58,6 +60,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: CompleteAsync,
                     precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
                     needDefer: true
                 )
             };
