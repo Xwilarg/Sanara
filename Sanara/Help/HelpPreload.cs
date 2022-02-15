@@ -14,7 +14,9 @@ namespace Sanara.Help
                 {
                     Name = c.SlashCommand.Name.Value,
                     Description = c.SlashCommand.Description.Value,
-                    Restrictions = c.Precondition.ToString()
+                    Restrictions = c.Precondition.ToString(),
+                    Aliases = string.Join(", ", c.Aliases).ToLowerInvariant(),
+                    Arguments = !c.SlashCommand.Options.IsSpecified ? "" : string.Join(" ", c.SlashCommand.Options.Value.Select(x => x.IsRequired == true ? $"[{x.Name}]" : $"<{x.Name}>"))
                 }).ToArray()
             }).ToArray();
         }
