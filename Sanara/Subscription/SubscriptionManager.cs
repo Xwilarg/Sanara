@@ -101,7 +101,8 @@ namespace Sanara.Subscription
                             }
                             catch (HttpException http)
                             {
-                                if (!http.DiscordCode.HasValue || http.DiscordCode.Value != DiscordErrorCode.MissingPermissions)
+                                if (!http.DiscordCode.HasValue ||
+                                    (http.DiscordCode.Value != DiscordErrorCode.MissingPermissions && http.DiscordCode.Value != DiscordErrorCode.UnknownChannel))
                                     throw;
                             }
                             catch (System.Exception e)
