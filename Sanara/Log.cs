@@ -31,19 +31,27 @@ namespace Sanara
 
             if (ctx != null)
             {
-                var id = Guid.NewGuid();
-                var button = new ComponentBuilder()
-                        .WithButton("More information", $"error-{id}");
-
-                StaticObjects.Errors.Add($"error-{id}", e);
-                var embed = new EmbedBuilder
+                try
                 {
-                    Color = Color.Red,
-                    Title = "An error occured",
-                    Description = "The error was automatically reported. If the error persist, please contact the bot owner."
-                }.Build();
+                    var id = Guid.NewGuid();
+                    var button = new ComponentBuilder()
+                            .WithButton("More information", $"error-{id}");
 
-                await ctx.ReplyAsync(embed: embed, components: button.Build());
+                    StaticObjects.Errors.Add($"error-{id}", e);
+                    var embed = new EmbedBuilder
+                    {
+                        Color = Color.Red,
+                        Title = "An error occured",
+                        Description = "The error was automatically reported. If the error persist, please contact the bot owner."
+                    }.Build();
+
+                    await ctx.ReplyAsync(embed: embed, components: button.Build());
+                }
+                catch (System.Exception ex)
+                {
+                    // TODO: Couldn't send error in channel
+                }
+
 
                 if (SentrySdk.IsEnabled)
                     SentrySdk.CaptureException(new System.Exception($"Command {ctx} failed", e));
