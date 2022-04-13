@@ -238,11 +238,11 @@ namespace Sanara
                 {
                     if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
                     {
-                        await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
+                        await Module.Button.Settings.DatabaseDump(ctx);
                     }
                     else
                     {
-                        await Module.Button.Settings.DatabaseDump(ctx);
+                        throw new CommandFailed("You don't have the permissions to do this");
                     }
                     _pendingRequests.Remove(arg.User.Id);
                 }
@@ -259,7 +259,7 @@ namespace Sanara
                     }
                     else
                     {
-                        await Module.Button.Settings.DatabaseDump(ctx);
+                        throw new CommandFailed("You don't have the permissions to do this");
                     }
                     _pendingRequests.Remove(arg.User.Id);
                 }
