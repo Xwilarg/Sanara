@@ -60,6 +60,7 @@ namespace Sanara.Module.Utility
 
         public static async Task<Embed> GetTranslationEmbedAsync(string sentence, string language)
         {
+            List<EmbedFieldBuilder> fields = new();
             if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && sentence.Trim().Count(x => x == ' ') == 0)
             {
                 if (StaticObjects.VisionClient == null)
@@ -81,6 +82,11 @@ namespace Sanara.Module.Utility
                     if (response == null)
                         throw new CommandFailed("There is no text on the image.");
                     sentence = response.Text;
+                    fields.Add(new EmbedFieldBuilder()
+                    {
+                        Name = "Original Text",
+                        Value = sentence
+                    });
                 }
                 catch (GoogleApiException)
                 {
@@ -95,7 +101,8 @@ namespace Sanara.Module.Utility
                 {
                     Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
                     Description = translation.TranslatedText,
-                    Color = Color.Blue
+                    Color = Color.Blue,
+                    Fields = fields
                 }.Build();
             }
             catch (GoogleApiException)
