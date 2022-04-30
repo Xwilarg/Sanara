@@ -61,7 +61,15 @@ namespace Sanara
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             // Initialize services
-            await StaticObjects.InitializeAsync(_credentials);
+            try
+            {
+                await StaticObjects.InitializeAsync(_credentials);
+            }
+            catch (System.Exception e)
+            {
+                await Log.LogErrorAsync(e, null);
+                throw;
+            }
 
             // If the bot takes way too much time to start, we stop the program
             // We do that after the StaticObjects initialization because the first time we load game cache, it can takes plenty of time
