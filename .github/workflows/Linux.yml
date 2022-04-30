@@ -32,17 +32,6 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Start ReThinkdb
       run: nohup rethinkdb &
-    - name: Test
-      env:
-        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
-      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
-    - name: Copy coverage
-      run: sh copy_coverage.sh
-    - name: Upload coverage to Codacy
-      uses: codacy/codacy-coverage-reporter-action@master
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: coverage.xml
     - name: Publish Sanara
       run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE%3BNSFW_BUILD
     - name: Publish Sanara SFW version
@@ -57,5 +46,16 @@ jobs:
         name: Sanara-SFW
         path: ./Release-SFW
         retention-days: 2
+    - name: Test
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+    - name: Copy coverage
+      run: sh copy_coverage.sh
+    - name: Upload coverage to Codacy
+      uses: codacy/codacy-coverage-reporter-action@master
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: coverage.xml
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
