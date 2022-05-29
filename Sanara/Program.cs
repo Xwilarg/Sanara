@@ -470,6 +470,11 @@ namespace Sanara
                     _pendingRequests.Remove(arg.User.Id);
                 }
             }
+            catch (CommandFailed cf)
+            {
+                await ctx.ReplyAsync(cf.Message, ephemeral: true);
+                _pendingRequests.Remove(arg.User.Id);
+            }
             catch (System.Exception ex)
             {
                 await Log.LogErrorAsync(ex, ctx);
