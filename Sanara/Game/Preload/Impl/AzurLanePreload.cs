@@ -24,7 +24,7 @@ namespace Sanara.Game.Preload.Impl
 
                         // Get URL
                         var regexData = elem.Item1[5..].Replace("(", "%28").Replace(")", "%29");
-                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(https:\\/\\/azurlane.netojuu.com\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + regexData + ".png)").Groups[1].Value;
+                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/wiki/" + elem.Item1).GetAwaiter().GetResult(), "src=\"(https:\\/\\/azurlane.netojuu.com\\/images\\/thumb\\/[^\\/]+\\/[^\\/]+\\/[^\\/]+\\/[0-9]+px-" + regexData + ".png)").Groups[1].Value;
                         if (string.IsNullOrWhiteSpace(htmlValue))
                         {
                             throw new NullReferenceException("No image found in page");

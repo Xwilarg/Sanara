@@ -54,7 +54,7 @@ namespace Sanara.Module.Command.Impl
                                 Name = "sentence",
                                 Description = "Start of the sentence",
                                 Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
+                                IsRequired = true
                             }
                         }
                     }.Build(),
