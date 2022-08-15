@@ -11,18 +11,18 @@ namespace Sanara.Module.Utility
     {
         public static async Task TranslateFromReactionAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
-            if (StaticObjects.TranslationClient == null)
+            string emote = react.Emote.ToString();
+            bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+            if (!allowFlags)
             {
                 return;
             }
-            string emote = react.Emote.ToString();
-            if (StaticObjects.Flags.ContainsKey(emote))
+            if (StaticObjects.TranslationClient != null && StaticObjects.Flags.ContainsKey(emote))
             {
                 _ = Task.Run(async () =>
                 {
-                    bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
                     // If emote is not from the bot and is an arrow emote
-                    if (allowFlags && react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId)
+                    if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId)
                     {
                         var dMsg = await msg.GetOrDownloadAsync();
                         var gMsg = dMsg.Content;
@@ -52,7 +52,30 @@ namespace Sanara.Module.Utility
                                     Description = ex.Message
                                 }.Build(), messageReference: new(dMsg.Id));
                             }
+                            catch (System.Exception e)
+                            {
+                                await Log.LogErrorAsync(e, null);
+                            }
                         }
+                    }
+                });
+            }
+            else if (emote == "🛸" || emote == "ℹ️")
+            {
+                _ = Task.Run(async () =>
+                {
+                    var dMsg = await msg.GetOrDownloadAsync();
+                    try
+                    {
+                        await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
+                    }
+                    catch (CommandFailed cf)
+                    {
+                        await (await chan.GetOrDownloadAsync()).SendMessageAsync(cf.Message, messageReference: new(dMsg.Id));
+                    }
+                    catch (System.Exception e)
+                    {
+                        await Log.LogErrorAsync(e, null);
                     }
                 });
             }

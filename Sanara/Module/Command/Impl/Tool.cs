@@ -8,7 +8,6 @@ using Sanara.Module.Utility;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Processing;
-using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
@@ -262,25 +261,7 @@ namespace Sanara.Module.Command.Impl
         {
             var image = ctx.GetArgument<string>("image");
 
-            var html = await StaticObjects.HttpClient.GetStringAsync("https://saucenao.com/search.php?db=999&url=" + Uri.EscapeDataString(image));
-            if (!html.Contains("<div id=\"middle\">"))
-                throw new CommandFailed("I didn't find the source of this image.");
-            var subHtml = html.Split(new[] { "<td class=\"resulttablecontent\">" }, StringSplitOptions.None)[1];
-
-            var compatibility = float.Parse(Regex.Match(subHtml, "<div class=\"resultsimilarityinfo\">([0-9]{2,3}\\.[0-9]{1,2})%<\\/div>").Groups[1].Value, CultureInfo.InvariantCulture);
-            var content = Utils.CleanHtml(subHtml.Split(new[] { "<div class=\"resultcontentcolumn\">" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]);
-            var url = Regex.Match(html, "<img title=\"Index #[^\"]+\"( raw-rating=\"[^\"]+\") src=\"(https:\\/\\/img[0-9]+.saucenao.com\\/[^\"]+)\"").Groups[2].Value;
-
-            await ctx.ReplyAsync(embed: new EmbedBuilder
-            {
-                ImageUrl = url,
-                Description = content,
-                Color = Color.Green,
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Certitude: {compatibility}%"
-                }
-            }.Build());
+            await ctx.ReplyAsync(embed: await Utility.Tool.GetSourceAsync(image));
         }
 
         public async Task PhotoAsync(ICommandContext ctx)
