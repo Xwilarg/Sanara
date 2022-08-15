@@ -9,6 +9,17 @@ namespace Sanara.Module.Utility
 {
     public class Language
     {
+        private static List<string> _alreadyRequests = new();
+
+        private static void AddToRequestList(string id)
+        {
+            if (_alreadyRequests.Count == 100)
+            {
+                _alreadyRequests.RemoveAt(0);
+            }
+            _alreadyRequests.Add(id);
+        }
+
         public static async Task TranslateFromReactionAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
         {
             string emote = react.Emote.ToString();
@@ -25,6 +36,10 @@ namespace Sanara.Module.Utility
                     if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId)
                     {
                         var dMsg = await msg.GetOrDownloadAsync();
+                        if (_alreadyRequests.Contains("TR_" + dMsg.Id))
+                        {
+                            return;
+                        }
                         var gMsg = dMsg.Content;
                         if (string.IsNullOrEmpty(gMsg) && dMsg.Attachments.Any())
                         {
@@ -43,6 +58,7 @@ namespace Sanara.Module.Utility
                             try
                             {
                                 await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await GetTranslationEmbedAsync(gMsg, StaticObjects.Flags[emote]), messageReference: new(dMsg.Id));
+                                AddToRequestList("TR_" + dMsg.Id);
                             }
                             catch (CommandFailed ex)
                             {
@@ -65,9 +81,14 @@ namespace Sanara.Module.Utility
                 _ = Task.Run(async () =>
                 {
                     var dMsg = await msg.GetOrDownloadAsync();
+                    if (_alreadyRequests.Contains("SR_" + dMsg.Id))
+                    {
+                        return;
+                    }
                     try
                     {
                         await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
+                        AddToRequestList("SR_" + dMsg.Id);
                     }
                     catch (CommandFailed cf)
                     {
