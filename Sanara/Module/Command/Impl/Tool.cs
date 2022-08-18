@@ -200,8 +200,42 @@ namespace Sanara.Module.Command.Impl
                     precondition: Precondition.None,
                     aliases: Array.Empty<string>(),
                     needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "get",
+                        Description = "Do a GET request to an URL and return the result",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "url",
+                                Description = "URL",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: GetAsync,
+                    precondition: Precondition.OwnerOnly,
+                    aliases: Array.Empty<string>(),
+                    needDefer: true
                 )
             };
+        }
+
+        public async Task GetAsync(ICommandContext ctx)
+        {
+            var url = ctx.GetArgument<string>("url");
+            var resp = await StaticObjects.HttpClient.SendAsync(new(HttpMethod.Get, url));
+
+            await ctx.ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = resp.StatusCode == HttpStatusCode.OK ? Color.Green : Color.Red,
+                Title = resp.StatusCode.ToString(),
+                Description = $"```\n{await resp.Content.ReadAsStringAsync()}\n```"
+            }.Build(), ephemeral: true);
         }
 
         public async Task OCRAsync(ICommandContext ctx)

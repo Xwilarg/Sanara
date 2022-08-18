@@ -18,6 +18,8 @@
         /// <summary>
         /// Can't be done in private message
         /// </summary>
-        GuildOnly = 4
+        GuildOnly = 4,
+
+        OwnerOnly = 8
     }
 }

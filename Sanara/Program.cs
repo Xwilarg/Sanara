@@ -126,7 +126,11 @@ namespace Sanara
 
         private async Task LaunchCommandAsync(Module.Command.CommandInfo cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.ICommandContext>> ctxCreatorAsync)
         {
-            if ((cmd.Precondition & Precondition.NsfwOnly) != 0 && DoesFailNsfwOnlyPrecondition(tChan))
+            if ((cmd.Precondition & Precondition.OwnerOnly) != 0 && user.Id != 144851584478740481) // TODO: May want to not hardcode that
+            {
+                await errorMsgAsync("This command can only be done by the bot owner", true);
+            }
+            else if ((cmd.Precondition & Precondition.NsfwOnly) != 0 && DoesFailNsfwOnlyPrecondition(tChan))
             {
                 await errorMsgAsync("This command can only be done in NSFW channels", true);
             }
@@ -542,7 +546,7 @@ namespace Sanara
 
                     foreach (var s in _submodules)
                     {
-                        foreach (var c in s.GetCommands()
+                        foreach (var c in s.GetCommands().Where(x => (x.Precondition & Precondition.OwnerOnly) != 0) // No need to create slash commands that only owner can access
 #if !NSFW_BUILD
                             .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
 #endif
