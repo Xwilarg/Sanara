@@ -230,12 +230,25 @@ namespace Sanara.Module.Command.Impl
             var url = ctx.GetArgument<string>("url");
             var resp = await StaticObjects.HttpClient.SendAsync(new(HttpMethod.Get, url));
 
-            await ctx.ReplyAsync(embed: new EmbedBuilder
+            var text = await resp.Content.ReadAsStringAsync();
+            if (text.Length > 4088)
             {
-                Color = resp.StatusCode == HttpStatusCode.OK ? Color.Green : Color.Red,
-                Title = resp.StatusCode.ToString(),
-                Description = $"```\n{await resp.Content.ReadAsStringAsync()}\n```"
-            }.Build(), ephemeral: true);
+                using var mStream = new MemoryStream();
+                using var fStream = new StreamWriter(mStream);
+                fStream.Write(text);
+                fStream.Flush();
+                mStream.Position = 0;
+                await ctx.ReplyAsync(mStream, $"output-{resp.StatusCode}.txt");
+            }
+            else
+            {
+                await ctx.ReplyAsync(embed: new EmbedBuilder
+                {
+                    Color = resp.StatusCode == HttpStatusCode.OK ? Color.Green : Color.Red,
+                    Title = resp.StatusCode.ToString(),
+                    Description = $"```\n{await resp.Content.ReadAsStringAsync()}\n```"
+                }.Build(), ephemeral: true);
+            }
         }
 
         public async Task OCRAsync(ICommandContext ctx)
