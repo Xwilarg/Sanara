@@ -1,12 +1,12 @@
 # Sanara
 
 ## Description
-Sanara is a multipurpose bot that is now in more than 1400 servers (02/2022).<br/>
+Sanara is a multipurpose bot that is now in more than 1500 servers (08/2022).<br/>
 Here are some of her features:
 - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), compete against others servers for the best score
 - Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
-- Doujinshi/Cosplay search, find links to good content and download them directly with Sanara
-- Subscription, stay aware of the new anime and doujinshi airing
+- Cosplay search, find links to good content and download them directly with Sanara
+- Subscription, stay aware of the new animes airing
 
 | ![Preview Doujin](Preview/Doujin.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
 | ------------------------------------- | ----------------------------------- | --------------------------------- | ------------------------------------------------- |
@@ -31,7 +31,8 @@ If you want to add them yourself, feel free to do a pull request! (You might wan
 ## Information collected
 If you want to, you can also see [stats about her usage](https://sanara.zirk.eu/stats.html).
 
-If you have any wonder about what the bot collect on you and how you can get/delete these information, you can check the [GDPR page](https://sanara.zirk.eu/documentation.html).
+If you have any wonder about what the bot collect on you and how you can get/delete these information, you can check the [privacy policy](https://sanara.zirk.eu/privacy.html).
 
 ## Others
-You also might want to see her [discordbots.org page](https://discordbots.org/bot/329664361016721408).
+You can consult Sanara terms of services [here](https://sanara.zirk.eu/terms.html). \
+You also might want to see her [top.gg page](https://top.gg/bot/329664361016721408).
