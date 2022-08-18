@@ -546,23 +546,26 @@ namespace Sanara
 
                     foreach (var s in _submodules)
                     {
-                        foreach (var c in s.GetCommands().Where(x => (x.Precondition & Precondition.OwnerOnly) != 0) // No need to create slash commands that only owner can access
+                        foreach (var c in s.GetCommands()
 #if !NSFW_BUILD
                             .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
 #endif
                         )
                         {
-                            if (c.Precondition != Precondition.None)
+                            if ((c.Precondition & Precondition.OwnerOnly) == 0)
                             {
-                                c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
-                            }
-                            if (debugGuild != null)
-                            {
-                                await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
-                            }
-                            else
-                            {
-                                await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                                if (c.Precondition != Precondition.None)
+                                {
+                                    c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
+                                }
+                                if (debugGuild != null)
+                                {
+                                    await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
+                                }
+                                else
+                                {
+                                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                                }
                             }
                             _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
                         }
