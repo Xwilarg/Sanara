@@ -3,9 +3,6 @@ using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
 using Newtonsoft.Json;
-using NHentaiSharp.Core;
-using NHentaiSharp.Exception;
-using NHentaiSharp.Search;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
@@ -204,6 +201,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: embed.Build()/*, components: button.Build()*/);
         }
 
+        /*
         public async Task DoujinshiAsync(ICommandContext ctx)
         {
             var tags = ctx.GetArgument<string>("tags");
@@ -262,6 +260,7 @@ namespace Sanara.Module.Command.Impl
 
             await ctx.ReplyAsync(embed: embed, components: button.Build());
         }
+        */
 
         public async Task AdultVideoAsync(ICommandContext ctx)
         {

@@ -1,6 +1,5 @@
 ﻿using Discord;
-using NHentaiSharp.Core;
-
+/*
 namespace Sanara.Subscription.Impl
 {
     public class NHentaiSubscription : ISubscription
@@ -33,3 +32,4 @@ namespace Sanara.Subscription.Impl
             => "nhentai";
     }
 }
+*/

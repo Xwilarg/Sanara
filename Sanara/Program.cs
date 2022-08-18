@@ -334,7 +334,7 @@ namespace Sanara
                         }
                     });
                 }
-                else if (arg.Data.CustomId.StartsWith("doujinshi-") && StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
+                /*else if (arg.Data.CustomId.StartsWith("doujinshi-") && StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
                 {
                     StaticObjects.Doujinshis.Remove(arg.Data.CustomId);
                     await arg.DeferLoadingAsync();
@@ -352,7 +352,7 @@ namespace Sanara
                             _pendingRequests.Remove(arg.User.Id);
                         }
                     });
-                }
+                }*/
                 else if (arg.Data.CustomId.StartsWith("replay/"))
                 {
                     var id = arg.Data.CustomId[7..];

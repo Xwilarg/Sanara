@@ -1,14 +1,11 @@
-﻿using NHentaiSharp.Core;
-using NHentaiSharp.Exception;
-using NHentaiSharp.Search;
-using Sanara.Exception;
+﻿using Sanara.Exception;
 using Sanara.Module.Command;
 using System.IO.Compression;
 
 namespace Sanara.Module.Button
 {
     public class Doujinshi
-    {
+    {/*
         public static async Task DownloadDoujinshiAsync(ICommandContext ctx, string id)
         {
             string path = id + "_" + DateTime.Now.ToString("HHmmssff") + StaticObjects.Random.Next(0, int.MaxValue);
@@ -64,5 +61,6 @@ namespace Sanara.Module.Button
             File.Delete(finalPath);
             Directory.CreateDirectory("Saves/Download/" + path + "/" + id);
         }
+        */
     }
 }
