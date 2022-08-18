@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
@@ -46,6 +45,7 @@ namespace Sanara.Module.Command.Impl
                                         Name = "Anime (SFW)",
                                         Value = (int)SubscriptionType.Anime
                                     },
+                                    /*
 #if NSFW_BUILD
                                     new ApplicationCommandOptionChoiceProperties()
                                     {
@@ -53,6 +53,7 @@ namespace Sanara.Module.Command.Impl
                                         Value = (int)SubscriptionType.Doujinshi
                                     }
 #endif
+                                    */
                                 }
                             },
                             new SlashCommandOptionBuilder()

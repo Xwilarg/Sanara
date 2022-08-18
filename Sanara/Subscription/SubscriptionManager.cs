@@ -10,7 +10,7 @@ namespace Sanara.Subscription
         {
             _subscriptions = new ISubscription[]
             {
-                new NHentaiSubscription(),
+                // new NHentaiSubscription(),
                 new AnimeSubscription()
             };
         }

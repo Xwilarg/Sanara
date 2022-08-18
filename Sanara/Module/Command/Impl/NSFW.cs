@@ -144,6 +144,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "av" },
                     needDefer: true
                 ),
+                /*
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -165,7 +166,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "doujin", "nhentai" },
                     needDefer: true
                 ),
-
+                */
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -200,7 +201,7 @@ namespace Sanara.Module.Command.Impl
             embed.AddField("Note", info.note, true);
             embed.WithFooter($"Tier: {info.tier}");
 
-            await ctx.ReplyAsync(embed: embed.Build(), components: button.Build());
+            await ctx.ReplyAsync(embed: embed.Build()/*, components: button.Build()*/);
         }
 
         public async Task DoujinshiAsync(ICommandContext ctx)
