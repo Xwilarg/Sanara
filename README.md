@@ -8,9 +8,9 @@ Here are some of her features:
 - Cosplay search, find links to good content and download them directly with Sanara
 - Subscription, stay aware of the new animes airing
 
-| ![Preview Doujin](Preview/Doujin.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
-| ------------------------------------- | ----------------------------------- | --------------------------------- | ------------------------------------------------- |
-| Doujin command preview                | Booru command preview               | Game command preview              | Subscription command preview                      |
+| ![Preview Cosplay](Preview/Cosplay.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
+| ------------------------------------- - | ----------------------------------- | --------------------------------- | ------------------------------------------------- |
+| Cosplay command preview                 | Booru command preview               | Game command preview              | Subscription command preview                      |
 
 ## Commands
 You can see the full list on [Sanara's command page](https://sanara.zirk.eu/commands.html)<br/>
