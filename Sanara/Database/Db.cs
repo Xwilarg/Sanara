@@ -73,9 +73,9 @@ namespace Sanara.Database
                 var sub = await GetSubscriptionAsync(sGuild, "anime");
                 if (sub != null)
                     _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new AnimeTags(Array.Empty<string>(), false)));
-                sub = await GetSubscriptionAsync(sGuild, "nhentai");
-                if (sub != null)
-                    _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
+                //sub = await GetSubscriptionAsync(sGuild, "nhentai");
+                //if (sub != null)
+                //    _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
             }
             _guilds.Add(sGuild.Id, guild);
 
