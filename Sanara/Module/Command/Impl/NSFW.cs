@@ -267,7 +267,7 @@ namespace Sanara.Module.Command.Impl
             if (StaticObjects.JavmostCategories.Count == 0)
                 throw new CommandFailed("Javmost categories aren't loaded yet, please retry later.");
 
-            var tag = ctx.GetArgument<string>("tags") ?? "all";
+            var tag = ctx.GetArgument<string>("tag") ?? "all";
 
             string url = "https://www5.javmost.com/category/" + tag;
             string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
