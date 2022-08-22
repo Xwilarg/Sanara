@@ -9,6 +9,7 @@ using Sanara.Module.Command.Context;
 using Sanara.Module.Command.Impl;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 namespace Sanara
 {
@@ -246,7 +247,49 @@ namespace Sanara
             _pendingRequests.Add(arg.User.Id);
             try
             {
-                if (arg.Data.CustomId == "dump")
+                if (arg.Data.CustomId == "globalStats")
+                {
+                    var embed = new EmbedBuilder();
+
+                    // Get informations about games
+                    StringBuilder str = new();
+                    List<string> gameNames = new();
+                    foreach (var elem in StaticObjects.Preloads)
+                    {
+                        // We only get games once so we skip when we get the "others" versions (like audio)
+                        //if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
+                        //    continue;
+                        // var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
+                        try
+                        {
+                            var loadInfo = elem.Load();
+                            if (loadInfo != null)
+                                str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: {elem.Load().Count} words.");
+                            else // Get information at runtime
+                                str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: None");
+                        }
+                        catch (System.Exception e)
+                        {
+                            str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: Failed to load: {e.GetType().ToString()}");
+                        }
+                    }
+                    embed.AddField("Games", str.ToString());
+
+                    // Get information about subscriptions
+                    var subs = StaticObjects.GetSubscriptionCount();
+                    embed.AddField("Subscriptions",
+                        subs == null ?
+                            "Not yet initialized" :
+#if NSFW_BUILD
+                            string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
+#else
+                    "**Anime**: " + subs["anime"]);
+#endif
+
+                    await ctx.ReplyAsync(embed: embed.Build());
+                    _pendingRequests.Remove(arg.User.Id);
+                }
+                else if (arg.Data.CustomId == "dump")
                 {
                     if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
                     {

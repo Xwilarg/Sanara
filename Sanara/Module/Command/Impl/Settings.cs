@@ -100,40 +100,14 @@ namespace Sanara.Module.Command.Impl
             embed.AddField("Uptime", Utils.ToDiscordTimestamp(StaticObjects.Started, Utils.TimestampInfo.TimeAgo), true);
             embed.AddField("Guild count", StaticObjects.Client.Guilds.Count, true);
 
-            // Get informations about games
-            StringBuilder str = new();
-            List<string> gameNames = new();
-            foreach (var elem in StaticObjects.Preloads)
+            var options = new ComponentBuilder();
+            if (StaticObjects.IsBotOwner(ctx.User))
             {
-                // We only get games once so we skip when we get the "others" versions (like audio)
-                //if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
-                //    continue;
-                // var fullName = name + (elem.GetNameArg() != null ? $" {elem.GetNameArg()}" : "");
-                try
-                {
-                    var loadInfo = elem.Load();
-                    if (loadInfo != null)
-                        str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: {elem.Load().Count} words.");
-                    else // Get information at runtime
-                        str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: None");
-                }
-                catch (System.Exception e)
-                {
-                    str.AppendLine($"**{Utils.ToWordCase(elem.Name)}**: Failed to load: {e.GetType().ToString()}");
-                }
+                options.WithSelectMenu("delCache", StaticObjects.AllGameNames.Select(x => new SelectMenuOptionBuilder(x, StaticObjects.Db.GetCacheName(x))).ToList(), placeholder: "Select a game cache to delete (require bot restart)");
             }
-            embed.AddField("Games", str.ToString());
+            options.WithButton("Show Global Stats", "globalStats");
 
-            // Get information about subscriptions
-            var subs = StaticObjects.GetSubscriptionCount();
-            embed.AddField("Subscriptions",
-                subs == null ?
-                    "Not yet initialized" :
-#if NSFW_BUILD
-                    string.Join("\n", subs.Select(x => "**" + char.ToUpper(x.Key[0]) + string.Join("", x.Key.Skip(1)) + "**: " + x.Value)));
-#else
-                    "**Anime**: " + subs["anime"]);
-#endif
+            await ctx.ReplyAsync(embed: embed.Build(), components: options.Build(), ephemeral: true);
 
             embed.AddField("Useful links",
 #if NSFW_BUILD
@@ -156,16 +130,9 @@ namespace Sanara.Module.Command.Impl
 #endif // TODO: Can prob use current pfp for SFW version
                 );
 
-            var options = new ComponentBuilder();
-            if (StaticObjects.IsBotOwner(ctx.User))
-            {
-                options.WithSelectMenu("delCache", StaticObjects.AllGameNames.Select(x => new SelectMenuOptionBuilder(x, StaticObjects.Db.GetCacheName(x))).ToList(), placeholder: "Select a game cache to delete (require bot restart)");
-            }
-
-            await ctx.ReplyAsync(embed: embed.Build(), components: options.Build(), ephemeral: true);
 #if NSFW_BUILD
             // Get latests commits
-            str = new();
+            StringBuilder str = new();
             var json = JsonConvert.DeserializeObject<JArray>(await StaticObjects.HttpClient.GetStringAsync("https://api.github.com/repos/Xwilarg/Sanara/commits?per_page=5"));
             foreach (var elem in json)
             {
