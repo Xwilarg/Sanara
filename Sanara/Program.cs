@@ -320,6 +320,7 @@ namespace Sanara
                 }
                 else if (arg.Data.CustomId.StartsWith("delSub-"))
                 {
+                    await arg.DeferLoadingAsync();
                     if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
                     {
                         await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
