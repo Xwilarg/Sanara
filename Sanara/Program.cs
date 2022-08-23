@@ -458,6 +458,7 @@ namespace Sanara
                             case "start":
                                 if (lobby.IsHost(ctx.User))
                                 {
+                                    await arg.DeferLoadingAsync();
                                     await StaticObjects.GameManager.StartGameAsync(ctx);
                                     await arg.Message.DeleteAsync();
                                 }
