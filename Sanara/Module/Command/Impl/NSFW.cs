@@ -493,6 +493,7 @@ namespace Sanara.Module.Command.Impl
                 {
                     Color = post.Rating switch
                     {
+                        Rating.General => Color.Green,
                         Rating.Safe => Color.Green,
                         Rating.Questionable => new Color(255, 255, 0), // Yellow
                         Rating.Explicit => Color.Red,

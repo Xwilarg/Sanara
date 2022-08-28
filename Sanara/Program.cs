@@ -475,6 +475,7 @@ namespace Sanara
                                 }
                                 else
                                 {
+                                    await arg.DeferLoadingAsync();
                                     var state = lobby.ToggleUser(ctx.User);
                                     await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
                                     await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
