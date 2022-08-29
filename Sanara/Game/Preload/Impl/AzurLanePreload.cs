@@ -23,7 +23,7 @@ namespace Sanara.Game.Preload.Impl
                         // Item2: name
 
                         // Get URL
-                        var regexData = elem.Item1[5..].Replace("(", "%28").Replace(")", "%29");
+                        var regexData = elem.Item1.Replace("(", "%28").Replace(")", "%29");
                         var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/wiki/" + elem.Item1).GetAwaiter().GetResult(), "class=\"image\"><img alt=\"[^\"]+\\.png\" src=\"([^\"]+)\"").Groups[1].Value;
                         if (string.IsNullOrWhiteSpace(htmlValue))
                         {
