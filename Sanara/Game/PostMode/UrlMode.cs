@@ -9,7 +9,6 @@ namespace Sanara.Game.PostMode
         {
             try
             {
-                Console.WriteLine(text);
                 var result = await StaticObjects.HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, text));
                 var length = int.Parse(result.Content.Headers.GetValues("content-length").ElementAt(0));
                 if (length < 8000000)
