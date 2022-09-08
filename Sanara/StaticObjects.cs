@@ -295,8 +295,8 @@ namespace Sanara
             do
             {
                 newTags = new(); // We keep track of how many tags we found in this page
-                string html = await AdultVideo.DoJavmostHttpRequestAsync("https://www.javmost.xyz/allcategory/" + page);
-                foreach (Match m in Regex.Matches(html, "<a href=\"(https:\\/\\/www.javmost.xyz\\/category\\/[^\\/]+\\/)\">").Cast<Match>())
+                string html = await AdultVideo.DoJavmostHttpRequestAsync("https://www.javmost.cx/allcategory/" + page);
+                foreach (Match m in Regex.Matches(html, "<a href=\"(https:\\/\\/www.javmost.cx\\/category\\/[^\\/]+\\/)\">").Cast<Match>())
                 {
                     string content = m.Groups[1].Value;
                     if (!alreadyDone.Contains(content))
@@ -306,7 +306,7 @@ namespace Sanara
                         var cM = Regex.Match(subHtml, "<h1 class=\"page-header\">Category <small>Name<\\/small> <strong>([^<]+)<small>\\( Result ([0-9]+)");
                         var name = cM.Groups[1].Value.Trim();
 
-                        if (Regex.Match(subHtml, "<a href=\"https:\\/\\/www.javmost.xyz\\/category\\/[^\\/]+\\/\"[^>]+>" + name + "<\\/a>").Success)
+                        if (Regex.Match(subHtml, "<a href=\"https:\\/\\/www.javmost.cx\\/category\\/[^\\/]+\\/\"[^>]+>" + name + "<\\/a>").Success)
                         {
                             newTags.Add((name, int.Parse(cM.Groups[2].Value)));
                         }

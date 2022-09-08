@@ -11,7 +11,7 @@ namespace Sanara.Module.Utility
             HttpRequestMessage request = new(new HttpMethod("GET"), url);
             do
             {
-                request.Headers.Add("Host", "www5.javmost.com");
+                request.Headers.Add("Host", "www.javmost.cx");
                 html = await (await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync();
                 Match redirect = Regex.Match(html, "<p>The document has moved <a href=\"([^\"]+)\">");
                 if (redirect.Success)

@@ -269,9 +269,9 @@ namespace Sanara.Module.Command.Impl
 
             var tag = ctx.GetArgument<string>("tag") ?? "all";
 
-            string url = "https://www5.javmost.com/category/" + tag;
+            string url = "https://www.javmost.cx/category/" + tag;
             string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
-            int perPage = Regex.Matches(html, "<!-- begin card -->").Count; // Number of result per page
+            int perPage = Regex.Matches(html, "<div class=\"card \">").Count; // Number of result per page
             int total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
             if (total == 0)
             {
@@ -282,7 +282,7 @@ namespace Sanara.Module.Command.Impl
             {
                 html = await AdultVideo.DoJavmostHttpRequestAsync(url + "/page/" + (page + 1));
             }
-            var arr = html.Split(new[] { "<!-- begin card -->" }, StringSplitOptions.None).Skip(1).ToList(); // We remove things life header and stuff
+            var arr = html.Split(new[] { "<div class=\"card \">" }, StringSplitOptions.None).Skip(1).ToList(); // We remove things life header and stuff
             Match videoMatch = null;
             string[] videoTags = null;
             string previewUrl = "";
@@ -290,7 +290,7 @@ namespace Sanara.Module.Command.Impl
             while (arr.Count > 0) // That shouldn't fail
             {
                 string currHtml = arr[StaticObjects.Random.Next(arr.Count)];
-                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
+                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.cx\\/([^\\/]+)\\/)\"");
                 if (!videoMatch.Success)
                 {
                     retryCount--;
@@ -300,11 +300,11 @@ namespace Sanara.Module.Command.Impl
                     }
                     continue;
                 }
-                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www5\\.javmost\\.com\\/([^\\/]+)\\/)\"");
+                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.cx\\/([^\\/]+)\\/)\"");
                 previewUrl = Regex.Match(currHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
                 if (previewUrl.StartsWith("//"))
                     previewUrl = "https:" + previewUrl;
-                videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www5\\.javmost\\.com\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
+                videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www\\.javmost\\.cx\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
                 break;
             }
             await ctx.ReplyAsync(embed: new EmbedBuilder()
