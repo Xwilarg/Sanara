@@ -354,8 +354,8 @@ namespace Sanara.Module.Command.Impl
             // Getting rating
             string rating = Regex.Match(html, "average_rating = ([0-9.]+)").Groups[1].Value;
 
-            var token = $"{name}-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}";
-            StaticObjects.Cosplays.Add(token);
+            var token = $"ehentai-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}";
+            StaticObjects.EHentai.Add(token);
             var button = new ComponentBuilder()
                 .WithButton("Download", token);
 

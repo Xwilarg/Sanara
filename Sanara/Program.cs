@@ -359,9 +359,9 @@ namespace Sanara
                         }
                     });
                 }
-                else if (arg.Data.CustomId.StartsWith("cosplay-") && StaticObjects.Cosplays.Contains(arg.Data.CustomId))
+                else if (arg.Data.CustomId.StartsWith("ehentai-") && StaticObjects.EHentai.Contains(arg.Data.CustomId))
                 {
-                    StaticObjects.Cosplays.Remove(arg.Data.CustomId);
+                    StaticObjects.EHentai.Remove(arg.Data.CustomId);
                     await arg.DeferLoadingAsync();
                     _ = Task.Run(async () =>
                     {

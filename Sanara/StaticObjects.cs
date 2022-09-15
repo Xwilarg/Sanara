@@ -71,7 +71,7 @@ namespace Sanara
         /// List of all errors that occured
         /// </summary>
         public static Dictionary<string, System.Exception> Errors { get; } = new();
-        public static List<string> Cosplays { get; } = new();
+        public static List<string> EHentai { get; } = new();
         public static List<string> Doujinshis { get; } = new();
         /// <summary>
         /// Authentification token for discordbotlist.com
