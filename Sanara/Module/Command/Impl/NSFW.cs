@@ -159,7 +159,7 @@ namespace Sanara.Module.Command.Impl
                     }.Build(),
                     callback: DoujinshiAsync,
                     precondition: Precondition.NsfwOnly,
-                    aliases: new[] { "doujin", "nhentai" },
+                    aliases: new[] { "doujin" },
                     needDefer: true
                 ),
                 new CommandInfo(
