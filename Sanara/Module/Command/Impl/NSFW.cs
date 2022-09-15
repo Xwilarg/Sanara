@@ -141,7 +141,6 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "av" },
                     needDefer: true
                 ),
-                /*
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -163,7 +162,6 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "doujin", "nhentai" },
                     needDefer: true
                 ),
-                */
                 new CommandInfo(
                     slashCommand: new SlashCommandBuilder()
                     {
@@ -200,67 +198,6 @@ namespace Sanara.Module.Command.Impl
 
             await ctx.ReplyAsync(embed: embed.Build()/*, components: button.Build()*/);
         }
-
-        /*
-        public async Task DoujinshiAsync(ICommandContext ctx)
-        {
-            var tags = ctx.GetArgument<string>("tags");
-
-            if (string.IsNullOrEmpty(tags))
-            {
-                var result = await SearchClient.SearchAsync();
-                int page = StaticObjects.Random.Next(0, result.numPages) + 1;
-                result = await SearchClient.SearchAsync(page);
-                await FormatDoujinshiAsync(ctx, result.elements[StaticObjects.Random.Next(0, result.elements.Length)]);
-            }
-            else if (int.TryParse(tags, out int id))
-            {
-                try
-                {
-                    await FormatDoujinshiAsync(ctx, await SearchClient.SearchByIdAsync(id));
-                }
-                catch (InvalidArgumentException)
-                {
-                    throw new CommandFailed("These is no doujin with this id");
-                }
-            }
-            else
-            {
-                // Somehow the API return invalid values depending of the country we are doing the request from
-                // To avoid that, we parse the HTML instead
-                string html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")));
-                var m = Regex.Match(html, ";page=([0-9]+)\" class=\"last\"");
-                if (!m.Success)
-                {
-                    throw new CommandFailed("There is no doujin with these tags");
-                }
-                int page = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value)) + 1;
-                html = await StaticObjects.HttpClient.GetStringAsync("https://nhentai.net/search/?q=" + HttpUtility.UrlEncode(tags.Replace(" ", "+")) + "&page=" + page);
-                var matches = Regex.Matches(html, "<a href=\"\\/g\\/([0-9]+)\\/\"").Cast<Match>().ToArray();
-                var result = await SearchClient.SearchByIdAsync(int.Parse(matches[StaticObjects.Random.Next(0, matches.Length)].Groups[1].Value));
-                await FormatDoujinshiAsync(ctx, result);
-            }
-        }
-
-        private async Task FormatDoujinshiAsync(ICommandContext ctx, GalleryElement result)
-        {
-            var token = $"doujinshi-{Guid.NewGuid()}/{result.id}";
-            StaticObjects.Doujinshis.Add(token);
-            var button = new ComponentBuilder()
-                .WithButton("Download", token);
-
-            var embed = new EmbedBuilder
-            {
-                Color = new Color(255, 20, 147),
-                Description = string.Join(", ", result.tags.Select(x => x.name)),
-                Title = result.prettyTitle,
-                Url = result.url.AbsoluteUri,
-                ImageUrl = result.pages[0].imageUrl.AbsoluteUri
-            }.Build();
-
-            await ctx.ReplyAsync(embed: embed, components: button.Build());
-        }
-        */
 
         public async Task AdultVideoAsync(ICommandContext ctx)
         {
@@ -376,17 +313,27 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
+        public async Task DoujinshiAsync(ICommandContext ctx)
+        {
+            await GetEHentaiAsync(ctx, "doujinshi", 1021);
+        }
+
         public async Task CosplayAsync(ICommandContext ctx)
+        {
+            await GetEHentaiAsync(ctx, "cosplay", 959);
+        }
+
+        private async Task GetEHentaiAsync(ICommandContext ctx, string name, int category)
         {
             var tags = ctx.GetArgument<string>("tags") ?? "";
 
             // 959 means we only take cosplays
-            string url = "https://e-hentai.org/?f_cats=959&f_search=" + Uri.EscapeDataString(tags);
+            string url = $"https://e-hentai.org/?f_cats={category}&f_search=" + Uri.EscapeDataString(tags);
             string html = await StaticObjects.HttpClient.GetStringAsync(url);
             Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
 
             if (!m.Success)
-                throw new CommandFailed("There is no cosplay with these tags");
+                throw new CommandFailed($"There is no {name} with these tags");
 
             int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
             html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
@@ -407,18 +354,18 @@ namespace Sanara.Module.Command.Impl
             // Getting rating
             string rating = Regex.Match(html, "average_rating = ([0-9.]+)").Groups[1].Value;
 
-            var token = $"cosplay-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}";
+            var token = $"{name}-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}";
             StaticObjects.Cosplays.Add(token);
             var button = new ComponentBuilder()
                 .WithButton("Download", token);
 
-            await ctx.ReplyAsync(embed: new EmbedBuilder
+            var embed = new EmbedBuilder
             {
                 Color = new Color(255, 20, 147),
                 Description = string.Join(", ", allTags),
                 Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
                 Url = finalUrl,
-                ImageUrl = imageUrl,
+                ImageUrl = $"attachment://image{Path.GetExtension(imageUrl)}",
                 Fields = new List<EmbedFieldBuilder>
                     {
                         new EmbedFieldBuilder
@@ -428,7 +375,8 @@ namespace Sanara.Module.Command.Impl
                             IsInline = true
                         }
                     }
-            }.Build(), components: button.Build());
+            }.Build();
+            await ctx.Channel.SendFileAsync(await StaticObjects.HttpClient.GetStreamAsync(imageUrl), $"image{Path.GetExtension(imageUrl)}", embed: embed, components: button.Build());
         }
 
         public async Task BooruAsync(ICommandContext ctx)
