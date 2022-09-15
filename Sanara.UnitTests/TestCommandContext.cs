@@ -11,9 +11,9 @@ namespace Sanara.UnitTests
         }
 
         private Dictionary<string, object> _args;
-        public Result Result { private set; get; }
+        public Result Result { internal set; get; }
 
-        public IMessageChannel Channel => throw new NotImplementedException();
+        public IMessageChannel Channel => new TestChannel(this);
 
         public IUser User => throw new NotImplementedException();
 
