@@ -7,7 +7,7 @@ namespace Sanara.Module.Button
 {
     public class Cosplay
     {
-        public static async Task DownloadCosplayAsync(ICommandContext ctx, string idFirst, string idSecond)
+        public static async Task DownloadCosplayAsync(ICommandContext ctx, string idFirst, string idSecond, string idName)
         {
             string html;
             int nbPages;
@@ -50,7 +50,18 @@ namespace Sanara.Module.Button
             Directory.Delete("Saves/Download/" + path + "/" + id);
 
             FileInfo fi = new(finalPath);
-            await StaticObjects.Db.AddDownloadCosplayAsync((int)(fi.Length / 1000));
+            if (idName == "cosplay")
+            {
+                await StaticObjects.Db.AddDownloadCosplayAsync((int)(fi.Length / 1000));
+            }
+            else if (idName == "doujinshi")
+            {
+                await StaticObjects.Db.AddDownloadDoujinshiAsync((int)(fi.Length / 1000));
+            }
+            else
+            {
+                throw new ArgumentException("Invalid downlaod type", nameof(idName));
+            }
             if (fi.Length < 8000000) // 8MB
             {
                 await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), fi.Name);

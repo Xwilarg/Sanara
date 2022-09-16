@@ -368,7 +368,7 @@ namespace Sanara
                         try
                         {
                             var id = arg.Data.CustomId.Split('/');
-                            await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2]);
+                            await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2], id[3]);
                             _pendingRequests.Remove(arg.User.Id);
                         }
                         catch (System.Exception ex)
