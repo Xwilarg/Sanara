@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Help;
+using Sanara.Module.Command.Context;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -84,8 +85,11 @@ namespace Sanara.Module.Command.Impl
         {
             var content = ":ping_pong: Pong!";
             await ctx.ReplyAsync(content);
-            var orMsg = await ctx.GetOriginalAnswerAsync();
-            await ctx.ReplyAsync(orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
+            if (ctx is SlashCommandContext)
+            {
+                var orMsg = await ctx.GetOriginalAnswerAsync();
+                await ctx.ReplyAsync(orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
+            }
         }
 
         public async Task BotInfoAsync(ICommandContext ctx)
