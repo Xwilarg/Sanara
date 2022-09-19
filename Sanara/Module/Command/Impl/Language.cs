@@ -229,6 +229,11 @@ namespace Sanara.Module.Command.Impl
             // Radical of the kanji
             var radicalMatch = Regex.Match(html, "<span class=\"radical_meaning\">([^<]+)<\\/span>([^<]+)<\\/span>");
 
+            if (radicalMatch.Length == 0)
+            {
+                throw new CommandFailed("I didn't find any kanji with this query.");
+            }
+
             // Kanji meaning in english
             var meaning = Regex.Match(html, "<div class=\"kanji-details__main-meanings\">([^<]+)<\\/div>").Groups[1].Value.Trim();
 
