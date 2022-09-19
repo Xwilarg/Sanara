@@ -100,6 +100,13 @@ namespace Sanara.Module.Command.Impl
                                 Description = "Tags of the search, separated by an empty space",
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = false
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "rating",
+                                Description = "Minimum rating (between 2 and 5)",
+                                Type = ApplicationCommandOptionType.Integer,
+                                IsRequired = false
                             }
                         }
                     }.Build(),
@@ -151,8 +158,15 @@ namespace Sanara.Module.Command.Impl
                             new SlashCommandOptionBuilder()
                             {
                                 Name = "tags",
-                                Description = "Either the tags of your search, or a 6 digit number",
+                                Description = "Tags of your search",
                                 Type = ApplicationCommandOptionType.String,
+                                IsRequired = false
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "rating",
+                                Description = "Minimum rating (between 2 and 5)",
+                                Type = ApplicationCommandOptionType.Integer,
                                 IsRequired = false
                             }
                         }
@@ -326,14 +340,25 @@ namespace Sanara.Module.Command.Impl
         private async Task GetEHentaiAsync(ICommandContext ctx, string name, int category)
         {
             var tags = ctx.GetArgument<string>("tags") ?? "";
+            var ratingInput = ctx.GetArgument<long?>("rating") ?? 0;
 
-            // 959 means we only take cosplays
+            if (ratingInput != 0 && (ratingInput < 2 || ratingInput > 5))
+            {
+                throw new CommandFailed($"The rating given must be between 2 and 5");
+            }
+
             string url = $"https://e-hentai.org/?f_cats={category}&f_search=" + Uri.EscapeDataString(tags);
+            if (ratingInput != 0)
+            {
+                url += $"&advsearch=1&f_sname=on&f_stags=on&f_sr=on&f_srdd={ratingInput}";
+            }
             string html = await StaticObjects.HttpClient.GetStringAsync(url);
             Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
 
             if (!m.Success)
-                throw new CommandFailed($"There is no {name} with these tags");
+            {
+                throw new CommandFailed($"There is no {name} with these tags{(ratingInput != 0 ? ", this might be due to the rating given in parameter being too high" : string.Empty)}");
+            }
 
             int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
             html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
