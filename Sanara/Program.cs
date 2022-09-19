@@ -643,10 +643,6 @@ namespace Sanara
 
                 await StaticObjects.Db.UpdateGuildCountAsync();
             });
-
-#if NSFW_BUILD
-            await StaticObjects.Client.SetActivityAsync(new Discord.Game("Prefix are gone, please use slash commands!", ActivityType.Watching));
-#endif
         }
 
         private Task Disconnected(System.Exception e)
