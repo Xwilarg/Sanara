@@ -43,9 +43,14 @@ namespace Sanara.UnitTests
             return Task.CompletedTask;
         }
 
-        public Task ReplyAsync(Stream file, string fileName)
+        public Task ReplyAsync(Stream file, string fileName, string text = "", Embed? embed = null, MessageComponent? components = null)
         {
-            throw new NotImplementedException();
+            Result = new()
+            {
+                Text = text,
+                Embed = embed
+            };
+            return Task.CompletedTask;
         }
 
         public Task AddReactionAsync(IEmote emote)
