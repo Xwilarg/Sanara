@@ -147,9 +147,9 @@ namespace Sanara.Module.Command.Context
             }
         }
 
-        public async Task ReplyAsync(Stream file, string fileName)
+        public async Task ReplyAsync(Stream file, string fileName, string text = "", Embed? embed = null, MessageComponent? components = null)
         {
-            _reply = await _message.Channel.SendFileAsync(new FileAttachment(file, fileName));
+            _reply = await _message.Channel.SendFileAsync(new FileAttachment(file, fileName), text: text, embed: embed, components: components);
         }
 
         public override string ToString()

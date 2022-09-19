@@ -401,7 +401,7 @@ namespace Sanara.Module.Command.Impl
                         }
                     }
             }.Build();
-            await ctx.Channel.SendFileAsync(await StaticObjects.HttpClient.GetStreamAsync(imageUrl), $"image{Path.GetExtension(imageUrl)}", embed: embed, components: button.Build());
+            await ctx.ReplyAsync(await StaticObjects.HttpClient.GetStreamAsync(imageUrl), $"image{Path.GetExtension(imageUrl)}", embed: embed, components: button.Build());
         }
 
         public async Task BooruAsync(ICommandContext ctx)

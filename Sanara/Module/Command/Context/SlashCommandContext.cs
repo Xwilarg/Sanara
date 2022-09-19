@@ -31,24 +31,24 @@ namespace Sanara.Module.Command.Context
             }
         }
 
-        public async Task ReplyAsync(Stream file, string fileName)
+        public async Task ReplyAsync(Stream file, string fileName, string text = "", Embed? embed = null, MessageComponent? components = null)
         {
             if (_ctx.HasResponded)
             {
-                await _ctx.FollowupWithFileAsync(file, fileName);
+                await _ctx.FollowupWithFileAsync(file, fileName, text: text, embed: embed, components: components);
             }
             else
             {
                 await _ctx.RespondWithFileAsync(
                     fileStream: file,
                     fileName: fileName,
-                    text: "",
+                    text: text,
                     embeds: null,
                     isTTS: false,
                     ephemeral: false,
                     allowedMentions: null,
-                    components: null,
-                    embed: null,
+                    components: components,
+                    embed: embed,
                     options: null
                 );
             }
