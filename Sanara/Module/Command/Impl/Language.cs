@@ -265,7 +265,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Title = finalKanji.Value.ToString(),
-                // Url = url, // TODO: https://github.com/dotnet/runtime/issues/21626 , .NET said they will fix that in a next release
+                Url = url,
                 Description = meaning,
                 ImageUrl = "http://classic.jisho.org/static/images/stroke_diagrams/" + (int)finalKanji.Value + "_frames.png",
                 Fields = new List<EmbedFieldBuilder>
