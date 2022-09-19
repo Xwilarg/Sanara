@@ -569,9 +569,16 @@ namespace Sanara.Module.Command.Impl
                     };
                     var answer = await StaticObjects.HttpClient.SendAsync(tokenReq);
                     var authJson = JsonConvert.DeserializeObject<JObject>(await answer.Content.ReadAsStringAsync());
-                    StaticObjects.KitsuAccessToken = authJson["access_token"].Value<string>();
-                    StaticObjects.KitsuRefreshDate = DateTime.Now.AddSeconds(authJson["expires_in"].Value<int>());
-                    StaticObjects.KitsuRefreshToken = authJson["refresh_token"].Value<string>();
+                    if (authJson["error"] != null)
+                    {
+                        await Log.LogErrorAsync(new System.Exception($"{authJson["error"].Value<string>()}: {authJson["error_description"].Value<string>()}"), null);
+                    }
+                    else
+                    {
+                        StaticObjects.KitsuAccessToken = authJson["access_token"].Value<string>();
+                        StaticObjects.KitsuRefreshDate = DateTime.Now.AddSeconds(authJson["expires_in"].Value<int>());
+                        StaticObjects.KitsuRefreshToken = authJson["refresh_token"].Value<string>();
+                    }
                 }
             }
 
