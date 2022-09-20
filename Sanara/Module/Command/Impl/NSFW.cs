@@ -205,7 +205,7 @@ namespace Sanara.Module.Command.Impl
                 Url = info.link,
                 ImageUrl = info.image
             };
-            embed.AddField("Tags", string.Join(", ", info.tags), true);
+            embed.AddField("Tags", info.tags == null ? string.Empty : string.Join(", ", info.tags), true);
             embed.AddField("Parody", info.parody, true);
             embed.AddField("Note", info.note, true);
             embed.WithFooter($"Tier: {info.tier}");
