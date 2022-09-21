@@ -61,6 +61,27 @@ namespace Sanara.Module.Command.Impl
                     precondition: Precondition.None,
                     aliases: Array.Empty<string>(),
                     needDefer: true
+                ),
+                new CommandInfo(
+                    slashCommand: new SlashCommandBuilder()
+                    {
+                        Name = "generate",
+                        Description = "Generate an image from a sentence",
+                        Options = new()
+                        {
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "sentence",
+                                Description = "Sentence to make the image from",
+                                Type = ApplicationCommandOptionType.String,
+                                IsRequired = true
+                            }
+                        }
+                    }.Build(),
+                    callback: GenerateAsync,
+                    precondition: Precondition.None,
+                    aliases: Array.Empty<string>(),
+                    needDefer: true
                 )
             };
         }
@@ -106,6 +127,26 @@ namespace Sanara.Module.Command.Impl
             {
                 Color = Color.Blue,
                 Description = (string)resp.output
+            }.Build());
+        }
+
+        public async Task GenerateAsync(ICommandContext ctx)
+        {
+            if (StaticObjects.DeepAI == null)
+            {
+                throw new CommandFailed("Machine Learning client is not available");
+            }
+
+            var sentence = ctx.GetArgument<string>("sentence");
+
+            StandardApiResponse resp = StaticObjects.DeepAI.callStandardApi("text2img", new
+            {
+                text = sentence,
+            });
+            await ctx.ReplyAsync(embed: new EmbedBuilder
+            {
+                Color = Color.Blue,
+                ImageUrl = resp.output_url
             }.Build());
         }
     }
