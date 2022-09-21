@@ -1,8 +1,7 @@
-﻿using Discord;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using DeepAI;
+using Discord;
+using Sanara.Exception;
 using Sanara.Help;
-using System.Text;
 using System.Text.RegularExpressions;
 using VndbSharp;
 using VndbSharp.Models;
@@ -92,23 +91,22 @@ namespace Sanara.Module.Command.Impl
 
         public async Task CompleteAsync(ICommandContext ctx)
         {
+            if (StaticObjects.DeepAI == null)
+            {
+                throw new CommandFailed("Machine Learning client is not available");
+            }
+
             var sentence = ctx.GetArgument<string>("sentence");
 
-            var embed = new EmbedBuilder
+            StandardApiResponse resp = StaticObjects.DeepAI.callStandardApi("text-generator", new
             {
-                Description = "Please wait, this can take up to a few minutes...",
-                Color = Color.Blue
-            };
-            var timer = DateTime.Now;
-            var resp = await StaticObjects.HttpClient.PostAsync("https://api.eleuther.ai/complete", new StringContent("{\"context\":\"" + sentence.Replace("\"", "\\\"").Replace("\n", "\\n") + "\",\"top_p\":0.9,\"temp\":1}", Encoding.UTF8, "application/json"));
-            resp.EnsureSuccessStatusCode();
-            embed.Footer = new EmbedFooterBuilder
+                text = sentence,
+            });
+            await ctx.ReplyAsync(embed: new EmbedBuilder
             {
-                Text = $"Time elapsed: {(DateTime.Now - timer).TotalSeconds:0.00}s"
-            };
-            var json = await resp.Content.ReadAsStringAsync();
-            embed.Description = "**" + sentence + "**" + JsonConvert.DeserializeObject<JArray>(json)[0]["generated_text"].Value<string>();
-            await ctx.ReplyAsync(embed: embed.Build());
+                Color = Color.Blue,
+                Description = (string)resp.output
+            }.Build());
         }
     }
 }

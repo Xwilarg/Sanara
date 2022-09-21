@@ -1,4 +1,5 @@
 ﻿using BooruSharp.Booru;
+using DeepAI;
 using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
@@ -123,6 +124,9 @@ namespace Sanara
         /// Auth used for kitsu.io requests (Anime search)
         /// </summary>
         public static HttpRequestMessage? KitsuAuth { set; get; }
+
+        public static DeepAI_API? DeepAI { set; get; }
+
         /// <summary>
         /// Authentification token used for kitsu.io
         /// </summary>
@@ -405,6 +409,11 @@ namespace Sanara
             GameManager.Init();
 
             await Log.LogAsync(new LogMessage(LogSeverity.Info, "Static Preload", "Initializing services needing credentials"));
+
+            if (credentials.DeepAIKey != null)
+            {
+                DeepAI = new DeepAI_API(credentials.DeepAIKey);
+            }
 
             if (credentials.KitsuEmail != null)
             {

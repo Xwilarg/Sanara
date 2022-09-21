@@ -12,5 +12,6 @@
         public string MyDramaListApiKey;
         public string UnsplashToken;
         public string DebugGuild;
+        public string DeepAIKey;
     }
 }
