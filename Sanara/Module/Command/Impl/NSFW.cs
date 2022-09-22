@@ -363,7 +363,7 @@ namespace Sanara.Module.Command.Impl
             int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
             html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
             var sM = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/([a-z0-9]+)\\/([a-z0-9]+)\\/)\"")[rand % 25];
-            string finalUrl = sM.Groups[1].Value;
+            string finalUrl = sM.Groups[1].Value + "?nw=always";
             html = await StaticObjects.HttpClient.GetStringAsync(finalUrl);
 
             // Getting tags
