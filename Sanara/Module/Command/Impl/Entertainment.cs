@@ -123,10 +123,11 @@ namespace Sanara.Module.Command.Impl
             {
                 text = sentence,
             });
+            var output = (string)resp.output;
             await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Color = Color.Blue,
-                Description = (string)resp.output
+                Description = $"**{output[..sentence.Length]}**{output[sentence.Length..]}"
             }.Build());
         }
 
