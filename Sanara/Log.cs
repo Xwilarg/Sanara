@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Sanara.Module.Command;
 using Sentry;
+using System.Net;
 
 namespace Sanara
 {
@@ -33,19 +34,31 @@ namespace Sanara
             {
                 try
                 {
-                    var id = Guid.NewGuid();
-                    var button = new ComponentBuilder()
-                            .WithButton("More information", $"error-{id}");
-
-                    StaticObjects.Errors.Add($"error-{id}", e);
-                    var embed = new EmbedBuilder
+                    if (e is HttpRequestException hre && hre.StatusCode == HttpStatusCode.ServiceUnavailable)
                     {
-                        Color = Color.Red,
-                        Title = "An error occured",
-                        Description = "The error was automatically reported. If the error persist, please contact the bot owner."
-                    }.Build();
+                        await ctx.ReplyAsync(embed: new EmbedBuilder
+                        {
+                            Color = Color.Orange,
+                            Title = "Service Unavailable",
+                            Description = "The command failed with an error 503, this probably mean the website used for this service is unavailable"
+                        }.Build());
+                    }
+                    else
+                    {
+                        var id = Guid.NewGuid();
+                        var button = new ComponentBuilder()
+                                .WithButton("More information", $"error-{id}");
 
-                    await ctx.ReplyAsync(embed: embed, components: button.Build());
+                        StaticObjects.Errors.Add($"error-{id}", e);
+                        var embed = new EmbedBuilder
+                        {
+                            Color = Color.Red,
+                            Title = "An error occured",
+                            Description = "The error was automatically reported, you can click the button below to have more information about it"
+                        }.Build();
+
+                        await ctx.ReplyAsync(embed: embed, components: button.Build());
+                    }
                 }
                 catch (System.Exception ex)
                 {
