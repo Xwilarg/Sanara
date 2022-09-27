@@ -409,6 +409,12 @@ namespace Sanara.Module.Command.Impl
             var tags = (ctx.GetArgument<string>("tags") ?? "").Split(' ');
             var type = (BooruType)ctx.GetArgument<long>("source");
 
+            var booruMax = Enum.GetValues(typeof(BooruType)).Cast<int>().Max();
+            if ((int)type < 0 || (int)type > booruMax)
+            {
+                throw new CommandFailed($"The booru given in parameter must be between 0 and {booruMax}");
+            }
+
             ABooru booru = type switch
             {
                 BooruType.Safebooru => StaticObjects.Safebooru,
