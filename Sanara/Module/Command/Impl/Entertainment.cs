@@ -144,10 +144,10 @@ namespace Sanara.Module.Command.Impl
             {
                 text = sentence,
             });
-            await ctx.ReplyAsync(embed: new EmbedBuilder
+            await ctx.ReplyAsync(await StaticObjects.HttpClient.GetStreamAsync(resp.output_url), $"image{Path.GetExtension(resp.output_url)}", embed: new EmbedBuilder
             {
                 Color = Color.Blue,
-                ImageUrl = resp.output_url
+                ImageUrl = $"attachment://image{Path.GetExtension(resp.output_url)}"
             }.Build());
         }
     }
