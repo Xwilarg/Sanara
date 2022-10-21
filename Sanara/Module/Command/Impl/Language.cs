@@ -23,7 +23,7 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "translate",
-                        Description = "Translate a sentence",
+                        Description = "Translate a sentence or an image",
                         Options = new()
                         {
                             new SlashCommandOptionBuilder()
@@ -36,9 +36,16 @@ namespace Sanara.Module.Command.Impl
                             new SlashCommandOptionBuilder()
                             {
                                 Name = "sentence",
-                                Description = "Sentence to translate or URL to an image",
+                                Description = "Sentence to translate",
                                 Type = ApplicationCommandOptionType.String,
-                                IsRequired = true
+                                IsRequired = false
+                            },
+                            new SlashCommandOptionBuilder()
+                            {
+                                Name = "image",
+                                Description = "Image to translate",
+                                Type = ApplicationCommandOptionType.Attachment,
+                                IsRequired = false
                             }
                         }
                     }.Build(),
@@ -121,7 +128,13 @@ namespace Sanara.Module.Command.Impl
             }
 
             var language = ctx.GetArgument<string>("language")!;
-            var sentence = ctx.GetArgument<string>("sentence")!;
+            var sentence = ctx.GetArgument<string>("sentence");
+            var image = ctx.GetArgument<IAttachment>("image");
+
+            if ((image == null && sentence == null) || (image != null && sentence != null))
+            {
+                throw new CommandFailed("You must either precise the sentence argument xor the image one");
+            }
 
             if (StaticObjects.ISO639Reverse.ContainsKey(language))
                 language = StaticObjects.ISO639Reverse[language];
@@ -129,7 +142,7 @@ namespace Sanara.Module.Command.Impl
             if (language.Length != 2)
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
-            await ctx.ReplyAsync(embed: await Utility.Language.GetTranslationEmbedAsync(sentence, language));
+            await ctx.ReplyAsync(embed: await Utility.Language.GetTranslationEmbedAsync(sentence ?? image!.Url, language));
         }
 
         public async Task UrbanAsync(ICommandContext ctx)

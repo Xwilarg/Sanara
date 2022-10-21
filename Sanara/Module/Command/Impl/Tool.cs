@@ -189,9 +189,9 @@ namespace Sanara.Module.Command.Impl
                         {
                             new SlashCommandOptionBuilder()
                             {
-                                Name = "url",
-                                Description = "URL to an image",
-                                Type = ApplicationCommandOptionType.String,
+                                Name = "image",
+                                Description = "Image",
+                                Type = ApplicationCommandOptionType.Attachment,
                                 IsRequired = true
                             }
                         }
@@ -253,8 +253,8 @@ namespace Sanara.Module.Command.Impl
 
         public async Task OCRAsync(ICommandContext ctx)
         {
-            var input = ctx.GetArgument<string>("url");
-            var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input);
+            var input = ctx.GetArgument<IAttachment>("image");
+            var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input.Url);
             TextAnnotation response;
             try
             {
@@ -268,7 +268,7 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("There is no text on the image.");
 
             var embed = new EmbedBuilder();
-            var img = SixLabors.ImageSharp.Image.Load(await StaticObjects.HttpClient.GetStreamAsync(input));
+            var img = SixLabors.ImageSharp.Image.Load(await StaticObjects.HttpClient.GetStreamAsync(input.Url));
             var pen = new Pen(SixLabors.ImageSharp.Color.Red, 2f);
 
             foreach (var page in response.Pages)

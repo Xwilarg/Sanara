@@ -55,6 +55,10 @@ namespace Sanara.Module.Command.Context
                                 }
                                 break;
 
+                            case ApplicationCommandOptionType.Attachment:
+                                argsDict.Add(arg.Name, new UrlAttachment(data));
+                                break;
+
                             case ApplicationCommandOptionType.Integer:
                                 {
                                     if (long.TryParse(data, out var value))
