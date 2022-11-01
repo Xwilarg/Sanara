@@ -66,6 +66,7 @@ namespace Sanara.Database
         {
             var newDay = DateTime.UtcNow.ToString("yyyyMMdd");
             if (newDay == CurrentDay) return false;
+            CurrentDay = newDay;
             await _r.Db(_dbName).Table("Data").Update(_r.HashMap("id", "currentDay")
                        .With("value", newDay)
                    ).RunAsync(_conn);
