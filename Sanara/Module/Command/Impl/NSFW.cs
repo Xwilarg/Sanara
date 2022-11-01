@@ -350,61 +350,11 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed($"The rating given must be between 2 and 5");
             }
 
-            string url = $"https://e-hentai.org/?f_cats={category}&f_search=" + Uri.EscapeDataString(tags);
-            if (ratingInput != 0)
-            {
-                url += $"&advsearch=1&f_sname=on&f_stags=on&f_sr=on&f_srdd={ratingInput}";
-            }
-            string html = await StaticObjects.HttpClient.GetStringAsync(url);
-            Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
-
-            if (!m.Success)
-            {
-                throw new CommandFailed($"There is no {name} with these tags{(ratingInput != 0 ? ", this might be due to the rating given in parameter being too high" : string.Empty)}");
-            }
-
-            int rand = StaticObjects.Random.Next(0, int.Parse(m.Groups[1].Value.Replace(",", ""))); // Number is displayed like 10,000 so we remove the comma to parse it
-            html = await StaticObjects.HttpClient.GetStringAsync(url + "&page=" + (rand / 25)); // There are 25 results by page
-            var sM = Regex.Matches(html, "<a href=\"(https:\\/\\/e-hentai\\.org\\/g\\/([a-z0-9]+)\\/([a-z0-9]+)\\/)\"")[rand % 25];
-            string finalUrl = sM.Groups[1].Value + "?nw=always";
-            html = await StaticObjects.HttpClient.GetStringAsync(finalUrl);
-
-            // Getting tags
-            List<string> allTags = new();
-            string htmlTags = html.Split(new[] { "taglist" }, StringSplitOptions.None)[1].Split(new[] { "Showing" }, StringSplitOptions.None)[0];
-            foreach (Match match in Regex.Matches(htmlTags, ">([^<]+)<\\/a><\\/div>"))
-                allTags.Add(match.Groups[1].Value);
-
-            // To get the cover image, we first must go the first image of the gallery then we get it
-            string htmlCover = await StaticObjects.HttpClient.GetStringAsync(Regex.Match(html, "<a href=\"([^\"]+)\"><img alt=\"0*1\"").Groups[1].Value);
-            string imageUrl = Regex.Match(htmlCover, "<img id=\"img\" src=\"([^\"]+)\"").Groups[1].Value;
-
-            // Getting rating
-            string rating = Regex.Match(html, "average_rating = ([0-9.]+)").Groups[1].Value;
-
-            var token = $"ehentai-{Guid.NewGuid()}/{sM.Groups[2].Value}/{sM.Groups[3].Value}/{name}";
-            StaticObjects.EHentai.Add(token);
-            var button = new ComponentBuilder()
-                .WithButton("Download", token);
-
-            var embed = new EmbedBuilder
-            {
-                Color = new Color(255, 20, 147),
-                Description = string.Join(", ", allTags),
-                Title = HttpUtility.HtmlDecode(Regex.Match(html, "<title>(.+) - E-Hentai Galleries<\\/title>").Groups[1].Value),
-                Url = finalUrl,
-                ImageUrl = $"attachment://image{Path.GetExtension(imageUrl)}",
-                Fields = new List<EmbedFieldBuilder>
-                    {
-                        new EmbedFieldBuilder
-                        {
-                            Name = "Rating",
-                            Value = rating,
-                            IsInline = true
-                        }
-                    }
-            }.Build();
-            await ctx.ReplyAsync(await StaticObjects.HttpClient.GetStreamAsync(imageUrl), $"image{Path.GetExtension(imageUrl)}", embed: embed, components: button.Build());
+            var pageCount = await EHentai.GetEHentaiContentCountAsync(name, category, (int)ratingInput, tags);
+            var rand = StaticObjects.Random.Next(0, pageCount);
+            var matches = await EHentai.GetAllMatchesAsync(category, (int)ratingInput, tags, rand / 25); // There are 25 results by page
+            var target = matches[rand % 25];
+            await EHentai.SendEmbedAsync(ctx, name, target);
         }
 
         public async Task BooruAsync(ICommandContext ctx)

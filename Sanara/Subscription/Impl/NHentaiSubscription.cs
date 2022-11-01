@@ -1,13 +1,17 @@
-﻿using Discord;
-/*
+﻿/*using Discord;
+using Sanara.Module.Utility;
+
 namespace Sanara.Subscription.Impl
 {
     public class NHentaiSubscription : ISubscription
     {
-        public async Task<FeedItem[]> GetFeedAsync(int current)
+        public bool DeleteOldMessage => false;
+
+        public async Task<FeedItem[]> GetFeedAsync(int current, bool _)
         {
-            var datas = await SearchClient.SearchAsync();
-            List<FeedItem> finalDatas = new();
+            var matches = await EHentai.GetAllMatchesAsync(1021, 0, string.Empty, 0); // There are 25 results by page
+            var target = matches[rand % 25];
+            await EHentai.SendEmbedAsync(ctx, name, target);
             foreach (var x in datas.elements)
             {
                 if (x.id == current)
@@ -31,5 +35,4 @@ namespace Sanara.Subscription.Impl
         public string GetName()
             => "nhentai";
     }
-}
-*/
+}*/
