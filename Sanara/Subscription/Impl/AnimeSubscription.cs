@@ -8,6 +8,8 @@ namespace Sanara.Subscription.Impl
 {
     public class AnimeSubscription : ISubscription
     {
+        public bool DeleteOldMessage => false;
+
         public async Task<FeedItem[]> GetFeedAsync(int current, bool _)
         {
             List<FeedItem> items = new();

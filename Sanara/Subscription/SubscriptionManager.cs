@@ -30,8 +30,7 @@ namespace Sanara.Subscription
 
                 try
                 {
-                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), await StaticObjects.Db.CheckForDayUpdateAsync());
-                    if (feed.Length > 0)
+                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), false);
                         await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed[0].Id); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
                 }
                 catch (System.Exception e)
@@ -93,6 +92,15 @@ namespace Sanara.Subscription
                         {
                             try
                             {
+                                // Subscription that works daily need to remove the previous message
+                                if (sub.DeleteOldMessage)
+                                {
+                                    var lastMsg = await elem.TextChan.GetMessagesAsync(1).FlattenAsync();
+                                    if (lastMsg.Any() && lastMsg.ElementAt(0).Author.Id == StaticObjects.ClientId)
+                                    {
+                                        await lastMsg.ElementAt(0).DeleteAsync();
+                                    }
+                                }
                                 foreach (var data in feed)
                                 {
                                     if (elem.Tags.IsTagValid(data.Tags)) // Check if tags are valid with black/whitelist

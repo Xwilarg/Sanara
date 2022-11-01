@@ -5,6 +5,8 @@ namespace Sanara.Subscription.Impl
 {
     public class InspireSubscription : ISubscription
     {
+        public bool DeleteOldMessage => true;
+
         public async Task<FeedItem[]> GetFeedAsync(int current, bool isNewDay)
         {
             if (!isNewDay)
