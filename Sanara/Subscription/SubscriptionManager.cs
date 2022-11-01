@@ -79,11 +79,11 @@ namespace Sanara.Subscription
 
         private async Task Update()
         {
+            var isNewDay = await StaticObjects.Db.CheckForDayUpdateAsync();
             foreach (var sub in _subscriptions)
             {
                 try
                 {
-                    var isNewDay = await StaticObjects.Db.CheckForDayUpdateAsync();
                     var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), isNewDay);
                     if (feed.Length > 0) // If there is anything new in the feed compared to last time
                     {

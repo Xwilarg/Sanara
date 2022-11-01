@@ -9,7 +9,7 @@ namespace Sanara.Subscription.Impl
 
         public async Task<FeedItem[]> GetFeedAsync(int current, bool isNewDay)
         {
-            if (!isNewDay)
+            if (isNewDay)
             {
                 var inspire = await Inspire.GetInspireAsync();
                 return new[] { new FeedItem(inspire.GetHashCode(), new EmbedBuilder()
