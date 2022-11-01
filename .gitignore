@@ -1,3 +1,4 @@
+.infersharpconfig
 rethinkdb-*/
 *coverage.xml
 results.xml
