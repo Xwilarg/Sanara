@@ -60,6 +60,10 @@ namespace Sanara.Database
                     ).RunAsync(_conn);
                 CurrentDay = currDay;
             }
+            else
+            {
+                CurrentDay = (await _r.Db(_dbName).Table("Data").Get("currentDay").RunAsync(_conn))["value"];
+            }
         }
 
         public async Task<bool> CheckForDayUpdateAsync()
