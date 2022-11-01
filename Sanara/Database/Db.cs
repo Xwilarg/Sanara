@@ -43,11 +43,33 @@ namespace Sanara.Database
             // Current subscriptions
             await CreateIfDontExistsAsync(_dbName, "Subscriptions");
 
+            // Global information
+            await CreateIfDontExistsAsync(_dbName, "Data");
+
             await InitStatsAsync();
 
             var tmp = (Cursor<Subscription>)await _r.Db(_dbName).Table("Subscriptions").RunAsync<Subscription>(_conn);
             while (tmp.MoveNext())
                 _subscriptionProgress.Add(tmp.Current.id, tmp.Current.value);
+
+            if (await _r.Db(_dbName).Table("Data").GetAll("currentDay").Count().Eq(0).RunAsync<bool>(_conn))
+            {
+                var currDay = DateTime.UtcNow.ToString("yyyyMMdd");
+                await _r.Db(_dbName).Table("Data").Insert(_r.HashMap("id", "currentDay")
+                        .With("value", currDay)
+                    ).RunAsync(_conn);
+                CurrentDay = currDay;
+            }
+        }
+
+        public async Task<bool> CheckForDayUpdateAsync()
+        {
+            var newDay = DateTime.UtcNow.ToString("yyyyMMdd");
+            if (newDay == CurrentDay) return false;
+            await _r.Db(_dbName).Table("Data").Update(_r.HashMap("id", "currentDay")
+                       .With("value", newDay)
+                   ).RunAsync(_conn);
+            return true;
         }
 
         private async Task CreateIfDontExistsAsync(string dbName, string tableName)
@@ -72,7 +94,10 @@ namespace Sanara.Database
                 guild = await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync<Guild>(_conn);
                 var sub = await GetSubscriptionAsync(sGuild, "anime");
                 if (sub != null)
-                    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new AnimeTags(Array.Empty<string>(), false)));
+                    _subscriptions["anime"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new DefaultTags(Array.Empty<string>(), false)));
+                sub = await GetSubscriptionAsync(sGuild, "inspire");
+                if (sub != null)
+                    _subscriptions["inspire"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new DefaultTags(Array.Empty<string>(), false)));
                 //sub = await GetSubscriptionAsync(sGuild, "nhentai");
                 //if (sub != null)
                 //    _subscriptions["nhentai"].Add(sGuild.Id, new SubscriptionGuild(sub.Item1, new NHentaiTags(sub.Item2, false)));
@@ -304,5 +329,7 @@ namespace Sanara.Database
         private Dictionary<string, Dictionary<ulong, SubscriptionGuild>> _subscriptions; // All guild subscriptions
         private Dictionary<string, int> _subscriptionProgress;
         public Guild GetGuild(ulong id) => _guilds[id];
+
+        public string CurrentDay { private set; get; }
     }
 }

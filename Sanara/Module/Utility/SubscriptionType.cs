@@ -3,6 +3,7 @@
     public enum SubscriptionType
     {
         Doujinshi,
-        Anime
+        Anime,
+        Inspiration
     }
 }

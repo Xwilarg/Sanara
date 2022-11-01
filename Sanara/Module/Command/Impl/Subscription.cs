@@ -45,6 +45,11 @@ namespace Sanara.Module.Command.Impl
                                         Name = "Anime (SFW)",
                                         Value = (int)SubscriptionType.Anime
                                     },
+                                    new ApplicationCommandOptionChoiceProperties()
+                                    {
+                                        Name = "Inspiration (SFW)",
+                                        Value = (int)SubscriptionType.Inspiration
+                                    },
                                     /*
 #if NSFW_BUILD
                                     new ApplicationCommandOptionChoiceProperties()
@@ -86,14 +91,16 @@ namespace Sanara.Module.Command.Impl
             {
                 SubscriptionType.Anime => "anime",
                 SubscriptionType.Doujinshi => "nhentai",
+                SubscriptionType.Inspiration => "inspire",
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             }, channel, type switch
             {
-                SubscriptionType.Anime => new AnimeTags(tags, true),
+                SubscriptionType.Anime => new DefaultTags(tags, true),
                 SubscriptionType.Doujinshi => new NHentaiTags(tags, true),
+                SubscriptionType.Inspiration => new DefaultTags(tags, true),
                 _ => throw new NotImplementedException("Invalid subscription type " + type)
             });
-            await ctx.ReplyAsync($"You subscribed for {type} in {channel.Mention}, use the configure command to remove it");
+            await ctx.ReplyAsync($"You subscribed for {type} in {channel.Mention}, use the configure command to remove it\nNew message will be sent either every day or when new content is available, depending of the type of subscription");
         }
     }
 }

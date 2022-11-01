@@ -11,7 +11,8 @@ namespace Sanara.Subscription
             _subscriptions = new ISubscription[]
             {
                 // new NHentaiSubscription(),
-                new AnimeSubscription()
+                new AnimeSubscription(),
+                new InspireSubscription()
             };
         }
 
@@ -29,7 +30,7 @@ namespace Sanara.Subscription
 
                 try
                 {
-                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()));
+                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), await StaticObjects.Db.CheckForDayUpdateAsync());
                     if (feed.Length > 0)
                         await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed[0].Id); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
                 }
@@ -83,7 +84,8 @@ namespace Sanara.Subscription
             {
                 try
                 {
-                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()));
+                    var isNewDay = await StaticObjects.Db.CheckForDayUpdateAsync();
+                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), isNewDay);
                     if (feed.Length > 0) // If there is anything new in the feed compared to last time
                     {
                         await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed[0].Id);

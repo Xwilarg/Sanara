@@ -8,7 +8,7 @@ namespace Sanara.Subscription.Impl
 {
     public class AnimeSubscription : ISubscription
     {
-        public async Task<FeedItem[]> GetFeedAsync(int current)
+        public async Task<FeedItem[]> GetFeedAsync(int current, bool _)
         {
             List<FeedItem> items = new();
             foreach (var node in await GetFeedInternalAsync())

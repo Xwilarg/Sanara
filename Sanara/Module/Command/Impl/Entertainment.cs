@@ -2,6 +2,7 @@
 using Discord;
 using Sanara.Exception;
 using Sanara.Help;
+using Sanara.Module.Utility;
 using System.Text.RegularExpressions;
 using VndbSharp;
 using VndbSharp.Models;
@@ -91,7 +92,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: new EmbedBuilder
             {
                 Color = Color.Blue,
-                ImageUrl = await StaticObjects.HttpClient.GetStringAsync("https://inspirobot.me/api?generate=true")
+                ImageUrl = await Inspire.GetInspireAsync()
             }.Build());
         }
 
