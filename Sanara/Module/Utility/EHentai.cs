@@ -20,8 +20,9 @@ namespace Sanara.Module.Utility
 
         public static async Task<int> GetEHentaiContentCountAsync(string name, int category, int rating, string tags)
         {
-            string html = await StaticObjects.HttpClient.GetStringAsync(GetUrl(category, rating, tags));
-            Match m = Regex.Match(html, "Showing ([0-9,]+) result"); // Get number of results
+            var url = GetUrl(category, rating, tags);
+            string html = await StaticObjects.HttpClient.GetStringAsync(url);
+            Match m = Regex.Match(html, "Found about ([0-9,]+) result"); // Get number of results
 
             if (!m.Success)
             {
