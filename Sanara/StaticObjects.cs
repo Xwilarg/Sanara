@@ -121,18 +121,12 @@ namespace Sanara
 
         // ENTERTAINMENT MODULE
         /// <summary>
-        /// Auth used for kitsu.io requests (Anime search)
+        /// Auth used for anilist.co requests (Anime search)
         /// </summary>
-        public static HttpRequestMessage? KitsuAuth { set; get; }
+        public static string? AniListToken { set; get; }
 
         public static DeepAI_API? DeepAI { set; get; }
 
-        /// <summary>
-        /// Authentification token used for kitsu.io
-        /// </summary>
-        public static string? KitsuAccessToken { set; get; }
-        public static DateTime KitsuRefreshDate { set; get; }
-        public static string? KitsuRefreshToken { set; get; }
         /// <summary>
         /// VNDB client (visual novel search)
         /// </summary>
@@ -341,6 +335,8 @@ namespace Sanara
                 DebugGuildId = ulong.Parse(credentials.DebugGuild);
             }
 
+            AniListToken = credentials.AniListKey;
+
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 
             if (credentials.SentryKey != null)
@@ -413,19 +409,6 @@ namespace Sanara
             if (credentials.DeepAIKey != null)
             {
                 DeepAI = new DeepAI_API(credentials.DeepAIKey);
-            }
-
-            if (credentials.KitsuEmail != null)
-            {
-                KitsuAuth = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token")
-                {
-                    Content = new FormUrlEncodedContent(new Dictionary<string, string>
-                    {
-                        { "grant_type", "password" },
-                        { "username", credentials.KitsuEmail },
-                        { "password", credentials.KitsuPassword }
-                    })
-                };
             }
 
             if (credentials.UploadWebsiteLocation != null)

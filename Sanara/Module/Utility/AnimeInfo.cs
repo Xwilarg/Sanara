@@ -2,35 +2,52 @@
 {
     public record AnimeInfo
     {
-        public Attributes Attributes;
+        public AnimeData data;
     }
 
-    public record Attributes
+    public record AnimeData
     {
-        public string Subtype;
-        public bool Nsfw;
-        public string Synopsis;
-        public string CanonicalTitle;
-        public string Slug;
-        public PosterImage PosterImage;
-        public Titles Titles;
-        public string AverageRating;
-        public string EpisodeCount;
-        public string EpisodeLength;
-        public string StartDate;
-        public string EndDate;
-        public string AgeRatingGuide;
+        public AnimeContainer anime;
     }
 
-    public record PosterImage
+    public record AnimeContainer
     {
-        public string Original;
+        public AnimeResult[] media;
     }
 
-    public record Titles
+    public record AnimeResult
     {
-        public string En;
-        public string En_jp;
-        public string En_us;
+        public int id;
+        public AnimeTitle title;
+        public bool isAdult;
+        public string description;
+        public AnimeCover coverImage;
+        public int? averageScore;
+        public int? episodes;
+        public int? duration;
+        public FuzzyDate startDate;
+        public FuzzyDate endDate;
+        public string source;
+        public string format;
+        public string type;
+    }
+
+    public record AnimeTitle
+    {
+        public string romaji;
+        public string native;
+        public string english;
+    }
+
+    public record AnimeCover
+    {
+        public string large;
+    }
+
+    public record FuzzyDate
+    {
+        public int? year;
+        public int? month;
+        public int? day;
     }
 }

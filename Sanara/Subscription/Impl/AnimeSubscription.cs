@@ -23,8 +23,11 @@ namespace Sanara.Subscription.Impl
                 try
                 {
                     var result = await Module.Command.Impl.Tool.SearchMediaAsync(JapaneseMedia.Anime, animeName, true);
-                    if (result.Attributes.Synopsis != null)
-                        description = result.Attributes.Synopsis.Length > 1000 ? result.Attributes.Synopsis[..1000] + " [...]" : result.Attributes.Synopsis;
+                    if (result == null)
+                        throw new CommandFailed(string.Empty);
+                    if (result.description != null)
+                        description = result.description.Length > 1000 ? result.description[..1000] + " [...]" : result.description;
+                    description = Utils.CleanHtml(description);
                 }
                 catch (CommandFailed) // Can't find an anime with this name
                 { }

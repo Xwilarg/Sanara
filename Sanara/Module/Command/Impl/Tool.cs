@@ -2,6 +2,7 @@
 using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Quickenshtein;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
@@ -9,7 +10,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Processing;
 using System.Net;
-using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using VndbSharp;
@@ -464,7 +465,7 @@ namespace Sanara.Module.Command.Impl
             var response = await StaticObjects.HttpClient.SendAsync(request);
             var searchResults = JsonConvert.DeserializeObject<JArray>(await response.Content.ReadAsStringAsync());
 
-            if (searchResults.Count == 0)
+            if (!searchResults.Any())
                 throw new CommandFailed("Nothing was found with this name.");
 
             var id = searchResults.First().Value<int>("id");
@@ -518,138 +519,111 @@ namespace Sanara.Module.Command.Impl
         {
             var name = ctx.GetArgument<string>("name");
             var media = (JapaneseMedia)ctx.GetArgument<long>("type");
-            var answer = (await SearchMediaAsync(media, name)).Attributes;
+            var answer = await SearchMediaAsync(media, name);
 
-            if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.Nsfw)
+            if (answer == null)
+                throw new CommandFailed("Nothing was found with this name.");
+
+            if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.isAdult)
                 throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
 
             var description = "";
-            if (!string.IsNullOrEmpty(answer.Synopsis))
-                description = answer.Synopsis.Length > 1000 ? answer.Synopsis[..1000] + " [...]" : answer.Synopsis; // Description that fill the whole screen are a pain
+            if (!string.IsNullOrEmpty(answer.description))
+                description = answer.description.Length > 1000 ? answer.description[..1000] + " [...]" : answer.description; // Description that fill the whole screen are a pain
+            description = Utils.CleanHtml(description);
+
             var embed = new EmbedBuilder
             {
-                Title = answer.CanonicalTitle,
-                Color = answer.Nsfw ? new Color(255, 20, 147) : Color.Green,
-                Url = "https://kitsu.io/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "/" + answer.Slug,
+                Title = answer.title.romaji,
+                Color = answer.isAdult ? new Color(255, 20, 147) : Color.Green,
+                Url = $"https://anilist.co/{(media == JapaneseMedia.Anime ? "anime" : "manga")}/{answer.id}",
                 Description = description,
-                ImageUrl = answer.PosterImage.Original
+                ImageUrl = answer.coverImage.large
             };
-            if (!string.IsNullOrEmpty(answer.Titles?.En) && answer.Titles?.En != answer.CanonicalTitle) // No use displaying this if it's the same as the embed title
-                embed.AddField("English Title", answer.Titles!.En, true);
-            if (!string.IsNullOrEmpty(null))
-                embed.AddField("Kitsu User Rating", answer.AverageRating, true);
-            if (media == JapaneseMedia.Anime && !string.IsNullOrEmpty(answer.EpisodeCount))
-                embed.AddField("Episode Count", answer.EpisodeCount + (answer.EpisodeLength != null ? $" ({answer.EpisodeLength} min per episode)" : ""), true);
-            if (!string.IsNullOrEmpty(answer.StartDate))
+
+            if (!string.IsNullOrEmpty(answer.title.english)) // No use displaying this if it's the same as the embed title
+                embed.AddField("English Title", answer.title.english, true);
+            if (answer.averageScore != null)
+                embed.AddField("User Average Rating", answer.averageScore, true);
+            if (media == JapaneseMedia.Anime && answer.episodes != null)
+                embed.AddField("Episode Count", answer.episodes + (answer.duration != null ? $" ({answer.duration} min per episode)" : ""), true);
+            if (answer.startDate.year == null)
                 embed.AddField("Release Date", "To Be Announced", true);
+            else if (answer.endDate == answer.startDate)
+                embed.AddField("Release Date", $"{answer.startDate.year}-{answer.startDate.month}-{answer.startDate.day}", true);
             else
-                embed.AddField("Release Date", answer.StartDate + " - " + (answer.EndDate ?? "???"), true);
-            if (!string.IsNullOrEmpty(answer.AgeRatingGuide))
-                embed.AddField("Audiance Warning", answer.AgeRatingGuide, true);
+                embed.AddField("Release Date", $"{answer.startDate.year}-{answer.startDate.month}-{answer.startDate.day}" + " - " + (answer.endDate.year == null ? "???" : $"{answer.endDate.year}-{answer.endDate.month}-{answer.endDate.day}"), true);
+            if (!string.IsNullOrEmpty(answer.source))
+                embed.AddField("Source", Utils.ToWordCase(answer.source), true);
+            if (!string.IsNullOrEmpty(answer.type))
+                embed.AddField("Type", Utils.ToWordCase(answer.type), true);
+            if (!string.IsNullOrEmpty(answer.format))
+                embed.AddField("Format", answer.format, true);
+
             await ctx.ReplyAsync(embed: embed.Build());
         }
 
-        public static async Task<AnimeInfo> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
+        public static async Task<AnimeResult?> SearchMediaAsync(JapaneseMedia media, string query, bool onlyExactMatch = false)
         {
             // Authentification is required to see NSFW content
-            if (StaticObjects.KitsuAuth != null)
+            if (StaticObjects.AniListToken == null)
+                throw new CommandFailed("Anime service is not available (missing API key in Credentials file)");
+
+            var json = JsonConvert.SerializeObject(new GraphQL
             {
-                if (StaticObjects.KitsuAccessToken == null) // Get access token
+                query = "query ($search: String) { anime: Page(perPage: 8) { media(type: " + (media == JapaneseMedia.Anime ? "ANIME" : "MANGA") + ", search: $search) { id title { romaji english native } isAdult description(asHtml: false) coverImage { large } averageScore episodes duration startDate { year month day } endDate { year month day } source(version: 3) format type } } }",
+                variables = new Dictionary<string, dynamic>
                 {
-                    var answer = await StaticObjects.HttpClient.SendAsync(StaticObjects.KitsuAuth);
-                    var authJson = JsonConvert.DeserializeObject<JObject>(await answer.Content.ReadAsStringAsync());
-                    StaticObjects.KitsuAccessToken = authJson["access_token"].Value<string>();
-                    StaticObjects.KitsuRefreshDate = DateTime.Now.AddSeconds(authJson["expires_in"].Value<int>());
-                    StaticObjects.KitsuRefreshToken = authJson["refresh_token"].Value<string>();
+                    { "search", query }
                 }
-                else if (DateTime.Now > StaticObjects.KitsuRefreshDate) // Access token expired, need to refresh it
-                {
-                    var tokenReq = new HttpRequestMessage(HttpMethod.Post, "https://kitsu.io/api/oauth/token")
-                    {
-                        Content = new FormUrlEncodedContent(new Dictionary<string, string>
-                        {
-                            { "grant_type", "refresh_token" },
-                            { "refresh_token", StaticObjects.KitsuRefreshToken }
-                        })
-                    };
-                    var answer = await StaticObjects.HttpClient.SendAsync(tokenReq);
-                    var authJson = JsonConvert.DeserializeObject<JObject>(await answer.Content.ReadAsStringAsync());
-                    if (authJson["error"] != null)
-                    {
-                        await Log.LogErrorAsync(new System.Exception($"{authJson["error"].Value<string>()}: {authJson["error_description"].Value<string>()}"), null);
-                    }
-                    else
-                    {
-                        StaticObjects.KitsuAccessToken = authJson["access_token"].Value<string>();
-                        StaticObjects.KitsuRefreshDate = DateTime.Now.AddSeconds(authJson["expires_in"].Value<int>());
-                        StaticObjects.KitsuRefreshToken = authJson["refresh_token"].Value<string>();
-                    }
-                }
+            });
+
+            var answer = await StaticObjects.HttpClient.PostAsync("https://graphql.anilist.co", new StringContent(json, Encoding.UTF8, "application/json"));
+           // answer.EnsureSuccessStatusCode();
+
+            var str = await answer.Content.ReadAsStringAsync();
+
+            var results = JsonConvert.DeserializeObject<AnimeInfo>(str);
+
+            var target = results.data.anime.media;
+            var search = query.ToUpperInvariant();
+            if (onlyExactMatch)
+            {
+                return target.FirstOrDefault(x =>
+                 search == (x.title.english?.ToUpperInvariant() ?? "") ||
+                 search == (x.title.native?.ToUpperInvariant() ?? "") ||
+                 search == (x.title.romaji?.ToUpperInvariant() ?? ""));
             }
 
-            var request = new HttpRequestMessage()
+            if (!target.Any())
             {
-                RequestUri = new Uri("https://kitsu.io/api/edge/" + (media == JapaneseMedia.Anime ? "anime" : "manga") + "?page[limit]=5&filter[text]=" + HttpUtility.UrlEncode(query)),
-                Method = HttpMethod.Get
-            };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", StaticObjects.KitsuAccessToken);
-            // For anime we need to contact the anime endpoint, manga and light novels are on the manga endpoint
-            // The limit=5 is because we only take the 5 firsts results to not end up with things that are totally unrelated
-            var json = JsonConvert.DeserializeObject<JObject>(await (await StaticObjects.HttpClient.SendAsync(request)).Content.ReadAsStringAsync());
-
-            var data = json!["data"]!.Value<JArray>()!.ToObject<AnimeInfo[]>();
-
-            // Filter data depending of wanted media
-            AnimeInfo[] allData;
-            if (media == JapaneseMedia.Manga)
-                allData = data.Where(x => x.Attributes.Subtype != "novel").ToArray();
-            else if (media == JapaneseMedia.LightNovel)
-                allData = data.Where(x => x.Attributes.Subtype == "novel").ToArray();
-            else
-                allData = data.ToArray();
-
-            if (allData.Length == 0)
-                throw new CommandFailed("Nothing was found with this name.");
-
-            string cleanName = Utils.CleanWord(query); // Cleaned word for comparaisons
-
-            // If we can find an exact match, we go with that
-            string upperName = query.ToUpperInvariant();
-            foreach (var elem in allData)
-            {
-                var answer = elem.Attributes;
-                if (answer.CanonicalTitle.ToUpperInvariant() == upperName ||
-                    answer.Titles.En?.ToUpperInvariant() == upperName ||
-                    answer.Titles.En_jp?.ToUpperInvariant() == upperName ||
-                    answer.Titles.En_us?.ToUpperInvariant() == upperName)
-                {
-                    return elem;
-                }
+                return null;
             }
 
-            if (onlyExactMatch) // Used by subscriptions (because we want to be 100% sure to not match the wrong anime)
-                throw new CommandFailed("Nothing was found with this name");
+            var ordered = target.Select(x => // Get the closest title to what we are looking for
+                (x, Math.Min(Math.Min(Levenshtein.GetDistance(search, x.title.english?.ToUpperInvariant() ?? ""),
+                    Levenshtein.GetDistance(search, x.title.romaji?.ToUpperInvariant() ?? "")),
+                        Levenshtein.GetDistance(search, x.title.native?.ToUpperInvariant() ?? "")))).OrderBy(x => x.Item2).ToArray();
 
-            // Else we try to find something that somehow match
-            foreach (var elem in allData)
+            var smallest = ordered.Where(x => x.Item2 == ordered[0].Item2); // Get all the items that have the smallest scores
+            if (smallest.Count() == 1) // There is only one so we pick this one
             {
-                var answer = elem.Attributes;
-                if (Utils.CleanWord(answer.CanonicalTitle).Contains(cleanName) ||
-                    Utils.CleanWord(answer.Titles.En?.ToUpperInvariant() ?? "").Contains(cleanName) ||
-                    Utils.CleanWord(answer.Titles.En_jp?.ToUpperInvariant() ?? "").Contains(cleanName) ||
-                    Utils.CleanWord(answer.Titles.En_us?.ToUpperInvariant() ?? "").Contains(cleanName))
-                {
-                    // We would rather find the episodes and not some OVA/ONA
-                    // We don't filter them before so we can fallback on them if we find nothing else
-                    if (media == JapaneseMedia.Anime && elem.Attributes.Subtype != "TV")
-                        continue;
-
-                    return elem;
-                }
+                return smallest.First().x;
             }
 
-            // Otherwise, we just fall back on the first result available
-            return allData[0];
+            var tv = ordered.Where(x => x.x.format == "TV"); // Else we try to get the one that is on "TV" format
+            if (tv.Any())
+            {
+                return tv.First().x;
+            }
+
+            return ordered.First().x;
+        }
+
+        class GraphQL
+        {
+            public string query;
+            public Dictionary<string, dynamic> variables;
         }
     }
 }
