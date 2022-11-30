@@ -30,6 +30,8 @@
         public string source;
         public string format;
         public string type;
+        public AnimeTag[] tags;
+        public string[] genres;
     }
 
     public record AnimeTitle
@@ -49,5 +51,11 @@
         public int? year;
         public int? month;
         public int? day;
+    }
+
+    public record AnimeTag
+    {
+        public string name;
+        public int rank;
     }
 }

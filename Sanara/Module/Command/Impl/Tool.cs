@@ -525,7 +525,11 @@ namespace Sanara.Module.Command.Impl
                 throw new CommandFailed("Nothing was found with this name.");
 
             if (ctx.Channel is ITextChannel channel && !channel.IsNsfw && answer.isAdult)
+#if NSFW_BUILD
                 throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
+#else
+                throw new CommandFailed("Nothing was found with this name.");
+#endif
 
             var description = "";
             if (!string.IsNullOrEmpty(answer.description))
@@ -541,6 +545,8 @@ namespace Sanara.Module.Command.Impl
                 ImageUrl = answer.coverImage.large
             };
 
+            if (answer.tags.Any())
+                embed.AddField("Tags", string.Join(", ", answer.tags.Where(x => x.rank > 50).Select(x => x.name)));
             if (!string.IsNullOrEmpty(answer.title.english)) // No use displaying this if it's the same as the embed title
                 embed.AddField("English Title", answer.title.english, true);
             if (answer.averageScore != null)
@@ -566,6 +572,8 @@ namespace Sanara.Module.Command.Impl
                     "TV_SHORT" => "TV short",
                     _ => Utils.ToWordCase(answer.format.Replace('_', ' '))
                 }, true);
+            if (answer.genres.Any())
+                embed.AddField("Genres", string.Join(", ", answer.genres), true);
 
             await ctx.ReplyAsync(embed: embed.Build());
         }
@@ -578,7 +586,7 @@ namespace Sanara.Module.Command.Impl
 
             var json = JsonConvert.SerializeObject(new GraphQL
             {
-                query = "query ($search: String) { anime: Page(perPage: 10) { media(type: " + (media == JapaneseMedia.Anime ? "ANIME" : "MANGA") + ", search: $search) { id title { romaji english native } isAdult description(asHtml: false) coverImage { large } averageScore episodes duration startDate { year month day } endDate { year month day } source(version: 3) format type } } }",
+                query = "query ($search: String) { anime: Page(perPage: 10) { media(type: " + (media == JapaneseMedia.Anime ? "ANIME" : "MANGA") + ", search: $search) { id title { romaji english native } isAdult description(asHtml: false) coverImage { large } averageScore episodes duration startDate { year month day } endDate { year month day } source(version: 3) format type tags { name rank } genres } } }",
                 variables = new Dictionary<string, dynamic>
                 {
                     { "search", query }
@@ -586,7 +594,7 @@ namespace Sanara.Module.Command.Impl
             });
 
             var answer = await StaticObjects.HttpClient.PostAsync("https://graphql.anilist.co", new StringContent(json, Encoding.UTF8, "application/json"));
-           // answer.EnsureSuccessStatusCode();
+            answer.EnsureSuccessStatusCode();
 
             var str = await answer.Content.ReadAsStringAsync();
 
