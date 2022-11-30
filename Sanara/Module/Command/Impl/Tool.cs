@@ -550,15 +550,22 @@ namespace Sanara.Module.Command.Impl
             if (answer.startDate.year == null)
                 embed.AddField("Release Date", "To Be Announced", true);
             else if (answer.endDate == answer.startDate)
-                embed.AddField("Release Date", $"{answer.startDate.year}-{answer.startDate.month}-{answer.startDate.day}", true);
+                embed.AddField("Release Date", $"{answer.startDate.year}-{Utils.PadNumber(answer.startDate.month.Value)}-{Utils.PadNumber(answer.startDate.day.Value)}", true);
             else
-                embed.AddField("Release Date", $"{answer.startDate.year}-{answer.startDate.month}-{answer.startDate.day}" + " - " + (answer.endDate.year == null ? "???" : $"{answer.endDate.year}-{answer.endDate.month}-{answer.endDate.day}"), true);
+                embed.AddField("Release Date", $"{answer.startDate.year.Value}-{Utils.PadNumber(answer.startDate.month.Value)}-{Utils.PadNumber(answer.startDate.day.Value)}" + " - " + (answer.endDate.year == null ? "???" : $"{answer.endDate.year}-{Utils.PadNumber(answer.endDate.month.Value)}-{Utils.PadNumber(answer.endDate.day.Value)}"), true);
             if (!string.IsNullOrEmpty(answer.source))
-                embed.AddField("Source", Utils.ToWordCase(answer.source), true);
+                embed.AddField("Source", Utils.ToWordCase(answer.source.Replace('_', ' ')), true);
             if (!string.IsNullOrEmpty(answer.type))
                 embed.AddField("Type", Utils.ToWordCase(answer.type), true);
             if (!string.IsNullOrEmpty(answer.format))
-                embed.AddField("Format", answer.format, true);
+                embed.AddField("Format", answer.format switch
+                {
+                    "TV" => answer.format,
+                    "OVA" => answer.format,
+                    "ONA" => answer.format,
+                    "TV_SHORT" => "TV short",
+                    _ => Utils.ToWordCase(answer.format.Replace('_', ' '))
+                }, true);
 
             await ctx.ReplyAsync(embed: embed.Build());
         }
@@ -571,7 +578,7 @@ namespace Sanara.Module.Command.Impl
 
             var json = JsonConvert.SerializeObject(new GraphQL
             {
-                query = "query ($search: String) { anime: Page(perPage: 8) { media(type: " + (media == JapaneseMedia.Anime ? "ANIME" : "MANGA") + ", search: $search) { id title { romaji english native } isAdult description(asHtml: false) coverImage { large } averageScore episodes duration startDate { year month day } endDate { year month day } source(version: 3) format type } } }",
+                query = "query ($search: String) { anime: Page(perPage: 10) { media(type: " + (media == JapaneseMedia.Anime ? "ANIME" : "MANGA") + ", search: $search) { id title { romaji english native } isAdult description(asHtml: false) coverImage { large } averageScore episodes duration startDate { year month day } endDate { year month day } source(version: 3) format type } } }",
                 variables = new Dictionary<string, dynamic>
                 {
                     { "search", query }
@@ -593,6 +600,15 @@ namespace Sanara.Module.Command.Impl
                  search == (x.title.english?.ToUpperInvariant() ?? "") ||
                  search == (x.title.native?.ToUpperInvariant() ?? "") ||
                  search == (x.title.romaji?.ToUpperInvariant() ?? ""));
+            }
+
+            if (media == JapaneseMedia.LightNovel)
+            {
+                target = target.Where(x => x.format == "NOVEL").ToArray();
+            }
+            else if (media == JapaneseMedia.Manga)
+            {
+                target = target.Where(x => x.format != "NOVEL").ToArray();
             }
 
             if (!target.Any())
