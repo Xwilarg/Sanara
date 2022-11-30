@@ -26,12 +26,12 @@ namespace Sanara.UnitTests.Test
             var mod = new Module.Command.Impl.NSFW();
             var ctx = new TestCommandContext(new()
             {
-                { "tags", "kantai collection" }
+                { "tags", "touhou" }
             });
             await mod.DoujinshiAsync(ctx);
             Assert.NotNull(ctx.Result.Embed.Title);
             Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
-            Assert.Contains("kantai collection", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
+            Assert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
             Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
             // Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
@@ -42,12 +42,12 @@ namespace Sanara.UnitTests.Test
             var mod = new Module.Command.Impl.NSFW();
             var ctx = new TestCommandContext(new()
             {
-                { "tags", "kantai collection" }
+                { "tags", "touhou" }
             });
             await mod.CosplayAsync(ctx);
             Assert.NotNull(ctx.Result.Embed.Title);
             Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
-            Assert.Contains("kantai collection", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
+            Assert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
             Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
             // Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
