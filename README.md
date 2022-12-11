@@ -17,8 +17,8 @@ You can see the full list on [Sanara's command page](https://sanara.zirk.eu/comm
 You will also have the list of command by typing "/"
 
 ## How to invite her on my server
-You can just use her [invite link](https://discord.com/oauth2/authorize?client_id=329664361016721408&scope=bot%20applications.commands)<br/>
-Don't want to have NSFW commands? You can invite her [SFW version](https://discord.com/api/oauth2/authorize?client_id=883767204733157397&scope=bot%20applications.commands)
+You can just use her [invite link](https://discord.com/oauth2/authorize?client_id=329664361016721408&permissions=51264&scope=bot%20applications.commands)<br/>
+Don't want to have NSFW commands? You can invite her [SFW version](https://discord.com/api/oauth2/authorize?client_id=883767204733157397&permissions=51264&scope=bot%20applications.commands)
 
 ## Contact
 If you need anything you can come [open an issue](https://github.com/Xwilarg/Sanara/issues), [come to her official server](https://discordapp.com/invite/H6wMRYV) or contact Zirk#0001 on Discord.
