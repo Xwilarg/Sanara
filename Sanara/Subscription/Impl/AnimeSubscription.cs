@@ -13,12 +13,12 @@ namespace Sanara.Subscription.Impl
             List<FeedItem> items = new();
             foreach (var info in await GetFeedInternalAsync())
             {
-                items.Add(new FeedItem($"{info.id},{info.episode}".GetHashCode(), new EmbedBuilder
+                items.Add(new FeedItem(info.id.GetHashCode(), new EmbedBuilder
                 {
                     Color = Color.Blue,
-                    Title = info.media.title.romaji,
+                    Title = $"{info.media.title.romaji} (Episode {info.episode})",
                     Description = info.media.description,
-                    Url = $"https://anilist.co/anime/{info.id}",
+                    Url = $"https://anilist.co/anime/{info.media.id}",
                     ImageUrl = info.media.coverImage.large
                 }.Build(), Array.Empty<string>()));
             }
