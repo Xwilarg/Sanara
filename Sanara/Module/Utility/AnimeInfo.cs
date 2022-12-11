@@ -7,12 +7,20 @@
 
     public record AnimeData
     {
-        public AnimeContainer anime;
+        public AnimeContainer Page;
     }
 
     public record AnimeContainer
     {
         public AnimeResult[] media;
+        public AiringSchedule[] airingSchedules;
+    }
+
+    public record AiringSchedule
+    {
+        public int id;
+        public int episode;
+        public AnimeResult media;
     }
 
     public record AnimeResult

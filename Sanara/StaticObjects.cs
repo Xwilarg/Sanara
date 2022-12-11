@@ -120,10 +120,6 @@ namespace Sanara
         public static List<(string Tag, int Count)> JavmostCategories { set; get; } = new();
 
         // ENTERTAINMENT MODULE
-        /// <summary>
-        /// Auth used for anilist.co requests (Anime search)
-        /// </summary>
-        public static string? AniListToken { set; get; }
 
         public static DeepAI_API? DeepAI { set; get; }
 
@@ -334,8 +330,6 @@ namespace Sanara
             {
                 DebugGuildId = ulong.Parse(credentials.DebugGuild);
             }
-
-            AniListToken = credentials.AniListKey;
 
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", AppDomain.CurrentDomain.BaseDirectory + "/Keys/GoogleAPI.json");
 

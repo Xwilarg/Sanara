@@ -1,7 +1,5 @@
 ﻿using Discord;
-using Sanara.Exception;
 using Sanara.Module.Utility;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Sanara.Subscription.Impl
@@ -13,31 +11,15 @@ namespace Sanara.Subscription.Impl
         public async Task<FeedItem[]> GetFeedAsync(int current, bool _)
         {
             List<FeedItem> items = new();
-            foreach (var node in await GetFeedInternalAsync())
+            foreach (var info in await GetFeedInternalAsync())
             {
-                string title = GetAttribute(node, "title");
-                if (title.GetHashCode() == current)
-                    break;
-                string animeName = Regex.Match(title, "(^.+) #[0-9]+$").Groups[1].Value; // We get only the title (and remove things such as the episode name)
-                string description = "";
-                try
-                {
-                    var result = await Module.Command.Impl.Tool.SearchMediaAsync(JapaneseMedia.Anime, animeName, true);
-                    if (result == null)
-                        throw new CommandFailed(string.Empty);
-                    if (result.description != null)
-                        description = result.description.Length > 1000 ? result.description[..1000] + " [...]" : result.description;
-                    description = Utils.CleanHtml(description);
-                }
-                catch (CommandFailed) // Can't find an anime with this name
-                { }
-                items.Add(new FeedItem(title.GetHashCode(), new EmbedBuilder
+                items.Add(new FeedItem($"{info.id},{info.episode}".GetHashCode(), new EmbedBuilder
                 {
                     Color = Color.Blue,
-                    Title = title,
-                    Description = description,
-                    Url = GetAttribute(node, "guid"),
-                    ImageUrl = GetAttribute(node, "media:thumbnail", "url")
+                    Title = info.media.title.romaji,
+                    Description = info.media.description,
+                    Url = $"https://anilist.co/anime/{info.id}",
+                    ImageUrl = info.media.coverImage.large
                 }.Build(), Array.Empty<string>()));
             }
             return items.ToArray();
@@ -60,17 +42,9 @@ namespace Sanara.Subscription.Impl
             return null;
         }
 
-        private async Task<XmlNode[]> GetFeedInternalAsync()
+        private async Task<AiringSchedule[]> GetFeedInternalAsync()
         {
-            XmlDocument xml = new();
-            xml.LoadXml(await StaticObjects.HttpClient.GetStringAsync("https://www.livechart.me/feeds/episodes"));
-            List<XmlNode> nodes = new();
-            foreach (XmlNode node in xml.ChildNodes[1].FirstChild)
-            {
-                if (node.Name == "item")
-                    nodes.Add(node);
-            }
-            return nodes.ToArray();
+            return await AniList.GetAnimeFeedAsync();
         }
     }
 }

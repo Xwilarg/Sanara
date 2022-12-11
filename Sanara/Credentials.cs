@@ -5,7 +5,6 @@
         public string BotToken;
         public string UploadWebsiteUrl;
         public string UploadWebsiteLocation;
-        public string AniListKey;
         public string SentryKey;
         public string TopGgToken;
         public string MyDramaListApiKey;
