@@ -12,20 +12,27 @@ namespace Sanara.Subscription.Impl
         {
             List<FeedItem> items = new();
             var feed = await GetFeedInternalAsync();
-            for (int i = 0; i < feed.Length; i++)
+            foreach (var info in feed)
             {
-                var info = feed[i];
-                while (i + 1 < feed.Length && info.media.id == feed[i + 1].media.id && feed[i].episode == feed[i + 1].episode - 1)
+                if (current == info.id.GetHashCode())
                 {
-                    i++;
+                    break;
                 }
                 items.Add(new FeedItem(info.id.GetHashCode(), new EmbedBuilder
                 {
                     Color = Color.Blue,
-                    Title = $"{info.media.title.romaji} (Episode {info.episode}" + (info.episode == feed[i].episode ? "" : $" - {feed[i].episode}") + ")",
+                    Title = $"{info.media.title.romaji} (Episode)",
                     Description = info.media.description,
                     Url = $"https://anilist.co/anime/{info.media.id}",
-                    ImageUrl = info.media.coverImage.large
+                    ImageUrl = info.media.coverImage.large,
+                    Fields = new()
+                    {
+                        new EmbedFieldBuilder()
+                        {
+                            Name = "Released in",
+                            Value = $"<t:{info.airingAt}:R>"
+                        }
+                    }
                 }.Build(), Array.Empty<string>()));
             }
             return items.ToArray();

@@ -21,6 +21,7 @@
         public int id;
         public int episode;
         public AnimeResult media;
+        public int airingAt;
     }
 
     public record AnimeResult
