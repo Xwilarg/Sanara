@@ -30,8 +30,9 @@ namespace Sanara.Subscription
 
                 try
                 {
-                    var feed = await sub.GetFeedAsync(StaticObjects.Db.GetCurrent(sub.GetName()), false);
-                    await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed.Any() ? feed[0].Id : 0); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
+                    var currId = StaticObjects.Db.GetCurrent(sub.GetName());
+                    var feed = await sub.GetFeedAsync(currId, false);
+                    await StaticObjects.Db.SetCurrentAsync(sub.GetName(), feed.Any() ? feed[0].Id : currId); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
                 }
                 catch (System.Exception e)
                 {

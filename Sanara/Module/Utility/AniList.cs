@@ -72,7 +72,7 @@ namespace Sanara.Module.Utility
         {
             var json = JsonConvert.SerializeObject(new GraphQL
             {
-                query = "query { Page(perPage: 10) { airingSchedules(notYetAired: true) { id airingAt episode media { id title { romaji } description coverImage { large } } } } }",
+                query = "query { Page(perPage: 25) { airingSchedules(notYetAired: true) { id airingAt episode media { id title { romaji } description coverImage { large } } } } }",
                 variables = new Dictionary<string, dynamic>()
             });
 

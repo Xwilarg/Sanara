@@ -21,7 +21,7 @@ namespace Sanara.Subscription.Impl
                 items.Add(new FeedItem(info.id.GetHashCode(), new EmbedBuilder
                 {
                     Color = Color.Blue,
-                    Title = $"{info.media.title.romaji} (Episode)",
+                    Title = $"{info.media.title.romaji} (Episode {info.episode})",
                     Description = info.media.description,
                     Url = $"https://anilist.co/anime/{info.media.id}",
                     ImageUrl = info.media.coverImage.large,
