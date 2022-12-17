@@ -12,7 +12,7 @@ namespace Sanara.Subscription.Impl
         {
             List<FeedItem> items = new();
             var feed = await GetFeedInternalAsync();
-            foreach (var info in feed)
+            foreach (var info in feed.Reverse())
             {
                 if (current == info.id.GetHashCode())
                 {
