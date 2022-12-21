@@ -18,6 +18,10 @@ namespace Sanara.Subscription.Impl
                 {
                     break;
                 }
+                if (info.media.isAdult)
+                {
+                    continue;
+                }
                 items.Add(new FeedItem(info.id.GetHashCode(), new EmbedBuilder
                 {
                     Color = Color.Blue,
