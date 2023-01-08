@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Sanara.Exception;
 using Sanara.Module.Button;
@@ -287,6 +288,17 @@ namespace Sanara
 #endif
 
                     await ctx.ReplyAsync(embed: embed.Build());
+                    _pendingRequests.Remove(arg.User.Id);
+                }
+                else if (arg.Data.CustomId.StartsWith("tr-") && StaticObjects.TranslationOriginalText.ContainsKey(arg.Data.CustomId[3..]))
+                {
+                    await ctx.ReplyAsync(embed: new EmbedBuilder
+                    {
+                        Title = "Original Text",
+                        Description = StaticObjects.TranslationOriginalText[arg.Data.CustomId[3..]],
+                        Color = Color.Blue,
+                    }.Build());
+                    StaticObjects.TranslationOriginalText.Remove(arg.Data.CustomId[3..]);
                     _pendingRequests.Remove(arg.User.Id);
                 }
                 else if (arg.Data.CustomId == "dump")

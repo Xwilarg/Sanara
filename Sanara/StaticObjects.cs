@@ -235,6 +235,8 @@ namespace Sanara
         /// </summary>
         public static Dictionary<string, string> ISO639Reverse { set; get; } = new();
 
+        public static Dictionary<string, string> TranslationOriginalText { set; get; } = new();
+
         // DIAPORAMA
         /// <summary>
         /// List of diaporama

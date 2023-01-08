@@ -142,7 +142,8 @@ namespace Sanara.Module.Command.Impl
             if (language.Length != 2)
                 throw new CommandFailed("The language given must be in format ISO 639-1.");
 
-            await ctx.ReplyAsync(embed: await Utility.Language.GetTranslationEmbedAsync(sentence ?? image!.Url, language));
+            var (embed, component) = await Utility.Language.GetTranslationEmbedAsync(sentence ?? image!.Url, language);
+            await ctx.ReplyAsync(embed: embed, components: component.Build());
         }
 
         public async Task UrbanAsync(ICommandContext ctx)

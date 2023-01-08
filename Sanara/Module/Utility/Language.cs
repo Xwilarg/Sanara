@@ -57,7 +57,8 @@ namespace Sanara.Module.Utility
                         {
                             try
                             {
-                                await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await GetTranslationEmbedAsync(gMsg, StaticObjects.Flags[emote]), messageReference: new(dMsg.Id));
+                                var tr = await GetTranslationEmbedAsync(gMsg, StaticObjects.Flags[emote]);
+                                await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: tr.embed, components: tr.component.Build(), messageReference: new(dMsg.Id));
                                 AddToRequestList("TR_" + dMsg.Id);
                             }
                             catch (CommandFailed ex)
@@ -102,10 +103,11 @@ namespace Sanara.Module.Utility
             }
         }
 
-        public static async Task<Embed> GetTranslationEmbedAsync(string sentence, string language)
+        public static async Task<(Embed embed, ComponentBuilder component)> GetTranslationEmbedAsync(string sentence, string language)
         {
             List<EmbedFieldBuilder> fields = new();
-            if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && sentence.Trim().Count(x => x == ' ') == 0)
+            ComponentBuilder buttons = new();
+            if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && !sentence.Trim().Any(x => x == ' '))
             {
                 if (StaticObjects.VisionClient == null)
                 {
@@ -126,11 +128,9 @@ namespace Sanara.Module.Utility
                     if (response == null)
                         throw new CommandFailed("There is no text on the image.");
                     sentence = response.Text;
-                    fields.Add(new EmbedFieldBuilder()
-                    {
-                        Name = "Original Text",
-                        Value = sentence
-                    });
+                    var key = $"{DateTime.Now:HHmmssff}{sentence.GetHashCode()}{StaticObjects.Random.Next(int.MaxValue)}";
+                    StaticObjects.TranslationOriginalText.Add(key, sentence);
+                    buttons.WithButton("Original Text", $"tr-{key}");
                 }
                 catch (GoogleApiException)
                 {
@@ -141,13 +141,13 @@ namespace Sanara.Module.Utility
             try
             {
                 var translation = await StaticObjects.TranslationClient.TranslateTextAsync(sentence, language);
-                return new EmbedBuilder
+                return (new EmbedBuilder
                 {
                     Title = "From " + (StaticObjects.ISO639.ContainsKey(translation.DetectedSourceLanguage) ? StaticObjects.ISO639[translation.DetectedSourceLanguage] : translation.DetectedSourceLanguage),
                     Description = translation.TranslatedText,
                     Color = Color.Blue,
                     Fields = fields
-                }.Build();
+                }.Build(), buttons);
             }
             catch (GoogleApiException)
             {
