@@ -1,6 +1,5 @@
 ﻿using BooruSharp.Search.Post;
 using Discord;
-using Discord.WebSocket;
 using Sanara.Exception;
 using Sanara.Module.Command;
 
@@ -23,6 +22,7 @@ namespace Sanara.Module.Button
                 Url = res.Post.PostUrl.AbsoluteUri,
                 Color = res.Post.Rating switch
                 {
+                    Rating.General => Color.Green,
                     Rating.Safe => Color.Green,
                     Rating.Questionable => new Color(255, 255, 0), // Yellow
                     Rating.Explicit => Color.Red,
