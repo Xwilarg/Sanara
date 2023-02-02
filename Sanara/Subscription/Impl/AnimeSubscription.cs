@@ -26,7 +26,7 @@ namespace Sanara.Subscription.Impl
                 {
                     Color = Color.Blue,
                     Title = $"{info.media.title.romaji} (Episode {info.episode})",
-                    Description = info.media.description,
+                    Description = Utils.CleanHtml(info.media.description),
                     Url = $"https://anilist.co/anime/{info.media.id}",
                     ImageUrl = info.media.coverImage.large,
                     Fields = new()
