@@ -47,7 +47,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.Attachment,
                                 IsRequired = false
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: TranslateAsync,
                     precondition: Precondition.None,
@@ -68,7 +69,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = true
                     }.Build(),
                     callback: UrbanAsync,
                     precondition: Precondition.NsfwOnly,
@@ -89,7 +91,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: KanjiAsync,
                     precondition: Precondition.None,
@@ -110,7 +113,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: JapaneseAsync,
                     precondition: Precondition.None,

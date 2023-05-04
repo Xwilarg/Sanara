@@ -80,7 +80,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = false
                             }
-                        }
+                        },
+                        IsNsfw = true
                     }.Build(),
                     callback: BooruAsync,
                     precondition: Precondition.None,
@@ -108,7 +109,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.Integer,
                                 IsRequired = false
                             }
-                        }
+                        },
+                        IsNsfw = true
                     }.Build(),
                     callback: CosplayAsync,
                     precondition: Precondition.NsfwOnly,
@@ -119,7 +121,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "dlrand",
-                        Description = "Get a random DLSite work"
+                        Description = "Get a random DLSite work",
+                        IsNsfw = true
                     }.Build(),
                     callback: DlRandAsync,
                     precondition: Precondition.NsfwOnly,
@@ -141,7 +144,8 @@ namespace Sanara.Module.Command.Impl
                                 IsRequired = false,
                                 IsAutocomplete = true
                             }
-                        }
+                        },
+                        IsNsfw = true
                     }.Build(),
                     callback: AdultVideoAsync,
                     precondition: Precondition.NsfwOnly,
@@ -169,7 +173,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.Integer,
                                 IsRequired = false
                             }
-                        }
+                        },
+                        IsNsfw = true
                     }.Build(),
                     callback: DoujinshiAsync,
                     precondition: Precondition.NsfwOnly,
@@ -180,7 +185,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "wholesome",
-                        Description = "Get a random wholesome doujinshi"
+                        Description = "Get a random wholesome doujinshi",
+                        IsNsfw = true
                     }.Build(),
                     callback: WholesomeAsync,
                     precondition: Precondition.NsfwOnly,

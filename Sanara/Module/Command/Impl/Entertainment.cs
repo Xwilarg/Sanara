@@ -24,7 +24,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "inspire",
-                        Description = "Get a random \"inspirational\" quote"
+                        Description = "Get a random \"inspirational\" quote",
+                        IsNsfw = false
                     }.Build(),
                     callback: InspireAsync,
                     precondition: Precondition.None,
@@ -35,7 +36,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "vnquote",
-                        Description = "Get a quote from a random Visual Novel"
+                        Description = "Get a quote from a random Visual Novel",
+                        IsNsfw = true
                     }.Build(),
                     callback: VNQuoteAsync,
                     precondition: Precondition.NsfwOnly,
@@ -56,7 +58,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: CompleteAsync,
                     precondition: Precondition.None,
@@ -77,7 +80,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: GenerateAsync,
                     precondition: Precondition.None,

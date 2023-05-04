@@ -62,6 +62,10 @@ namespace Sanara.UnitTests
 
         public ulong Id => throw new NotImplementedException();
 
+        public IThreadChannel Thread => throw new NotImplementedException();
+
+        public MessageRoleSubscriptionData RoleSubscriptionData => throw new NotImplementedException();
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             throw new NotImplementedException();

@@ -49,18 +49,20 @@ namespace Sanara.Module.Command.Impl
                                 IsRequired = true,
                                 Choices = games
                             }
-                       }
+                       },
+                       IsNsfw = false
                    }.Build(),
                    callback: PlayAsync,
                    precondition: Precondition.None,
-                    aliases: Array.Empty<string>(),
+                   aliases: Array.Empty<string>(),
                    needDefer: false
                ),
                new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
                    {
                        Name = "leaderboard",
-                       Description = "See the global leaderboard"
+                       Description = "See the global leaderboard",
+                       IsNsfw = false
                    }.Build(),
                    callback: LeaderboardAsync,
                    precondition: Precondition.GuildOnly,
@@ -71,7 +73,8 @@ namespace Sanara.Module.Command.Impl
                    slashCommand: new SlashCommandBuilder()
                    {
                        Name = "cancel",
-                       Description = "Stop the current game"
+                       Description = "Stop the current game",
+                       IsNsfw = false
                    }.Build(),
                    callback: CancelAsync,
                    precondition: Precondition.None,

@@ -68,7 +68,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = false
                             },
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: SubscribeAsync,
                     precondition: Precondition.GuildOnly | Precondition.AdminOnly,

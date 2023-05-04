@@ -24,7 +24,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "ping",
-                        Description = "Get the latency between the bot and Discord"
+                        Description = "Get the latency between the bot and Discord",
+                        IsNsfw = false
                     }.Build(),
                     callback: PingAsync,
                     precondition: Precondition.None,
@@ -36,7 +37,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "help",
-                        Description = "Get the list of commands"
+                        Description = "Get the list of commands",
+                        IsNsfw = false
                     }.Build(),
                     callback: HelpAsync,
                     precondition: Precondition.None,
@@ -48,7 +50,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "botinfo",
-                        Description = "Get various information about the bot"
+                        Description = "Get various information about the bot",
+                        IsNsfw = false
                     }.Build(),
                     callback: BotInfoAsync,
                     precondition: Precondition.None,
@@ -59,7 +62,8 @@ namespace Sanara.Module.Command.Impl
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "configure",
-                        Description = "Configure the bot for the current guild"
+                        Description = "Configure the bot for the current guild",
+                        IsNsfw = false
                     }.Build(),
                     callback: ConfigureAsync,
                     precondition: Precondition.AdminOnly | Precondition.GuildOnly,

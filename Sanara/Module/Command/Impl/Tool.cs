@@ -44,7 +44,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = false
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: PhotoAsync,
                     precondition: Precondition.None,
@@ -65,7 +66,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: SourceAsync,
                     precondition: Precondition.None,
@@ -111,7 +113,8 @@ namespace Sanara.Module.Command.Impl
                                     }
                                 }
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: AnimeAsync,
                     precondition: Precondition.None,
@@ -132,7 +135,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: DramaAsync,
                     precondition: Precondition.None,
@@ -153,7 +157,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: VisualNovelAsync,
                     precondition: Precondition.None,
@@ -174,7 +179,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: QrcodeAsync,
                     precondition: Precondition.None,
@@ -195,7 +201,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.Attachment,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: OCRAsync,
                     precondition: Precondition.None,
@@ -216,7 +223,8 @@ namespace Sanara.Module.Command.Impl
                                 Type = ApplicationCommandOptionType.String,
                                 IsRequired = true
                             }
-                        }
+                        },
+                        IsNsfw = false
                     }.Build(),
                     callback: GetAsync,
                     precondition: Precondition.OwnerOnly,
