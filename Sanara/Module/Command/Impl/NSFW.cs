@@ -81,7 +81,7 @@ namespace Sanara.Module.Command.Impl
                                 IsRequired = false
                             }
                         },
-                        IsNsfw = true
+                        IsNsfw = false
                     }.Build(),
                     callback: BooruAsync,
                     precondition: Precondition.None,
