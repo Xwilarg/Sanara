@@ -99,8 +99,9 @@ namespace Sanara
             return matrix[source1Length, source2Length];
         }
 
-        public static string CleanHtml(string msg)
+        public static string? CleanHtml(string msg)
         {
+            if (msg == null) return null;
             msg = Regex.Replace(msg, "<br *\\/>", "\n");
             msg = Regex.Replace(msg, "<\\/br>", "\n");
             msg = Regex.Replace(msg, "<b>([^<]+)<\\/b>", "**$1**");

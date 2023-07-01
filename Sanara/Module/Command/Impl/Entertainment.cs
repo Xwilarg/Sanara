@@ -103,7 +103,7 @@ namespace Sanara.Module.Command.Impl
         public async Task VNQuoteAsync(ICommandContext ctx)
         {
             var html = await StaticObjects.HttpClient.GetStringAsync("https://vndb.org");
-            var match = Regex.Match(html, "footer\">\"<a href=\"\\/v([0-9]+)\"[^>]+>([^<]+)+<");
+            var match = Regex.Match(html, "footer>\"<a href=\"\\/v([0-9]+)\"[^>]+>([^<]+)+<");
             var id = match.Groups[1].Value;
             var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id)), VndbFlags.FullVisualNovel)).ToArray()[0];
             await ctx.ReplyAsync(embed: new EmbedBuilder
