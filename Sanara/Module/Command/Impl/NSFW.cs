@@ -215,8 +215,14 @@ namespace Sanara.Module.Command.Impl
             {
                 embed.AddField("Tags", string.Join(", ", info.tags), true);
             }
-            embed.AddField("Parody", info.parody, true);
-            embed.AddField("Note", info.note, true);
+            if (info.parody != null)
+            {
+                embed.AddField("Parody", info.parody, true);
+            }
+            if (info.note != null)
+            {
+                embed.AddField("Note", info.note, true);
+            }
             embed.WithFooter($"Tier: {info.tier}");
 
             await ctx.ReplyAsync(embed: embed.Build()/*, components: button.Build()*/);
