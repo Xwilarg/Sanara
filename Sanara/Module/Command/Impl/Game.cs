@@ -66,8 +66,8 @@ namespace Sanara.Module.Command.Impl
                    }.Build(),
                    callback: LeaderboardAsync,
                    precondition: Precondition.GuildOnly,
-                    aliases: Array.Empty<string>(),
-                   needDefer: false
+                   aliases: Array.Empty<string>(),
+                   needDefer: true
                ),
                new CommandInfo(
                    slashCommand: new SlashCommandBuilder()
