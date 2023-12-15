@@ -602,38 +602,40 @@ namespace Sanara
                         debugGuild = StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId);
                     }
 
+                    // Preload commands
                     foreach (var s in _submodules)
                     {
+                        await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Module] {s.GetInfo().Name}"));
                         foreach (var c in s.GetCommands()
 #if !NSFW_BUILD
+                            // NSFW build doesn't preload NSFW commands
                             .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
 #endif
                         )
                         {
-                            if ((c.Precondition & Precondition.OwnerOnly) == 0)
-                            {
-                                if (c.Precondition != Precondition.None)
-                                {
-                                    c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
-                                }
-                                if (debugGuild != null)
-                                {
-                                    await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
-                                }
-                                else
-                                {
-                                    await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
-                                }
-                            }
+                            await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Command] {c.SlashCommand.Name}"));
                             _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
                         }
                     }
 
-                    var cmds = _commandsAssociations.Values
-#if !NSFW_BUILD
-                            .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
-#endif
-                    .Select(x => x.SlashCommand);
+                    // Send everything to Discord
+                    foreach (var c in _commandsAssociations.Values.Where(x => (x.Precondition & Precondition.OwnerOnly) == 0))
+                    {
+                        if (c.Precondition != Precondition.None)
+                        {
+                            c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
+                        }
+                        if (debugGuild != null)
+                        {
+                            await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
+                        }
+                        else
+                        {
+                            await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                        }
+                    }
+
+                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand);
                     if (debugGuild != null)
                     {
                         await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
