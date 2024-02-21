@@ -412,7 +412,17 @@ namespace Sanara.Module.Command.Impl
             }
 
 
-            var vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
+            VisualNovel? vn;
+
+            try
+            {
+                vn = (await StaticObjects.VnClient.GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
+            }
+            catch (UnexpectedResponseException ure)
+            {
+                Console.WriteLine($"An error occurred searching for a VN: {ure.Message}");
+                throw;
+            }
 
             var embed = new EmbedBuilder()
             {
