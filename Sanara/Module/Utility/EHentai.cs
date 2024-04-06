@@ -22,14 +22,14 @@ namespace Sanara.Module.Utility
         {
             var url = GetUrl(category, rating, tags);
             string html = await StaticObjects.HttpClient.GetStringAsync(url);
-            Match m = Regex.Match(html, "Found about ([0-9,]+) result"); // Get number of results
+            Match m = Regex.Match(html, "Found (about )?([0-9,]+) result"); // Get number of results
 
             if (!m.Success)
             {
                 throw new CommandFailed($"There is no {name} with these tags{(rating != 0 ? ", this might be due to the rating given in parameter being too high" : string.Empty)}");
             }
 
-            return int.Parse(m.Groups[1].Value.Replace(",", "")); // Number is displayed like 10,000 so we remove the comma to parse it
+            return int.Parse(m.Groups[2].Value.Replace(",", "")); // Number is displayed like 10,000 so we remove the comma to parse it
         }
 
         public static async Task<MatchCollection> GetAllMatchesAsync(int category, int rating, string tags, int page)
