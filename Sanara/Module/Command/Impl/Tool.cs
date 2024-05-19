@@ -385,7 +385,7 @@ namespace Sanara.Module.Command.Impl
             {
                 // Parse HTML and go though every VN, check the original name and translated name to get the VN id
                 // TODO: Use string length for comparison
-                MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" title=\"([^\"]+)\">([^<]+)<\\/a>");
+                MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" lang=\"[^\"]+\" title=\"([^\\\"]+)\">([^<]+)<\\/a>");
                 foreach (Match match in matches)
                 {
                     string titleName = Utils.CleanWord(match.Groups[3].Value);
