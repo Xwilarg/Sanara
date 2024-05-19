@@ -28,5 +28,19 @@ namespace Sanara.Module.Command.Context
         public string Description => throw new NotImplementedException();
 
         public string ContentType => throw new NotImplementedException();
+
+        public double? Duration => throw new NotImplementedException();
+
+        public string Waveform => throw new NotImplementedException();
+
+        public AttachmentFlags Flags => throw new NotImplementedException();
+
+        public IReadOnlyCollection<IUser> ClipParticipants => throw new NotImplementedException();
+
+        public string Title => throw new NotImplementedException();
+
+        public DateTimeOffset? ClipCreatedAt => throw new NotImplementedException();
+
+        public DateTimeOffset CreatedAt => throw new NotImplementedException();
     }
 }

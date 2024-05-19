@@ -1,5 +1,6 @@
 ﻿using Discord;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sanara.UnitTests.Test
 {
@@ -14,10 +15,10 @@ namespace Sanara.UnitTests.Test
                 { "source", 0L }
             });
             await mod.BooruAsync(ctx);
-            Assert.AreEqual("From Safebooru", ctx.Result.Embed.Title);
-            Assert.AreEqual(Color.Green, ctx.Result.Embed.Color);
-            Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
-            Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
+            ClassicAssert.AreEqual("From Safebooru", ctx.Result.Embed.Title);
+            ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
+            ClassicAssert.IsTrue(ctx.Result.Embed.Image.HasValue);
+            ClassicAssert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
 
         [Test]
@@ -29,10 +30,10 @@ namespace Sanara.UnitTests.Test
                 { "tags", "touhou" }
             });
             await mod.DoujinshiAsync(ctx);
-            Assert.NotNull(ctx.Result.Embed.Title);
-            Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
-            Assert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
-            Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
+            ClassicAssert.NotNull(ctx.Result.Embed.Title);
+            ClassicAssert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
+            ClassicAssert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
+            ClassicAssert.IsTrue(ctx.Result.Embed.Image.HasValue);
             // Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
 
@@ -45,10 +46,10 @@ namespace Sanara.UnitTests.Test
                 { "tags", "touhou" }
             });
             await mod.CosplayAsync(ctx);
-            Assert.NotNull(ctx.Result.Embed.Title);
-            Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
-            Assert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
-            Assert.IsTrue(ctx.Result.Embed.Image.HasValue);
+            ClassicAssert.NotNull(ctx.Result.Embed.Title);
+            ClassicAssert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Url));
+            ClassicAssert.Contains("touhou project", ctx.Result.Embed.Description.Split(',').Select(x => x.Trim()).ToArray());
+            ClassicAssert.IsTrue(ctx.Result.Embed.Image.HasValue);
             // Assert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
         }
     }

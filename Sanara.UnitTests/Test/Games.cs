@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sanara.Module.Utility;
 
 namespace Sanara.UnitTests.Test
@@ -11,7 +12,7 @@ namespace Sanara.UnitTests.Test
         [TestCase("ラムネ", "らむね")]
         public async Task TestHiraganaConvertion(string input, string answer)
         {
-            Assert.AreEqual(answer, Language.ToHiragana(input));
+            ClassicAssert.AreEqual(answer, Language.ToHiragana(input));
         }
     }
 }

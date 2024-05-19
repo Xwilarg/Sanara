@@ -278,7 +278,7 @@ namespace Sanara.Module.Command.Impl
 
             var embed = new EmbedBuilder();
             var img = SixLabors.ImageSharp.Image.Load(await StaticObjects.HttpClient.GetStreamAsync(input.Url));
-            var pen = new Pen(SixLabors.ImageSharp.Color.Red, 2f);
+            var pen = new SolidPen(SixLabors.ImageSharp.Color.Red, 2f);
 
             foreach (var page in response.Pages)
             {

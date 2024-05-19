@@ -66,6 +66,12 @@ namespace Sanara.UnitTests
 
         public MessageRoleSubscriptionData RoleSubscriptionData => throw new NotImplementedException();
 
+        public MessageResolvedData ResolvedData => throw new NotImplementedException();
+
+        public IMessageInteractionMetadata InteractionMetadata => throw new NotImplementedException();
+
+        public Poll? Poll => throw new NotImplementedException();
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             throw new NotImplementedException();
@@ -81,7 +87,22 @@ namespace Sanara.UnitTests
             throw new NotImplementedException();
         }
 
+        public Task EndPollAsync(RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetPollAnswerVotersAsync(uint answerId, int? limit = null, ulong? afterId = null, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
         {
             throw new NotImplementedException();
         }
