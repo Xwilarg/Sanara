@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Sanara.Exception;
 using Sanara.Module.Button;
