@@ -562,9 +562,9 @@ namespace Sanara
                 }
             }, async () =>
             {
-                if (cmd.NeedDefer)
+                //if (cmd.NeedDefer)
                 {
-                    await arg.DeferAsync();
+                    await arg.DeferAsync(); // Somehow all commands not defer-ed fail
                 }
                 return new SlashCommandContext(arg);
             });
