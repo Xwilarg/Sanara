@@ -169,6 +169,7 @@ namespace Sanara
             new AzurLanePreload(),
             new FateGOPreload(),
             new PokemonPreload(),
+            new NikkePreload(),
             new AnimePreload(),
 #if NSFW_BUILD
             new BooruQuizzPreload(),
