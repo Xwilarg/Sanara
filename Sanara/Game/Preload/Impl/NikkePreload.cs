@@ -11,7 +11,7 @@ namespace Sanara.Game.Preload.Impl
         public void Init()
         {
             var html = StaticObjects.HttpClient.GetStringAsync("https://www.prydwen.gg/nikke/characters/").GetAwaiter().GetResult();
-            _preload = Regex.Matches(html, "data-src=\"([^\"]+)\" data-srcset=\"[^\"]+\" alt=\"([^\"]+)\"\\/><noscript>").Cast<Match>().Select(x => new QuizzPreloadResult($"https://www.prydwen.gg{x.Groups[1].Value}", new[] { x.Groups[2].Value })).ToArray();
+            _preload = Regex.Matches(html, "data-src=\"([^\"]+)\" data-srcset=\"[^\"]+\" alt=\"([^\"]+)\"\\/><noscript>").Cast<Match>().Skip(1).Select(x => new QuizzPreloadResult($"https://www.prydwen.gg{x.Groups[1].Value}", new[] { x.Groups[2].Value })).ToArray();
         }
 
         public ReadOnlyCollection<IPreloadResult> Load()
