@@ -5,14 +5,14 @@ namespace Sanara.Module.Button
 {
     public class Settings
     {
-        public static async Task DatabaseDump(ICommandContext ctx)
+        public static async Task DatabaseDump(IContext ctx)
         {
             await ctx.ReplyAsync("```json\n" +
                 await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id) +
                 "\n```", ephemeral: true);
         }
 
-        public static async Task RemoveSubscription(ICommandContext ctx, string key)
+        public static async Task RemoveSubscription(IContext ctx, string key)
         {
             var guildId = ((ITextChannel)ctx.Channel).Guild.Id;
             var subs = await StaticObjects.GetSubscriptionsAsync(guildId);

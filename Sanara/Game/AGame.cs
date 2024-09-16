@@ -24,7 +24,7 @@ namespace Sanara.Game
 
             _gameName = preload.Name;
             _argument = null;// preload.GetNameArg();
-            _messages = new List<ICommandContext>();
+            _messages = new List<IContext>();
             _preload = preload;
 
             _contributors = new List<ulong>();
@@ -34,7 +34,7 @@ namespace Sanara.Game
         }
 
         protected abstract string[] GetPostInternal(); // Get next post
-        protected abstract Task CheckAnswerInternalAsync(ICommandContext answer); // Check if user answer is right
+        protected abstract Task CheckAnswerInternalAsync(IContext answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
         protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
@@ -66,7 +66,7 @@ namespace Sanara.Game
             await _postMode.PostAsync(_textChan, _current, this);
         }
 
-        public async Task StartAsync(ICommandContext ctx)
+        public async Task StartAsync(IContext ctx)
         {
             if (_state != GameState.Prepare)
                 return;
@@ -172,7 +172,7 @@ namespace Sanara.Game
             _state = GameState.Running;
         }
 
-        public void AddAnswer(ICommandContext msg)
+        public void AddAnswer(IContext msg)
         {
             lock (_messages)
             {
@@ -366,7 +366,7 @@ namespace Sanara.Game
         private string _current; // Current value, used for Replay command
         private IPreload _preload;
 
-        List<ICommandContext> _messages;
+        List<IContext> _messages;
 
         // SCORES
         private List<ulong> _contributors; // Users that contributed

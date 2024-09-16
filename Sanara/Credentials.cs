@@ -11,5 +11,9 @@
         public string UnsplashToken;
         public string DebugGuild;
         public string DeepAIKey;
+        /// <summary>
+        /// Need to be created on Google console
+        /// </summary>
+        public string GoogleProjectId { set; get; }
     }
 }

@@ -26,11 +26,11 @@ namespace Sanara.Module.Command.Impl
             return new("Tool", "Utility commands");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "photo",
@@ -52,7 +52,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "source",
@@ -74,7 +74,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "anime",
@@ -121,7 +121,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "drama",
@@ -143,7 +143,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "visualnovel",
@@ -165,7 +165,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "vn" },
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "qrcode",
@@ -187,7 +187,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "ocr",
@@ -209,7 +209,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "get",
@@ -234,7 +234,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task GetAsync(ICommandContext ctx)
+        public async Task GetAsync(IContext ctx)
         {
             var url = ctx.GetArgument<string>("url");
             var resp = await StaticObjects.HttpClient.SendAsync(new(HttpMethod.Get, url));
@@ -260,7 +260,7 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
-        public async Task OCRAsync(ICommandContext ctx)
+        public async Task OCRAsync(IContext ctx)
         {
             var input = ctx.GetArgument<IAttachment>("image");
             var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input.Url);
@@ -305,7 +305,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(mStream, "ocr.jpg");
         }
 
-        public async Task QrcodeAsync(ICommandContext ctx)
+        public async Task QrcodeAsync(IContext ctx)
         {
             var input = ctx.GetArgument<string>("input");
             await ctx.ReplyAsync(file: await StaticObjects.HttpClient.GetStreamAsync("https://api.qrserver.com/v1/create-qr-code/?data=" + HttpUtility.UrlEncode(input)),
@@ -313,14 +313,14 @@ namespace Sanara.Module.Command.Impl
         }
 
 
-        public async Task SourceAsync(ICommandContext ctx)
+        public async Task SourceAsync(IContext ctx)
         {
             var image = ctx.GetArgument<string>("image");
 
             await ctx.ReplyAsync(embed: await Utility.Tool.GetSourceAsync(image));
         }
 
-        public async Task PhotoAsync(ICommandContext ctx)
+        public async Task PhotoAsync(IContext ctx)
         {
             if (StaticObjects.UnsplashToken == null)
             {
@@ -354,7 +354,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task VisualNovelAsync(ICommandContext ctx)
+        public async Task VisualNovelAsync(IContext ctx)
         {
             var name = ctx.GetArgument<string>("name");
             string originalName = name;
@@ -466,7 +466,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: embed.Build());
         }
 
-        public async Task DramaAsync(ICommandContext ctx)
+        public async Task DramaAsync(IContext ctx)
         {
             if (StaticObjects.TranslationClient == null)
             {
@@ -533,7 +533,7 @@ namespace Sanara.Module.Command.Impl
             return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task AnimeAsync(ICommandContext ctx)
+        public async Task AnimeAsync(IContext ctx)
         {
             var name = ctx.GetArgument<string>("name");
             var media = (JapaneseMedia)ctx.GetArgument<long>("type");

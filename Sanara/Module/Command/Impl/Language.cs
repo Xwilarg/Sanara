@@ -15,11 +15,11 @@ namespace Sanara.Module.Command.Impl
             return new("Language", "Get information related to others languages");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "translate",
@@ -55,7 +55,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: new[] { "tr" },
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "urban",
@@ -77,7 +77,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "kanji",
@@ -99,7 +99,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "japanese",
@@ -124,7 +124,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task TranslateAsync(ICommandContext ctx)
+        public async Task TranslateAsync(IContext ctx)
         {
             if (StaticObjects.TranslationClient == null)
             {
@@ -150,7 +150,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: embed, components: component.Build());
         }
 
-        public async Task UrbanAsync(ICommandContext ctx)
+        public async Task UrbanAsync(IContext ctx)
         {
             var word = ctx.GetArgument<string>("word");
 
@@ -214,7 +214,7 @@ namespace Sanara.Module.Command.Impl
         }
 
 
-        public async Task KanjiAsync(ICommandContext ctx)
+        public async Task KanjiAsync(IContext ctx)
         {
             var kanji = ctx.GetArgument<string>("kanji");
 
@@ -312,7 +312,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task JapaneseAsync(ICommandContext ctx)
+        public async Task JapaneseAsync(IContext ctx)
         {
             var word = ctx.GetArgument<string>("word");
 

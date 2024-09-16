@@ -7,7 +7,7 @@ namespace Sanara.Module.Button
 {
     public class Booru
     {
-        public static async Task GetTagsAsync(ICommandContext ctx, string id)
+        public static async Task GetTagsAsync(IContext ctx, string id)
         {
             var info = await StaticObjects.Tags.GetTagAsync(id);
             if (!info.HasValue)

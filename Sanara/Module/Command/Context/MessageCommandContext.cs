@@ -4,11 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace Sanara.Module.Command.Context
 {
-    public class MessageCommandContext : ICommandContext
+    public class MessageCommandContext : IContext
     {
         private Dictionary<string, object> argsDict = new();
 
-        public MessageCommandContext(IMessage message, string arguments, CommandInfo command)
+        public MessageCommandContext(IMessage message, string arguments, CommandData command)
         {
             _message = message;
             var matches = Regex.Matches(arguments, @"[\""].+?[\""]|[^ ]+");

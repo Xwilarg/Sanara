@@ -13,11 +13,11 @@ namespace Sanara.Module.Command.Impl
             return new("Subscription", "Subscribe to various service and follow them from a channel");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "subscribe",
@@ -79,7 +79,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task SubscribeAsync(ICommandContext ctx)
+        public async Task SubscribeAsync(IContext ctx)
         {
             var channel = ctx.GetArgument<ITextChannel>("channel");
             var type = (SubscriptionType)ctx.GetArgument<long>("type");

@@ -16,7 +16,7 @@ namespace Sanara.Game.Impl
             _allowedFormats = info.AllowedFormats;
         }
 
-        protected override Task CheckAnswerInternalAsync(ICommandContext answer)
+        protected override Task CheckAnswerInternalAsync(IContext answer)
         {
             string userAnswer = answer.GetArgument<string>("answer");
             if (!_current.Answers.Any(x => Utils.EasyCompare(x, userAnswer)))

@@ -16,11 +16,11 @@ namespace Sanara.Module.Command.Impl
             return new("Settings", "Configure and get information about the bot");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "ping",
@@ -33,7 +33,7 @@ namespace Sanara.Module.Command.Impl
                     needDefer: false
                 ),
 #if NSFW_BUILD
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "help",
@@ -46,7 +46,7 @@ namespace Sanara.Module.Command.Impl
                     needDefer: false
                 ),
 #endif
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "botinfo",
@@ -58,7 +58,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: false
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "configure",
@@ -73,19 +73,19 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task HelpAsync(ICommandContext ctx)
+        public async Task HelpAsync(IContext ctx)
         {
             await ctx.ReplyAsync("Slash commands are now here! Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
         }
 
-        public async Task ConfigureAsync(ICommandContext ctx)
+        public async Task ConfigureAsync(IContext ctx)
         {
             var guild = ((ITextChannel)ctx.Channel).Guild;
             var data = await Utility.Settings.GetSettingsDisplayAsync(guild);
             await ctx.ReplyAsync(embed: data.Embed, ephemeral: true, components: data.Components);
         }
 
-        public async Task PingAsync(ICommandContext ctx)
+        public async Task PingAsync(IContext ctx)
         {
             var content = ":ping_pong: Pong!";
             await ctx.ReplyAsync(content);
@@ -96,7 +96,7 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
-        public async Task BotInfoAsync(ICommandContext ctx)
+        public async Task BotInfoAsync(IContext ctx)
         {
             var embed = new EmbedBuilder
             {

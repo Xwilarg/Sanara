@@ -13,7 +13,7 @@ namespace Sanara.Module.Command.Impl
             return new("Game", "Play various games directly on Discord");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             List<ApplicationCommandOptionChoiceProperties> games = new();
             for (int i = 0; i < StaticObjects.Preloads.Length; i++)
@@ -34,7 +34,7 @@ namespace Sanara.Module.Command.Impl
 
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                    slashCommand: new SlashCommandBuilder()
                    {
                        Name = "play",
@@ -57,7 +57,7 @@ namespace Sanara.Module.Command.Impl
                    aliases: Array.Empty<string>(),
                    needDefer: false
                ),
-               new CommandInfo(
+               new CommandData(
                    slashCommand: new SlashCommandBuilder()
                    {
                        Name = "leaderboard",
@@ -69,7 +69,7 @@ namespace Sanara.Module.Command.Impl
                    aliases: Array.Empty<string>(),
                    needDefer: true
                ),
-               new CommandInfo(
+               new CommandData(
                    slashCommand: new SlashCommandBuilder()
                    {
                        Name = "cancel",
@@ -84,7 +84,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task PlayAsync(ICommandContext ctx)
+        public async Task PlayAsync(IContext ctx)
         {
             if (StaticObjects.GameManager.IsChannelBusy(ctx.Channel))
                 throw new CommandFailed("A game is already running in this channel.");
@@ -133,7 +133,7 @@ namespace Sanara.Module.Command.Impl
             }
         }
 
-        public async Task LeaderboardAsync(ICommandContext ctx)
+        public async Task LeaderboardAsync(IContext ctx)
         {
             var guild = StaticObjects.Db.GetGuild(((ITextChannel)ctx.Channel).GuildId);
             var embed = new EmbedBuilder
@@ -170,7 +170,7 @@ namespace Sanara.Module.Command.Impl
             await ctx.ReplyAsync(embed: embed.Build());
         }
 
-        public async Task CancelAsync(ICommandContext ctx)
+        public async Task CancelAsync(IContext ctx)
         {
             var game = StaticObjects.GameManager.GetGame(ctx.Channel);
 

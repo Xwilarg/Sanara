@@ -89,7 +89,7 @@ namespace Sanara.Game
             return result ? rLobby.GetEmbed() : null;
         }
 
-        public async Task<bool> CheckRestartLobbyFullAsync(ICommandContext ctx)
+        public async Task<bool> CheckRestartLobbyFullAsync(IContext ctx)
         {
             var rLobby = _replayLobby[ctx.Channel.Id.ToString()];
             if (rLobby.IsAllReady)
@@ -110,7 +110,7 @@ namespace Sanara.Game
             _replayLobby.Remove(chanId);
         }
 
-        public async Task StartGameAsync(ICommandContext ctx)
+        public async Task StartGameAsync(IContext ctx)
         {
             var chanId = ctx.Channel.Id.ToString();
             await _pendingGames[chanId].StartAsync(ctx);

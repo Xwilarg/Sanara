@@ -58,7 +58,7 @@ namespace Sanara.Game.Impl
             }
         }
 
-        protected override async Task CheckAnswerInternalAsync(Module.Command.ICommandContext answer)
+        protected override async Task CheckAnswerInternalAsync(Module.Command.IContext answer)
         {
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"

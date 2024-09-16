@@ -33,7 +33,7 @@ namespace Sanara.Game.Impl
             return new[] { post.FileUrl.AbsoluteUri };
         }
 
-        protected override Task CheckAnswerInternalAsync(ICommandContext answer)
+        protected override Task CheckAnswerInternalAsync(IContext answer)
         {
             string userAnswer = answer.GetArgument<string>("answer");
             var foundTag = _allTags.Where(x => Utils.EasyCompare(x, userAnswer)).FirstOrDefault();

@@ -3,7 +3,7 @@ using Sanara.Module.Command;
 
 namespace Sanara.UnitTests
 {
-    public class TestCommandContext : ICommandContext
+    public class TestCommandContext : IContext
     {
         public TestCommandContext(Dictionary<string, object> args)
         {

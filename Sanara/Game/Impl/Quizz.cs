@@ -39,7 +39,7 @@ namespace Sanara.Game.Impl
             return new[] { _current.ImageUrl };
         }
 
-        protected override async Task CheckAnswerInternalAsync(ICommandContext answer)
+        protected override async Task CheckAnswerInternalAsync(IContext answer)
         {
             string userAnswer = Utils.CleanWord(answer.GetArgument<string>("answer"));
             if (!_allValidNames.Any(x => Utils.CleanWord(x) == userAnswer))

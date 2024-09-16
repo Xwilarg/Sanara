@@ -7,7 +7,7 @@ namespace Sanara.Module.Button
 {
     public class Cosplay
     {
-        public static async Task DownloadCosplayAsync(ICommandContext ctx, string idFirst, string idSecond, string idName)
+        public static async Task DownloadCosplayAsync(IContext ctx, string idFirst, string idSecond, string idName)
         {
             string html;
             int nbPages;

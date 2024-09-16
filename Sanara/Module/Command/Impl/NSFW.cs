@@ -2,13 +2,12 @@
 using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
-using System.Net;
+using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Web;
 
 namespace Sanara.Module.Command.Impl
 {
@@ -19,216 +18,141 @@ namespace Sanara.Module.Command.Impl
             return new("NSFW", "Commands to get lewd stuffs");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
-            return new[]
-            {
-                
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "booru",
-                        Description = "Get an anime image",
-                        Options = new()
-                        {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "source",
-                                Description = "Where the image is coming from",
-                                Type = ApplicationCommandOptionType.Integer,
-                                IsRequired = true,
-                                Choices = new()
-                                {
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "Safebooru (SFW)",
-                                        Value = (int)BooruType.Safebooru
-                                    },
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "E926 (SFW, furry)",
-                                        Value = (int)BooruType.E926
-                                    },
+            return [
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                    .WithName("cosplay")
+                    .WithDescription("Get a cosplay")
+                    .WithNsfw(true)
+                    .AddOptions(GetEHentaiOptions()),
+                callback: CosplayAsync,
+                aliases: []
+            ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                    .WithName("doujinshi")
+                    .WithDescription("Get a fan-made manga")
+                    .WithNsfw(true)
+                    .AddOptions(GetEHentaiOptions()),
+                callback: DoujinshiAsync,
+                aliases: [ "doujin" ]
+            ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                    .WithName("wholesome")
+                    .WithDescription("Get a random wholesome NSFW fan-made manga")
+                    .WithNsfw(true),
+                callback: WholesomeAsync,
+                aliases: []
+            ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                    .WithName("adultvideo")
+                    .WithDescription("Get a random Japanese Adult Video")
+                    .AddOption(
+                        new SlashCommandOptionBuilder()
+                            .WithName("query")
+                            .WithDescription("Search query")
+                            .WithType(ApplicationCommandOptionType.String)
+                            .WithRequired(false)
+                    )
+                    .WithNsfw(true),
+                callback: AdultVideoAsync,
+                aliases: [ "av", "jav" ]
+            ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                    .WithName("booru")
+                    .WithDescription("Get an anime image")
+                    .WithNsfw(false)
+                    .AddOptions(
+                        new SlashCommandOptionBuilder()
+                            .WithName("source")
+                            .WithDescription("Where the image is coming from")
+                            .WithType(ApplicationCommandOptionType.Integer)
+                            .WithRequired(false)
+                            .AddChoice("Safebooru", (int)BooruType.Safebooru)
+                            .AddChoice("E926", (int)BooruType.E926)
+                            .AddChoice("Sakugabooru (anime clips)", (int)BooruType.Sakugabooru)
 #if NSFW_BUILD
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "Gelbooru (NSFW)",
-                                        Value = (int)BooruType.Gelbooru
-                                    },
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "E621 (NSFW, furry)",
-                                        Value = (int)BooruType.E621
-                                    },
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "Rule34 (NSFW, more variety of content)",
-                                        Value = (int)BooruType.Rule34
-                                    },
-                                    new ApplicationCommandOptionChoiceProperties()
-                                    {
-                                        Name = "Konachan (NSFW, wallpaper format)",
-                                        Value = (int)BooruType.Konachan
-                                    }
+                            .AddChoice("Gelbooru (NSFW)", (int)BooruType.Gelbooru)
+                            .AddChoice("E621 (NSFW, furry)", (int)BooruType.E621)
+                            .AddChoice("Rule34 (NSFW, more variety of content)", (int)BooruType.Rule34)
+                            .AddChoice("Konachan (NSFW, wallpaper format)", (int)BooruType.Konachan)
 #endif
-                                }
-                            },
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "tags",
-                                Description = "Tags of the search, separated by an empty space",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
-                            }
-                        },
-                        IsNsfw = false
-                    }.Build(),
-                    callback: BooruAsync,
-                    precondition: Precondition.None,
-                    aliases: Array.Empty<string>(),
-                    needDefer: true
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "cosplay",
-                        Description = "Get a cosplay",
-                        Options = new()
-                        {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "tags",
-                                Description = "Tags of the search, separated by an empty space",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
-                            },
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "rating",
-                                Description = "Minimum rating (between 2 and 5)",
-                                Type = ApplicationCommandOptionType.Integer,
-                                IsRequired = false
-                            }
-                        },
-                        IsNsfw = true
-                    }.Build(),
-                    callback: CosplayAsync,
-                    precondition: Precondition.NsfwOnly,
-                    aliases: Array.Empty<string>(),
-                    needDefer: true
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "dlrand",
-                        Description = "Get a random DLSite work",
-                        IsNsfw = true
-                    }.Build(),
-                    callback: DlRandAsync,
-                    precondition: Precondition.NsfwOnly,
-                    aliases: Array.Empty<string>(),
-                    needDefer: true
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "adultvideo",
-                        Description = "Get a random adult video work",
-                        Options = new()
-                        {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "tag",
-                                Description = "Tag of the search",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false,
-                                IsAutocomplete = true
-                            }
-                        },
-                        IsNsfw = true
-                    }.Build(),
-                    callback: AdultVideoAsync,
-                    precondition: Precondition.NsfwOnly,
-                    aliases: new[] { "av" },
-                    needDefer: true
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "doujinshi",
-                        Description = "Get a random doujinshi",
-                        Options = new()
-                        {
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "tags",
-                                Description = "Tags of your search",
-                                Type = ApplicationCommandOptionType.String,
-                                IsRequired = false
-                            },
-                            new SlashCommandOptionBuilder()
-                            {
-                                Name = "rating",
-                                Description = "Minimum rating (between 2 and 5)",
-                                Type = ApplicationCommandOptionType.Integer,
-                                IsRequired = false
-                            }
-                        },
-                        IsNsfw = true
-                    }.Build(),
-                    callback: DoujinshiAsync,
-                    precondition: Precondition.NsfwOnly,
-                    aliases: new[] { "doujin" },
-                    needDefer: true
-                ),
-                new CommandInfo(
-                    slashCommand: new SlashCommandBuilder()
-                    {
-                        Name = "wholesome",
-                        Description = "Get a random wholesome doujinshi",
-                        IsNsfw = true
-                    }.Build(),
-                    callback: WholesomeAsync,
-                    precondition: Precondition.NsfwOnly,
-                    aliases: Array.Empty<string>(),
-                    needDefer: true
-                )
-            };
+                            ,
+                        new SlashCommandOptionBuilder()
+                            .WithName("tags")
+                            .WithDescription("Tags of the search, separated by an empty space")
+                            .WithType(ApplicationCommandOptionType.String)
+                            .WithRequired(false)
+                    ),
+                callback: BooruAsync,
+                aliases: []
+            )
+        ];
         }
 
-        public async Task WholesomeAsync(ICommandContext ctx)
+
+        private SlashCommandOptionBuilder[] GetEHentaiOptions()
+            => [
+                    new SlashCommandOptionBuilder()
+                    .WithName("tags")
+                    .WithDescription("List of tags matching your search")
+                    .WithType(ApplicationCommandOptionType.String)
+                    .WithRequired(false),
+                new SlashCommandOptionBuilder()
+                    .WithName("rating")
+                    .WithDescription("Minimum rating of the search (default: 3)")
+                    .WithType(ApplicationCommandOptionType.Integer)
+                    .WithMinValue(1)
+                    .WithMaxValue(5)
+                    .WithRequired(false),
+                new SlashCommandOptionBuilder()
+                    .WithName("nsfw")
+                    .WithDescription("Choose if the option should be NSFW or not")
+                    .WithType(ApplicationCommandOptionType.Boolean)
+                    .WithRequired(false)
+                ];
+
+        public async Task WholesomeAsync(IContext ctx)
         {
-            var info = JsonConvert.DeserializeObject<WholesomeList>(await StaticObjects.HttpClient.GetStringAsync("https://wholesomelist.com/api/random")).entry;
-            var token = $"doujinshi-{Guid.NewGuid()}/{Regex.Match(info.link, "([0-9]+)").Groups[1].Value}";
-            StaticObjects.Doujinshis.Add(token);
-            var button = new ComponentBuilder()
-                .WithButton("Download", token);
+            var info = JsonSerializer.Deserialize<WholesomeList>(await ctx.Provider.GetRequiredService<HttpClient>().GetStringAsync("https://wholesomelist.com/api/random"), ctx.Provider.GetRequiredService<JsonSerializerOptions>()).Entry;
 
             var embed = new EmbedBuilder
             {
                 Color = new Color(255, 20, 147),
-                Title = info.title,
-                Url = info.link,
-                ImageUrl = info.image
+                Title = info.Title,
+                Url = $"https://wholesomelist.com/list/{info.Uuid}",
+                ImageUrl = info.Image
             };
-            if (info.tags != null)
-            {
-                embed.AddField("Tags", string.Join(", ", info.tags), true);
-            }
-            if (info.parody != null)
-            {
-                embed.AddField("Parody", info.parody, true);
-            }
-            if (info.note != null)
-            {
-                embed.AddField("Note", info.note, true);
-            }
-            embed.WithFooter($"Tier: {info.tier}");
+            var components = new ComponentBuilder();
 
-            await ctx.ReplyAsync(embed: embed.Build()/*, components: button.Build()*/);
+            if (info.Tags != null)
+            {
+                embed.AddField("Tags", string.Join(", ", info.Tags));
+            }
+            if (info.Note != null)
+            {
+                embed.AddField("Note", info.Note, true);
+            }
+            embed.AddField("Pages", $"{info.Pages} pages", true);
+            if (info.Parody != null)
+            {
+                embed.AddField("Parody", info.Parody, true);
+            }
+            if (info.EH != null)
+            {
+                components.WithButton("Download", EHentai.GetEHentaiButton(info.EH));
+            }
+            embed.WithFooter($"Tier: {info.Tier}");
+
+            await ctx.ReplyAsync(embed: embed.Build(), components: components.Build());
         }
 
-        public async Task AdultVideoAsync(ICommandContext ctx)
+        public async Task AdultVideoAsync(IContext ctx)
         {
             if (StaticObjects.JavmostCategories.Count == 0)
                 throw new CommandFailed("Javmost categories aren't loaded yet, please retry later.");
@@ -283,121 +207,69 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task DlRandAsync(ICommandContext ctx)
-        {
-            var last = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0));
-            var url = "https://www.dlsite.com/maniax/fsr/=/language/jp/regist_date_start/" + last.ToString("yyyy-MM-dd") + "/ana_flg/off/work_category%5B0%5D/doujin/order%5B0%5D/trend/per_page/30/release_term/week/show_type/1/from/fs.detail";
-
-            var html = await StaticObjects.HttpClient.GetStringAsync(url);
-            int maxId = int.Parse(Regex.Match(html, "RJ([0-9]+)\\.html").Groups[1].Value) + 1;
-            int id;
-            string doujinUrl;
-            HttpResponseMessage msg;
-
-            do
-            {
-                id = StaticObjects.Random.Next(1, maxId);
-                doujinUrl = "https://www.dlsite.com/maniax/work/=/product_id/RJ" + id + ".html";
-                msg = await StaticObjects.HttpClient.GetAsync(doujinUrl);
-            } while (msg.StatusCode == HttpStatusCode.NotFound);
-            html = await msg.Content.ReadAsStringAsync();
-
-            var title = Regex.Match(html, "<meta property=\"og:title\" content=\"([^\"]+)").Groups[1].Value;
-            title = HttpUtility.HtmlDecode(title[0..^9]);
-            var imageUrl = Regex.Match(html, "<meta property=\"og:image\" content=\"([^\"]+)").Groups[1].Value;
-            var description = HttpUtility.HtmlDecode(Regex.Match(html, "<meta name=\"description\" content=\"([^\"]+)").Groups[1].Value);
-            var price = Regex.Match(html, "class=\"price[^\"]*\">([0-9,]+)").Groups[1].Value.Replace(',', ' ');
-            var type = Regex.Match(html, "work_type[^\"]+\"><[^>]+>([^<]+)").Groups[1].Value;
-            html = html.Contains("main_genre") ?
-                html.Split(new[] { "main_genre" }, StringSplitOptions.None)[1].Split(new[] { "</div>" }, StringSplitOptions.None)[0]
-                : "";
-            var tags = Regex.Matches(html, "<a href=\"[^\"]+\">([^<]+)").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
-
-            await ctx.ReplyAsync(embed: new EmbedBuilder
-            {
-                Color = new Color(255, 20, 147),
-                Title = title,
-                Url = doujinUrl,
-                ImageUrl = imageUrl,
-                Description = description,
-                Fields = new List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Type",
-                        Value = type,
-                        IsInline = true
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        Name = "Price",
-                        Value = price + " ¥",
-                        IsInline = true
-                    }
-                },
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Tags: {string.Join(", ", tags)}"
-                }
-            }.Build());
-        }
-
-        public async Task DoujinshiAsync(ICommandContext ctx)
-        {
-            await GetEHentaiAsync(ctx, "doujinshi", 1021);
-        }
-
-        public async Task CosplayAsync(ICommandContext ctx)
-        {
-            await GetEHentaiAsync(ctx, "cosplay", 959);
-        }
-
-        private async Task GetEHentaiAsync(ICommandContext ctx, string name, int category)
+        public async Task CosplayAsync(IContext ctx)
         {
             var tags = ctx.GetArgument<string>("tags") ?? "";
-            var ratingInput = ctx.GetArgument<long?>("rating") ?? 0;
-
-            if (ratingInput != 0 && (ratingInput < 2 || ratingInput > 5))
+            var nsfwFilter = ctx.GetArgument<bool?>("nsfw");
+            if (nsfwFilter.HasValue)
             {
-                throw new CommandFailed($"The rating given must be between 2 and 5");
+                if (nsfwFilter.Value) tags = $"-other:non-nude {tags}";
+                else tags = $"other:non-nude {tags}";
             }
 
-            var pageCount = await EHentai.GetEHentaiContentCountAsync(name, category, (int)ratingInput, tags);
-            var rand = StaticObjects.Random.Next(0, pageCount);
-            var matches = await EHentai.GetAllMatchesAsync(category, (int)ratingInput, tags, rand / 25); // There are 25 results by page
-            var target = matches[rand % 25];
-            await EHentai.SendEmbedAsync(ctx, name, target);
+            await EHentai.GetEHentaiAsync(ctx, tags, "cosplay", 959);
         }
 
-        public async Task BooruAsync(ICommandContext ctx)
+        public async Task DoujinshiAsync(IContext ctx)
         {
-            var tags = (ctx.GetArgument<string>("tags") ?? "").Split(' ');
-            var type = (BooruType)ctx.GetArgument<long>("source");
+            var tags = ctx.GetArgument<string>("tags") ?? "";
+            var nsfwFilter = ctx.GetArgument<bool?>("nsfw");
 
-            var booruMax = Enum.GetValues(typeof(BooruType)).Cast<int>().Max();
-            if ((int)type < 0 || (int)type > booruMax)
+            int searchTarget = nsfwFilter switch
             {
-                throw new CommandFailed($"The booru given in parameter must be between 0 and {booruMax}");
-            }
+                null => 253,
+                true => 509,
+                false => 767
+            };
+
+            await EHentai.GetEHentaiAsync(ctx, tags, "cosplay", searchTarget);
+        }
+
+        public async Task BooruAsync(IContext ctx)
+        {
+            var tags = (ctx.GetArgument<string>("tags") ?? string.Empty).Split(' ');
+            var type = (BooruType)(ctx.GetArgument<long?>("source") ??
+#if NSFW_BUILD
+                (ctx.Channel is ITextChannel tChan && !tChan.IsNsfw ? (int)BooruType.Safebooru : (int)BooruType.Gelbooru)
+
+#else
+            (int)BooruType.Safebooru
+#endif
+
+            );
 
             ABooru booru = type switch
             {
-                BooruType.Safebooru => StaticObjects.Safebooru,
-                BooruType.Gelbooru => StaticObjects.Gelbooru,
-                BooruType.E621 => StaticObjects.E621,
-                BooruType.E926 => StaticObjects.E926,
-                BooruType.Rule34 => StaticObjects.Rule34,
-                BooruType.Konachan => StaticObjects.Konachan,
+                BooruType.Safebooru => new Safebooru(),
+                BooruType.E926 => new E926(),
+                BooruType.Sakugabooru => new Sakugabooru(),
+#if NSFW_BUILD
+                BooruType.Gelbooru => new Gelbooru(),
+                BooruType.E621 => new E621(),
+                BooruType.Rule34 => new Rule34(),
+                BooruType.Konachan => new Konachan(),
+#endif
                 _ => throw new NotImplementedException($"Invalid booru type {type}")
             };
 
-            if (!booru.IsSafe && ctx.Channel is ITextChannel tChan && !tChan.IsNsfw)
+            var isChanSfw = ctx.Channel is ITextChannel textC && !textC.IsNsfw;
+            if (isChanSfw && !booru.IsSafe && type != BooruType.Sakugabooru)
             {
-                throw new CommandFailed("This booru is only available in NSFW channels", true);
+                throw new CommandFailed("NSFW booru can only be requested in NSFW channels", ephemeral: true);
             }
 
-            BooruSharp.Search.Post.SearchResult post;
-            List<string> newTags = new();
+            SearchResult post;
+            List<string> newTags = [];
             try
             {
                 post = await booru.GetRandomPostAsync(tags);
@@ -405,10 +277,10 @@ namespace Sanara.Module.Command.Impl
             catch (InvalidTags)
             {
                 // On invalid tags we try to get guess which one the user wanted to use
-                newTags = new List<string>();
+                newTags = [];
                 foreach (string s in tags)
                 {
-                    var related = await StaticObjects.Konachan.GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
+                    var related = await new Konachan().GetTagsAsync(s); // Konachan have a feature where it can "autocomplete" a tag so we use it to guess what the user meant
                     if (related.Length == 0)
                         throw new CommandFailed("There is no image with those tags.");
                     newTags.Add(related.OrderBy(x => Utils.GetStringDistance(x.Name, s)).First().Name);
@@ -416,7 +288,7 @@ namespace Sanara.Module.Command.Impl
                 try
                 {
                     // Once we got our new tags, we try doing a new search with them
-                    post = await booru.GetRandomPostAsync(newTags.ToArray());
+                    post = await booru.GetRandomPostAsync([.. newTags]);
                 }
                 catch (InvalidTags)
                 {
@@ -425,30 +297,65 @@ namespace Sanara.Module.Command.Impl
                 }
             }
 
-            string id = $"tags-{(int)type}{post.ID}";
-            StaticObjects.Tags.AddTag(id, booru, post);
+            if (!isChanSfw && post.Rating == Rating.Explicit)
+            {
+                throw new CommandFailed("The image found have an unexpected rating of explicit");
+            }
 
-            if (post.FileUrl == null)
-                throw new CommandFailed("A post was found but no image was available.");
-
-            var button = new ComponentBuilder()
-                .WithButton("Tags info", id);
-            await ctx.ReplyAsync(embed: new EmbedBuilder
+            var embed = new EmbedBuilder
+            {
+                Color = post.Rating switch
                 {
-                    Color = post.Rating switch
-                    {
-                        Rating.General => Color.Green,
-                        Rating.Safe => Color.Green,
-                        Rating.Questionable => new Color(255, 255, 0), // Yellow
-                        Rating.Explicit => Color.Red,
-                        _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
-                    },
-                    ImageUrl = post.FileUrl.AbsoluteUri,
-                    Url = post.PostUrl.AbsoluteUri,
-                    Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last())
-                }.Build(), components: button.Build());
+                    Rating.General => Color.Green,
+                    Rating.Safe => Color.Green,
+                    Rating.Questionable => new Color(255, 255, 0),
+                    Rating.Explicit => Color.Red,
+                    _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
+                },
+                Url = post.PostUrl.AbsoluteUri,
+                Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last())
+            };
 
-            await StaticObjects.Db.AddBooruAsync(type.ToString());
+            if (post.DetailedTags != null)
+            {
+                var copyrights = post.DetailedTags.Where(x => x.Type == BooruSharp.Search.Tag.TagType.Copyright);
+                var characters = post.DetailedTags.Where(x => x.Type == BooruSharp.Search.Tag.TagType.Character);
+                var artists = post.DetailedTags.Where(x => x.Type == BooruSharp.Search.Tag.TagType.Artist);
+                if (copyrights.Any())
+                {
+                    embed.AddField("Copyrights", string.Join(", ", copyrights.Select(x => x.Name)));
+                }
+                if (characters.Any())
+                {
+                    embed.AddField("Characters", string.Join(", ", characters.Select(x => x.Name)));
+                }
+                if (artists.Any())
+                {
+                    embed.AddField("Artists", string.Join(", ", artists.Select(x => x.Name)));
+                }
+            }
+
+            var ext = Path.GetExtension(post.FileUrl.AbsoluteUri);
+            if (post.FileUrl == null)
+            {
+                embed.Description = "This post doesn't have any image associated";
+                await ctx.ReplyAsync(embed: embed.Build());
+            }
+            else if (Utils.IsImage(ext))
+            {
+                embed.ImageUrl = post.FileUrl.AbsoluteUri;
+                await ctx.ReplyAsync(embed: embed.Build());
+            }
+            else if (ext == ".swf")
+            {
+                embed.Description = "Flash games cannot be previewed";
+                await ctx.ReplyAsync(embed: embed.Build());
+            }
+            else
+            {
+                using MemoryStream ms = new(await ctx.Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(post.FileUrl.AbsoluteUri));
+                await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build());
+            }
         }
     }
 }

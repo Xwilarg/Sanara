@@ -16,11 +16,11 @@ namespace Sanara.Module.Command.Impl
             return new("Entertainment", "A collection of fun silly stuffs");
         }
 
-        public CommandInfo[] GetCommands()
+        public CommandData[] GetCommands()
         {
             return new[]
             {
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "inspire",
@@ -32,7 +32,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "vnquote",
@@ -44,7 +44,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "complete",
@@ -66,7 +66,7 @@ namespace Sanara.Module.Command.Impl
                     aliases: Array.Empty<string>(),
                     needDefer: true
                 ),
-                new CommandInfo(
+                new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "generate",
@@ -91,7 +91,7 @@ namespace Sanara.Module.Command.Impl
             };
         }
 
-        public async Task InspireAsync(ICommandContext ctx)
+        public async Task InspireAsync(IContext ctx)
         {
             await ctx.ReplyAsync(embed: new EmbedBuilder
             {
@@ -100,7 +100,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task VNQuoteAsync(ICommandContext ctx)
+        public async Task VNQuoteAsync(IContext ctx)
         {
             var html = await StaticObjects.HttpClient.GetStringAsync("https://vndb.org");
             var match = Regex.Match(html, "footer><span>\"<a href=\"\\/v([0-9]+)\">([^<]+)+<");
@@ -115,7 +115,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task CompleteAsync(ICommandContext ctx)
+        public async Task CompleteAsync(IContext ctx)
         {
             if (StaticObjects.DeepAI == null)
             {
@@ -136,7 +136,7 @@ namespace Sanara.Module.Command.Impl
             }.Build());
         }
 
-        public async Task GenerateAsync(ICommandContext ctx)
+        public async Task GenerateAsync(IContext ctx)
         {
             if (StaticObjects.DeepAI == null)
             {

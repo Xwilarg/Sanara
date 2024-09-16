@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace Sanara.Module.Command.Context
 {
-    public class ComponentCommandContext : ICommandContext
+    public class ComponentCommandContext : IContext
     {
         public ComponentCommandContext(SocketMessageComponent ctx)
             => _ctx = ctx;

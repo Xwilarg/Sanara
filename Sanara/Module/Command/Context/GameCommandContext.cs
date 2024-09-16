@@ -2,7 +2,7 @@
 
 namespace Sanara.Module.Command.Context
 {
-    public class GameCommandContext : ICommandContext
+    public class GameCommandContext : IContext
     {
         public GameCommandContext(IMessage message)
         {

@@ -26,7 +26,7 @@ namespace Sanara
             return Task.CompletedTask;
         }
 
-        public static async Task LogErrorAsync(System.Exception e, ICommandContext ctx)
+        public static async Task LogErrorAsync(System.Exception e, IContext ctx)
         {
             await LogAsync(new LogMessage(LogSeverity.Error, e.Source, e.Message, e));
 
