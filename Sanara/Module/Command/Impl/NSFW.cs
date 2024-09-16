@@ -2,12 +2,14 @@
 using BooruSharp.Search;
 using BooruSharp.Search.Post;
 using Discord;
+using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Sanara.Exception;
 using Sanara.Help;
 using Sanara.Module.Utility;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Sanara.Module.Command.Impl
 {
@@ -154,57 +156,47 @@ namespace Sanara.Module.Command.Impl
 
         public async Task AdultVideoAsync(IContext ctx)
         {
-            if (StaticObjects.JavmostCategories.Count == 0)
-                throw new CommandFailed("Javmost categories aren't loaded yet, please retry later.");
+            var query = (ctx.GetArgument<string>("query") ?? null);
 
-            var tag = ctx.GetArgument<string>("tag") ?? "all";
+            var rand = ctx.Provider.GetRequiredService<Random>();
+            var web = ctx.Provider.GetRequiredService<HtmlWeb>();
 
-            string url = "https://www.javmost.cx/category/" + tag;
-            string html = await AdultVideo.DoJavmostHttpRequestAsync(url);
-            int perPage = Regex.Matches(html, "<div class=\"card \">").Count; // Number of result per page
-            int total = int.Parse(Regex.Match(html, "<input type=\"hidden\" id=\"page_total\" value=\"([0-9]+)\" \\/>").Groups[1].Value); // Total number of video
-            if (total == 0)
-            {
-                throw new CommandFailed("There is nothing with this tag");
-            }
-            int page = StaticObjects.Random.Next(total / perPage);
-            if (page > 0) // If it's the first page, we already got the HTML
-            {
-                html = await AdultVideo.DoJavmostHttpRequestAsync(url + "/page/" + (page + 1));
-            }
-            var arr = html.Split(new[] { "<div class=\"card \">" }, StringSplitOptions.None).Skip(1).ToList(); // We remove things life header and stuff
-            Match videoMatch = null;
-            string[] videoTags = null;
-            string previewUrl = "";
-            int retryCount = 10;
-            while (arr.Count > 0) // That shouldn't fail
-            {
-                string currHtml = arr[StaticObjects.Random.Next(arr.Count)];
-                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.cx\\/([^\\/]+)\\/)\"");
-                if (!videoMatch.Success)
-                {
-                    retryCount--;
-                    if (retryCount == 0)
-                    {
-                        throw new InvalidOperationException("No video found after 10 tries...");
-                    }
-                    continue;
-                }
-                videoMatch = Regex.Match(currHtml, "<a href=\"(https:\\/\\/www\\.javmost\\.cx\\/([^\\/]+)\\/)\"");
-                previewUrl = Regex.Match(currHtml, "data-src=\"([^\"]+)\"").Groups[1].Value;
-                if (previewUrl.StartsWith("//"))
-                    previewUrl = "https:" + previewUrl;
-                videoTags = Regex.Matches(currHtml, "<a href=\"https:\\/\\/www\\.javmost\\.cx\\/category\\/([^\\/]+)\\/\"").Cast<Match>().Select(x => x.Groups[1].Value).ToArray();
-                break;
-            }
-            await ctx.ReplyAsync(embed: new EmbedBuilder()
-            {
-                Color = new Color(255, 20, 147),
-                Description = string.Join(", ", videoTags),
-                Title = videoMatch.Groups[2].Value,
-                Url = videoMatch.Groups[1].Value,
-                ImageUrl = previewUrl
-            }.Build());
+            // Get main page
+            var targetUrl = query == null ? "https://missav.com/dm506/en/release" : $"https://missav.com/en/search/{HttpUtility.UrlEncode(query)}";
+            var html = web.Load(targetUrl);
+            var page = int.Parse(html.DocumentNode.SelectSingleNode("//nav[contains(@class, 'mt-6')]").ChildNodes[1].SelectSingleNode("form").SelectSingleNode("div").ChildNodes[1].InnerHtml[2..]);
+
+            // Get random page
+            html = web.Load($"{targetUrl}?page={rand.Next(0, page)}");
+            var videos = html.DocumentNode.SelectSingleNode("//body").ChildNodes[3].ChildNodes[5].ChildNodes[5].ChildNodes.Where(x => !string.IsNullOrWhiteSpace(x.InnerHtml)).ToArray();
+            var target = videos[rand.Next(0, videos.Length)];
+            var container = target.ChildNodes[1].ChildNodes[1].ChildNodes[1];
+            var code = container.Attributes["alt"].Value;
+            var image = container.SelectSingleNode("img").Attributes["data-src"].Value;
+
+            // Get random video
+            var finalUrl = $"https://missav.com/en/{code}";
+            html = web.Load(finalUrl);
+            var info = html.DocumentNode.SelectSingleNode("//div[contains(@x-show, \"currentTab === 'video_details'\")]");
+
+            // Get fields
+            var name = html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml;
+            var description = HttpUtility.HtmlDecode(info.ChildNodes[1].ChildNodes[1].ChildNodes[1].InnerHtml);
+            var tags = info.ChildNodes[1].ChildNodes[5].ChildNodes[7].SelectNodes("a").Select(x => x.InnerHtml);
+
+            var embed = new EmbedBuilder()
+                .WithColor(Color.Blue)
+                .WithTitle(name)
+                .WithUrl(finalUrl)
+                .WithImageUrl(image)
+                .WithDescription(description)
+                .WithFields(
+                    new EmbedFieldBuilder()
+                        .WithName("Tags")
+                        .WithValue(string.Join(", ", tags))
+                );
+
+            await ctx.ReplyAsync(embed: embed.Build());
         }
 
         public async Task CosplayAsync(IContext ctx)
@@ -261,6 +253,7 @@ namespace Sanara.Module.Command.Impl
 #endif
                 _ => throw new NotImplementedException($"Invalid booru type {type}")
             };
+            booru.HttpClient = ctx.Provider.GetRequiredService<HttpClient>();
 
             var isChanSfw = ctx.Channel is ITextChannel textC && !textC.IsNsfw;
             if (isChanSfw && !booru.IsSafe && type != BooruType.Sakugabooru)

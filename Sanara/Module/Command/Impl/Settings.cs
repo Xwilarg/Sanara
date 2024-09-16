@@ -26,11 +26,9 @@ namespace Sanara.Module.Command.Impl
                         Name = "ping",
                         Description = "Get the latency between the bot and Discord",
                         IsNsfw = false
-                    }.Build(),
+                    },
                     callback: PingAsync,
-                    precondition: Precondition.None,
-                    aliases: Array.Empty<string>(),
-                    needDefer: false
+                    aliases: []
                 ),
 #if NSFW_BUILD
                 new CommandData(
@@ -39,11 +37,9 @@ namespace Sanara.Module.Command.Impl
                         Name = "help",
                         Description = "Get the list of commands",
                         IsNsfw = false
-                    }.Build(),
+                    },
                     callback: HelpAsync,
-                    precondition: Precondition.None,
-                    aliases: Array.Empty<string>(),
-                    needDefer: false
+                    aliases: []
                 ),
 #endif
                 new CommandData(
@@ -52,30 +48,28 @@ namespace Sanara.Module.Command.Impl
                         Name = "botinfo",
                         Description = "Get various information about the bot",
                         IsNsfw = false
-                    }.Build(),
+                    },
                     callback: BotInfoAsync,
-                    precondition: Precondition.None,
-                    aliases: Array.Empty<string>(),
-                    needDefer: false
+                    aliases: Array.Empty<string>()
                 ),
                 new CommandData(
                     slashCommand: new SlashCommandBuilder()
                     {
                         Name = "configure",
                         Description = "Configure the bot for the current guild",
-                        IsNsfw = false
+                        IsNsfw = false,
+                        ContextTypes = [ InteractionContextType.Guild ],
                     }.Build(),
                     callback: ConfigureAsync,
-                    precondition: Precondition.AdminOnly | Precondition.GuildOnly,
-                    aliases: Array.Empty<string>(),
-                    needDefer: false
+                    adminOnly: true,
+                    aliases: []
                 )
             };
         }
 
         public async Task HelpAsync(IContext ctx)
         {
-            await ctx.ReplyAsync("Slash commands are now here! Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
+            await ctx.ReplyAsync("Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
         }
 
         public async Task ConfigureAsync(IContext ctx)

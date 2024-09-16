@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotsList.Api;
 using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Sanara.Converter;
+using Sanara.Service;
 using Sanara.Exception;
 using Sanara.Module.Button;
 using Sanara.Module.Command;
@@ -17,6 +17,8 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using VndbSharp;
+using Sanara.Database;
+using Microsoft.Extensions.Logging;
 
 namespace Sanara;
 
@@ -25,19 +27,31 @@ public sealed class Program
     private bool _didStart = false; // Keep track if the bot already started (mean it called the "Connected" callback)
     private readonly Dictionary<string, CommandData> _commandsAssociations = [];
 
-    public static IServiceProvider CreateProvider(DiscordSocketClient client, Credentials credentials)
+    private IServiceProvider _provider;
+    private DiscordSocketClient _client;
+
+    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient client, Credentials credentials)
     {
+        Db db = new();
+        await db.InitAsync();
+
         var coll = new ServiceCollection();
         coll
             .AddSingleton<HttpClient>()
             .AddSingleton<HtmlWeb>() // HTML Parser
             .AddSingleton<Vndb>() // VNDB Client
             .AddSingleton<Random>()
+            .AddSingleton<Db>()
             .AddSingleton(new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
             })
             .AddSingleton<JapaneseConverter>();
+
+        if (credentials.TopGgToken != null)
+        {
+            coll.AddSingleton(new TopGGClient(client.CurrentUser.Id, credentials.TopGgToken));
+        }
 
         if (File.Exists("Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
         {
@@ -93,32 +107,31 @@ public sealed class Program
     {
         await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
-        // Create saves directories
-        if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
-        if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
-        if (!Directory.Exists("Saves/Game")) Directory.CreateDirectory("Saves/Game");
-
+        _client = new(new()
+        {
+#if DEBUG
+            LogLevel = LogSeverity.Verbose,
+#endif
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.MessageContent
+        });
         // Setting Logs callback
-        StaticObjects.Client.Log += Log.LogAsync;
+        _client.Log += Log.LogAsync;
 
         // Load credentials
         if (!File.Exists("Keys/Credentials.json"))
             throw new FileNotFoundException("Missing Credentials file");
-        var _credentials = JsonConvert.DeserializeObject<Credentials>(File.ReadAllText("Keys/Credentials.json"));
+        var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
 
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-        // Initialize services
-        try
+
+        if (credentials.SentryKey != null)
         {
-            await StaticObjects.InitializeAsync(_credentials);
+            SentrySdk.Init(credentials.SentryKey);
         }
-        catch (System.Exception e)
-        {
-            await Log.LogErrorAsync(e, null);
-            throw;
-        }
+
+        _provider = await CreateProviderAsync(_client, credentials);
 
         // If the bot takes way too much time to start, we stop the program
         // We do that after the StaticObjects initialization because the first time we load game cache, it can takes plenty of time
@@ -132,40 +145,46 @@ public sealed class Program
         // Discord callbacks
 
         // Reactions to messages
-        StaticObjects.Client.ReactionAdded += Module.Utility.Language.TranslateFromReactionAsync;
+        _client.ReactionAdded += Module.Utility.Language.TranslateFromReactionAsync;
 
         // Games
-        StaticObjects.Client.MessageReceived += HandleCommandAsync;
+        _client.MessageReceived += HandleCommandAsync;
 
         // Ready the bot
-        StaticObjects.Client.Connected += ConnectedAsync;
-        StaticObjects.Client.Ready += Ready;
-        StaticObjects.Client.Disconnected += Disconnected;
+        _client.Connected += ConnectedAsync;
+        _client.Ready += Ready;
+        _client.Disconnected += Disconnected;
 
         // Db
-        StaticObjects.Client.GuildAvailable += GuildJoined;
-        StaticObjects.Client.JoinedGuild += GuildJoined;
+        _client.GuildAvailable += GuildJoined;
+        _client.JoinedGuild += GuildJoined;
 
         // Guild count
-        StaticObjects.Client.JoinedGuild += ChangeGuildCountAsync;
-        StaticObjects.Client.LeftGuild += ChangeGuildCountAsync;
+        _client.JoinedGuild += ChangeGuildCountAsync;
+        _client.LeftGuild += ChangeGuildCountAsync;
 
         // Interactions
-        StaticObjects.Client.SlashCommandExecuted += SlashCommandExecuted;
-        StaticObjects.Client.AutocompleteExecuted += AutocompleteExecuted;
-        StaticObjects.Client.ButtonExecuted += ButtonExecuted;
-        StaticObjects.Client.SelectMenuExecuted += SelectMenuExecuted;
+        _client.SlashCommandExecuted += SlashCommandExecuted;
+        _client.ButtonExecuted += ButtonExecuted;
+        _client.SelectMenuExecuted += SelectMenuExecuted;
 
-        await StaticObjects.Client.LoginAsync(TokenType.Bot, _credentials.BotToken);
-        await StaticObjects.Client.StartAsync();
+        await _client.LoginAsync(TokenType.Bot, credentials.BotToken);
+        await _client.StartAsync();
 
         // We keep the bot online
         await Task.Delay(-1);
     }
 
-    private bool DoesFailNsfwOnlyPrecondition(ITextChannel? tChan)
+    public async Task UpdateTopGgAsync()
     {
-        return tChan != null && !tChan.IsNsfw;
+        var auth = _provider.GetService<TopGGClient>();
+        if (auth != null)
+        {
+            if (auth.ShouldSend) // Make sure to not spam the API
+            {
+                await auth.SendAsync(_client.Guilds.Count);
+            }
+        }
     }
 
     private bool DoesFailAdminOnlyPrecondition(ITextChannel? tChan, IUser user)
@@ -175,22 +194,9 @@ public sealed class Program
 
     private async Task LaunchCommandAsync(Module.Command.CommandData cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.IContext>> ctxCreatorAsync)
     {
-        if ((cmd.Precondition & Precondition.OwnerOnly) != 0 && user.Id != 144851584478740481) // TODO: May want to not hardcode that
-        {
-            await errorMsgAsync("This command can only be done by the bot owner", true);
-        }
-        else if ((cmd.Precondition & Precondition.NsfwOnly) != 0 && DoesFailNsfwOnlyPrecondition(tChan))
-        {
-            await errorMsgAsync("This command can only be done in NSFW channels", true);
-        }
-        else if ((cmd.Precondition & Precondition.AdminOnly) != 0 && DoesFailAdminOnlyPrecondition(tChan, user))
+        if (cmd.adminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
         {
             await errorMsgAsync("This command can only be done by a guild administrator", true);
-        }
-        else if ((cmd.Precondition & Precondition.GuildOnly) != 0 &&
-            tChan == null)
-        {
-            await errorMsgAsync("This command can only be done in a guild", true);
         }
         else
         {
@@ -201,10 +207,12 @@ public sealed class Program
                 {
                     try
                     {
-                        await StaticObjects.Db.AddNewCommandAsync(cmd.SlashCommand.Name.Value.ToUpperInvariant(), isSlashCommand);
+                        var db = _provider.GetRequiredService<Db>();
+
+                        await db.AddNewCommandAsync(cmd.SlashCommand.Name.ToUpperInvariant(), isSlashCommand);
                         StaticObjects.LastMessage = DateTime.UtcNow;
                         await cmd.Callback(context);
-                        await StaticObjects.Db.AddCommandSucceed();
+                        await db.AddCommandSucceed();
                     }
                     catch (System.Exception e)
                     {
@@ -234,52 +242,16 @@ public sealed class Program
         }
     }
 
-    private async Task AutocompleteExecuted(SocketAutocompleteInteraction arg)
-    {
-        var input = arg.Data.Current.Value;
-        if (arg.Data.CommandName == "adultvideo")
-        {
-            if (arg.Channel is ITextChannel tChan && !tChan.IsNsfw)
-            {
-                await arg.RespondAsync(new[]
-                {
-                    new AutocompleteResult("This command must be done in a NSFW channel", string.Empty)
-                });
-            }
-            else
-            {
-                if ((string)input == string.Empty)
-                {
-                    await arg.RespondAsync(StaticObjects.JavmostCategories
-                        .Select(tag =>
-                        {
-                            return new AutocompleteResult(tag.Tag, tag.Tag.ToLowerInvariant());
-                        })
-                        .Take(25)
-                    );
-                }
-                else
-                {
-                    await arg.RespondAsync(StaticObjects.JavmostCategories
-                        .Where(tag => tag.Item1.ToLowerInvariant().StartsWith((string)input))
-                        .Select(tag =>
-                        {
-                            return new AutocompleteResult(tag.Tag, tag.Tag.ToLowerInvariant());
-                        })
-                        .Take(25)
-                    );
-                }
-            }
-        }
-    }
+    public static bool IsBotOwner(IUser user) => user.Id == 144851584478740481; // TODO: ew
 
-    private readonly List<ulong> _pendingRequests = new();
+    private readonly List<ulong> _pendingRequests = [];
+    private readonly List<string> _downloadRequests = [];
 
     private async Task SelectMenuExecuted(SocketMessageComponent arg)
     {
-        if (arg.Data.CustomId == "delCache" && StaticObjects.IsBotOwner(arg.User))
+        if (arg.Data.CustomId == "delCache" && IsBotOwner(arg.User))
         {
-            await StaticObjects.Db.DeleteCacheAsync(arg.Data.Values.ElementAt(0));
+            await _provider.GetRequiredService<Db>().DeleteCacheAsync(arg.Data.Values.ElementAt(0));
             await arg.RespondAsync("Cache deleted", ephemeral: true);
         }
     }
@@ -401,41 +373,49 @@ public sealed class Program
                 }.Build(), ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
-            else if (arg.Data.CustomId.StartsWith("tags-") && StaticObjects.Tags.ContainsTag(arg.Data.CustomId))
+            else if (arg.Data.CustomId.StartsWith("download-"))
             {
-                await arg.DeferLoadingAsync();
-                _ = Task.Run(async () =>
+                var target = arg.Data.CustomId[9..];
+                lock (_downloadRequests)
                 {
-                    try
+                    if (_downloadRequests.Contains(target))
                     {
-                        await Booru.GetTagsAsync(ctx, arg.Data.CustomId);
-                        _pendingRequests.Remove(arg.User.Id);
+                        return;
                     }
-                    catch (System.Exception ex)
+                    _downloadRequests.Add(target);
+                    _ = Task.Run(async () =>
                     {
-                        await Log.LogErrorAsync(ex, ctx);
-                        _pendingRequests.Remove(arg.User.Id);
-                    }
-                });
-            }
-            else if (arg.Data.CustomId.StartsWith("ehentai-") && StaticObjects.EHentai.Contains(arg.Data.CustomId))
-            {
-                StaticObjects.EHentai.Remove(arg.Data.CustomId);
-                await arg.DeferLoadingAsync();
-                _ = Task.Run(async () =>
+                        try
+                        {
+                            await arg.Message.ModifyAsync(x => x.Components = new ComponentBuilder().Build());
+                        }
+                        catch (Exception e)
+                        {
+                            await Logger.LogErrorAsync(e, ctx);
+                        }
+                        finally
+                        {
+                            _downloadRequests.Remove(target);
+                        }
+                    });
+                }
+
+                if (target.StartsWith("ehentai-"))
                 {
-                    try
+                    var ids = target[8..];
+                    _ = Task.Run(async () =>
                     {
-                        var id = arg.Data.CustomId.Split('/');
-                        await Cosplay.DownloadCosplayAsync(ctx, id[1], id[2], id[3]);
-                        _pendingRequests.Remove(arg.User.Id);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        await Log.LogErrorAsync(ex, ctx);
-                        _pendingRequests.Remove(arg.User.Id);
-                    }
-                });
+                        try
+                        {
+                            await ctx.ReplyAsync("Your file is being downloaded...");
+                            await Command.ButtonCommand.Nsfw.EHentaiDownloadAsync(ctx, _provider, ids);
+                        }
+                        catch (Exception e)
+                        {
+                            await Logger.LogErrorAsync(e, ctx);
+                        }
+                    });
+                }
             }
             /*else if (arg.Data.CustomId.StartsWith("doujinshi-") && StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
             {

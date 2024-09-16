@@ -2,7 +2,7 @@
 
 namespace Sanara.Module.Command;
 
-public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task> callback, string[] aliases)
+public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task> callback, string[] aliases, bool adminOnly = false)
 {
     /// <summary>
     /// Slash command info
@@ -16,4 +16,5 @@ public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task>
     /// Other names that can be used instead of the command name
     /// </summary>
     public string[] Aliases { get; } = aliases.Select(x => x.ToUpperInvariant()).ToArray();
+    public bool IsAdminOnly { get; } = adminOnly;
 }

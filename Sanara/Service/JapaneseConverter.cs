@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace Sanara.Converter;
+namespace Sanara.Service;
 
 public class JapaneseConverter // TODO: Use external library instead?
 {
