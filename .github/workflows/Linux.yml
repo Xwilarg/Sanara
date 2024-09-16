@@ -2,7 +2,7 @@ name: Linux
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, v5 ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -14,28 +14,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v4
       with:
-        dotnet-version: '6.0.x'
-        include-prerelease: true
+        submodules: 'true'
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-    - name: Init submodules
-      run: git submodule init && git submodule update
+      uses: github/codeql-action/init@v3
     - name: Install dependencies
       run: dotnet restore
-    - name: Install ReThinkdb
-      run: source /etc/lsb-release && echo "deb https://download.rethinkdb.com/repository/ubuntu-$DISTRIB_CODENAME $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list && wget -qO- https://download.rethinkdb.com/repository/raw/pubkey.gpg | sudo apt-key add - && sudo apt-get update && sudo apt-get install rethinkdb
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Start ReThinkdb
-      run: nohup rethinkdb &
+    - name: Generate help
+      run: dotnet run --project Sanara.Help/Sanara.Help.csproj
     - name: Publish Sanara
       run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE%3BNSFW_BUILD
     - name: Publish Sanara SFW version
       run: dotnet publish -c Release-SFW -r linux-x64 -o Release-SFW Sanara/Sanara.csproj /p:DefineConstants=TRACE
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Help
+        path: ./help.json
+        retention-days: 2
     - uses: actions/upload-artifact@v2
       with:
         name: Sanara
@@ -47,8 +49,6 @@ jobs:
         path: ./Release-SFW
         retention-days: 2
     - name: Test
-      env:
-        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
     - name: Copy coverage
       run: sh copy_coverage.sh
@@ -58,4 +58,4 @@ jobs:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage.xml
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v3
