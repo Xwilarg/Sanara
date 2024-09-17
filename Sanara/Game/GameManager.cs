@@ -31,7 +31,7 @@ namespace Sanara.Game
 #if !NSFW_BUILD
                 if (!p.IsSafe())
                 {
-                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " was skipped"));
+                    Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " was skipped")).GetAwaiter().GetResult();
                     continue;
                 }
 #endif
