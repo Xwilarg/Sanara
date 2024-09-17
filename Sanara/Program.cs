@@ -136,6 +136,13 @@ public sealed class Program
             throw new FileNotFoundException("Missing Credentials file");
         var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
 
+        if (credentials.UploadWebsiteLocation != null)
+        {
+            if (!credentials.UploadWebsiteLocation.EndsWith("/")) credentials.UploadWebsiteLocation += "/";
+
+            if (!credentials.UploadWebsiteUrl.EndsWith("/")) credentials.UploadWebsiteUrl += "/"; // Makes sure the URL end with a /
+        }
+
         _debugGuildId = credentials.DebugGuild;
 
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
