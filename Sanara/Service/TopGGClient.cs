@@ -7,7 +7,7 @@ public class TopGGClient
     private AuthDiscordBotListApi _client;
     private DateTime _lastSend;
 
-    public TopGGClient(ulong id, string token)
+    public void Init(ulong id, string token)
     {
         _client = new AuthDiscordBotListApi(id, token);
     }

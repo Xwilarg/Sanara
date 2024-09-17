@@ -36,9 +36,6 @@ public sealed class Program
     public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient client, Credentials credentials)
     {
         Db db = new();
-        await db.InitAsync();
-
-        Log.Init(db);
 
         GameManager gameManager = new();
 
@@ -67,7 +64,7 @@ public sealed class Program
 
         if (credentials.TopGgToken != null)
         {
-            coll.AddSingleton(new TopGGClient(client.CurrentUser.Id, credentials.TopGgToken));
+            coll.AddSingleton<TopGGClient>();
         }
 
         if (File.Exists("Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
@@ -139,7 +136,7 @@ public sealed class Program
             throw new FileNotFoundException("Missing Credentials file");
         var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
 
-        _debugGuildId = ulong.Parse(credentials.DebugGuild);
+        _debugGuildId = credentials.DebugGuild;
 
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -152,16 +149,21 @@ public sealed class Program
 
         _provider = await CreateProviderAsync(_client, credentials);
 
+        await _provider.GetRequiredService<Db>().InitAsync();
+
+        Log.Init(_provider.GetRequiredService<Db>());
 
         _ = Task.Run(async () => { try { await _provider.GetRequiredService<SubscriptionManager>().InitAsync(_provider); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
-        Game.Preload.Impl.Static.Shiritori.Init(_provider);
-        Game.Preload.Impl.Static.Arknights.Init(_provider);
-        Game.Preload.Impl.Static.AzurLane.Init(_provider);
-        Game.Preload.Impl.Static.FateGO.Init(_provider);
-        Game.Preload.Impl.Static.GirlsFrontline.Init(_provider);
-        Game.Preload.Impl.Static.Kancolle.Init(_provider);
-        Game.Preload.Impl.Static.Pokemon.Init(_provider);
-        _provider.GetRequiredService<GameManager>().Init(_provider);
+        _ = Task.Run(async () => { try {
+                Game.Preload.Impl.Static.Shiritori.Init(_provider);
+                Game.Preload.Impl.Static.Arknights.Init(_provider);
+                Game.Preload.Impl.Static.AzurLane.Init(_provider);
+                Game.Preload.Impl.Static.FateGO.Init(_provider);
+                Game.Preload.Impl.Static.GirlsFrontline.Init(_provider);
+                Game.Preload.Impl.Static.Kancolle.Init(_provider);
+                Game.Preload.Impl.Static.Pokemon.Init(_provider);
+                _provider.GetRequiredService<GameManager>().Init(_provider);
+            } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
 
 
         // If the bot takes way too much time to start, we stop the program
@@ -615,7 +617,7 @@ public sealed class Program
         new Module.Command.Impl.Game(),
         new Language(),
         new NSFW(),
-        new Module.Command.Impl.Settings(),
+        new Settings(),
         new Module.Command.Impl.Subscription(),
         new Tool()
     ];
@@ -761,6 +763,8 @@ public sealed class Program
     {
         _didStart = true;
         ClientId = _client.CurrentUser.Id;
+        var drama = _provider.GetService<TopGGClient>();
+        if (drama != null) drama.Init(_client.CurrentUser.Id, _provider.GetRequiredService<Credentials>().TopGgToken);
         await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
     }
 }

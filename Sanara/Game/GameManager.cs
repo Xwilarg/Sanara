@@ -10,11 +10,22 @@ namespace Sanara.Game
         public GameManager()
         {
             thread = new(new ThreadStart(Loop));
+            List<string> allNames = [];
+            foreach (var p in Preloads)
+            {
+#if !NSFW_BUILD
+                if (!p.IsSafe())
+                {
+                    continue;
+                }
+#endif
+                allNames.Add(p.Name);// TODO: + (option == null ? "" : "-" + option));
+            }
+            AllGameNames = [.. allNames];
         }
 
         public void Init(IServiceProvider provider)
         {
-            List<string> allNames = [];
             foreach (var p in Preloads)
             {
 #if !NSFW_BUILD
@@ -24,7 +35,6 @@ namespace Sanara.Game
                     continue;
                 }
 #endif
-                allNames.Add(p.Name);// TODO: + (option == null ? "" : "-" + option));
                 _ = Task.Run(async () =>
                 {
                     try
@@ -39,7 +49,6 @@ namespace Sanara.Game
                     }
                 });
             }
-            AllGameNames = [.. allNames];
 
             thread.Start();
         }

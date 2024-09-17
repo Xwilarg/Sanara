@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sanara.Game.Preload.Result;
-using Sanara.Module.Utility;
 using Sanara.Service;
 
 namespace Sanara.Game.Preload.Impl.Static

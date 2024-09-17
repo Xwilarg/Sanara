@@ -2,13 +2,13 @@
 {
     public record Credentials
     {
-        public string BotToken;
-        public string UploadWebsiteUrl;
-        public string UploadWebsiteLocation;
-        public string SentryKey;
-        public string TopGgToken;
-        public string MyDramaListApiKey;
-        public string DebugGuild;
+        public string BotToken { set; get; }
+        public string UploadWebsiteUrl { set; get; }
+        public string UploadWebsiteLocation { set; get; }
+        public string SentryKey { set; get; }
+        public string TopGgToken { set; get; }
+        public string MyDramaListApiKey { set; get; }
+        public ulong DebugGuild { set; get; }
         /// <summary>
         /// Need to be created on Google console
         /// </summary>

@@ -7,9 +7,9 @@ public class JapaneseConverter // TODO: Use external library instead?
 {
     public JapaneseConverter()
     {
-        _romajiToHiragana = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Hiragana.json"))!;
+        _romajiToHiragana = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Hiragana.json"))!;
         _hiraganaToRomaji = _romajiToHiragana.ToDictionary(x => x.Value, x => x.Key);
-        _romajiToKatakana = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText("LanguageResources/Katakana.json"))!;
+        _romajiToKatakana = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText("LanguageResource/Katakana.json"))!;
         _katakanaToRomaji = _romajiToKatakana.ToDictionary(x => x.Value, x => x.Key);
     }
 
