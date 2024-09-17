@@ -9,13 +9,17 @@ public class TopGGClient
 
     public void Init(ulong id, string token)
     {
-        _client = new AuthDiscordBotListApi(id, token);
+        if (token != null)
+        {
+            _client = new AuthDiscordBotListApi(id, token);
+        }
     }
 
     public bool ShouldSend => _lastSend.AddMinutes(10).CompareTo(DateTime.Now) < 0;
 
     public async Task SendAsync(int guildCount)
     {
+        if (_client == null) return;
         _lastSend = DateTime.Now;
         await _client.UpdateStats(guildCount);
     }

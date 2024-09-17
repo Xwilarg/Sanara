@@ -56,16 +56,12 @@ public sealed class Program
             .AddSingleton(db)
             .AddSingleton(gameManager)
             .AddSingleton<TranslatorService>()
+            .AddSingleton<TopGGClient>()
             .AddSingleton(new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
             })
             .AddSingleton<JapaneseConverter>();
-
-        if (credentials.TopGgToken != null)
-        {
-            coll.AddSingleton<TopGGClient>();
-        }
 
         if (File.Exists("Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
         {
@@ -803,6 +799,6 @@ public sealed class Program
         ClientId = _client.CurrentUser.Id;
         var drama = _provider.GetService<TopGGClient>();
         if (drama != null) drama.Init(_client.CurrentUser.Id, _provider.GetRequiredService<Credentials>().TopGgToken);
-        await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
+        await _provider.GetService<TopGGClient>().SendAsync(_client.Guilds.Count);
     }
 }
