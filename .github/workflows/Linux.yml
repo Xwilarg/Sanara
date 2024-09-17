@@ -2,7 +2,7 @@ name: Linux
 
 on:
   push:
-    branches: [ master, v5 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -33,17 +33,17 @@ jobs:
       run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE%3BNSFW_BUILD
     - name: Publish Sanara SFW version
       run: dotnet publish -c Release-SFW -r linux-x64 -o Release-SFW Sanara/Sanara.csproj /p:DefineConstants=TRACE
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: Help
         path: ./help.json
         retention-days: 2
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: Sanara
         path: ./Release
         retention-days: 2
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: Sanara-SFW
         path: ./Release-SFW
