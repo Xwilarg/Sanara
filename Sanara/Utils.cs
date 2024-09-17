@@ -4,9 +4,6 @@ namespace Sanara
 {
     public static class Utils
     {
-        public static string PadNumber(int nb)
-            => nb > 9 ? $"{nb}" : $"0{nb}";
-
         public static bool EasyCompare(string a, string b)
         {
             string va, vb;

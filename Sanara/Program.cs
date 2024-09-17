@@ -1,14 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotsList.Api;
 using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Sanara.Service;
 using Sanara.Exception;
-using Sanara.Module.Button;
 using Sanara.Module.Command;
 using Sanara.Module.Command.Context;
 using Sanara.Module.Command.Impl;
@@ -18,7 +16,6 @@ using System.Text;
 using System.Text.Json;
 using VndbSharp;
 using Sanara.Database;
-using Microsoft.Extensions.Logging;
 
 namespace Sanara;
 
@@ -29,6 +26,8 @@ public sealed class Program
 
     private IServiceProvider _provider;
     private DiscordSocketClient _client;
+
+    private ulong _debugGuildId;
 
     public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient client, Credentials credentials)
     {
@@ -47,6 +46,11 @@ public sealed class Program
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
             })
             .AddSingleton<JapaneseConverter>();
+
+        if (credentials.MyDramaListApiKey != null)
+        {
+            coll.AddSingleton(new DramaApiData() { ApiKey = credentials.MyDramaListApiKey });
+        }
 
         if (credentials.TopGgToken != null)
         {
@@ -121,6 +125,8 @@ public sealed class Program
         if (!File.Exists("Keys/Credentials.json"))
             throw new FileNotFoundException("Missing Credentials file");
         var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
+
+        _debugGuildId = ulong.Parse(credentials.DebugGuild);
 
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -417,25 +423,6 @@ public sealed class Program
                     });
                 }
             }
-            /*else if (arg.Data.CustomId.StartsWith("doujinshi-") && StaticObjects.Doujinshis.Contains(arg.Data.CustomId))
-            {
-                StaticObjects.Doujinshis.Remove(arg.Data.CustomId);
-                await arg.DeferLoadingAsync();
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        var id = arg.Data.CustomId.Split('/').Last();
-                        await Doujinshi.DownloadDoujinshiAsync(ctx, id);
-                        _pendingRequests.Remove(arg.User.Id);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        await Log.LogErrorAsync(ex, ctx);
-                        _pendingRequests.Remove(arg.User.Id);
-                    }
-                });
-            }*/
             else if (arg.Data.CustomId.StartsWith("replay/"))
             {
                 var id = arg.Data.CustomId[7..];
@@ -598,6 +585,16 @@ public sealed class Program
         });
     }
 
+    private ISubmodule[] Submodules => [
+        new Entertainment(),
+        new Module.Command.Impl.Game(),
+        new Language(),
+        new NSFW(),
+        new Module.Command.Impl.Settings(),
+        new Module.Command.Impl.Subscription(),
+        new Tool()
+    ];
+
     private async Task Ready()
     {
         if (_commandsAssociations.Count != 0)
@@ -609,67 +606,51 @@ public sealed class Program
         {
             try
             {
-                List<ISubmodule> _submodules = new();
-
-                // Add submodules
-                _submodules.Add(new Entertainment());
-                _submodules.Add(new Module.Command.Impl.Game());
-                _submodules.Add(new Language());
-                _submodules.Add(new NSFW());
-                _submodules.Add(new Module.Command.Impl.Settings());
-                _submodules.Add(new Module.Command.Impl.Subscription());
-                _submodules.Add(new Tool());
-
-                StaticObjects.Help = new(_submodules);
-                File.WriteAllText("Saves/Help.json", JsonConvert.SerializeObject(StaticObjects.Help.Data));
+                var submobules = Submodules;
 
                 SocketGuild? debugGuild = null;
-                if (StaticObjects.DebugGuildId != 0 && Debugger.IsAttached)
+                if (_debugGuildId != 0 && Debugger.IsAttached)
                 {
-                    debugGuild = StaticObjects.Client.GetGuild(StaticObjects.DebugGuildId);
+                    debugGuild = _client.GetGuild(_debugGuildId);
                 }
 
                 // Preload commands
-                foreach (var s in _submodules)
+                foreach (var s in submobules)
                 {
-                    await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Module] {s.GetInfo().Name}"));
+                    await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Module] {s.Name}"));
                     foreach (var c in s.GetCommands()
 #if !NSFW_BUILD
                         // NSFW build doesn't preload NSFW commands
-                        .Where(x => (x.Precondition & Precondition.NsfwOnly) == 0)
+                        .Where(x => !x.SlashCommand.IsNsfw)
 #endif
                     )
                     {
                         await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Command] {c.SlashCommand.Name}"));
-                        _commandsAssociations.Add(c.SlashCommand.Name.Value.ToUpperInvariant(), c);
+                        _commandsAssociations.Add(c.SlashCommand.Name.ToUpperInvariant(), c);
                     }
                 }
 
                 // Send everything to Discord
-                foreach (var c in _commandsAssociations.Values.Where(x => (x.Precondition & Precondition.OwnerOnly) == 0))
+                foreach (var c in _commandsAssociations.Values.Select(x => x.SlashCommand.Build()))
                 {
-                    if (c.Precondition != Precondition.None)
-                    {
-                        c.SlashCommand.Description = $"({c.Precondition}) {c.SlashCommand.Description}";
-                    }
                     if (debugGuild != null)
                     {
-                        await debugGuild.CreateApplicationCommandAsync(c.SlashCommand);
+                        await debugGuild.CreateApplicationCommandAsync(c);
                     }
                     else
                     {
-                        await StaticObjects.Client.CreateGlobalApplicationCommandAsync(c.SlashCommand);
+                        await _client.CreateGlobalApplicationCommandAsync(c);
                     }
                 }
 
-                var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand);
+                var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand.Build());
                 if (debugGuild != null)
                 {
                     await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
                 }
                 else
                 {
-                    await StaticObjects.Client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
+                    await _client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
                 }
                 await Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready Handler", "Commands loaded"));
             }
@@ -682,7 +663,7 @@ public sealed class Program
             // The bot is now really ready to interact with people
             StaticObjects.Started = DateTime.UtcNow;
 
-            await StaticObjects.Db.UpdateGuildCountAsync();
+            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync();
         });
     }
 
@@ -696,13 +677,13 @@ public sealed class Program
 
     private async Task ChangeGuildCountAsync(SocketGuild _)
     {
-        await StaticObjects.UpdateTopGgAsync();
-        await StaticObjects.Db.UpdateGuildCountAsync();
+        await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
+        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync();
     }
 
     private async Task GuildJoined(SocketGuild guild)
     {
-        await StaticObjects.Db.InitGuildAsync(guild);
+        await _provider.GetRequiredService<Db>().InitGuildAsync(guild);
     }
 
     private async Task HandleCommandAsync(SocketMessage arg)
@@ -711,7 +692,7 @@ public sealed class Program
 
         // Deprecation warning
         int pos = 0;
-        if (msg.HasMentionPrefix(StaticObjects.Client.CurrentUser, ref pos))
+        if (msg.HasMentionPrefix(_client.CurrentUser, ref pos))
         {
             var content = msg.Content[pos..];
             var commandStr = content.Split(' ')[0].ToUpperInvariant();
@@ -755,6 +736,6 @@ public sealed class Program
     {
         _didStart = true;
         StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
-        await StaticObjects.UpdateTopGgAsync();
+        await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
     }
 }

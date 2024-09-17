@@ -1,9 +1,8 @@
-﻿namespace Sanara.Module.Utility
+﻿namespace Sanara.Module.Utility;
+
+public enum JapaneseMedia
 {
-    public enum JapaneseMedia
-    {
-        Anime,
-        Manga,
-        LightNovel
-    }
+    Anime,
+    Manga,
+    LightNovel
 }

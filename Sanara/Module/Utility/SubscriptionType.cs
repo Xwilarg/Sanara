@@ -1,9 +1,8 @@
-﻿namespace Sanara.Module.Utility
+﻿namespace Sanara.Module.Utility;
+
+public enum SubscriptionType
 {
-    public enum SubscriptionType
-    {
-        Doujinshi,
-        Anime,
-        Inspiration
-    }
+    Doujinshi,
+    Anime,
+    Inspiration
 }
