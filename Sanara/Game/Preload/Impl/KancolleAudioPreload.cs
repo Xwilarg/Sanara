@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -9,9 +10,12 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class KancolleAudioPreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
-            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
+            var db = provider.GetRequiredService<Db>();
+            var client = provider.GetRequiredService<HttpClient>();
+
+            var cache = db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (string name in Kancolle.GetShips())
             {
                 if (!cache.Any(x => x.id == name))
@@ -20,10 +24,10 @@ namespace Sanara.Game.Preload.Impl
                     {
                         // Get URL
                         string shipUrl = "https://kancolle.fandom.com/wiki/" + name;
-                        string html = StaticObjects.HttpClient.GetStringAsync(shipUrl).GetAwaiter().GetResult();
+                        string html = client.GetStringAsync(shipUrl).GetAwaiter().GetResult();
 
                         var result = new QuizzPreloadResult(Regex.Match(html, "https:\\/\\/vignette\\.wikia\\.nocookie\\.net\\/kancolle\\/images\\/[0-9a-z]+\\/[0-9a-z]+\\/[^-]*-Battle_Start\\.ogg").Value, new[] { name });
-                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
+                        db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)

@@ -5,13 +5,13 @@ namespace Sanara.Game.MultiplayerMode
 {
     public sealed class TurnByTurnMode : IMultiplayerMode
     {
-        public void Init(List<IUser> users)
+        public void Init(Random rand, List<IUser> users)
         {
             var tmp = new List<IUser>(users);
             _users = new List<IUser>();
             while (tmp.Count > 0)
             {
-                var index = StaticObjects.Random.Next(0, tmp.Count);
+                var index = rand.Next(0, tmp.Count);
                 _users.Add(tmp[index]);
                 tmp.RemoveAt(index);
             }

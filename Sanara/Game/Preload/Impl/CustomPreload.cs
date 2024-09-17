@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace Sanara.Game.Preload.Impl
 {
+    /*
     public class CustomPreload : IPreload
     {
         public CustomPreload(CustomGame _game)
@@ -38,4 +39,5 @@ namespace Sanara.Game.Preload.Impl
         private readonly string _gameName;
         private readonly string _rules;
     }
+    */
 }

@@ -8,7 +8,6 @@
         public string SentryKey;
         public string TopGgToken;
         public string MyDramaListApiKey;
-        public string UnsplashToken;
         public string DebugGuild;
         /// <summary>
         /// Need to be created on Google console

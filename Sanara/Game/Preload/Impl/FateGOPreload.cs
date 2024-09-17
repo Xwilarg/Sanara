@@ -1,4 +1,6 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -10,9 +12,13 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class FateGOPreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
-            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
+            _provider = provider;
+            var db = provider.GetRequiredService<Db>();
+            var client = provider.GetRequiredService<HttpClient>();
+
+            var cache = db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var tmp in FateGO.GetCharacters())
             {
                 string elem = tmp;
@@ -21,7 +27,7 @@ namespace Sanara.Game.Preload.Impl
                 {
                     try
                     {
-                        string html = StaticObjects.HttpClient.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + elem).GetAwaiter().GetResult();
+                        string html = client.GetStringAsync("https://fategrandorder.fandom.com/wiki/" + elem).GetAwaiter().GetResult();
 
                         List<string> allAnswer = new();
                         allAnswer.Add(elem);
@@ -55,7 +61,7 @@ namespace Sanara.Game.Preload.Impl
 
                         var result = new QuizzPreloadResult(Regex.Match(html.Split(new[] { "<figure class=\"pi-item pi-image\">" }, StringSplitOptions.None)[1], "<a href=\"([^\"]+)\"").Groups[1].Value.Split(new string[] { "/revision" }, StringSplitOptions.None)[0],
                             allAnswer.ToArray());
-                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
+                        db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -74,7 +80,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "FateGO Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new Quizz(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post an image of a servant, you'll have to give his/her name.";
@@ -83,5 +89,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private QuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

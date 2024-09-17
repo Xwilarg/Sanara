@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanara", "Sanara\Sanara.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanara.UnitTests", "Sanara.UnitTests\Sanara.UnitTests.csproj", "{0B7B0557-8AF0-4C23-B163-027F12990F4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanara.Help", "Sanara.Help\Sanara.Help.csproj", "{1A60E82A-F9E5-4223-AC88-A4D67DD21CD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0B7B0557-8AF0-4C23-B163-027F12990F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B7B0557-8AF0-4C23-B163-027F12990F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B7B0557-8AF0-4C23-B163-027F12990F4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A60E82A-F9E5-4223-AC88-A4D67DD21CD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A60E82A-F9E5-4223-AC88-A4D67DD21CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A60E82A-F9E5-4223-AC88-A4D67DD21CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A60E82A-F9E5-4223-AC88-A4D67DD21CD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

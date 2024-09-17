@@ -8,10 +8,10 @@ namespace Sanara.Subscription.Impl
     {
         public bool DeleteOldMessage => false;
 
-        public async Task<FeedItem[]> GetFeedAsync(int current, bool _)
+        public async Task<FeedItem[]> GetFeedAsync(HttpClient client, int current, bool _)
         {
             List<FeedItem> items = new();
-            var feed = await GetFeedInternalAsync();
+            var feed = await GetFeedInternalAsync(client);
             foreach (var info in feed.Reverse())
             {
                 if (current == info.id.GetHashCode())
@@ -59,9 +59,9 @@ namespace Sanara.Subscription.Impl
             return null;
         }
 
-        private async Task<AiringSchedule[]> GetFeedInternalAsync()
+        private async Task<AiringSchedule[]> GetFeedInternalAsync(HttpClient client)
         {
-            return await AniList.GetAnimeFeedAsync();
+            return await AniList.GetAnimeFeedAsync(client);
         }
     }
 }

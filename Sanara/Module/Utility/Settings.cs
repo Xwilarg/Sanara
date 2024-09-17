@@ -1,12 +1,15 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
+using Sanara.Subscription;
 
 namespace Sanara.Module.Utility;
 
 public class Settings
 {
-    public static async Task<(Embed Embed, MessageComponent Components)> GetSettingsDisplayAsync(IGuild guild)
+    public static async Task<(Embed Embed, MessageComponent Components)> GetSettingsDisplayAsync(IServiceProvider provider, IGuild guild)
     {
-        var subs = await StaticObjects.GetSubscriptionsAsync(guild.Id);
+        var subs = await provider.GetRequiredService<SubscriptionManager>().GetSubscriptionsAsync(provider, guild.Id);
         var mySubs = subs?.Select(x => $"**{Utils.ToWordCase(x.Key)}**: {(x.Value == null ? "None" : x.Value.Mention)}");
         var button = new ComponentBuilder();
         if (subs != null)
@@ -30,7 +33,7 @@ public class Settings
                 new EmbedFieldBuilder
                 {
                     Name = "Translation from flags",
-                    Value = StaticObjects.Db.GetGuild(guild.Id).TranslateUsingFlags ? "Enabled" : "Disabled"
+                    Value = provider.GetRequiredService<Db>().GetGuild(guild.Id).TranslateUsingFlags ? "Enabled" : "Disabled"
                 },
                 new EmbedFieldBuilder
                 {

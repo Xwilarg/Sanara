@@ -5,11 +5,12 @@ namespace Sanara.Module.Command.Context
 {
     public class ComponentCommandContext : IContext
     {
-        public ComponentCommandContext(SocketMessageComponent ctx)
-            => _ctx = ctx;
+        public ComponentCommandContext(IServiceProvider provider, SocketMessageComponent ctx)
+            => (Provider, _ctx) = (provider, ctx);
 
         private SocketMessageComponent _ctx;
 
+        public IServiceProvider Provider { private init; get; }
         public IMessageChannel Channel => _ctx.Channel;
         public IUser User => _ctx.User;
         public DateTimeOffset CreatedAt => _ctx.CreatedAt;

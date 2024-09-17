@@ -1,4 +1,6 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -9,9 +11,13 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class AzurLanePreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
-            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
+            _provider = provider;
+            var db = provider.GetRequiredService<Db>();
+            var client = provider.GetRequiredService<HttpClient>();
+
+            var cache = db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var elem in AzurLane.GetShips())
             {
                 if (!cache.Any(x => x.id == elem.Item2))
@@ -23,7 +29,7 @@ namespace Sanara.Game.Preload.Impl
 
                         // Get URL
                         var regexData = elem.Item1.Replace("(", "%28").Replace(")", "%29");
-                        var htmlValue = Regex.Match(StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/wiki/" + elem.Item1).GetAwaiter().GetResult(), "class=\"mw-file-description\"><img src=\"([^\"]+)\"").Groups[1].Value;
+                        var htmlValue = Regex.Match(client.GetStringAsync("https://azurlane.koumakan.jp/wiki/" + elem.Item1).GetAwaiter().GetResult(), "class=\"mw-file-description\"><img src=\"([^\"]+)\"").Groups[1].Value;
                         if (string.IsNullOrWhiteSpace(htmlValue))
                         {
                             throw new NullReferenceException("No image found in page");
@@ -37,7 +43,7 @@ namespace Sanara.Game.Preload.Impl
                             names.Add(escapeName);
 
                         var result = new QuizzPreloadResult(htmlValue, names.ToArray());
-                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
+                        db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -56,7 +62,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Azur Lane Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new Quizz(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post an image of a shipgirl, you'll have to give her name.";
@@ -65,5 +71,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private QuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

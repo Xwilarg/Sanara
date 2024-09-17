@@ -1,4 +1,5 @@
-﻿using Sanara.Game;
+﻿using Discord.WebSocket;
+using Sanara.Game;
 
 namespace Sanara.Database
 {
@@ -73,23 +74,23 @@ namespace Sanara.Database
             await InsertOrAddAsync("Booru", Daily, name);
         }
 
-        public async Task UpdateGuildCountAsync()
+        public async Task UpdateGuildCountAsync(DiscordSocketClient client)
         {
             if (await _r.Db(_statDbName).Table("GuildCount").GetAll(Daily).Count().Eq(0).RunAsync<bool>(_conn))
                 await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", Daily)
-                    .With("count", StaticObjects.Client.Guilds.Count)
+                    .With("count", client.Guilds.Count)
                 ).RunAsync(_conn);
             else
                 await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", Daily)
-                    .With("count", StaticObjects.Client.Guilds.Count)
+                    .With("count", client.Guilds.Count)
                 ).RunAsync(_conn);
             if (await _r.Db(_statDbName).Table("GuildCount").GetAll("Latest").Count().Eq(0).RunAsync<bool>(_conn))
                 await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", "Latest")
-                    .With("count", StaticObjects.Client.Guilds.Count)
+                    .With("count", client.Guilds.Count)
                 ).RunAsync(_conn);
             else
                 await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", "Latest")
-                    .With("count", StaticObjects.Client.Guilds.Count)
+                    .With("count", client.Guilds.Count)
                 ).RunAsync(_conn);
         }
 

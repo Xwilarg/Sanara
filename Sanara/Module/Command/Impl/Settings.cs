@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Database;
+using Sanara.Game;
 using Sanara.Module.Command.Context;
+using Sanara.Service;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -16,7 +18,7 @@ public class Settings : ISubmodule
     public string Name => "Settings";
     public string Description => "Configure and get information about the bot";
 
-    public CommandData[] GetCommands()
+    public CommandData[] GetCommands(IServiceProvider _)
     {
         return new[]
         {
@@ -98,14 +100,14 @@ public class Settings : ISubmodule
             Color = Color.Purple
         };
         embed.AddField("Latest version", Utils.ToDiscordTimestamp(new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc, Utils.TimestampInfo.None), true);
-        embed.AddField("Last command received", Utils.ToDiscordTimestamp(StaticObjects.LastMessage, Utils.TimestampInfo.TimeAgo), true);
-        embed.AddField("Uptime", Utils.ToDiscordTimestamp(StaticObjects.Started, Utils.TimestampInfo.TimeAgo), true);
-        embed.AddField("Guild count", ctx.Provider.GetRequiredService<DiscordSocketClient>().Client.Guilds.Count, true);
+        embed.AddField("Last command received", Utils.ToDiscordTimestamp(ctx.Provider.GetRequiredService<StatData>().LastMessage, Utils.TimestampInfo.TimeAgo), true);
+        embed.AddField("Uptime", Utils.ToDiscordTimestamp(ctx.Provider.GetRequiredService<StatData>().Started, Utils.TimestampInfo.TimeAgo), true);
+        embed.AddField("Guild count", ctx.Provider.GetRequiredService<DiscordSocketClient>().Guilds.Count, true);
 
         var options = new ComponentBuilder();
         if (Program.IsBotOwner(ctx.User))
         {
-            options.WithSelectMenu("delCache", StaticObjects.AllGameNames.Select(x => new SelectMenuOptionBuilder(x, ctx.Provider.GetRequiredService<Db>().GetCacheName(x))).ToList(), placeholder: "Select a game cache to delete (require bot restart)");
+            options.WithSelectMenu("delCache", ctx.Provider.GetRequiredService<GameManager>().AllGameNames.Select(x => new SelectMenuOptionBuilder(x, ctx.Provider.GetRequiredService<Db>().GetCacheName(x))).ToList(), placeholder: "Select a game cache to delete (require bot restart)");
         }
         options.WithButton("Show Global Stats", "globalStats");
 
@@ -116,7 +118,7 @@ public class Settings : ISubmodule
             " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
             " - [Website](https://sanara.zirk.eu/)\n" +
 #endif
-            " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + StaticObjects.ClientId + "&permissions=51264&scope=bot%20applications.commands)\n"
+            " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + Program.ClientId + "&permissions=51264&scope=bot%20applications.commands)\n"
 #if NSFW_BUILD
             +
             " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +

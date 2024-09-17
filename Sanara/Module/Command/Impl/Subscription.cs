@@ -12,7 +12,7 @@ public class Subscription : ISubmodule
     public string Name => "Subscription";
     public string Description => "Subscribe to various service and follow them from a channel";
 
-    public CommandData[] GetCommands()
+    public CommandData[] GetCommands(IServiceProvider _)
     {
         return new[]
         {

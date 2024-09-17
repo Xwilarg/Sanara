@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
 
@@ -18,24 +19,24 @@ namespace Sanara.Game.Impl
             if (results.Length == 0)
                 throw new IndexOutOfRangeException("No result with correct format found");
 
-            var result = results[StaticObjects.Random.Next(results.Length)];
+            var result = results[_provider.GetRequiredService<Random>().Next(results.Length)];
 
             List<string> answers = new List<string>();
 
             foreach (var t in result.Tags)
             {
                 var name = _booru.ToString() + "_" + t;
-                if (StaticObjects.QuizzTagsCache.ContainsKey(name))
+                if (_provider.GetRequiredService<GameManager>().QuizzTagsCache.ContainsKey(name))
                 {
-                    if (StaticObjects.QuizzTagsCache[name] == BooruSharp.Search.Tag.TagType.Copyright)
+                    if (_provider.GetRequiredService<GameManager>().QuizzTagsCache[name] == BooruSharp.Search.Tag.TagType.Copyright)
                         answers.Add(t);
                 }
                 else
                 {
                     var info = _booru.GetTagAsync(t).GetAwaiter().GetResult();
-                    lock (StaticObjects.QuizzTagsCache)
+                    lock (_provider.GetRequiredService<GameManager>().QuizzTagsCache)
                     {
-                        StaticObjects.QuizzTagsCache.Add(name, info.Type);
+                        _provider.GetRequiredService<GameManager>().QuizzTagsCache.Add(name, info.Type);
                     }
                     if (info.Type == BooruSharp.Search.Tag.TagType.Copyright)
                         answers.Add(t);

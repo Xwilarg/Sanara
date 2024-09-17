@@ -16,6 +16,8 @@ using System.Text;
 using System.Text.Json;
 using VndbSharp;
 using Sanara.Database;
+using Sanara.Subscription;
+using Sanara.Game;
 
 namespace Sanara;
 
@@ -29,18 +31,34 @@ public sealed class Program
 
     private ulong _debugGuildId;
 
+    public static ulong ClientId;
+
     public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient client, Credentials credentials)
     {
         Db db = new();
         await db.InitAsync();
 
+        Log.Init(db);
+
+        GameManager gameManager = new();
+
+        SubscriptionManager sub = new();
+
+        var http = new HttpClient();
+        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+
         var coll = new ServiceCollection();
         coll
-            .AddSingleton<HttpClient>()
+            .AddSingleton(http)
             .AddSingleton<HtmlWeb>() // HTML Parser
             .AddSingleton<Vndb>() // VNDB Client
             .AddSingleton<Random>()
             .AddSingleton<Db>()
+            .AddSingleton<StatData>()
+            .AddSingleton(sub)
+            .AddSingleton(db)
+            .AddSingleton(gameManager)
+            .AddSingleton<TranslatorService>()
             .AddSingleton(new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
@@ -109,8 +127,6 @@ public sealed class Program
 
     public async Task StartAsync()
     {
-        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
-
         _client = new(new()
         {
 #if DEBUG
@@ -118,8 +134,10 @@ public sealed class Program
 #endif
             GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.MessageContent
         });
-        // Setting Logs callback
         _client.Log += Log.LogAsync;
+
+        // Setting Logs callback
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
         // Load credentials
         if (!File.Exists("Keys/Credentials.json"))
@@ -139,6 +157,18 @@ public sealed class Program
 
         _provider = await CreateProviderAsync(_client, credentials);
 
+
+        _ = Task.Run(async () => { try { await _provider.GetRequiredService<SubscriptionManager>().InitAsync(_provider); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
+        Game.Preload.Impl.Static.Shiritori.Init(_provider);
+        Game.Preload.Impl.Static.Arknights.Init(_provider);
+        Game.Preload.Impl.Static.AzurLane.Init(_provider);
+        Game.Preload.Impl.Static.FateGO.Init(_provider);
+        Game.Preload.Impl.Static.GirlsFrontline.Init(_provider);
+        Game.Preload.Impl.Static.Kancolle.Init(_provider);
+        Game.Preload.Impl.Static.Pokemon.Init(_provider);
+        _provider.GetRequiredService<GameManager>().Init(_provider);
+
+
         // If the bot takes way too much time to start, we stop the program
         // We do that after the StaticObjects initialization because the first time we load game cache, it can takes plenty of time
         _ = Task.Run(async () =>
@@ -151,7 +181,10 @@ public sealed class Program
         // Discord callbacks
 
         // Reactions to messages
-        _client.ReactionAdded += Module.Utility.Language.TranslateFromReactionAsync;
+        _client.ReactionAdded += async (Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react) =>
+        {
+            await Module.Utility.Language.TranslateFromReactionAsync(_provider, msg, chan, react);
+        };
 
         // Games
         _client.MessageReceived += HandleCommandAsync;
@@ -184,12 +217,9 @@ public sealed class Program
     public async Task UpdateTopGgAsync()
     {
         var auth = _provider.GetService<TopGGClient>();
-        if (auth != null)
+        if (auth != null && auth.ShouldSend) // Make sure to not spam the API
         {
-            if (auth.ShouldSend) // Make sure to not spam the API
-            {
-                await auth.SendAsync(_client.Guilds.Count);
-            }
+            await auth.SendAsync(_client.Guilds.Count);
         }
     }
 
@@ -198,7 +228,7 @@ public sealed class Program
         return tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild;
     }
 
-    private async Task LaunchCommandAsync(Module.Command.CommandData cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<Module.Command.IContext>> ctxCreatorAsync)
+    private async Task LaunchCommandAsync(CommandData cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync)
     {
         if (cmd.adminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
         {
@@ -216,7 +246,7 @@ public sealed class Program
                         var db = _provider.GetRequiredService<Db>();
 
                         await db.AddNewCommandAsync(cmd.SlashCommand.Name.ToUpperInvariant(), isSlashCommand);
-                        StaticObjects.LastMessage = DateTime.UtcNow;
+                        _provider.GetRequiredService<StatData>().LastMessage = DateTime.UtcNow;
                         await cmd.Callback(context);
                         await db.AddCommandSucceed();
                     }
@@ -264,7 +294,7 @@ public sealed class Program
 
     private async Task ButtonExecuted(SocketMessageComponent arg)
     {
-        var ctx = new ComponentCommandContext(arg);
+        var ctx = new ComponentCommandContext(_provider, arg);
         if (_pendingRequests.Contains(arg.User.Id))
         {
             await ctx.ReplyAsync("A component request is already being treated for you, please retry afterward", ephemeral: true);
@@ -279,8 +309,8 @@ public sealed class Program
 
                 // Get informations about games
                 StringBuilder str = new();
-                List<string> gameNames = new();
-                foreach (var elem in StaticObjects.Preloads)
+                List<string> gameNames = [];
+                foreach (var elem in _provider.GetRequiredService<GameManager>().Preloads)
                 {
                     // We only get games once so we skip when we get the "others" versions (like audio)
                     //if (elem.GetNameArg() != null && elem.GetNameArg() != "hard")
@@ -302,7 +332,7 @@ public sealed class Program
                 embed.AddField("Games", str.ToString());
 
                 // Get information about subscriptions
-                var subs = StaticObjects.GetSubscriptionCount();
+                var subs = _provider.GetRequiredService<SubscriptionManager>().GetSubscriptionCount(_provider);
                 embed.AddField("Subscriptions",
                     subs == null ?
                         "Not yet initialized" :
@@ -315,15 +345,15 @@ public sealed class Program
                 await ctx.ReplyAsync(embed: embed.Build());
                 _pendingRequests.Remove(arg.User.Id);
             }
-            else if (arg.Data.CustomId.StartsWith("tr-") && StaticObjects.TranslationOriginalText.ContainsKey(arg.Data.CustomId[3..]))
+            else if (arg.Data.CustomId.StartsWith("tr-") && _provider.GetRequiredService<TranslatorService>().TranslationOriginalText.ContainsKey(arg.Data.CustomId[3..]))
             {
                 await ctx.ReplyAsync(embed: new EmbedBuilder
                 {
                     Title = "Original Text",
-                    Description = StaticObjects.TranslationOriginalText[arg.Data.CustomId[3..]],
+                    Description = _provider.GetRequiredService<TranslatorService>().TranslationOriginalText[arg.Data.CustomId[3..]],
                     Color = Color.Blue,
                 }.Build());
-                StaticObjects.TranslationOriginalText.Remove(arg.Data.CustomId[3..]);
+                _provider.GetRequiredService<TranslatorService>().TranslationOriginalText.Remove(arg.Data.CustomId[3..]);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId == "dump")
@@ -344,8 +374,8 @@ public sealed class Program
                 {
                     var tChan = (ITextChannel)ctx.Channel;
                     var guildId = tChan.GuildId;
-                    var newValue = !StaticObjects.Db.GetGuild(guildId).TranslateUsingFlags;
-                    await StaticObjects.Db.UpdateFlagAsync(guildId, newValue);
+                    var newValue = !_provider.GetRequiredService<Db>().GetGuild(guildId).TranslateUsingFlags;
+                    await _provider.GetRequiredService<Db>().UpdateFlagAsync(guildId, newValue);
                     await ctx.ReplyAsync($"Translation from flag is now {(newValue ? "enabled" : "disabled")}", ephemeral: true);
                     // TODO: Update display
                 }
@@ -368,9 +398,9 @@ public sealed class Program
                 }
                 _pendingRequests.Remove(arg.User.Id);
             }
-            else if (arg.Data.CustomId.StartsWith("error-") && StaticObjects.Errors.ContainsKey(arg.Data.CustomId))
+            else if (arg.Data.CustomId.StartsWith("error-") && Log.Errors.ContainsKey(arg.Data.CustomId))
             {
-                var e = StaticObjects.Errors[arg.Data.CustomId];
+                var e = Log.Errors[arg.Data.CustomId];
                 await ctx.ReplyAsync(embed: new EmbedBuilder
                 {
                     Color = Color.Red,
@@ -395,9 +425,9 @@ public sealed class Program
                         {
                             await arg.Message.ModifyAsync(x => x.Components = new ComponentBuilder().Build());
                         }
-                        catch (Exception e)
+                        catch (System.Exception e)
                         {
-                            await Logger.LogErrorAsync(e, ctx);
+                            await Log.LogErrorAsync(e, ctx);
                         }
                         finally
                         {
@@ -414,11 +444,11 @@ public sealed class Program
                         try
                         {
                             await ctx.ReplyAsync("Your file is being downloaded...");
-                            await Command.ButtonCommand.Nsfw.EHentaiDownloadAsync(ctx, _provider, ids);
+                            await Module.Utility.EHentai.EHentaiDownloadAsync(ctx, _provider, ids);
                         }
-                        catch (Exception e)
+                        catch (System.Exception e)
                         {
-                            await Logger.LogErrorAsync(e, ctx);
+                            await Log.LogErrorAsync(e, ctx);
                         }
                     });
                 }
@@ -430,18 +460,18 @@ public sealed class Program
                 switch (id)
                 {
                     case "ready":
-                        var rLobby = StaticObjects.GameManager.GetReplayLobby(ctx.Channel);
+                        var rLobby = _provider.GetRequiredService<GameManager>().GetReplayLobby(ctx.Channel);
                         if (rLobby == null)
                         {
                             await ctx.ReplyAsync("This lobby expired, please create a new one with the play command", ephemeral: true);
                         }
                         else
                         {
-                            var embed = StaticObjects.GameManager.ToggleReadyLobby(rLobby, ctx.User);
+                            var embed = _provider.GetRequiredService<GameManager>().ToggleReadyLobby(rLobby, ctx.User);
                             if (embed != null)
                             {
                                 await ctx.ReplyAsync("Ready state changed", ephemeral: true);
-                                if (await StaticObjects.GameManager.CheckRestartLobbyFullAsync(ctx))
+                                if (await _provider.GetRequiredService<GameManager>().CheckRestartLobbyFullAsync(ctx))
                                 {
                                     await arg.Message.DeleteAsync();
                                 }
@@ -458,7 +488,7 @@ public sealed class Program
                         break;
 
                     case "delete":
-                        StaticObjects.GameManager.DeleteReadyLobby(ctx.Channel);
+                        _provider.GetRequiredService<GameManager>().DeleteReadyLobby(ctx.Channel);
                         await ctx.ReplyAsync("Replay lobby deleted", ephemeral: true);
                         await arg.Message.DeleteAsync();
                         break;
@@ -472,7 +502,7 @@ public sealed class Program
             {
                 var id = arg.Data.CustomId[5..];
                 var chanId = ctx.Channel.Id.ToString();
-                var lobby = StaticObjects.GameManager.GetLobby(chanId);
+                var lobby = _provider.GetRequiredService<GameManager>().GetLobby(chanId);
                 if (lobby == null)
                 {
                     await ctx.ReplyAsync("This lobby is closed", ephemeral: true);
@@ -485,7 +515,7 @@ public sealed class Program
                             if (lobby.IsHost(ctx.User))
                             {
                                 await arg.DeferLoadingAsync();
-                                await StaticObjects.GameManager.StartGameAsync(ctx);
+                                await _provider.GetRequiredService<GameManager>().StartGameAsync(ctx);
                                 await arg.Message.DeleteAsync();
                             }
                             else
@@ -524,7 +554,7 @@ public sealed class Program
                         case "cancel":
                             if (lobby.IsHost(ctx.User))
                             {
-                                StaticObjects.GameManager.RemoveLobby(chanId);
+                                _provider.GetRequiredService<GameManager>().RemoveLobby(chanId);
                                 await arg.Message.DeleteAsync();
                                 await ctx.ReplyAsync($"The lobby was cancelled", ephemeral: true);
                             }
@@ -581,7 +611,7 @@ public sealed class Program
             {
                 await arg.DeferAsync(); // Somehow all commands not defer-ed fail
             }
-            return new SlashCommandContext(arg);
+            return new SlashCommandContext(_provider, arg);
         });
     }
 
@@ -618,7 +648,7 @@ public sealed class Program
                 foreach (var s in submobules)
                 {
                     await Log.LogAsync(new(LogSeverity.Verbose, "Cmd Preload", $"[Module] {s.Name}"));
-                    foreach (var c in s.GetCommands()
+                    foreach (var c in s.GetCommands(_provider)
 #if !NSFW_BUILD
                         // NSFW build doesn't preload NSFW commands
                         .Where(x => !x.SlashCommand.IsNsfw)
@@ -661,9 +691,9 @@ public sealed class Program
             }
 
             // The bot is now really ready to interact with people
-            StaticObjects.Started = DateTime.UtcNow;
+            _provider.GetRequiredService<StatData>().Started = DateTime.UtcNow;
 
-            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync();
+            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_client);
         });
     }
 
@@ -678,7 +708,7 @@ public sealed class Program
     private async Task ChangeGuildCountAsync(SocketGuild _)
     {
         await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
-        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync();
+        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_client);
     }
 
     private async Task GuildJoined(SocketGuild guild)
@@ -696,7 +726,7 @@ public sealed class Program
         {
             var content = msg.Content[pos..];
             var commandStr = content.Split(' ')[0].ToUpperInvariant();
-            Module.Command.CommandData? cmd = null;
+            CommandData? cmd = null;
             if (_commandsAssociations.ContainsKey(commandStr))
             {
                 cmd = _commandsAssociations[commandStr];
@@ -717,14 +747,14 @@ public sealed class Program
                     {
                         newContent += " " + msg.Attachments.ElementAt(0).Url;
                     }
-                    return new MessageCommandContext(msg, newContent, cmd);
+                    return new MessageCommandContext(_provider, msg, newContent, cmd);
                 });
             }
         }
         else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
         {
-            var context = new GameCommandContext(msg);
-            var game = StaticObjects.GameManager.GetGame(msg.Channel);
+            var context = new GameCommandContext(_provider, msg);
+            var game = _provider.GetRequiredService<GameManager>().GetGame(msg.Channel);
             if (game != null && game.CanPlay(msg.Author))
             {
                 game.AddAnswer(context);
@@ -735,7 +765,7 @@ public sealed class Program
     private async Task ConnectedAsync()
     {
         _didStart = true;
-        StaticObjects.ClientId = StaticObjects.Client.CurrentUser.Id;
+        ClientId = _client.CurrentUser.Id;
         await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
     }
 }

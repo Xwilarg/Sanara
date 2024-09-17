@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using BooruSharp.Booru;
+using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Result;
 using System.Collections.ObjectModel;
@@ -7,17 +9,23 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class BooruQuizzPreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
             if (!File.Exists("Saves/Game/QuizzTags.txt"))
-                File.WriteAllBytes("Saves/Game/QuizzTags.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
+                File.WriteAllBytes("Saves/Game/QuizzTags.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
             string[] lines = File.ReadAllLines("Saves/Game/QuizzTags.txt");
             var preload = new List<BooruQuizzPreloadResult>();
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] curr = lines[i].Split(' ');
                 if (int.Parse(curr[1]) > 3)
-                    preload.Add(new BooruQuizzPreloadResult(StaticObjects.Gelbooru, new[] { ".gif", ".png", ".jpg", ".jpeg" }, curr[0], new[] { curr[0] }));
+                {
+                    var booru = new Gelbooru()
+                    {
+                        HttpClient = provider.GetRequiredService<HttpClient>()
+                    };
+                    preload.Add(new BooruQuizzPreloadResult(booru, new[] { ".gif", ".png", ".jpg", ".jpeg" }, curr[0], new[] { curr[0] }));
+                }
             }
             _preload = preload.ToArray();
         }

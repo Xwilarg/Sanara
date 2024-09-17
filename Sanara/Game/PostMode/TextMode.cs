@@ -4,7 +4,7 @@ namespace Sanara.Game.PostMode
 {
     public class TextMode : IPostMode
     {
-        public async Task PostAsync(IMessageChannel chan, string text, AGame _)
+        public async Task PostAsync(IServiceProvider _, IMessageChannel chan, string text, AGame _2)
         {
             await chan.SendMessageAsync(text);
         }

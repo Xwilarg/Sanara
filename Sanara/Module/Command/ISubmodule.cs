@@ -4,6 +4,6 @@
     {
         public string Name { get; }
         public string Description { get; }
-        public CommandData[] GetCommands();
+        public CommandData[] GetCommands(IServiceProvider provider);
     }
 }

@@ -4,7 +4,7 @@ namespace Sanara.Game.MultiplayerMode
 {
     public interface IMultiplayerMode
     {
-        public void Init(List<IUser> users);
+        public void Init(Random rand, List<IUser> users);
 
         /// <summary>
         /// Called before a post is sent

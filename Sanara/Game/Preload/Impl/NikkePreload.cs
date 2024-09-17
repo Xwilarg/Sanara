@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Result;
 using System.Collections.ObjectModel;
@@ -8,9 +9,10 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class NikkePreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
-            var html = StaticObjects.HttpClient.GetStringAsync("https://www.prydwen.gg/nikke/characters/").GetAwaiter().GetResult();
+            _provider = provider;
+            var html = provider.GetRequiredService<HttpClient>().GetStringAsync("https://www.prydwen.gg/nikke/characters/").GetAwaiter().GetResult();
             _preload = Regex.Matches(html, "data-src=\"([^\"]+)\" data-srcset=\"[^\"]+\" alt=\"([^\"]+)\"\\/><noscript>").Cast<Match>().Skip(1).Select(x => new QuizzPreloadResult($"https://www.prydwen.gg{x.Groups[1].Value}", new[] { x.Groups[2].Value })).ToArray();
         }
 
@@ -20,7 +22,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Nikke Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new Quizz(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post an image of a character, you'll have to give her name.";
@@ -29,5 +31,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private QuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

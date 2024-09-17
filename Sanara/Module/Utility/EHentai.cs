@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Sanara.Exception;
 using Sanara.Module.Command;
+using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,6 +11,81 @@ namespace Sanara.Module.Utility;
 
 public static class EHentai
 {
+    public static async Task EHentaiDownloadAsync(IContext ctx, IServiceProvider provider, string urlId)
+    {
+        var web = provider.GetRequiredService<HtmlWeb>();
+        var html = web.Load($"https://e-hentai.org/g/{urlId}/");
+
+        // Get all pages
+        var name = html.GetElementbyId("gn").InnerHtml;
+        var pages = html.DocumentNode.SelectSingleNode("//table[contains(@class, 'ptt')]").FirstChild.ChildNodes;
+        var count = int.Parse(pages[pages.Count - 2].SelectSingleNode("a").InnerHtml);
+        var dirName = Guid.NewGuid();
+
+        Directory.CreateDirectory("Saves/Download/" + dirName);
+        var finalPath = $"Saves/Download/{Guid.NewGuid()}.zip";
+
+        try
+        {
+            // We iterate on each page
+            int pageIndex = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (count > 1)
+                {
+                    await ctx.ReplyAsync($"Your file is being downloaded... {i}/{count}");
+                }
+                var images = html.GetElementbyId("gdt").ChildNodes;
+                foreach (var img in images)
+                {
+                    if (img.HasClass("gdtm")) // Get all images to download them
+                    {
+                        var node = img.FirstChild.FirstChild.Attributes["href"].Value;
+                        var image = web.Load(node).GetElementbyId("img").Attributes["src"].Value;
+                        File.WriteAllBytes($"Saves/Download/{dirName}/{pageIndex:000}{Path.GetExtension(image)}",
+                        await provider.GetRequiredService<HttpClient>().GetByteArrayAsync(image));
+                        pageIndex++;
+                    }
+                }
+
+                if (i < count - 1)
+                {
+                    html = web.Load($"https://e-hentai.org/g/{urlId}/?p={i + 1}");
+                }
+            }
+            ZipFile.CreateFromDirectory($"Saves/Download/{dirName}", finalPath);
+            FileInfo fi = new(finalPath);
+            if (fi.Length < 25_000_000) // 25MB
+            {
+                string finalName = name;
+                foreach (var c in Path.GetInvalidFileNameChars()) finalName = finalName.Replace(c.ToString(), string.Empty);
+                finalName += ".zip";
+                await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), finalName);
+                await (await ctx.GetOriginalAnswerAsync()).DeleteAsync();
+            }
+            else
+            {
+                var creds = provider.GetRequiredService<Credentials>();
+                if (creds.UploadWebsiteUrl != null && creds.UploadWebsiteLocation != null)
+                {
+                    File.Copy(finalPath, creds.UploadWebsiteLocation + dirName + ".zip");
+                    await ctx.ReplyAsync(creds.UploadWebsiteUrl + dirName + ".zip\n-# You file will be deleted after 10 minutes.");
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(600000); // 10 minutes
+                        File.Delete(creds.UploadWebsiteLocation + dirName + ".zip");
+                    });
+                }
+                await ctx.ReplyAsync("The result ZIP was too big to be sent on Discord");
+            }
+        }
+        finally
+        {
+            Directory.Delete("Saves/Download/" + dirName, true);
+            File.Delete(finalPath);
+        }
+    }
+
     public static async Task GetEHentaiAsync(IContext ctx, string tags, string name, int category)
     {
         int ratingInput = -1;

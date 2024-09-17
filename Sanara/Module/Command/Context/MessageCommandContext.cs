@@ -8,8 +8,9 @@ namespace Sanara.Module.Command.Context
     {
         private Dictionary<string, object> argsDict = new();
 
-        public MessageCommandContext(IMessage message, string arguments, CommandData command)
+        public MessageCommandContext(IServiceProvider provider, IMessage message, string arguments, CommandData command)
         {
+            Provider = provider;
             _message = message;
             var matches = Regex.Matches(arguments, @"[\""].+?[\""]|[^ ]+");
             List<string>? argsArray;
@@ -22,10 +23,10 @@ namespace Sanara.Module.Command.Context
                 argsArray = new();
             }
 
-            if (command.SlashCommand.Options.IsSpecified && command.SlashCommand.Options.Value.Any())
+            if (command.SlashCommand.Options != null && command.SlashCommand.Options.Any())
             {
-                var last = command.SlashCommand.Options.Value.Last().Name;
-                foreach (var arg in command.SlashCommand.Options.Value)
+                var last = command.SlashCommand.Options.Last().Name;
+                foreach (var arg in command.SlashCommand.Options)
                 {
                     if (argsArray.Count == 0)
                     {
@@ -103,6 +104,8 @@ namespace Sanara.Module.Command.Context
                 }
             }
         }
+
+        public IServiceProvider Provider { private init; get; }
 
         private IMessage _message;
         private IUserMessage? _reply;

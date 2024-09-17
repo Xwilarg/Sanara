@@ -1,10 +1,7 @@
-﻿using DeepAI;
-using Discord;
+﻿using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Sanara.Exception;
 using Sanara.Module.Utility;
-using System.Text.RegularExpressions;
 using VndbSharp;
 using VndbSharp.Models;
 
@@ -15,7 +12,7 @@ namespace Sanara.Module.Command.Impl
         public string Name => "Entertainment";
         public string Description => "A collection of fun silly stuffs";
 
-        public CommandData[] GetCommands()
+        public CommandData[] GetCommands(IServiceProvider _)
         {
             return new[]
             {

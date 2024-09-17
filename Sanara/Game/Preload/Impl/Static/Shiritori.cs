@@ -1,5 +1,7 @@
-﻿using Sanara.Game.Preload.Result;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Sanara.Game.Preload.Result;
 using Sanara.Module.Utility;
+using Sanara.Service;
 
 namespace Sanara.Game.Preload.Impl.Static
 {
@@ -13,22 +15,25 @@ namespace Sanara.Game.Preload.Impl.Static
             "For example if someone say りゅう (ryuu, dragon) you have to say a word starting by う (u), like うさぎ (usagi, rabbit).\n" +
             "First player must start by saying しりとり (shiritori)";
 
-        static Shiritori()
+        public static void Init(IServiceProvider provider)
         {
+            var client = provider.GetRequiredService<HttpClient>();
+            var lang = provider.GetRequiredService<JapaneseConverter>();
+
             if (!File.Exists("Saves/Game/ShiritoriJapanese.txt"))
-                File.WriteAllBytes("Saves/Game/ShiritoriJapanese.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/ShiritoriJapanese.txt").GetAwaiter().GetResult());
+                File.WriteAllBytes("Saves/Game/ShiritoriJapanese.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/ShiritoriJapanese.txt").GetAwaiter().GetResult());
             string[] lines = File.ReadAllLines("Saves/Game/ShiritoriJapanese.txt");
             _words = new();
             foreach (var l in lines)
             {
                 string[] curr = l.Split('$');
                 string word = curr[0];
-                _words.Add(new ShiritoriPreloadResult(word, Language.ToRomaji(word), curr[1]));
+                _words.Add(new ShiritoriPreloadResult(word, lang.ToRomaji(word), curr[1]));
             }
             for (int i = 5; i >= 1; i--)
             {
                 if (!File.Exists($"Saves/Game/Jlpt{i}Vocabulary.txt"))
-                    File.WriteAllBytes($"Saves/Game/Jlpt{i}Vocabulary.txt", StaticObjects.HttpClient.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i + "Vocabulary.txt").GetAwaiter().GetResult());
+                    File.WriteAllBytes($"Saves/Game/Jlpt{i}Vocabulary.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i + "Vocabulary.txt").GetAwaiter().GetResult());
                 string[] jlptLines = File.ReadAllLines($"Saves/Game/Jlpt{i}Vocabulary.txt");
                 foreach (var l in jlptLines)
                 {
@@ -37,7 +42,7 @@ namespace Sanara.Game.Preload.Impl.Static
                     var value = _words.Find(x => x.Word == word);
                     if (value == null)
                     {
-                        value = new ShiritoriPreloadResult(word, Language.ToRomaji(word), curr[1]);
+                        value = new ShiritoriPreloadResult(word, lang.ToRomaji(word), curr[1]);
                         _words.Add(value);
                     }
                     value.LearningLevels.Add(i);

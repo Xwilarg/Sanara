@@ -23,7 +23,7 @@ public class Tool : ISubmodule
     public string Name => "Tool";
     public string Description => "Utility commands";
 
-    public CommandData[] GetCommands()
+    public CommandData[] GetCommands(IServiceProvider _)
     {
         return new[]
         {
@@ -45,7 +45,7 @@ public class Tool : ISubmodule
                     IsNsfw = false
                 },
                 callback: SourceAsync,
-                aliases: Array.[]
+                aliases: []
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -205,7 +205,7 @@ public class Tool : ISubmodule
     {
         var image = ctx.GetArgument<string>("image");
 
-        await ctx.ReplyAsync(embed: await Utility.Tool.GetSourceAsync(image));
+        await ctx.ReplyAsync(embed: await Utility.Tool.GetSourceAsync(ctx.Provider.GetRequiredService<HttpClient>(), image));
     }
 
     public async Task VisualNovelAsync(IContext ctx)
@@ -392,7 +392,7 @@ public class Tool : ISubmodule
     {
         var name = ctx.GetArgument<string>("name");
         var media = (JapaneseMedia)ctx.GetArgument<long>("type");
-        var answer = await AniList.SearchMediaAsync(media, name);
+        var answer = await AniList.SearchMediaAsync(ctx.Provider.GetRequiredService<HttpClient>(), media, name);
 
         if (answer == null)
             throw new CommandFailed("Nothing was found with this name.");

@@ -1,4 +1,6 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -9,9 +11,13 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class PokemonPreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
-            var cache = StaticObjects.Db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
+            _provider = provider;
+            var db = provider.GetRequiredService<Db>();
+            var client = provider.GetRequiredService<HttpClient>();
+
+            var cache = db.GetCacheAsync(Name).GetAwaiter().GetResult().ToList();
             foreach (var elem in Pokemon.GetPokemons())
             {
                 if (!cache.Any(x => x.id == elem))
@@ -19,13 +25,13 @@ namespace Sanara.Game.Preload.Impl
                     try
                     {
                         string html;
-                        html = StaticObjects.HttpClient.GetStringAsync("https://pokemondb.net/pokedex/" + elem).GetAwaiter().GetResult();
+                        html = client.GetStringAsync("https://pokemondb.net/pokedex/" + elem).GetAwaiter().GetResult();
                         string french = Regex.Match(html, "<th>French<\\/th>[^<]*<td>([^<]+)<\\/td>").Groups[1].Value;
                         string japanese = Regex.Match(html, "<th>Japanese<\\/th>[^<]*<td>[^\\(]+\\(([^\\)]+)\\)<\\/td>").Groups[1].Value;
                         string german = Regex.Match(html, "<th>German<\\/th>[^<]*<td>([^<]+)<\\/td>").Groups[1].Value;
 
                         var result = new QuizzPreloadResult("https://img.pokemondb.net/artwork/" + elem + ".jpg", new[] { elem, french, japanese, german });
-                        StaticObjects.Db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
+                        db.SetCacheAsync(Name, result).GetAwaiter().GetResult();
                         cache.Add(result);
                     }
                     catch (System.Exception e)
@@ -44,7 +50,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Pokemon Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Quizz(chan, user, this, settings);
+            => new Quizz(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post an image of a pokemon, you'll have to give its name.";
@@ -53,5 +59,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private QuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -16,14 +17,14 @@ namespace Sanara.Game.Impl
         /// <summary>
         /// Called by QuizzAudio
         /// </summary>
-        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode, bool doesCongratulate) : base(textChan, user, preload, mode, new SpeedMode(), settings)
+        public Quizz(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode, bool doesCongratulate) : base(provider, textChan, user, preload, mode, new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
             _doesCongratulate = doesCongratulate;
         }
 
-        public Quizz(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedMode(), settings)
+        public Quizz(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider,textChan, user, preload, new UrlMode(), new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
@@ -34,7 +35,7 @@ namespace Sanara.Game.Impl
             if (_words.Count == 0)
                 throw new GameLost("All questions were answered! Congratulations!");
 
-            _current = _words[StaticObjects.Random.Next(0, _words.Count)];
+            _current = _words[_provider.GetRequiredService<Random>().Next(0, _words.Count)];
             _words.Remove(_current);
             return new[] { _current.ImageUrl };
         }

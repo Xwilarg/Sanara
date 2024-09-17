@@ -1,13 +1,20 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Sanara.Database;
 using Sanara.Module.Command;
-using Sentry;
 using System.Net;
 
 namespace Sanara
 {
     public static class Log
     {
+        public static void Init(Db db)
+        {
+            _db = db;
+        }
+
+        private static Db _db;
+        public static Dictionary<string, System.Exception> Errors { get; } = [];
+
         public static Task LogAsync(LogMessage msg)
         {
             var cc = Console.ForegroundColor;
@@ -49,7 +56,7 @@ namespace Sanara
                         var button = new ComponentBuilder()
                                 .WithButton("More information", $"error-{id}");
 
-                        StaticObjects.Errors.Add($"error-{id}", e);
+                        Errors.Add($"error-{id}", e);
                         var embed = new EmbedBuilder
                         {
                             Color = Color.Red,
@@ -75,7 +82,7 @@ namespace Sanara
                     SentrySdk.CaptureException(e);
             }
 
-            await StaticObjects.Db.AddErrorAsync(e);
+            if (_db != null) await _db.AddErrorAsync(e);
         }
     }
 }

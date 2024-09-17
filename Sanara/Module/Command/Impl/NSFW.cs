@@ -16,7 +16,7 @@ public sealed class NSFW : ISubmodule
     public string Name => "NSFW";
     public string Description => "Commands to get lewd stuffs";
 
-    public CommandData[] GetCommands()
+    public CommandData[] GetCommands(IServiceProvider _)
     {
         return [
         new CommandData(

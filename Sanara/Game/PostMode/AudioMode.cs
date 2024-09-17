@@ -1,11 +1,12 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
 namespace Sanara.Game.PostMode
 {
     public class AudioMode : IPostMode
     {
-        public Task PostAsync(IMessageChannel chan, string text, AGame sender)
+        public Task PostAsync(IServiceProvider provider, IMessageChannel chan, string text, AGame sender)
         {
             var quizzAudio = (IAudioGame)sender;
             quizzAudio.GetNewProcess();
@@ -20,7 +21,7 @@ namespace Sanara.Game.PostMode
             quizzAudio.SetCurrentProcess(process);
             _ = Task.Run(async () =>
             {
-                var stream = await StaticObjects.HttpClient.GetStreamAsync(text);
+                var stream = await provider.GetRequiredService<HttpClient>().GetStreamAsync(text);
                 await stream.CopyToAsync(process.StandardInput.BaseStream);
                 process.StandardInput.Close();
             });

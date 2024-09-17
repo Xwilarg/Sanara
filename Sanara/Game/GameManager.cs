@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Sanara.Game.Preload;
+using Sanara.Game.Preload.Impl;
 using Sanara.Module.Command;
 
 namespace Sanara.Game
@@ -11,8 +12,35 @@ namespace Sanara.Game
             thread = new(new ThreadStart(Loop));
         }
 
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
+            List<string> allNames = [];
+            foreach (var p in Preloads)
+            {
+#if !NSFW_BUILD
+                if (!p.IsSafe())
+                {
+                    await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " was skipped"));
+                    continue;
+                }
+#endif
+                allNames.Add(p.Name);// TODO: + (option == null ? "" : "-" + option));
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        p.Init(provider);
+                        await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " successfully loaded"));
+                    }
+                    catch (System.Exception e)
+                    {
+                        await Log.LogErrorAsync(e, null);
+                        await Log.LogAsync(new LogMessage(LogSeverity.Verbose, "Static Preload", p.Name + " failed to load"));
+                    }
+                });
+            }
+            AllGameNames = [.. allNames];
+
             thread.Start();
         }
 
@@ -133,5 +161,31 @@ namespace Sanara.Game
         private Dictionary<string, AGame> _pendingGames = new();
         private List<AGame> _games { get; } = new();
         private Dictionary<string, ReplayLobby> _replayLobby = new();
+
+        public IPreload[] Preloads { set; get; } =
+            [
+                /*new ArknightsAudioPreload(),
+                new KancolleAudioPreload(),
+
+                new ShiritoriHardPreload(),*/
+
+                new ShiritoriPreload(),
+            new KancollePreload(),
+            new ArknightsPreload(),
+            new GirlsFrontlinePreload(),
+            new AzurLanePreload(),
+            new FateGOPreload(),
+            new PokemonPreload(),
+            new NikkePreload(),
+            new AnimePreload(),
+#if NSFW_BUILD
+            new BooruQuizzPreload(),
+            new BooruFillPreload()
+#endif
+            ];
+        public string[] AllGameNames { set; get; }
+
+        public Dictionary<string, BooruSharp.Search.Tag.TagType> QuizzTagsCache { get; } = [];
+        public Dictionary<string, BooruSharp.Search.Tag.TagType> GelbooruTags { get; } = [];
     }
 }

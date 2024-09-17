@@ -6,7 +6,7 @@ namespace Sanara.Game.MultiplayerMode
 {
     public class SpeedMode : IMultiplayerMode
     {
-        public void Init(List<IUser> users)
+        public void Init(Random _, List<IUser> users)
         {
             _scores = new();
             foreach (var u in users)

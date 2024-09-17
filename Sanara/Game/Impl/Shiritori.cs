@@ -1,18 +1,20 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
+using Sanara.Game.PostMode;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Result;
-using Sanara.Module.Utility;
+using Sanara.Service;
 using System.Web;
 
 namespace Sanara.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, int minWordLength) : base(textChan, user, preload, StaticObjects.ModeText, new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, int minWordLength) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
@@ -21,7 +23,7 @@ namespace Sanara.Game.Impl
             _minWordLength = minWordLength;
         }
 
-        public Shiritori(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeText, new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
@@ -60,9 +62,11 @@ namespace Sanara.Game.Impl
 
         protected override async Task CheckAnswerInternalAsync(Module.Command.IContext answer)
         {
+            var langConverter = _provider.GetRequiredService<JapaneseConverter>();
+
             // We convert to hiragana so it's then easier to check if the word really exist
             // Especially for some edge case, like りゅう (ryuu) is starting by "ri" and not by "ry"
-            string hiraganaAnswer = Language.ToHiragana(answer.GetArgument<string>("answer").ToLowerInvariant());
+            string hiraganaAnswer = langConverter.ToHiragana(answer.GetArgument<string>("answer").ToLowerInvariant());
 
             if (hiraganaAnswer.Any(c => c < 0x0041 || (c > 0x005A && c < 0x0061) || (c > 0x007A && c < 0x3041) || (c > 0x3096 && c < 0x30A1) || c > 0x30FA))
                 throw new InvalidGameAnswer("Your answer must be in hiragana, katakana or romaji");
@@ -77,7 +81,7 @@ namespace Sanara.Game.Impl
                 return;
             }
 
-            JObject json = JsonConvert.DeserializeObject<JObject>(await StaticObjects.HttpClient.GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", hiraganaAnswer))));
+            JObject json = JsonConvert.DeserializeObject<JObject>(await _provider.GetRequiredService<HttpClient>().GetStringAsync("http://jisho.org/api/v1/search/words?keyword=" + HttpUtility.UrlEncode(string.Join("%20", hiraganaAnswer))));
             var data = (JArray)json["data"];
             if (data.Count == 0)
                 throw new InvalidGameAnswer("This word doesn't exist.");
@@ -93,7 +97,7 @@ namespace Sanara.Game.Impl
                     var readingObj = jp["reading"];
                     if (readingObj == null)
                         continue;
-                    reading = Language.ToHiragana(readingObj.Value<string>());
+                    reading = langConverter.ToHiragana(readingObj.Value<string>());
                     if (reading == hiraganaAnswer)
                     {
                         isCorrect = true;
@@ -118,7 +122,7 @@ namespace Sanara.Game.Impl
                 throw new InvalidGameAnswer("This word doesn't exist.");
             var ending = GetWordEnding(_currWord);
             if (!hiraganaAnswer.StartsWith(ending))
-                throw new InvalidGameAnswer($"Your word must begin by {ending} ({Language.ToRomaji(ending)}).");
+                throw new InvalidGameAnswer($"Your word must begin by {ending} ({langConverter.ToRomaji(ending)}).");
             if (_alreadySaid.Contains(hiraganaAnswer))
                 throw new GameLost("This word was already said.");
             if (!isNoun)
@@ -131,7 +135,7 @@ namespace Sanara.Game.Impl
                 _words.Remove(_words.Where(x => x.Word == hiraganaAnswer).First());
             _alreadySaid.Add(hiraganaAnswer);
             _currWord = hiraganaAnswer;
-            _lastUserChoice = _currWord + $" ({Language.ToRomaji(_currWord)}) - Meaning: {string.Join(", ", meanings)}";
+            _lastUserChoice = _currWord + $" ({langConverter.ToRomaji(_currWord)}) - Meaning: {string.Join(", ", meanings)}";
         }
 
         protected override string GetAnswer()
@@ -145,7 +149,7 @@ namespace Sanara.Game.Impl
                 var validWords = _words.Where(x => x.Word.StartsWith(ending) && x.LearningLevels.Contains(i)).ToArray();
                 if (validWords.Length == 0)
                     continue;
-                word = validWords[StaticObjects.Random.Next(validWords.Length)];
+                word = validWords[_provider.GetRequiredService<Random>().Next(validWords.Length)];
                 break;
             }
             if (word == null)
@@ -163,7 +167,7 @@ namespace Sanara.Game.Impl
             var validWords = _words.Where(x => x.Word.StartsWith(ending)).ToArray(); // Valid words are the ones beginning by the ending of the current word
             if (validWords.Length == 0)
                 return null;
-            return validWords[StaticObjects.Random.Next(validWords.Length)];
+            return validWords[_provider.GetRequiredService<Random>().Next(validWords.Length)];
         }
 
         public static bool IsLongEnough(string word, int requiredLength)
@@ -203,5 +207,7 @@ namespace Sanara.Game.Impl
 
         // Used for multiplayer
         private string? _lastUserChoice;
+
+        private Random _rand;
     }
 }

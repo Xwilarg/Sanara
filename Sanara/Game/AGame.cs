@@ -9,8 +9,10 @@ namespace Sanara.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
+        protected AGame(IServiceProvider provider, IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
         {
+            _provider = provider;
+
             _state = GameState.Prepare;
             _textChan = textChan;
             if (_textChan is ITextChannel)
@@ -75,7 +77,7 @@ namespace Sanara.Game
             {
                 _versusMode.Init(_lobby.GetUsers());
             }
-            await StaticObjects.Db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount(), _lobby.MultiplayerType);
+            await _db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount(), _lobby.MultiplayerType);
 
             _state = GameState.Ready;
 
@@ -157,7 +159,7 @@ namespace Sanara.Game
                 {
                     var specifierException = new System.Exception("Error while posting for " + _gameName + ", tried to post " + currentPostDebug.Length + " elements."
                         + (currentPostDebug.Length == 0 ? "" : "First element is: " + currentPostDebug[0]));
-                    await Log.LogErrorAsync(e, null);
+                    await _log.LogErrorAsync(e, null);
                     if (nbTries == 3)
                     {
                         await LooseAsync("Failed to get something to post after 3 tries...", true);
@@ -244,7 +246,7 @@ namespace Sanara.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await Log.LogErrorAsync(e, null);
+                                    await _log.LogErrorAsync(e, null);
                                     await msg.AddReactionAsync(new Emoji("🕷"));
                                 });
                             }
@@ -308,19 +310,19 @@ namespace Sanara.Game
             string scoreSentence = "";
             if (_lobby.MultiplayerType != MultiplayerType.VERSUS && !_isCustomGame) // Score aren't saved in multiplayer games
             {
-                int bestScore = StaticObjects.Db.GetGameScore(_guildId, _gameName, _argument);
+                int bestScore = _db.GetGameScore(_guildId, _gameName, _argument);
 
                 if (_score < bestScore) scoreSentence = $"You didn't beat the guild best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized the guild best score with a score of {bestScore}.";
                 else
                 {
-                    await StaticObjects.Db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
+                    await _db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
                     scoreSentence = $"You have beat the guild best score of {bestScore} with a new score of {_score}!";
 
-                    var guild = StaticObjects.Db.GetGuild(_guildId);
+                    var guild = _db.GetGuild(_guildId);
                     string fullName = _argument == null ? _gameName : (_gameName + "-" + _argument);
-                    int myScore = guild.GetScore(StaticObjects.Db.GetCacheName(fullName));
-                    var scores = StaticObjects.Db.GetAllScores(fullName);
+                    int myScore = guild.GetScore(_db.GetCacheName(fullName));
+                    var scores = _db.GetAllScores(fullName);
                     scoreSentence += "\nYou are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count;
                 }
             }
@@ -330,7 +332,7 @@ namespace Sanara.Game
 
         private async Task CreateReplayLobbyAsync()
         {
-            var replayLobby = StaticObjects.GameManager.AddReplayLobby(_textChan, _preload, _lobby);
+            var replayLobby = _gm.AddReplayLobby(_textChan, _preload, _lobby);
 
             var buttons = new ComponentBuilder()
                 .WithButton(label: "Ready/Unready", customId: $"replay/ready", style: ButtonStyle.Success)
@@ -377,5 +379,7 @@ namespace Sanara.Game
         protected Lobby _lobby;
         private const int _lobbyTimer = 30;
         protected IMultiplayerMode _versusMode;
+
+        protected IServiceProvider _provider;
     }
 }

@@ -1,6 +1,9 @@
-﻿using Discord;
+﻿using BooruSharp.Booru;
+using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
+using Sanara.Game.PostMode;
 using Sanara.Game.Preload;
 using Sanara.Module.Command;
 using System.Web;
@@ -12,19 +15,24 @@ namespace Sanara.Game.Impl
     /// </summary>
     public class FillAllBooru : AGame
     {
-        public FillAllBooru(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, StaticObjects.ModeUrl, new SpeedFillAllBooruMode(), settings)
+        public FillAllBooru(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new UrlMode(), new SpeedFillAllBooruMode(), settings)
         { }
 
         protected override string[] GetPostInternal()
         {
-            var post = StaticObjects.Gelbooru.GetRandomPostAsync().GetAwaiter().GetResult();
+            _booru = new()
+            {
+                HttpClient = _provider.GetRequiredService<HttpClient>()
+            };
+            var post = _booru.GetRandomPostAsync().GetAwaiter().GetResult();
             var tags = post.Tags.Select(x => HttpUtility.UrlDecode(x)).ToList();
+            var gm = _provider.GetRequiredService<GameManager>();
             tags.RemoveAll(x => // TODO: Put that in some cache
             {
-                if (StaticObjects.GelbooruTags.ContainsKey(x))
-                    return StaticObjects.GelbooruTags[x] == BooruSharp.Search.Tag.TagType.Metadata;
-                var tag = StaticObjects.Gelbooru.GetTagAsync(x).GetAwaiter().GetResult();
-                StaticObjects.GelbooruTags.Add(x, tag.Type);
+                if (gm.GelbooruTags.ContainsKey(x))
+                    return gm.GelbooruTags[x] == BooruSharp.Search.Tag.TagType.Metadata;
+                var tag = _booru.GetTagAsync(x).GetAwaiter().GetResult();
+                gm.GelbooruTags.Add(x, tag.Type);
                 return tag.Type == BooruSharp.Search.Tag.TagType.Metadata;
             });
             _allTags = tags.ToArray();
@@ -70,5 +78,7 @@ namespace Sanara.Game.Impl
         private string[] _allTags;
         private List<string> _foundTags;
         private int _nbNeed; // Number of tags you need to find (75% of total count)
+
+        private Gelbooru _booru;
     }
 }

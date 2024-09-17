@@ -7,9 +7,10 @@ namespace Sanara.Game.Preload.Impl
 {
     public sealed class ShiritoriHardPreload : IPreload
     {
-        public void Init()
+        public void Init(IServiceProvider provider)
         {
             _preload = Static.Shiritori.GetWords().Where(x => Shiritori.IsLongEnough(x.Word, 3)).ToArray();
+            _provider = provider;
         }
 
         public ReadOnlyCollection<IPreloadResult> Load()
@@ -18,7 +19,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Shiritori (Hard)";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new Shiritori(chan, user, this, settings, 3);
+            => new Shiritori(_provider, chan, user, this, settings, 3);
 
         public string GetRules()
             => Static.Shiritori.GetRules() +
@@ -28,5 +29,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private ShiritoriPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

@@ -5,11 +5,12 @@ namespace Sanara.Module.Command.Context
 {
     public class SlashCommandContext : IContext
     {
-        public SlashCommandContext(SocketSlashCommand ctx)
-            => _ctx = ctx;
+        public SlashCommandContext(IServiceProvider provider, SocketSlashCommand ctx)
+            => (Provider, _ctx) = (provider, ctx);
 
         private SocketSlashCommand _ctx;
 
+        public IServiceProvider Provider { private init; get; }
         public IMessageChannel Channel => _ctx.Channel;
         public IUser User => _ctx.User;
         public DateTimeOffset CreatedAt => _ctx.CreatedAt;

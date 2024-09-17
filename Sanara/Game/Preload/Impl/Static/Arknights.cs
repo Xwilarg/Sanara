@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Sanara.Game.Preload.Impl.Static
@@ -8,11 +9,13 @@ namespace Sanara.Game.Preload.Impl.Static
         public static List<(string, List<string>)> GetOperators()
             => _operators;
 
-        static Arknights()
+        public static void Init(IServiceProvider provider)
         {
+            var http = provider.GetRequiredService<HttpClient>();
+
             _operators = new();
-            var json = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(StaticObjects.HttpClient.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json").GetAwaiter().GetResult());
-            var jsonName = JsonConvert.DeserializeObject<JArray>(StaticObjects.HttpClient.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json").GetAwaiter().GetResult());
+            var json = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(http.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/gamedata/zh_CN/gamedata/excel/character_table.json").GetAwaiter().GetResult());
+            var jsonName = JsonConvert.DeserializeObject<JArray>(http.GetStringAsync("https://aceship.github.io/AN-EN-Tags/json/tl-unreadablename.json").GetAwaiter().GetResult());
             foreach (var elem in json)
             {
                 string name = elem.Key;

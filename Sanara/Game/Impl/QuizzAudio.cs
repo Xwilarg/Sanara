@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Audio;
 using Sanara.Exception;
+using Sanara.Game.PostMode;
 using Sanara.Game.Preload;
 using System.Diagnostics;
 
@@ -11,7 +12,7 @@ namespace Sanara.Game.Impl
     /// </summary>
     public class QuizzAudio : Quizz, IAudioGame
     {
-        public QuizzAudio(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, settings, StaticObjects.ModeAudio, true)
+        public QuizzAudio(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings, new AudioMode(), true)
         {
             var gUser = user as IGuildUser;
             if (gUser == null)

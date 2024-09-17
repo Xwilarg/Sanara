@@ -1,5 +1,8 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Module.Command;
+using Sanara.Subscription;
 
 namespace Sanara.Module.Button
 {
@@ -8,14 +11,14 @@ namespace Sanara.Module.Button
         public static async Task DatabaseDump(IContext ctx)
         {
             await ctx.ReplyAsync("```json\n" +
-                await StaticObjects.Db.DumpAsync(((ITextChannel)ctx.Channel).Guild.Id) +
+                await ctx.Provider.GetRequiredService<Db>().DumpAsync(((ITextChannel)ctx.Channel).Guild.Id) +
                 "\n```", ephemeral: true);
         }
 
         public static async Task RemoveSubscription(IContext ctx, string key)
         {
             var guildId = ((ITextChannel)ctx.Channel).Guild.Id;
-            var subs = await StaticObjects.GetSubscriptionsAsync(guildId);
+            var subs = await ctx.Provider.GetRequiredService<SubscriptionManager>().GetSubscriptionsAsync(ctx.Provider, guildId);
             if (subs == null)
             {
                 await ctx.ReplyAsync("Subscription system is not ready yet", ephemeral: true);
@@ -26,7 +29,7 @@ namespace Sanara.Module.Button
             }
             else
             {
-                await StaticObjects.Db.RemoveSubscriptionAsync(guildId, key);
+                await ctx.Provider.GetRequiredService<Db>().RemoveSubscriptionAsync(guildId, key);
                 await ctx.ReplyAsync("The subscription was removed", ephemeral: true);
             }
         }

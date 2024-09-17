@@ -3,6 +3,8 @@ using Discord.WebSocket;
 using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Exception;
 using System.Globalization;
 
@@ -21,10 +23,10 @@ public class Language
         _alreadyRequests.Add(id);
     }
 
-    public static async Task TranslateFromReactionAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
+    public static async Task TranslateFromReactionAsync(IServiceProvider provider, Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react)
     {
         string emote = react.Emote.ToString();
-        bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && StaticObjects.Db.GetGuild(textChan.GuildId).TranslateUsingFlags;
+        bool allowFlags = await chan.GetOrDownloadAsync() is ITextChannel textChan && provider.GetRequiredService<Db>().GetGuild(textChan.GuildId).TranslateUsingFlags;
         if (!allowFlags)
         {
             return;

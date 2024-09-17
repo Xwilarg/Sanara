@@ -19,7 +19,7 @@ public class Language : ISubmodule
     public string Name => "Language";
     public string Description => "Get information related to others languages";
 
-    public CommandData[] GetCommands()
+    public CommandData[] GetCommands(IServiceProvider _)
     {
         return new[]
         {

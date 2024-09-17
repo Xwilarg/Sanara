@@ -4,11 +4,13 @@ namespace Sanara.Module.Command.Context
 {
     public class GameCommandContext : IContext
     {
-        public GameCommandContext(IMessage message)
+        public GameCommandContext(IServiceProvider provider, IMessage message)
         {
+            Provider = provider;
             _message = message;
         }
 
+        public IServiceProvider Provider { private init; get; }
         private IMessage _message;
         private IUserMessage? _reply;
 

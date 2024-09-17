@@ -4,13 +4,14 @@ using Sanara.Diaporama.Impl;
 
 namespace Sanara.Diaporama
 {
+    /*
     public static class ReactionManager
     {
         public static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> _, SocketReaction react)
         {
             string emote = react.Emote.ToString();
             // If emote is not from the bot and is an arrow emote
-            if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId && Constants.DIAPORAMA_EMOTES.Contains(emote) && StaticObjects.Diaporamas.ContainsKey(msg.Id))
+            if (react.User.IsSpecified && react.User.Value.Id != Program.ClientId && Constants.DIAPORAMA_EMOTES.Contains(emote) && StaticObjects.Diaporamas.ContainsKey(msg.Id))
             {
                 var dMsg = await msg.GetOrDownloadAsync();
                 var elem = StaticObjects.Diaporamas[msg.Id];
@@ -136,4 +137,5 @@ namespace Sanara.Diaporama
             }.Build();
         }
     }
+    */
 }

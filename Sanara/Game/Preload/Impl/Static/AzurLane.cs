@@ -1,13 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 
 namespace Sanara.Game.Preload.Impl.Static
 {
     class AzurLane
     {
-        static AzurLane()
+        public static void Init(IServiceProvider provider)
         {
             _ships = new();
-            string html = StaticObjects.HttpClient.GetStringAsync("https://azurlane.koumakan.jp/wiki/List_of_Ships").GetAwaiter().GetResult();
+            string html = provider.GetRequiredService<HttpClient>().GetStringAsync("https://azurlane.koumakan.jp/wiki/List_of_Ships").GetAwaiter().GetResult();
             foreach (string s in html.Split(new string[] { "title=\"Category:" }, StringSplitOptions.None))
             {
                 if (s.Contains("Unreleased") || s.Contains("Plan")) // We skip ships that weren't released and were found by data mining
