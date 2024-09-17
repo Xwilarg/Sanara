@@ -8,6 +8,7 @@ using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Service;
 using System.Globalization;
+using System.Web;
 
 namespace Sanara.Module.Utility;
 
@@ -157,7 +158,7 @@ public class Language
         return (new EmbedBuilder
         {
             Title = $"From {new CultureInfo(answer.DetectedLanguageCode)}",
-            Description = answer.TranslatedText,
+            Description = HttpUtility.HtmlDecode(answer.TranslatedText),
             Color = Color.Blue
         }.Build(), buttons);
     }

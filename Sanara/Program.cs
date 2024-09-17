@@ -155,13 +155,26 @@ public sealed class Program
 
         _ = Task.Run(async () => { try { await _provider.GetRequiredService<SubscriptionManager>().InitAsync(_provider); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
         _ = Task.Run(async () => { try {
-                Game.Preload.Impl.Static.Shiritori.Init(_provider);
-                Game.Preload.Impl.Static.Arknights.Init(_provider);
-                Game.Preload.Impl.Static.AzurLane.Init(_provider);
-                Game.Preload.Impl.Static.FateGO.Init(_provider);
-                Game.Preload.Impl.Static.GirlsFrontline.Init(_provider);
-                Game.Preload.Impl.Static.Kancolle.Init(_provider);
-                Game.Preload.Impl.Static.Pokemon.Init(_provider);
+                Action<IServiceProvider>[] targets = [
+                    Game.Preload.Impl.Static.Shiritori.Init,
+                    Game.Preload.Impl.Static.Arknights.Init,
+                    Game.Preload.Impl.Static.AzurLane.Init,
+                    Game.Preload.Impl.Static.FateGO.Init,
+                    Game.Preload.Impl.Static.GirlsFrontline.Init,
+                    Game.Preload.Impl.Static.Kancolle.Init,
+                    Game.Preload.Impl.Static.Pokemon.Init
+                ];
+                foreach (var t in targets)
+                {
+                    try
+                    {
+                        t(_provider);
+                    }
+                    catch (System.Exception e)
+                    {
+                        await Log.LogErrorAsync(e, null);
+                    }
+                }
                 _provider.GetRequiredService<GameManager>().Init(_provider);
             } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
 
@@ -225,11 +238,25 @@ public sealed class Program
         return tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild;
     }
 
+    private bool DoesFailNsfwOnlyPrecondition(ITextChannel? tChan)
+    {
+        return tChan != null && !tChan.IsNsfw;
+    }
+
     private async Task LaunchCommandAsync(CommandData cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync)
     {
-        if (cmd.adminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
+        if (cmd.IsAdminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
         {
             await errorMsgAsync("This command can only be done by a guild administrator", true);
+        }
+        else if (cmd.SlashCommand.IsNsfw && DoesFailNsfwOnlyPrecondition(tChan))
+        {
+            await errorMsgAsync("This command can only be done in NSFW channels", true);
+        }
+        else if (cmd.SlashCommand.ContextTypes != null && !cmd.SlashCommand.ContextTypes.Contains(InteractionContextType.Guild) &&
+            tChan == null)
+        {
+            await errorMsgAsync("This command can only be done in a guild", true);
         }
         else
         {
