@@ -474,6 +474,10 @@ public sealed class Program
                         {
                             await Log.LogErrorAsync(e, ctx);
                         }
+                        finally
+                        {
+                            _pendingRequests.Remove(arg.User.Id);
+                        }
                     });
                 }
             }

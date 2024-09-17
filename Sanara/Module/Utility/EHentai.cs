@@ -6,6 +6,7 @@ using Sanara.Module.Command;
 using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Sanara.Module.Utility;
 
@@ -76,7 +77,10 @@ public static class EHentai
                         File.Delete(creds.UploadWebsiteLocation + dirName + ".zip");
                     });
                 }
-                await ctx.ReplyAsync("The result ZIP was too big to be sent on Discord");
+                else
+                {
+                    await ctx.ReplyAsync("The result ZIP was too big to be sent on Discord");
+                }
             }
         }
         finally
@@ -115,7 +119,7 @@ public static class EHentai
             var downloadUrl = GetEHentaiButton(url);
 
             var embed = new EmbedBuilder()
-                .WithTitle(title)
+                .WithTitle(HttpUtility.HtmlDecode(title))
                 .WithUrl(url)
                 .WithImageUrl(preview)
                 .WithColor(Color.Blue)
@@ -129,7 +133,7 @@ public static class EHentai
                 );
 
             var component = new ComponentBuilder()
-                .WithButton("Download", $"download-ehentai-{downloadUrl}");
+                .WithButton("Download", downloadUrl);
 
             await ctx.ReplyAsync(embed: embed.Build(), components: component.Build());
         }
