@@ -1,6 +1,8 @@
-﻿using Sanara.Help.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Sanara.Game;
+using Sanara.Help.Data;
+using Sanara.Module.Command;
 using System.Text.Json;
-using Sanara.Command.SlashCommand.Submodule;
 
 namespace Sanara.Help;
 
@@ -10,11 +12,15 @@ internal class Program
     {
         var submodules = Sanara.Program.Submodules;
 
+        var coll = new ServiceCollection();
+        coll.AddSingleton<GameManager>();
+        var provider = coll.BuildServiceProvider();
+
         var res = submodules.Select(s => new Submodule()
         {
             Name = s.Name,
             Description = s.Description,
-            Commands = s.GetCommands().Select(c => new Data.Command()
+            Commands = s.GetCommands(provider).Select(c => new Data.Command()
             {
                 Name = c.SlashCommand.Name,
                 Description = c.SlashCommand.Description,

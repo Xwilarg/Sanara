@@ -33,7 +33,7 @@ public sealed class SubscriptionManager
             try
             {
                 var currId = provider.GetRequiredService<Db>().GetCurrent(sub.GetName());
-                var feed = await sub.GetFeedAsync(currId, false);
+                var feed = await sub.GetFeedAsync(provider.GetRequiredService<HttpClient>(), currId, false);
                 await provider.GetRequiredService<Db>().SetCurrentAsync(sub.GetName(), feed.Any() ? feed[0].Id : currId); // Somehow doing the GetCurrent inside the GetFeedAsync stuck the bot
             }
             catch (System.Exception e)
@@ -48,7 +48,7 @@ public sealed class SubscriptionManager
             while (true)
             {
                 await Task.Delay(600000); // We check for new content every 10 minutes
-                await Update();
+                await Update(provider);
             }
         });
 
@@ -83,12 +83,13 @@ public sealed class SubscriptionManager
     private async Task Update(IServiceProvider provider)
     {
         var db = provider.GetRequiredService<Db>();
+        var client = provider.GetRequiredService<HttpClient>();
         var isNewDay = await db.CheckForDayUpdateAsync();
         foreach (var sub in _subscriptions)
         {
             try
             {
-                var feed = await sub.GetFeedAsync(provider.GetRequiredService<Db>().GetCurrent(sub.GetName()), isNewDay);
+                var feed = await sub.GetFeedAsync(client, db.GetCurrent(sub.GetName()), isNewDay);
                 if (feed.Length > 0) // If there is anything new in the feed compared to last time
                 {
                     await db.SetCurrentAsync(sub.GetName(), feed[0].Id);
@@ -100,7 +101,7 @@ public sealed class SubscriptionManager
                             if (sub.DeleteOldMessage)
                             {
                                 var lastMsg = await elem.TextChan.GetMessagesAsync(1).FlattenAsync();
-                                if (lastMsg.Any() && lastMsg.ElementAt(0).Author.Id == StaticObjects.ClientId)
+                                if (lastMsg.Any() && lastMsg.ElementAt(0).Author.Id == Program.ClientId)
                                 {
                                     await lastMsg.ElementAt(0).DeleteAsync();
                                 }

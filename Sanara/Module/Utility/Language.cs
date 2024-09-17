@@ -6,6 +6,7 @@ using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Sanara.Database;
 using Sanara.Exception;
+using Sanara.Service;
 using System.Globalization;
 
 namespace Sanara.Module.Utility;
@@ -31,12 +32,12 @@ public class Language
         {
             return;
         }
-        if (StaticObjects.TranslationClient != null && StaticObjects.Flags.ContainsKey(emote))
+        if (provider.GetRequiredService<TranslationServiceClient>() != null && provider.GetRequiredService<TranslatorService>().Flags.ContainsKey(emote))
         {
             _ = Task.Run(async () =>
             {
                 // If emote is not from the bot and is an arrow emote
-                if (react.User.IsSpecified && react.User.Value.Id != StaticObjects.ClientId)
+                if (react.User.IsSpecified && react.User.Value.Id != Program.ClientId)
                 {
                     var dMsg = await msg.GetOrDownloadAsync();
                     if (_alreadyRequests.Contains("TR_" + dMsg.Id))
@@ -60,8 +61,8 @@ public class Language
                     {
                         try
                         {
-                            var tr = await GetTranslationEmbedAsync(gMsg, StaticObjects.Flags[emote]);
-                            await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: tr.embed, components: tr.component.Build(), messageReference: new(dMsg.Id));
+                            var tr = await GetTranslationEmbedAsync(provider, gMsg, provider.GetRequiredService<TranslatorService>().Flags[emote]);
+                            await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: tr.embed, components: tr.component.Build(), messageReference: new MessageReference(dMsg.Id));
                             AddToRequestList("TR_" + dMsg.Id);
                         }
                         catch (CommandFailed ex)
@@ -91,7 +92,7 @@ public class Language
                 }
                 try
                 {
-                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
+                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(provider.GetRequiredService<HttpClient>(), dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
                     AddToRequestList("SR_" + dMsg.Id);
                 }
                 catch (CommandFailed cf)
@@ -106,7 +107,7 @@ public class Language
         }
     }
 
-    public static async Task<(Embed embed, ComponentBuilder component)> GetTranslationEmbedAsync(TranslationServiceClient trClient, ImageAnnotatorClient iClient, string projectId, string sentence, string language)
+    public static async Task<(Embed embed, ComponentBuilder component)> GetTranslationEmbedAsync(IServiceProvider provider, string sentence, string language)
     {
         ComponentBuilder buttons = new();
         if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && !sentence.Trim().Any(x => x == ' '))
@@ -115,7 +116,7 @@ public class Language
             TextAnnotation response;
             try
             {
-                response = await iClient.DetectDocumentTextAsync(image);
+                response = await provider.GetRequiredService<ImageAnnotatorClient>().DetectDocumentTextAsync(image);
             }
             catch (AnnotateImageException)
             {
@@ -124,8 +125,8 @@ public class Language
             if (response == null)
                 throw new CommandFailed("There is no text on the image.");
             sentence = response.Text;
-            var key = Guid.NewGuid();
-            StaticObjects.TranslationOriginalText.Add(key, sentence);
+            var key = Guid.NewGuid().ToString();
+            provider.GetRequiredService<TranslatorService>().TranslationOriginalText.Add(key, sentence);
             buttons.WithButton("Original Text", $"tr-{key}");
         }
 
@@ -134,13 +135,13 @@ public class Language
             Contents = { sentence },
             TargetLanguageCode = CultureInfo.GetCultures(CultureTypes.NeutralCultures)
                 .FirstOrDefault(x => x.EnglishName.Equals(language, StringComparison.InvariantCultureIgnoreCase) || x.NativeName.Equals(language, StringComparison.InvariantCultureIgnoreCase))?.TwoLetterISOLanguageName ?? language,
-            Parent = $"projects/{projectId}/locations/global"
+            Parent = $"projects/{provider.GetRequiredService<Credentials>().GoogleProjectId}/locations/global"
         };
 
         TranslateTextResponse translation;
         try
         {
-            translation = await trClient.TranslateTextAsync(req);
+            translation = await provider.GetRequiredService<TranslationServiceClient>().TranslateTextAsync(req);
         }
         catch (RpcException e)
         {

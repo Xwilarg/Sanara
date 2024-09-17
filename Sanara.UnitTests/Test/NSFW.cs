@@ -4,13 +4,13 @@ using NUnit.Framework.Legacy;
 
 namespace Sanara.UnitTests.Test
 {
-    public class NSFW
+    public class NSFW : TestBase
     {
         [Test]
         public async Task BooruTest()
         {
             var mod = new Module.Command.Impl.NSFW();
-            var ctx = new TestCommandContext(new()
+            var ctx = new TestCommandContext(_provider, new()
             {
                 { "source", 0L }
             });
@@ -25,7 +25,7 @@ namespace Sanara.UnitTests.Test
         public async Task DoujinshiTest()
         {
             var mod = new Module.Command.Impl.NSFW();
-            var ctx = new TestCommandContext(new()
+            var ctx = new TestCommandContext(_provider, new()
             {
                 { "tags", "touhou" }
             });
@@ -41,7 +41,7 @@ namespace Sanara.UnitTests.Test
         public async Task CosplayTest()
         {
             var mod = new Module.Command.Impl.NSFW();
-            var ctx = new TestCommandContext(new()
+            var ctx = new TestCommandContext(_provider, new()
             {
                 { "tags", "touhou" }
             });

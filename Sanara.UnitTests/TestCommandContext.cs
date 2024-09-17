@@ -5,10 +5,13 @@ namespace Sanara.UnitTests
 {
     public class TestCommandContext : IContext
     {
-        public TestCommandContext(Dictionary<string, object> args)
+        public TestCommandContext(IServiceProvider provider, Dictionary<string, object> args)
         {
+            Provider = provider;
             _args = args;
         }
+
+        public IServiceProvider Provider { init; get; }
 
         private Dictionary<string, object> _args;
         public Result Result { internal set; get; }

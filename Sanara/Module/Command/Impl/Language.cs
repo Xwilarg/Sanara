@@ -139,7 +139,7 @@ public class Language : ISubmodule
             throw new CommandFailed("You must either precise the sentence argument or the image one");
         }
 
-        var res = await Utility.Language.GetTranslationEmbedAsync(trClient, iClient, ctx.Provider.GetRequiredService<Credentials>().GoogleProjectId, sentence ?? image!.Url, language);
+        var res = await Utility.Language.GetTranslationEmbedAsync(ctx.Provider, sentence ?? image!.Url, language);
         await ctx.ReplyAsync(embed: res.embed, components: res.component.Build());
     }
 

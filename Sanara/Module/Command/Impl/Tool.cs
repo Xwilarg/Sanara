@@ -322,8 +322,8 @@ public class Tool : ISubmodule
 
     public async Task DramaAsync(IContext ctx)
     {
-        var dramaClient = ctx.Provider.GetService<DramaApiData>();
-        if (dramaClient == null)
+        var apiKey = ctx.Provider.GetRequiredService<Credentials>().MyDramaListApiKey;
+        if (apiKey == null)
         {
             throw new CommandFailed("Drama token is not available");
         }
@@ -333,7 +333,7 @@ public class Tool : ISubmodule
             RequestUri = new Uri("https://api.mydramalist.com/v1/search/titles?q=" + HttpUtility.UrlEncode(ctx.GetArgument<string>("name"))),
             Method = HttpMethod.Post
         };
-        request.Headers.Add("mdl-api-key", dramaClient.ApiKey);
+        request.Headers.Add("mdl-api-key", apiKey);
 
         var response = await ctx.Provider.GetRequiredService<HttpClient>().SendAsync(request);
         var searchResults = JsonConvert.DeserializeObject<JArray>(await response.Content.ReadAsStringAsync());
@@ -342,7 +342,7 @@ public class Tool : ISubmodule
             throw new CommandFailed("Nothing was found with this name.");
 
         var id = searchResults.First().Value<int>("id");
-        var drama = await GetDramaAsync(dramaClient.ApiKey, ctx.Provider.GetRequiredService<HttpClient>(), id);
+        var drama = await GetDramaAsync(apiKey, ctx.Provider.GetRequiredService<HttpClient>(), id);
 
         var embed = new EmbedBuilder()
         {

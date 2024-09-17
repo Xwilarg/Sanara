@@ -65,11 +65,6 @@ public sealed class Program
             })
             .AddSingleton<JapaneseConverter>();
 
-        if (credentials.MyDramaListApiKey != null)
-        {
-            coll.AddSingleton(new DramaApiData() { ApiKey = credentials.MyDramaListApiKey });
-        }
-
         if (credentials.TopGgToken != null)
         {
             coll.AddSingleton(new TopGGClient(client.CurrentUser.Id, credentials.TopGgToken));
@@ -615,7 +610,7 @@ public sealed class Program
         });
     }
 
-    private ISubmodule[] Submodules => [
+    public static ISubmodule[] Submodules => [
         new Entertainment(),
         new Module.Command.Impl.Game(),
         new Language(),
@@ -713,7 +708,7 @@ public sealed class Program
 
     private async Task GuildJoined(SocketGuild guild)
     {
-        await _provider.GetRequiredService<Db>().InitGuildAsync(guild);
+        await _provider.GetRequiredService<Db>().InitGuildAsync(_provider, guild);
     }
 
     private async Task HandleCommandAsync(SocketMessage arg)

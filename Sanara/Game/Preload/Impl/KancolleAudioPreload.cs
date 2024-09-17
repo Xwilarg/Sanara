@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -12,6 +13,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init(IServiceProvider provider)
         {
+            _provider = provider;
             var db = provider.GetRequiredService<Db>();
             var client = provider.GetRequiredService<HttpClient>();
 
@@ -46,7 +48,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "KanColle Audio Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new QuizzAudio(chan, user, this, settings);
+            => new QuizzAudio(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll play a vocal line of a shipgirl, you'll have to give her name.";
@@ -55,5 +57,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private QuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

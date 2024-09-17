@@ -77,7 +77,7 @@ public class Settings : ISubmodule
     public async Task ConfigureAsync(IContext ctx)
     {
         var guild = ((ITextChannel)ctx.Channel).Guild;
-        var data = await Utility.Settings.GetSettingsDisplayAsync(guild);
+        var data = await Utility.Settings.GetSettingsDisplayAsync(ctx.Provider, guild);
         await ctx.ReplyAsync(embed: data.Embed, ephemeral: true, components: data.Components);
     }
 

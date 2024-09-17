@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
+using Sanara.Game;
 using Sanara.Game.Preload.Result;
 using Sanara.Subscription;
 using Sanara.Subscription.Tags;
@@ -18,9 +20,14 @@ namespace Sanara.Database
             _guilds = new Dictionary<ulong, Guild>();
             _subscriptions = new Dictionary<string, Dictionary<ulong, SubscriptionGuild>>();
             _subscriptionProgress = new Dictionary<string, int>();
-
-            _dbName = StaticObjects.BotName;
-            _statDbName = StaticObjects.BotName + "_stats";
+            string botName =
+#if NSFW_BUILD
+                "Sanara";
+#else
+                "Hanaki";
+#endif
+            _dbName = botName;
+            _statDbName = botName + "_stats";
         }
 
         public async Task InitAsync()
@@ -83,7 +90,7 @@ namespace Sanara.Database
                 _r.Db(dbName).TableCreate(tableName).Run(_conn);
         }
 
-        public async Task InitGuildAsync(SocketGuild sGuild)
+        public async Task InitGuildAsync(IServiceProvider provider, SocketGuild sGuild)
         {
             if (_guilds.ContainsKey(sGuild.Id)) // If the guild was already added, no need to do it a second time
                 return;
@@ -111,7 +118,7 @@ namespace Sanara.Database
 
             // Get score
             var json = (JObject)await _r.Db(_dbName).Table("Guilds").Get(sGuild.Id.ToString()).RunAsync(_conn);
-            foreach (var name in StaticObjects.AllGameNames.Select(x => GetCacheName(x)))
+            foreach (var name in provider.GetRequiredService<GameManager>().AllGameNames.Select(x => GetCacheName(x)))
             {
                 if (json[name] != null)
                 {

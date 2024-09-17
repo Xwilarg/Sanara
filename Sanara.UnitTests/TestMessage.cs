@@ -72,6 +72,12 @@ namespace Sanara.UnitTests
 
         public Poll? Poll => throw new NotImplementedException();
 
+        public IReadOnlyCollection<MessageSnapshot> ForwardedMessages => throw new NotImplementedException();
+
+        public PurchaseNotification PurchaseNotification => throw new NotImplementedException();
+
+        public MessageCallData? CallData => throw new NotImplementedException();
+
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
         {
             throw new NotImplementedException();

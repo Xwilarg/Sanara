@@ -1,4 +1,6 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -65,7 +67,7 @@ namespace Sanara.Game
         {
             if (_postMode is not AudioMode)
                 throw new CommandFailed("Replay can only be done on audio games.");
-            await _postMode.PostAsync(_textChan, _current, this);
+            await _postMode.PostAsync(_provider, _textChan, _current, this);
         }
 
         public async Task StartAsync(IContext ctx)
@@ -75,9 +77,9 @@ namespace Sanara.Game
 
             if (_lobby.MultiplayerType == MultiplayerType.VERSUS)
             {
-                _versusMode.Init(_lobby.GetUsers());
+                _versusMode.Init(_provider.GetRequiredService<Random>(), _lobby.GetUsers());
             }
-            await _db.AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount(), _lobby.MultiplayerType);
+            await _provider.GetRequiredService<Db>().AddGamePlayerAsync(_isCustomGame ? "custom" : _gameName, _argument, _lobby.GetUserCount(), _lobby.MultiplayerType);
 
             _state = GameState.Ready;
 
@@ -135,14 +137,14 @@ namespace Sanara.Game
                         {
                             _current = tmp;
                             if (_postMode is AudioMode)
-                                _ = Task.Run(async () => { await _postMode.PostAsync(_textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
+                                _ = Task.Run(async () => { await _postMode.PostAsync(_provider, _textChan, _current, this); }); // We don't wait for the audio to finish for audio games // TODO: That also means we don't handle exceptions
                             else if (_postMode is TextMode)
                             {
-                                await _postMode.PostAsync(_textChan, (introMsg == null ? "" : introMsg) + _current + postContent, this);
+                                await _postMode.PostAsync(_provider, _textChan, (introMsg == null ? "" : introMsg) + _current + postContent, this);
                                 introMsg = null;
                             }
                             else
-                                await _postMode.PostAsync(_textChan, _current, this);
+                                await _postMode.PostAsync(_provider, _textChan, _current, this);
                         }
                     }
                     if (_postMode is not TextMode)
@@ -159,7 +161,7 @@ namespace Sanara.Game
                 {
                     var specifierException = new System.Exception("Error while posting for " + _gameName + ", tried to post " + currentPostDebug.Length + " elements."
                         + (currentPostDebug.Length == 0 ? "" : "First element is: " + currentPostDebug[0]));
-                    await _log.LogErrorAsync(e, null);
+                    await Log.LogErrorAsync(e, null);
                     if (nbTries == 3)
                     {
                         await LooseAsync("Failed to get something to post after 3 tries...", true);
@@ -246,7 +248,7 @@ namespace Sanara.Game
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    await _log.LogErrorAsync(e, null);
+                                    await Log.LogErrorAsync(e, null);
                                     await msg.AddReactionAsync(new Emoji("🕷"));
                                 });
                             }
@@ -310,19 +312,20 @@ namespace Sanara.Game
             string scoreSentence = "";
             if (_lobby.MultiplayerType != MultiplayerType.VERSUS && !_isCustomGame) // Score aren't saved in multiplayer games
             {
-                int bestScore = _db.GetGameScore(_guildId, _gameName, _argument);
+                var db = _provider.GetRequiredService<Db>();
+                int bestScore = db.GetGameScore(_guildId, _gameName, _argument);
 
                 if (_score < bestScore) scoreSentence = $"You didn't beat the guild best score of {bestScore} with your score of {_score}.";
                 else if (_score == bestScore) scoreSentence = $"You equalized the guild best score with a score of {bestScore}.";
                 else
                 {
-                    await _db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
+                    await db.SaveGameScoreAsync(_guildId, _score, _contributors, _gameName, _argument);
                     scoreSentence = $"You have beat the guild best score of {bestScore} with a new score of {_score}!";
 
-                    var guild = _db.GetGuild(_guildId);
+                    var guild = db.GetGuild(_guildId);
                     string fullName = _argument == null ? _gameName : (_gameName + "-" + _argument);
-                    int myScore = guild.GetScore(_db.GetCacheName(fullName));
-                    var scores = _db.GetAllScores(fullName);
+                    int myScore = guild.GetScore(db.GetCacheName(fullName));
+                    var scores = db.GetAllScores(fullName);
                     scoreSentence += "\nYou are ranked #" + (scores.Count(x => x > myScore) + 1) + " out of " + scores.Count;
                 }
             }
@@ -332,7 +335,7 @@ namespace Sanara.Game
 
         private async Task CreateReplayLobbyAsync()
         {
-            var replayLobby = _gm.AddReplayLobby(_textChan, _preload, _lobby);
+            var replayLobby = _provider.GetRequiredService<GameManager>().AddReplayLobby(_textChan, _preload, _lobby);
 
             var buttons = new ComponentBuilder()
                 .WithButton(label: "Ready/Unready", customId: $"replay/ready", style: ButtonStyle.Success)

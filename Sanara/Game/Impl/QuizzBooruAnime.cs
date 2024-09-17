@@ -7,7 +7,7 @@ namespace Sanara.Game.Impl
 {
     public sealed class QuizzBooruAnime : QuizzBooru
     {
-        public QuizzBooruAnime(IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(textChan, user, preload, settings)
+        public QuizzBooruAnime(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings)
         { }
 
         protected override string[] GetPostInternal()

@@ -11,6 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init(IServiceProvider provider)
         {
+            _provider = provider;
             if (!File.Exists("Saves/Game/QuizzTags.txt"))
                 File.WriteAllBytes("Saves/Game/QuizzTags.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
             string[] lines = File.ReadAllLines("Saves/Game/QuizzTags.txt");
@@ -36,7 +37,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Booru Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new QuizzBooruTags(chan, user, this, settings);
+            => new QuizzBooruTags(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post 3 images, you'll have to give the tag they have in common.";
@@ -45,5 +46,6 @@ namespace Sanara.Game.Preload.Impl
             => false;
 
         private BooruQuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }

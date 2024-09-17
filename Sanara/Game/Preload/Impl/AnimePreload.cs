@@ -11,6 +11,7 @@ namespace Sanara.Game.Preload.Impl
     {
         public void Init(IServiceProvider provider)
         {
+            _provider = provider;
             if (!File.Exists("Saves/Game/QuizzAnime.txt"))
                 File.WriteAllBytes("Saves/Game/QuizzAnime.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzAnime.txt").GetAwaiter().GetResult());
             string[] lines = File.ReadAllLines("Saves/Game/QuizzAnime.txt");
@@ -36,7 +37,7 @@ namespace Sanara.Game.Preload.Impl
         public string Name => "Anime Quizz";
 
         public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
-            => new QuizzBooruAnime(chan, user, this, settings);
+            => new QuizzBooruAnime(_provider, chan, user, this, settings);
 
         public string GetRules()
             => "I'll post an extract from an anime, you'll have to give its name.";
@@ -45,5 +46,6 @@ namespace Sanara.Game.Preload.Impl
             => true;
 
         private BooruQuizzPreloadResult[] _preload;
+        private IServiceProvider _provider;
     }
 }
