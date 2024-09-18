@@ -30,7 +30,7 @@ internal class Program
             })
         });
 
-        File.WriteAllText("help.json", JsonSerializer.Serialize(res));
+        File.WriteAllText("Help.json", JsonSerializer.Serialize(res));
     }
 
     private static string[] BuildPreconditions(CommandData c)
