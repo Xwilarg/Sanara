@@ -52,7 +52,7 @@ public class Settings : ISubmodule
                     IsNsfw = false
                 },
                 callback: BotInfoAsync,
-                aliases: Array.Empty<string>()
+                aliases: []
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()

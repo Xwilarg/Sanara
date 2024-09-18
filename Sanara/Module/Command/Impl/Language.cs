@@ -63,26 +63,6 @@ public class Language : ISubmodule
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
                 {
-                    Name = "urban",
-                    Description = "Get the slang definition of a word",
-                    Options = new()
-                    {
-                        new SlashCommandOptionBuilder()
-                        {
-                            Name = "word",
-                            Description = "Word to get the meaning of",
-                            Type = ApplicationCommandOptionType.String,
-                            IsRequired = true
-                        }
-                    },
-                    IsNsfw = true
-                },
-                callback: UrbanAsync,
-                aliases: []
-            ),
-            new CommandData(
-                slashCommand: new SlashCommandBuilder()
-                {
                     Name = "kanji",
                     Description = "Get information about a kanji",
                     Options = new()
@@ -210,70 +190,6 @@ public class Language : ISubmodule
         var res = await Utility.Language.GetTranslationEmbedAsync(ctx.Provider, sentence ?? image!.Url, language);
         await ctx.ReplyAsync(embed: res.embed, components: res.component.Build());
     }
-
-    public async Task UrbanAsync(IContext ctx)
-    {
-        var word = ctx.GetArgument<string>("word");
-
-        JObject json;
-        try
-        {
-            json = JsonConvert.DeserializeObject<JObject>(await ctx.Provider.GetRequiredService<HttpClient>().GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + HttpUtility.UrlEncode(word)));
-        }
-        catch (HttpRequestException re)
-        {
-            if (re.StatusCode == System.Net.HttpStatusCode.InternalServerError) // Somehow for some invalid query urbandictionary throws a 500
-            {
-                throw new CommandFailed("There is no definition for this query.");
-            }
-            throw;
-        }
-        if (json["list"].Value<JArray>().Count == 0)
-            throw new CommandFailed("There is no definition for this query.");
-
-        int up = json["list"][0]["thumbs_up"].Value<int>();
-        int down = json["list"][0]["thumbs_down"].Value<int>();
-
-        if (up <= down)
-        {
-            throw new CommandFailed("There is no definition having a positive vote ratio for this query");
-        }
-
-        int gcd = Utils.GCD(up, down);
-
-        string definition = json["list"][0]["definition"].Value<string>();
-        if (definition.Length > 1000)
-            definition = definition[..1000] + " [...]";
-        string example = json["list"][0]["example"].Value<string>();
-        if (example.Length > 1000)
-            example = example[..1000] + " [...]";
-
-        var outWord = json["list"][0]["word"].Value<string>();
-        var embed = new EmbedBuilder
-        {
-            Color = Color.Blue,
-            Title = Utils.ToWordCase(outWord),
-            Url = json["list"][0]["permalink"].Value<string>(),
-            Fields = new()
-            {
-                new EmbedFieldBuilder
-                {
-                    Name = "Definition",
-                    Value = definition
-                }
-            },
-            Footer = new EmbedFooterBuilder
-            {
-                Text = $"Up/Down vote ratio: {up / gcd} : {down / gcd}"
-            }
-        };
-        if (example != "")
-        {
-            embed.AddField("Example", example);
-        }
-        await ctx.ReplyAsync(embed: embed.Build());
-    }
-
 
     public async Task KanjiAsync(IContext ctx)
     {
