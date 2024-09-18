@@ -11,10 +11,10 @@ using System.Web;
 
 namespace Sanara.Module.Command.Impl;
 
-public sealed class NSFW : ISubmodule
+public sealed class Doujin : ISubmodule
 {
-    public string Name => "NSFW";
-    public string Description => "Commands to get lewd stuffs";
+    public string Name => "Doujin";
+    public string Description => "Fan-made content";
 
     public CommandData[] GetCommands(IServiceProvider _)
     {

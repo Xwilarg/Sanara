@@ -11,6 +11,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using Sanara.Module.Utility;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Processing;
 
 namespace Sanara.Module.Command.Impl;
 
@@ -117,7 +120,72 @@ public class Language : ISubmodule
                 callback: JapaneseAsync,
                 aliases: [ "ja" ]
             ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "ocr",
+                    Description = "Detect text on an image",
+                    Options = new()
+                    {
+                        new SlashCommandOptionBuilder()
+                        {
+                            Name = "image",
+                            Description = "Image",
+                            Type = ApplicationCommandOptionType.Attachment,
+                            IsRequired = true
+                        }
+                    },
+                    IsNsfw = false
+                },
+                callback: OCRAsync,
+                aliases: []
+            )
         };
+    }
+
+    public async Task OCRAsync(IContext ctx)
+    {
+        var input = ctx.GetArgument<IAttachment>("image");
+        var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input.Url);
+        TextAnnotation response;
+        try
+        {
+            response = await ctx.Provider.GetRequiredService<ImageAnnotatorClient>().DetectDocumentTextAsync(image);
+        }
+        catch (AnnotateImageException)
+        {
+            throw new CommandFailed("The file given isn't a valid image.");
+        }
+        if (response == null)
+            throw new CommandFailed("There is no text on the image.");
+
+        var embed = new EmbedBuilder();
+        var img = SixLabors.ImageSharp.Image.Load(await ctx.Provider.GetRequiredService<HttpClient>().GetStreamAsync(input.Url));
+        var pen = new SolidPen(SixLabors.ImageSharp.Color.Red, 2f);
+
+        foreach (var page in response.Pages)
+        {
+            foreach (var block in page.Blocks)
+            {
+                foreach (var paragraph in block.Paragraphs)
+                {
+                    embed.AddField($"Confidence: {(paragraph.Confidence * 100):0.0}%", string.Join(" ", paragraph.Words.Select(x => string.Join("", x.Symbols.Select(s => s.Text)))));
+
+                    // Draw all lines
+                    var path = new PathBuilder();
+                    path.AddLines(paragraph.BoundingBox.Vertices.Select(v => new SixLabors.ImageSharp.PointF(v.X, v.Y)).ToArray());
+                    path.CloseFigure();
+
+                    img.Mutate(x => x.Draw(pen, path.Build()));
+                }
+            }
+        }
+
+        await ctx.ReplyAsync(embed: embed.Build());
+        using var mStream = new MemoryStream();
+        img.Save(mStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
+        mStream.Position = 0;
+        await ctx.ReplyAsync(mStream, "ocr.jpg");
     }
 
     public async Task TranslateAsync(IContext ctx)

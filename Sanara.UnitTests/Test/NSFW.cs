@@ -10,7 +10,7 @@ namespace Sanara.UnitTests.Test
         [Test]
         public async Task BooruTest()
         {
-            var mod = new Module.Command.Impl.NSFW();
+            var mod = new Module.Command.Impl.Doujin();
             var ctx = new TestCommandContext(_provider, new()
             {
                 { "source", 0L }
@@ -25,7 +25,7 @@ namespace Sanara.UnitTests.Test
         [Test]
         public async Task CosplayTest()
         {
-            var mod = new Module.Command.Impl.NSFW();
+            var mod = new Module.Command.Impl.Doujin();
             var ctx = new TestCommandContext(_provider, []);
             await mod.CosplayAsync(ctx);
             await AssertLinkAsync(ctx.Result.Embed.Image.Value.Url);

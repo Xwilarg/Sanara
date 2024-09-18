@@ -647,13 +647,12 @@ public sealed class Program
     }
 
     public static ISubmodule[] Submodules => [
-        new Entertainment(),
+        new Media(),
         new Module.Command.Impl.Game(),
         new Language(),
-        new NSFW(),
+        new Doujin(),
         new Settings(),
-        new Module.Command.Impl.Subscription(),
-        new Tool()
+        new Module.Command.Impl.Subscription()
     ];
 
     private async Task Ready()

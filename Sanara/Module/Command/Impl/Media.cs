@@ -1,14 +1,10 @@
 ﻿using Discord;
-using Google.Cloud.Vision.V1;
+using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Sanara.Exception;
 using Sanara.Module.Utility;
-using Sanara.Service;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Processing;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -18,15 +14,35 @@ using VndbSharp.Models.VisualNovel;
 
 namespace Sanara.Module.Command.Impl;
 
-public class Tool : ISubmodule
+public class Media : ISubmodule
 {
-    public string Name => "Tool";
-    public string Description => "Utility commands";
+    public string Name => "Media";
+    public string Description => "Data coming from various medias";
 
     public CommandData[] GetCommands(IServiceProvider _)
     {
         return new[]
         {
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "inspire",
+                    Description = "Get a random \"inspirational\" quote",
+                    IsNsfw = false
+                },
+                callback: InspireAsync,
+                aliases: []
+            ),
+            new CommandData(
+                slashCommand: new SlashCommandBuilder()
+                {
+                    Name = "vnquote",
+                    Description = "Get a quote from a random Visual Novel",
+                    IsNsfw = true
+                },
+                callback: VNQuoteAsync,
+                aliases: Array.Empty<string>()
+            ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
                 {
@@ -131,75 +147,32 @@ public class Tool : ISubmodule
                 },
                 callback: VisualNovelAsync,
                 aliases: [ "vn" ]
-            ),
-            new CommandData(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "ocr",
-                    Description = "Detect text on an image",
-                    Options = new()
-                    {
-                        new SlashCommandOptionBuilder()
-                        {
-                            Name = "image",
-                            Description = "Image",
-                            Type = ApplicationCommandOptionType.Attachment,
-                            IsRequired = true
-                        }
-                    },
-                    IsNsfw = false
-                },
-                callback: OCRAsync,
-                aliases: []
             )
         };
     }
 
-    public async Task OCRAsync(IContext ctx)
+    public async Task InspireAsync(IContext ctx)
     {
-        var input = ctx.GetArgument<IAttachment>("image");
-        var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(input.Url);
-        TextAnnotation response;
-        try
+        await ctx.ReplyAsync(embed: new EmbedBuilder
         {
-            response = await ctx.Provider.GetRequiredService<ImageAnnotatorClient>().DetectDocumentTextAsync(image);
-        }
-        catch (AnnotateImageException)
-        {
-            throw new CommandFailed("The file given isn't a valid image.");
-        }
-        if (response == null)
-            throw new CommandFailed("There is no text on the image.");
-
-        var embed = new EmbedBuilder();
-        var img = SixLabors.ImageSharp.Image.Load(await ctx.Provider.GetRequiredService<HttpClient>().GetStreamAsync(input.Url));
-        var pen = new SolidPen(SixLabors.ImageSharp.Color.Red, 2f);
-
-        foreach (var page in response.Pages)
-        {
-            foreach (var block in page.Blocks)
-            {
-                foreach (var paragraph in block.Paragraphs)
-                {
-                    embed.AddField($"Confidence: {(paragraph.Confidence * 100):0.0}%", string.Join(" ", paragraph.Words.Select(x => string.Join("", x.Symbols.Select(s => s.Text)))));
-
-                    // Draw all lines
-                    var path = new PathBuilder();
-                    path.AddLines(paragraph.BoundingBox.Vertices.Select(v => new SixLabors.ImageSharp.PointF(v.X, v.Y)).ToArray());
-                    path.CloseFigure();
-
-                    img.Mutate(x => x.Draw(pen, path.Build()));
-                }
-            }
-        }
-
-        await ctx.ReplyAsync(embed: embed.Build());
-        using var mStream = new MemoryStream();
-        img.Save(mStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
-        mStream.Position = 0;
-        await ctx.ReplyAsync(mStream, "ocr.jpg");
+            Color = Color.Blue,
+            ImageUrl = await Inspire.GetInspireAsync(ctx.Provider.GetRequiredService<HttpClient>())
+        }.Build());
     }
 
+    public async Task VNQuoteAsync(IContext ctx)
+    {
+        var quoteTag = ctx.Provider.GetRequiredService<HtmlWeb>().Load("https://vndb.org").DocumentNode.SelectSingleNode("//footer/span/a");
+        var id = quoteTag.Attributes["href"].Value;
+        var vn = (await ctx.Provider.GetRequiredService<Vndb>().GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id[2..])), VndbFlags.FullVisualNovel)).First();
+        await ctx.ReplyAsync(embed: new EmbedBuilder
+        {
+            Title = $"From {vn.Name}",
+            Url = $"https://vndb.org{id}",
+            Description = quoteTag.InnerHtml,
+            Color = Color.Blue
+        }.Build());
+    }
 
     public async Task SourceAsync(IContext ctx)
     {
@@ -286,7 +259,7 @@ public class Tool : ISubmodule
 #if NSFW_BUILD
             ctx.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg >= 1 || vn.ImageRating.ViolenceAvg >= 1) ? null : vn.Image,
 #else
-            (vn.ImageRating.SexualAvg >= 1 || vn.ImageRating.ViolenceAvg >= 1) ? null : vn.Image,
+        (vn.ImageRating.SexualAvg >= 1 || vn.ImageRating.ViolenceAvg >= 1) ? null : vn.Image,
 #endif
             Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description[0..1000] + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
             Color = Color.Blue
@@ -401,7 +374,7 @@ public class Tool : ISubmodule
 #if NSFW_BUILD
             throw new CommandFailed("The result of your search was NSFW and thus, can only be shown in a NSFW channel.");
 #else
-            throw new CommandFailed("Nothing was found with this name.");
+        throw new CommandFailed("Nothing was found with this name.");
 #endif
 
         var description = "";
