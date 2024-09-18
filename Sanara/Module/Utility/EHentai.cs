@@ -137,6 +137,10 @@ public static class EHentai
 
             await ctx.ReplyAsync(embed: embed.Build(), components: component.Build());
         }
+        catch (CommandFailed)
+        {
+            throw;
+        }
         catch (System.Exception e)
         {
             StringBuilder str = new();
