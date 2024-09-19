@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Utility;
+using Sanara.Service;
 using System.Text.Json;
 using System.Web;
 
@@ -292,6 +293,8 @@ public sealed class Doujin : ISubmodule
             throw new CommandFailed("The image found have an unexpected rating of explicit");
         }
 
+        var guid = Guid.NewGuid();
+        ctx.Provider.GetRequiredService<BooruService>().Results.Add(guid.ToString(), post);
         var embed = new EmbedBuilder
         {
             Color = post.Rating switch
@@ -303,11 +306,7 @@ public sealed class Doujin : ISubmodule
                 _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
             },
             Url = post.PostUrl.AbsoluteUri,
-            Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
-            Footer = new EmbedFooterBuilder()
-            {
-                Text = $"Tags\n{string.Join(", ", post.Tags)}"
-            }
+            Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last())
         };
 
         if (post.DetailedTags != null)
@@ -329,26 +328,30 @@ public sealed class Doujin : ISubmodule
             }
         }
 
+        var comp = new ComponentBuilder()
+            .WithButton("Details", $"booru-{guid}")
+            .Build();
+
         var ext = Path.GetExtension(post.FileUrl.AbsoluteUri);
         if (post.FileUrl == null)
         {
             embed.Description = "This post doesn't have any image associated";
-            await ctx.ReplyAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
         }
         else if (Utils.IsImage(ext))
         {
             embed.ImageUrl = post.FileUrl.AbsoluteUri;
-            await ctx.ReplyAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
         }
         else if (ext == ".swf")
         {
             embed.Description = "Flash games cannot be previewed";
-            await ctx.ReplyAsync(embed: embed.Build());
+            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
         }
         else
         {
             using MemoryStream ms = new(await ctx.Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(post.FileUrl.AbsoluteUri));
-            await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build());
+            await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build(), components: comp);
         }
 
         await ctx.Provider.GetRequiredService<Db>().AddBooruAsync(type.ToString());

@@ -56,6 +56,7 @@ public sealed class Program
             .AddSingleton(sub)
             .AddSingleton(db)
             .AddSingleton(gameManager)
+            .AddSingleton<BooruService>()
             .AddSingleton<TranslatorService>()
             .AddSingleton<TopGGClient>()
             .AddSingleton(new JsonSerializerOptions()
@@ -435,6 +436,20 @@ public sealed class Program
                     Title = e.GetType().ToString(),
                     Description = e.Message
                 }.Build(), ephemeral: true);
+                _pendingRequests.Remove(arg.User.Id);
+            }
+            else if (arg.Data.CustomId.StartsWith("booru-"))
+            {
+                var target = arg.Data.CustomId[6..];
+                var data = _provider.GetRequiredService<BooruService>().Results[target];
+                var embed = new EmbedBuilder
+                {
+                    Color = Color.Blue,
+                    Description = $"Tags\n{string.Join(", ", data.Tags)}",
+                    ImageUrl = data.PreviewUrl?.ToString()
+                };
+                embed.AddField("Size", $"{data.Width}x{data.Height}");
+                await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId.StartsWith("download-"))
