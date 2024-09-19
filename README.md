@@ -1,16 +1,17 @@
 # Sanara
 
 ## Description
-Sanara is a multipurpose bot that is now in more than 1500 servers (08/2022).<br/>
+Sanara is a multipurpose bot centered around Japanese culture, that is now in around 1500 servers (09/2024).<br/>
 Here are some of her features:
 - Games, from shiritori to quizzes based on popular series (Arknights, Azur Lane, Girls Frontline...), compete against others servers for the best score
-- Image search, get images from your favorite booru (Safebooru, Rule34, E621...)
-- Cosplay search, find links to good content and download them directly with Sanara
+- Image search, get images from your favorite booru (Gelbooru, Rule34, E621...)
+- Cosplay/doujinshi search, find links to content you like and download them directly with Sanara
 - Subscription, stay aware of the new animes airing
+- Translation, translate text or images directly from the bot
 
-| ![Preview Cosplay](Preview/Cosplay.png) | ![Preview Booru](Preview/Booru.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
+| ![Preview Cosplay](Preview/Cosplay.png) | ![Preview Translation](Preview/Translate.png) | ![Preview Game](Preview/Game.png) | ![Preview Subscription](Preview/Subscription.png) |
 | --------------------------------------- | ----------------------------------- | --------------------------------- | ------------------------------------------------- |
-| Cosplay command preview                 | Booru command preview               | Game command preview              | Subscription command preview                      |
+| Cosplay command preview                 | Translate command preview               | Game command preview              | Subscription command preview                      |
 
 ## Commands
 You can see the full list on [Sanara's command page](https://sanara.zirk.eu/commands.html)<br/>

@@ -178,7 +178,7 @@ public class Media : ISubmodule
     {
         var image = ctx.GetArgument<string>("image");
 
-        await ctx.ReplyAsync(embed: await Utility.Tool.GetSourceAsync(ctx.Provider.GetRequiredService<HttpClient>(), image));
+        await ctx.ReplyAsync(embed: await Tool.GetSourceAsync(ctx.Provider.GetRequiredService<HttpClient>(), image));
     }
 
     public async Task VisualNovelAsync(IContext ctx)
