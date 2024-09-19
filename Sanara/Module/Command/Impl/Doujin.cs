@@ -288,7 +288,7 @@ public sealed class Doujin : ISubmodule
             }
         }
 
-        if (!isChanSfw && post.Rating == Rating.Explicit)
+        if (isChanSfw && post.Rating == Rating.Explicit)
         {
             throw new CommandFailed("The image found have an unexpected rating of explicit");
         }

@@ -19,6 +19,7 @@ using Sanara.Database;
 using Sanara.Subscription;
 using Sanara.Game;
 using Sanara.Module.Utility;
+using System.Web;
 
 namespace Sanara;
 
@@ -448,7 +449,8 @@ public sealed class Program
                     Description = $"Tags\n{string.Join(", ", data.Tags)}",
                     ImageUrl = data.PreviewUrl?.ToString()
                 };
-                embed.AddField("Size", $"{data.Width}x{data.Height}");
+                embed.AddField("Size", $"{data.Width}x{data.Height}", true);
+                if (data.Source != null) embed.AddField("Source", HttpUtility.HtmlDecode(data.Source), true);
                 await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
