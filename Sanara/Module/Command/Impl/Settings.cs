@@ -22,16 +22,6 @@ public class Settings : ISubmodule
     {
         return new[]
         {
-            new CommandData(
-                slashCommand: new SlashCommandBuilder()
-                {
-                    Name = "ping",
-                    Description = "Get the latency between the bot and Discord",
-                    IsNsfw = false
-                },
-                callback: PingAsync,
-                aliases: []
-            ),
 #if NSFW_BUILD
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -81,17 +71,6 @@ public class Settings : ISubmodule
         await ctx.ReplyAsync(embed: data.Embed, ephemeral: true, components: data.Components);
     }
 
-    public async Task PingAsync(IContext ctx)
-    {
-        var content = ":ping_pong: Pong!";
-        await ctx.ReplyAsync(content);
-        if (ctx is SlashCommandContext)
-        {
-            var orMsg = await ctx.GetOriginalAnswerAsync();
-            await ctx.ReplyAsync(orMsg.Content + "\nLatency: " + orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds + "ms");
-        }
-    }
-
     public async Task BotInfoAsync(IContext ctx)
     {
         var embed = new EmbedBuilder
@@ -112,6 +91,9 @@ public class Settings : ISubmodule
         options.WithButton("Show Global Stats", "globalStats");
 
         await ctx.ReplyAsync(embed: embed.Build(), components: options.Build(), ephemeral: true);
+
+        var orMsg = await ctx.GetOriginalAnswerAsync();
+        embed.AddField("Ping", $"Latency: {orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds}ms", true);
 
         embed.AddField("Useful links",
 #if NSFW_BUILD
