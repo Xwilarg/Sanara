@@ -303,7 +303,11 @@ public sealed class Doujin : ISubmodule
                 _ => throw new NotImplementedException($"Invalid rating {post.Rating}")
             },
             Url = post.PostUrl.AbsoluteUri,
-            Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last())
+            Title = "From " + Utils.ToWordCase(booru.ToString().Split('.').Last()),
+            Footer = new EmbedFooterBuilder()
+            {
+                Text = $"Tags\n{string.Join(", ", post.Tags)}"
+            }
         };
 
         if (post.DetailedTags != null)
