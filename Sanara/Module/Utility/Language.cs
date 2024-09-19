@@ -93,7 +93,7 @@ public class Language
                 }
                 try
                 {
-                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(provider.GetRequiredService<HttpClient>(), dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
+                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(provider, dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
                     AddToRequestList("SR_" + dMsg.Id);
                 }
                 catch (CommandFailed cf)
