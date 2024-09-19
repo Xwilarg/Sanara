@@ -18,6 +18,7 @@ using VndbSharp;
 using Sanara.Database;
 using Sanara.Subscription;
 using Sanara.Game;
+using Sanara.Module.Utility;
 
 namespace Sanara;
 
@@ -466,12 +467,19 @@ public sealed class Program
                 if (target.StartsWith("ehentai-"))
                 {
                     var ids = target[8..];
+                    var type = ids[0];
+                    ids = ids[2..];
                     _ = Task.Run(async () =>
                     {
                         try
                         {
                             await ctx.ReplyAsync("Your file is being downloaded...");
-                            await Module.Utility.EHentai.EHentaiDownloadAsync(ctx, _provider, ids);
+                            await Module.Utility.EHentai.EHentaiDownloadAsync(ctx, _provider, ids, type switch
+                            {
+                                'c' => EHentai.EHentaiType.Cosplay,
+                                'd' => EHentai.EHentaiType.Doujinshi,
+                                _ => (EHentai.EHentaiType)(-1)
+                            });
                         }
                         catch (System.Exception e)
                         {
@@ -649,9 +657,9 @@ public sealed class Program
     public static ISubmodule[] Submodules => [
         new Media(),
         new Module.Command.Impl.Game(),
-        new Language(),
+        new Module.Command.Impl.Language(),
         new Doujin(),
-        new Settings(),
+        new Module.Command.Impl.Settings(),
         new Module.Command.Impl.Subscription()
     ];
 

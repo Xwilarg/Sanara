@@ -1,6 +1,7 @@
 ﻿using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Command;
 using System.IO.Compression;
@@ -12,7 +13,13 @@ namespace Sanara.Module.Utility;
 
 public static class EHentai
 {
-    public static async Task EHentaiDownloadAsync(IContext ctx, IServiceProvider provider, string urlId)
+    public enum EHentaiType
+    {
+        Doujinshi,
+        Cosplay
+    }
+
+    public static async Task EHentaiDownloadAsync(IContext ctx, IServiceProvider provider, string urlId, EHentaiType type)
     {
         var web = provider.GetRequiredService<HtmlWeb>();
         var html = web.Load($"https://e-hentai.org/g/{urlId}/");
@@ -56,6 +63,20 @@ public static class EHentai
             }
             ZipFile.CreateFromDirectory($"Saves/Download/{dirName}", finalPath);
             FileInfo fi = new(finalPath);
+
+            if (type == EHentaiType.Cosplay)
+            {
+                await provider.GetRequiredService<Db>().AddDownloadCosplayAsync((int)(fi.Length / 1000));
+            }
+            else if (type == EHentaiType.Doujinshi)
+            {
+                await provider.GetRequiredService<Db>().AddDownloadDoujinshiAsync((int)(fi.Length / 1000));
+            }
+            else
+            {
+                throw new ArgumentException("Invalid downlaod type", nameof(type));
+            }
+
             if (fi.Length < 25_000_000) // 25MB
             {
                 string finalName = name;
@@ -90,7 +111,7 @@ public static class EHentai
         }
     }
 
-    public static async Task GetEHentaiAsync(IContext ctx, string tags, string name, int category)
+    public static async Task GetEHentaiAsync(IContext ctx, string tags, int category, EHentaiType type)
     {
         int ratingInput = -1;
         int rand = -1;
@@ -98,7 +119,7 @@ public static class EHentai
         {
             ratingInput = (int)(ctx.GetArgument<long?>("rating") ?? 3);
 
-            var results = await GetEHentaiContentCountAsync(ctx.Provider.GetRequiredService<HtmlWeb>(), name, category, ratingInput, tags);
+            var results = await GetEHentaiContentCountAsync(ctx.Provider.GetRequiredService<HtmlWeb>(), category, ratingInput, tags);
             if (results > 2475) results = 2475; // TODO: can't get a page over 99 somehow
 
             rand = ctx.Provider.GetRequiredService<Random>().Next(0, results);
@@ -116,7 +137,7 @@ public static class EHentai
             var previewAttributes = target.ChildNodes[1].ChildNodes.First(x => x.HasClass("glthumb")).FirstChild.FirstChild.Attributes;
             var preview = previewAttributes.Contains("data-src") ? previewAttributes["data-src"].Value : previewAttributes["src"].Value;
             var pageCount = target.ChildNodes[3].ChildNodes[1].InnerHtml;
-            var downloadUrl = GetEHentaiButton(url);
+            var downloadUrl = GetEHentaiButton(url, type);
 
             var embed = new EmbedBuilder()
                 .WithTitle(HttpUtility.HtmlDecode(title))
@@ -160,12 +181,12 @@ public static class EHentai
     /// <summary>
     /// Get the amount of result for a e-hentai query
     /// </summary>
-    public static async Task<int> GetEHentaiContentCountAsync(HtmlWeb web, string name, int category, int rating, string tags)
+    public static async Task<int> GetEHentaiContentCountAsync(HtmlWeb web, int category, int rating, string tags)
     {
         var url = GetUrl(category, rating, tags, 0);
         var html = web.Load(url);
         var searchText = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'searchtext')]");
-        if (searchText == null) throw new CommandFailed($"There is no {name} with these tags{(rating != 0 ? ", this might be due to the rating given in parameter being too high" : string.Empty)}");
+        if (searchText == null) throw new CommandFailed($"There is nothing with these tags{(rating != 0 ? ", this might be due to the rating given in parameter being too high" : string.Empty)}");
         var div = searchText.SelectSingleNode("p");
         Match m = Regex.Match(div.InnerHtml, "([0-9,]+)"); // Get number of results
 
@@ -196,9 +217,14 @@ public static class EHentai
         return url;
     }
 
-    public static string GetEHentaiButton(string url)
+    public static string GetEHentaiButton(string url, EHentaiType type)
     {
         var downloadUrl = Regex.Match(url, "e-hentai\\.org\\/g\\/([0-9a-z]+\\/[0-9a-z]+)").Groups[1].Value;
-        return $"download-ehentai-{downloadUrl}";
+        return $"download-ehentai-{type switch
+        {
+            EHentaiType.Cosplay => 'c',
+            EHentaiType.Doujinshi => 'd',
+            _ => '_'
+        }}-{downloadUrl}";
     }
 }

@@ -4,6 +4,7 @@ using BooruSharp.Search.Post;
 using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Utility;
 using System.Text.Json;
@@ -143,7 +144,7 @@ public sealed class Doujin : ISubmodule
         }
         if (info.EH != null)
         {
-            components.WithButton("Download", EHentai.GetEHentaiButton(info.EH));
+            components.WithButton("Download", EHentai.GetEHentaiButton(info.EH, EHentai.EHentaiType.Doujinshi));
         }
         embed.WithFooter($"Tier: {info.Tier}");
 
@@ -205,7 +206,7 @@ public sealed class Doujin : ISubmodule
             else tags = $"other:non-nude {tags}";
         }
 
-        await EHentai.GetEHentaiAsync(ctx, tags, "cosplay", 959);
+        await EHentai.GetEHentaiAsync(ctx, tags, 959, EHentai.EHentaiType.Cosplay);
     }
 
     public async Task DoujinshiAsync(IContext ctx)
@@ -220,7 +221,7 @@ public sealed class Doujin : ISubmodule
             false => 767
         };
 
-        await EHentai.GetEHentaiAsync(ctx, tags, "cosplay", searchTarget);
+        await EHentai.GetEHentaiAsync(ctx, tags, searchTarget, EHentai.EHentaiType.Doujinshi);
     }
 
     public async Task BooruAsync(IContext ctx)
@@ -345,5 +346,7 @@ public sealed class Doujin : ISubmodule
             using MemoryStream ms = new(await ctx.Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(post.FileUrl.AbsoluteUri));
             await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build());
         }
+
+        await ctx.Provider.GetRequiredService<Db>().AddBooruAsync(type.ToString());
     }
 }
