@@ -111,7 +111,7 @@ public class Settings : ISubmodule
             "With the help of [TheIndra](https://theindra.eu/)\n"
 #if NSFW_BUILD
             +
-            "Profile Picture: [Uikoui](https://www.pixiv.net/en/users/11608780)"
+            "Profile Picture: [Fractal](https://x.com/FractalStella)"
 #endif // TODO: Can prob use current pfp for SFW version
             );
 
