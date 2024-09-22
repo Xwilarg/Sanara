@@ -162,7 +162,12 @@ public sealed class Doujin : ISubmodule
         // Get main page
         var targetUrl = query == null ? "https://missav.com/dm506/en/release" : $"https://missav.com/en/search/{HttpUtility.UrlEncode(query)}";
         var html = web.Load(targetUrl);
-        var page = int.Parse(html.DocumentNode.SelectSingleNode("//nav[contains(@class, 'mt-6')]").ChildNodes[1].SelectSingleNode("form").SelectSingleNode("div").ChildNodes[1].InnerHtml[2..]);
+        var conVideos = html.DocumentNode.SelectSingleNode("//nav[contains(@class, 'mt-6')]");
+        if (conVideos == null)
+        {
+            throw new CommandFailed("There is no video matching your search");
+        }
+        var page = int.Parse(conVideos.ChildNodes[1].SelectSingleNode("form").SelectSingleNode("div").ChildNodes[1].InnerHtml[2..]);
 
         // Get random page
         html = web.Load($"{targetUrl}?page={rand.Next(0, page)}");
@@ -181,6 +186,7 @@ public sealed class Doujin : ISubmodule
         var name = html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml;
         var description = HttpUtility.HtmlDecode(info.ChildNodes[1].ChildNodes[1].ChildNodes[1].InnerHtml);
         var tags = info.ChildNodes[1].ChildNodes[5].ChildNodes[7].SelectNodes("a").Select(x => x.InnerHtml);
+        if (name.Length > 256) name = name[..255] + "…";
 
         var embed = new EmbedBuilder()
             .WithColor(Color.Blue)
