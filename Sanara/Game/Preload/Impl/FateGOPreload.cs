@@ -23,6 +23,7 @@ namespace Sanara.Game.Preload.Impl
             {
                 string elem = tmp;
                 elem = HttpUtility.UrlDecode(elem).Replace("&amp;", "&").Replace("&#39;", "'");
+                if (elem.StartsWith("Category:")) continue;
                 if (!cache.Any(x => x.id == elem))
                 {
                     try
