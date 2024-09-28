@@ -26,7 +26,7 @@ public static class Tool
         {
             Title = "Closest match",
             Url = linkUrl,
-            ImageUrl = url,
+            ImageUrl = url.StartsWith("http") ? url : null,
             Description = Utils.CleanHtml(content),
             Color = Color.Blue,
             Footer = new EmbedFooterBuilder
