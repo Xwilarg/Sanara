@@ -450,7 +450,7 @@ public sealed class Program
                     ImageUrl = data.PreviewUrl?.ToString()
                 };
                 embed.AddField("Size", $"{data.Width}x{data.Height}", true);
-                if (data.Source != null) embed.AddField("Source", HttpUtility.HtmlDecode(data.Source), true);
+                if (!string.IsNullOrEmpty(data.Source)) embed.AddField("Source", HttpUtility.HtmlDecode(data.Source), true);
                 await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
