@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Quickenshtein;
+using System.Net;
 using System.Text;
 
 namespace Sanara.Module.Utility;
@@ -77,6 +78,11 @@ public static class AniList
         });
 
         var answer = await client.PostAsync("https://graphql.anilist.co", new StringContent(json, Encoding.UTF8, "application/json"));
+
+        if (answer.StatusCode == HttpStatusCode.Forbidden) // When API is down, it'll return a 403
+        {
+            return Array.Empty<AiringSchedule>();
+        }
         answer.EnsureSuccessStatusCode();
 
         var str = await answer.Content.ReadAsStringAsync();

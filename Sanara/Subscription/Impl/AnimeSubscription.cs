@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Sanara.Module.Utility;
-using System.Xml;
 
 namespace Sanara.Subscription.Impl
 {
@@ -44,20 +43,6 @@ namespace Sanara.Subscription.Impl
 
         public string GetName()
             => "anime";
-
-        private static string? GetAttribute(XmlNode node, string name, string? attribute = null)
-        {
-            foreach (XmlNode elem in node)
-            {
-                if (elem.Name == name)
-                {
-                    if (attribute == null)
-                        return elem.InnerText;
-                    return elem.Attributes?.GetNamedItem(attribute)?.InnerText;
-                }
-            }
-            return null;
-        }
 
         private async Task<AiringSchedule[]> GetFeedInternalAsync(HttpClient client)
         {
