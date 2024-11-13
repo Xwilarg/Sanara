@@ -360,8 +360,17 @@ public sealed class Doujin : ISubmodule
         }
         else
         {
-            using MemoryStream ms = new(await ctx.Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(post.FileUrl.AbsoluteUri));
-            await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build(), components: comp);
+            var arr = await ctx.Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(post.FileUrl.AbsoluteUri);
+            using MemoryStream ms = new(arr);
+            if (arr.Length > 8000000)
+            {
+                embed.Description = "This post was too heavy to be previewed";
+                await ctx.ReplyAsync(embed: embed.Build(), components: comp);
+            }
+            else
+            {
+                await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build(), components: comp);
+            }
         }
 
         await ctx.Provider.GetRequiredService<Db>().AddBooruAsync(type.ToString());
