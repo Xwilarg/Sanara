@@ -33,7 +33,7 @@ namespace Sanara.Module.Command.Context
                         if (arg.IsRequired.Value)
                         {
                             var errorMsg = $"Missing required argument {arg.Name} of type {arg.Type}";
-                            if (arg.Choices.Any())
+                            if (arg.Choices?.Any() ?? false)
                             {
                                 errorMsg += $"\n\nAvailable choices:\n{string.Join("\n", arg.Choices.Select(x => $"{x.Value}: {x.Name}"))}";
                             }

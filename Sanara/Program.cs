@@ -491,7 +491,7 @@ public sealed class Program
                         try
                         {
                             await ctx.ReplyAsync("Your file is being downloaded...");
-                            await Module.Utility.EHentai.EHentaiDownloadAsync(ctx, _provider, ids, type switch
+                            await EHentai.EHentaiDownloadAsync(ctx, _provider, ids, type switch
                             {
                                 'c' => EHentai.EHentaiType.Cosplay,
                                 'd' => EHentai.EHentaiType.Doujinshi,
