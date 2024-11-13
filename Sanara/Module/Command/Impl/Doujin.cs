@@ -167,11 +167,15 @@ public sealed class Doujin : ISubmodule
         {
             throw new CommandFailed("There is no video matching your search");
         }
-        var page = int.Parse(conVideos.ChildNodes[1].SelectSingleNode("form").SelectSingleNode("div").ChildNodes[1].InnerHtml[2..]);
+        var page = int.Parse(conVideos.ChildNodes[1].SelectSingleNode("form").SelectSingleNode("div").ChildNodes[1].InnerHtml[2..].Trim(' ', '\t', '\n', '\r', '/'));
 
         // Get random page
         html = web.Load($"{targetUrl}?page={rand.Next(0, page)}");
-        var videos = html.DocumentNode.SelectSingleNode("//body").ChildNodes[3].ChildNodes[5].ChildNodes[5].ChildNodes.Where(x => !string.IsNullOrWhiteSpace(x.InnerHtml)).ToArray();
+
+        // Used to debug HTML query when something breaks
+        // await ctx.Channel.SendMessageAsync("µ" + string.Join("\n µ ", html.DocumentNode.SelectSingleNode("//body").ChildNodes[3].ChildNodes.Select(x => x.OuterHtml.Length > 100 ? x.OuterHtml.Substring(0, 100) : x.OuterHtml)));
+
+        var videos = html.DocumentNode.SelectSingleNode("//body").ChildNodes[3].ChildNodes[7].ChildNodes[5].ChildNodes.Where(x => !string.IsNullOrWhiteSpace(x.InnerHtml)).ToArray();
         var target = videos[rand.Next(0, videos.Length)];
         var container = target.ChildNodes[1].ChildNodes[1].ChildNodes[1];
         var code = container.Attributes["alt"].Value;
