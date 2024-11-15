@@ -187,8 +187,9 @@ public sealed class Doujin : ISubmodule
         var info = html.DocumentNode.SelectSingleNode("//div[contains(@x-show, \"currentTab === 'video_details'\")]");
 
         // Get fields
-        var name = html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml;
-        var description = HttpUtility.HtmlDecode(info.ChildNodes[1].ChildNodes[1].ChildNodes[1].InnerHtml);
+        var name = HttpUtility.HtmlDecode(html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml);
+        var descNode = info.ChildNodes[1].ChildNodes[1].ChildNodes[1];
+        var description = descNode.HasClass("text-secondary") ? HttpUtility.HtmlDecode(descNode.InnerHtml) : string.Empty;
         IEnumerable<string> tags;
         try
         {
