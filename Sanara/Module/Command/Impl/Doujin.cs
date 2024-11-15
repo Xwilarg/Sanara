@@ -152,6 +152,18 @@ public sealed class Doujin : ISubmodule
         await ctx.ReplyAsync(embed: embed.Build(), components: components.Build());
     }
 
+    private HtmlNode? GetCategory(string text, HtmlNode parentNode)
+    {
+        foreach (var c in parentNode.ChildNodes)
+        {
+            if (c.ChildNodes.Any() && c.ChildNodes[1].InnerHtml == text)
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+
     public async Task AdultVideoAsync(IContext ctx)
     {
         var query = (ctx.GetArgument<string>("query") ?? null);
@@ -190,19 +202,10 @@ public sealed class Doujin : ISubmodule
         var name = HttpUtility.HtmlDecode(html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml);
         var descNode = info.ChildNodes[1].ChildNodes[1].ChildNodes[1];
         var description = descNode.HasClass("text-secondary") ? HttpUtility.HtmlDecode(descNode.InnerHtml) : string.Empty;
-        IEnumerable<string> tags;
-        try
-        {
-            tags = info.ChildNodes[1].ChildNodes[5].ChildNodes[7].SelectNodes("a").Select(x => x.InnerHtml);
-        }
-        catch (System.Exception e)
-        {
-            tags = [];
-            await Log.LogErrorAsync(e, null);
-        }
+        var tags = GetCategory("Genre:", info.ChildNodes[1].ChildNodes.Where(x => x.HasClass("space-y-2")).ElementAt(1))?.SelectNodes("a")?.Select(x => x.InnerHtml) ?? [];
         if (name.Length > 256) name = name[..255] + "…";
 
-        List<EmbedFieldBuilder> fields = new();
+        List<EmbedFieldBuilder> fields = [];
         if (tags.Any())
         {
             fields.Add(new EmbedFieldBuilder()
