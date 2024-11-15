@@ -189,7 +189,16 @@ public sealed class Doujin : ISubmodule
         // Get fields
         var name = html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml;
         var description = HttpUtility.HtmlDecode(info.ChildNodes[1].ChildNodes[1].ChildNodes[1].InnerHtml);
-        var tags = info.ChildNodes[1].ChildNodes[5].ChildNodes[7].SelectNodes("a").Select(x => x.InnerHtml);
+        IEnumerable<string> tags;
+        try
+        {
+            tags = info.ChildNodes[1].ChildNodes[5].ChildNodes[7].SelectNodes("a").Select(x => x.InnerHtml);
+        }
+        catch (System.Exception e)
+        {
+            tags = [];
+            await Log.LogErrorAsync(e, null);
+        }
         if (name.Length > 256) name = name[..255] + "…";
 
         var embed = new EmbedBuilder()
