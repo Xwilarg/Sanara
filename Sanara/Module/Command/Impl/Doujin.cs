@@ -201,17 +201,21 @@ public sealed class Doujin : ISubmodule
         }
         if (name.Length > 256) name = name[..255] + "…";
 
+        List<EmbedFieldBuilder> fields = new();
+        if (tags.Any())
+        {
+            fields.Add(new EmbedFieldBuilder()
+                    .WithName("Tags")
+                    .WithValue(string.Join(", ", tags)));
+        }
+
         var embed = new EmbedBuilder()
             .WithColor(Color.Blue)
             .WithTitle(name)
             .WithUrl(finalUrl)
             .WithImageUrl(image)
             .WithDescription(description)
-            .WithFields(
-                new EmbedFieldBuilder()
-                    .WithName("Tags")
-                    .WithValue(string.Join(", ", tags))
-            );
+            .WithFields([.. fields]);
 
         await ctx.ReplyAsync(embed: embed.Build());
     }
