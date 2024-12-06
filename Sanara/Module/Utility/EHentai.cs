@@ -46,28 +46,11 @@ public static class EHentai
                 var images = html.GetElementbyId("gdt").ChildNodes;
                 foreach (var img in images)
                 {
-                    if (img.HasClass("gdtm")) // Get all images to download them
-                    {
-                        System.Exception err = null;
-                        for (int c = 0; c < 2; c++)
-                        {
-                            try
-                            {
-                                var node = img.FirstChild.FirstChild.Attributes["href"].Value;
-                                var image = web.Load(node).GetElementbyId("img").Attributes["src"].Value;
-                                File.WriteAllBytes($"Saves/Download/{dirName}/{pageIndex:000}{Path.GetExtension(image)}",
-                                await provider.GetRequiredService<HttpClient>().GetByteArrayAsync(image));
-                                pageIndex++;
-                                err = null;
-                                break;
-                            }
-                            catch (System.Exception e)
-                            {
-                                err = e;
-                            }
-                        }
-                        if (err != null) throw err;
-                    }
+                    var node = img.Attributes["href"].Value;
+                    var image = web.Load(node).GetElementbyId("img").Attributes["src"].Value;
+                    File.WriteAllBytes($"Saves/Download/{dirName}/{pageIndex:000}{Path.GetExtension(image)}",
+                    await provider.GetRequiredService<HttpClient>().GetByteArrayAsync(image));
+                    pageIndex++;
                 }
 
                 if (i < count - 1)
