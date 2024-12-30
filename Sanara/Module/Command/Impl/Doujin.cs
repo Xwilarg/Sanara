@@ -130,7 +130,7 @@ public sealed class Doujin : ISubmodule
         };
         var components = new ComponentBuilder();
 
-        if (info.Tags != null)
+        if (info.Tags != null && info.Tags.Any())
         {
             embed.AddField("Tags", string.Join(", ", info.Tags));
         }
@@ -202,7 +202,7 @@ public sealed class Doujin : ISubmodule
         var name = HttpUtility.HtmlDecode(html.DocumentNode.SelectSingleNode("//h1[contains(@class, 'lg:text-lg')]").InnerHtml);
         var descNode = info.ChildNodes[1].ChildNodes[1].ChildNodes[1];
         var description = descNode.HasClass("text-secondary") ? HttpUtility.HtmlDecode(descNode.InnerHtml) : string.Empty;
-        var tags = GetCategory("Genre:", info.ChildNodes[1].ChildNodes.Where(x => x.HasClass("space-y-2")).ElementAt(1))?.SelectNodes("a")?.Select(x => x.InnerHtml) ?? [];
+        var tags = GetCategory("Genre:", info.ChildNodes[1].ChildNodes.Where(x => x.HasClass("space-y-2")).ElementAt(0))?.SelectNodes("a")?.Select(x => x.InnerHtml) ?? [];
         if (name.Length > 256) name = name[..255] + "…";
 
         List<EmbedFieldBuilder> fields = [];
