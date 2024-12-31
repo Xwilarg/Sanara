@@ -42,5 +42,7 @@ namespace Sanara.Module.Command.Context
         public DateTimeOffset? ClipCreatedAt => throw new NotImplementedException();
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();
+
+        public byte[] WaveformBytes => throw new NotImplementedException();
     }
 }

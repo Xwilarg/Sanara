@@ -37,6 +37,8 @@ namespace Sanara.UnitTests
 
         public ulong Id => throw new NotImplementedException();
 
+        public ChannelType ChannelType => throw new NotImplementedException();
+
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
         {
             throw new NotImplementedException();
