@@ -103,11 +103,11 @@ public class Settings : ISubmodule
 #if NSFW_BUILD
             +
             " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +
-            " - [Top.gg](https://discordbots.org/bot/329664361016721408)"
+            " - [Top.gg](https://top.gg/bot/329664361016721408)"
 #endif
             );
         embed.AddField("Credits",
-            "Programming: [Zirk#0001](https://zirk.eu/)\n" +
+            "Programming: [Zirk](https://zirk.eu/)\n" +
             "With the help of [TheIndra](https://theindra.eu/)\n"
 #if NSFW_BUILD
             +
