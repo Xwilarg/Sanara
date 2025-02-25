@@ -64,8 +64,8 @@ public sealed class Doujin : ISubmodule
         ),
         new CommandData(
             slashCommand: new SlashCommandBuilder()
-                .WithName("booru")
-                .WithDescription("Get an anime image")
+                .WithName("image")
+                .WithDescription("Get an anime image from a booru website")
                 .WithNsfw(false)
                 .AddOptions(
                     new SlashCommandOptionBuilder()
