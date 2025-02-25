@@ -90,7 +90,7 @@ public sealed class Doujin : ISubmodule
                         .WithRequired(false)
                 ),
             callback: BooruAsync,
-            aliases: []
+            aliases: [ "booru" ]
         )
     ];
     }
