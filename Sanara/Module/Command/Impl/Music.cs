@@ -1,4 +1,3 @@
-using System.Text;
 using System.Web;
 using Discord;
 using HtmlAgilityPack;
@@ -64,7 +63,7 @@ public class Music : ISubmodule
         await ctx.ReplyAsync(embed: new EmbedBuilder()
         {
             Title = html.DocumentNode.SelectSingleNode("//h2[contains(@class, 'newLyricTitle__main')]").ChildNodes[0].InnerHtml,
-            ImageUrl = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'lyricData__sub')]").ChildNodes[1].Attributes["src"].Value,
+            ImageUrl = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'lyricData__sub')]//img").Attributes["src"].Value,
             Description = await Lyrics.GetRawLyricsAsync(html, Lyrics.DisplayMode.Kanji),
         }.Build(), components: comp);
     }
