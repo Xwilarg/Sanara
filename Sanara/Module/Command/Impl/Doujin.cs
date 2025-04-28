@@ -166,6 +166,9 @@ public sealed class Doujin : ISubmodule
 
     public async Task AdultVideoAsync(IContext ctx)
     {
+        await ctx.ReplyAsync("The website used for this command was shut-downed", ephemeral: true);
+
+        return;
         var query = (ctx.GetArgument<string>("query") ?? null);
 
         var rand = ctx.Provider.GetRequiredService<Random>();
