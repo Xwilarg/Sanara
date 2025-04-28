@@ -74,7 +74,7 @@ public static class EHentai
                 throw new ArgumentException("Invalid downlaod type", nameof(type));
             }
 
-            if (fi.Length < 25_000_000) // 25MB
+            if (fi.Length < 8_000_000) // 8MB
             {
                 string finalName = name;
                 foreach (var c in Path.GetInvalidFileNameChars()) finalName = finalName.Replace(c.ToString(), string.Empty);

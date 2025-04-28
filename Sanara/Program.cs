@@ -454,6 +454,40 @@ public sealed class Program
                 await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
+            else if (arg.Data.CustomId.StartsWith("lyrics-"))
+            {
+                var target = arg.Data.CustomId[7..];
+                Lyrics.DisplayMode mode;
+                if (target.StartsWith("kanji-"))
+                {
+                    mode = Lyrics.DisplayMode.Kanji;
+                    target = target[6..];
+                }
+                else if (target.StartsWith("hiragana-"))
+                {
+                    mode = Lyrics.DisplayMode.Hiragana;
+                    target = target[9..];
+                }
+                else if (target.StartsWith("romaji-"))
+                {
+                    mode = Lyrics.DisplayMode.Romaji;
+                    target = target[7..];
+                }
+                else throw new NotImplementedException();
+                var web = ctx.Provider.GetRequiredService<HtmlWeb>();
+                Console.WriteLine($"https://utaten.com{target}");
+                var html = web.Load($"https://utaten.com{target}");
+
+                var d = await Lyrics.GetRawLyricsAsync(html, mode);
+                var embed = arg.Message.Embeds.First();
+                await arg.Message.ModifyAsync(x => x.Embed = new EmbedBuilder() {
+                    Description = d,
+                    Title = embed.Title,
+                    ImageUrl = embed.Image?.Url
+                }.Build());
+                await ctx.ReplyAsync("Lyrics updated", ephemeral: true);
+                _pendingRequests.Remove(arg.User.Id);
+            }
             else if (arg.Data.CustomId.StartsWith("download-"))
             {
                 var target = arg.Data.CustomId[9..];
@@ -676,6 +710,7 @@ public sealed class Program
         new Module.Command.Impl.Game(),
         new Module.Command.Impl.Language(),
         new Doujin(),
+        new Music(),
         new Module.Command.Impl.Settings(),
         new Module.Command.Impl.Subscription()
     ];
