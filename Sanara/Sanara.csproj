@@ -19,7 +19,7 @@
     <PackageReference Include="Quickenshtein" Version="1.5.1" />
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
     <PackageReference Include="Sentry" Version="5.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.4" />
     <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
