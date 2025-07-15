@@ -1,17 +1,19 @@
 ﻿using Discord;
 using Sanara.Exception;
+using Sanara.Module.Command.Context.Discord;
 using System.Text.RegularExpressions;
+using static Google.Api.Gax.Grpc.Gcp.AffinityConfig.Types;
 
 namespace Sanara.Module.Command.Context
 {
-    public class MessageCommandContext : IContext
+    public abstract class AMessageCommandContext
     {
-        private Dictionary<string, object> argsDict = new();
+        protected Dictionary<string, object> argsDict = new();
 
-        public MessageCommandContext(IServiceProvider provider, IMessage message, string arguments, CommandData command)
+        protected abstract void ParseChannel(string data, string name);
+
+        protected AMessageCommandContext(string arguments, CommandData command)
         {
-            Provider = provider;
-            _message = message;
             var matches = Regex.Matches(arguments, @"[\""].+?[\""]|[^ ]+");
             List<string>? argsArray;
             if (matches.Count > 0)
@@ -80,19 +82,7 @@ namespace Sanara.Module.Command.Context
 
                             case ApplicationCommandOptionType.Channel:
                                 {
-                                    var guild = (_message.Channel as ITextChannel)?.Guild;
-                                    if (guild == null)
-                                    {
-                                        throw new CommandFailed("Command must be done is a guild");
-                                    }
-                                    if (ulong.TryParse(data, out var value))
-                                    {
-                                        argsDict.Add(arg.Name, guild.GetTextChannelAsync(value).GetAwaiter().GetResult());
-                                    }
-                                    else
-                                    {
-                                        throw new CommandFailed($"Argument {arg.Name} must be an ID to a text channel");
-                                    }
+                                    ParseChannel(data, arg.Name);
                                 }
                                 break;
 
@@ -103,70 +93,6 @@ namespace Sanara.Module.Command.Context
                     }
                 }
             }
-        }
-
-        public IServiceProvider Provider { private init; get; }
-
-        private IMessage _message;
-        private IUserMessage? _reply;
-
-        public IMessageChannel Channel => _message.Channel;
-
-        public IUser User => _message.Author;
-
-        public DateTimeOffset CreatedAt => _message.CreatedAt;
-
-        public T? GetArgument<T>(string key)
-        {
-            if (!argsDict.ContainsKey(key))
-            {
-                return default;
-            }
-            return (T)argsDict[key];
-        }
-
-        public async Task<IMessage> GetOriginalAnswerAsync()
-        {
-            return _message;
-        }
-
-        public async Task ReplyAsync(string text = "", Embed? embed = null, MessageComponent? components = null, bool ephemeral = false)
-        {
-            if (_reply == null)
-            {
-                if (Channel is ITextChannel tChan && !(await tChan.Guild.GetCurrentUserAsync()).GuildPermissions.ReadMessageHistory && !tChan.PermissionOverwrites.Any(x => x.Permissions.ReadMessageHistory == PermValue.Allow))
-                {
-                    _reply = await _message.Channel.SendMessageAsync(text, embed: embed, components: components);
-                }
-                else
-                {
-                    _reply = await _message.Channel.SendMessageAsync(text, embed: embed, components: components, messageReference: new MessageReference(_message.Id));
-                }
-            }
-            else
-            {
-                await _reply.ModifyAsync(x =>
-                {
-                    x.Content = text;
-                    x.Embed = embed;
-                    x.Components = components;
-                });
-            }
-        }
-
-        public async Task ReplyAsync(Stream file, string fileName, string text = "", Embed? embed = null, MessageComponent? components = null)
-        {
-            _reply = await _message.Channel.SendFileAsync(new FileAttachment(file, fileName), text: text, embed: embed, components: components);
-        }
-
-        public override string ToString()
-        {
-            return _message.Content;
-        }
-
-        public async Task AddReactionAsync(IEmote emote)
-        {
-            throw new NotImplementedException();
         }
     }
 }

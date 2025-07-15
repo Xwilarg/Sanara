@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Module.Command;
 using System.Net;
@@ -43,12 +44,12 @@ namespace Sanara
                 {
                     if (e is HttpRequestException hre && hre.StatusCode == HttpStatusCode.ServiceUnavailable)
                     {
-                        await ctx.ReplyAsync(embed: new EmbedBuilder
+                        await ctx.ReplyAsync(embed: new CommonEmbedBuilder
                         {
                             Color = Color.Orange,
                             Title = "Service Unavailable",
                             Description = "The command failed with an error 503, this probably mean the website used for this service is unavailable"
-                        }.Build());
+                        });
                     }
                     else
                     {
@@ -57,12 +58,12 @@ namespace Sanara
                                 .WithButton("More information", $"error-{id}");
 
                         Errors.Add($"error-{id}", e);
-                        var embed = new EmbedBuilder
+                        var embed = new CommonEmbedBuilder
                         {
                             Color = Color.Red,
                             Title = "An error occured",
                             Description = "The error was automatically reported, you can click the button below to have more information about it"
-                        }.Build();
+                        };
 
                         await ctx.ReplyAsync(embed: embed, components: button.Build());
                     }

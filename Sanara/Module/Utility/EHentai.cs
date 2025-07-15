@@ -1,6 +1,7 @@
 ﻿using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Command;
@@ -136,24 +137,20 @@ public static class EHentai
             var pageCount = target.ChildNodes[3].ChildNodes[1].InnerHtml;
             var downloadUrl = GetEHentaiButton(url, type);
 
-            var embed = new EmbedBuilder()
-                .WithTitle(HttpUtility.HtmlDecode(title))
-                .WithUrl(url)
-                .WithImageUrl(preview)
-                .WithColor(Color.Blue)
-                .WithFields(
-                    new EmbedFieldBuilder()
-                        .WithName("Tags")
-                        .WithValue(resTags),
-                    new EmbedFieldBuilder()
-                        .WithName("Pages")
-                        .WithValue(pageCount)
-                );
+            var embed = new CommonEmbedBuilder()
+            {
+                Title = HttpUtility.HtmlDecode(title),
+                Url = url,
+                ImageUrl = preview,
+                Color = Color.Blue
+            };
+            embed.AddField("Tags", resTags);
+            embed.AddField("Pages", pageCount);
 
             var component = new ComponentBuilder()
                 .WithButton("Download", downloadUrl);
 
-            await ctx.ReplyAsync(embed: embed.Build(), components: component.Build());
+            await ctx.ReplyAsync(embed: embed, components: component.Build());
         }
         catch (CommandFailed)
         {

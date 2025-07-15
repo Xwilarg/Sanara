@@ -4,6 +4,7 @@ using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Service;
@@ -63,7 +64,7 @@ public class Language
                         try
                         {
                             var tr = await GetTranslationEmbedAsync(provider, gMsg, provider.GetRequiredService<TranslatorService>().Flags[emote]);
-                            await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: tr.embed, components: tr.component.Build(), messageReference: new MessageReference(dMsg.Id));
+                            await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: tr.embed.ToDiscord() /* TODO: uhoh */, components: tr.component.Build(), messageReference: new MessageReference(dMsg.Id));
                             AddToRequestList("TR_" + dMsg.Id);
                         }
                         catch (CommandFailed ex)
@@ -93,7 +94,7 @@ public class Language
                 }
                 try
                 {
-                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: await Tool.GetSourceAsync(provider, dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content), messageReference: new(dMsg.Id));
+                    await (await chan.GetOrDownloadAsync()).SendMessageAsync(embed: (await Tool.GetSourceAsync(provider, dMsg.Attachments.Any() ? dMsg.Attachments.First().Url : dMsg.Content)).ToDiscord(), messageReference: new(dMsg.Id));
                     AddToRequestList("SR_" + dMsg.Id);
                 }
                 catch (CommandFailed cf)
@@ -108,7 +109,7 @@ public class Language
         }
     }
 
-    public static async Task<(Embed embed, ComponentBuilder component)> GetTranslationEmbedAsync(IServiceProvider provider, string sentence, string language)
+    public static async Task<(CommonEmbedBuilder embed, ComponentBuilder component)> GetTranslationEmbedAsync(IServiceProvider provider, string sentence, string language)
     {
         ComponentBuilder buttons = new();
         if ((sentence.StartsWith("https://") || sentence.StartsWith("http://")) && !sentence.Trim().Any(x => x == ' '))
@@ -155,11 +156,11 @@ public class Language
 
         var answer = translation.Translations[0];
 
-        return (new EmbedBuilder
+        return (new CommonEmbedBuilder
         {
             Title = $"From {new CultureInfo(answer.DetectedLanguageCode)}",
             Description = HttpUtility.HtmlDecode(answer.TranslatedText),
             Color = Color.Blue
-        }.Build(), buttons);
+        }, buttons);
     }
 }

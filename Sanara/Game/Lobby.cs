@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Preload;
 
 namespace Sanara.Game
@@ -72,7 +73,7 @@ namespace Sanara.Game
 
         public IUser Host => _lobbyOwner;
 
-        public Embed GetIntroEmbed()
+        public CommonEmbedBuilder GetIntroEmbed()
         {
             string multiRules;
             if (_users.Count > 1)
@@ -91,13 +92,13 @@ namespace Sanara.Game
                 multiRules = "Only applicable if lobby has more than 1 player";
             }
 
-            var embed = new EmbedBuilder
+            var embed = new CommonEmbedBuilder
             {
                 Description = string.Join("\n", _users.Select(u => $"**{u}**" + (IsHost(u) ? " (Host)": "")))
             };
             embed.AddField("Rules", _preload.GetRules() + "\n\nIf the game break, you can use the \"/cancel\" command to force it to stop");
             embed.AddField($"Multiplayer Rules", multiRules);
-            return embed.Build();
+            return embed;
         }
 
         public bool HasExpired => DateTime.Now.Subtract(_creationTime).TotalHours > 2;

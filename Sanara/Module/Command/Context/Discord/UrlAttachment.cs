@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace Sanara.Module.Command.Context
+namespace Sanara.Module.Command.Context.Discord
 {
     public class UrlAttachment : IAttachment
     {

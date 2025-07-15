@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Game;
@@ -135,7 +136,7 @@ public class Game : ISubmodule
         var gm = ctx.Provider.GetRequiredService<GameManager>();
 
         var guild = db.GetGuild(((ITextChannel)ctx.Channel).GuildId);
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Title = "Scores",
             Color = Color.Blue
@@ -166,7 +167,7 @@ public class Game : ISubmodule
             embed.AddField(s, str.ToString());
         }
         embed.Description = "Global Score: " + (globalScore / gm.AllGameNames.Length * 100f).ToString("0.00") + "%";
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
     }
 
     public async Task CancelAsync(IContext ctx)

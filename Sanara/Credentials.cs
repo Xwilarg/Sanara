@@ -2,7 +2,7 @@
 {
     public record Credentials
     {
-        public string BotToken { set; get; }
+        public BotToken BotToken { set; get; } = new();
         public string UploadWebsiteUrl { set; get; }
         public string UploadWebsiteLocation { set; get; }
         public string SentryKey { set; get; }
@@ -13,5 +13,11 @@
         /// Need to be created on Google console
         /// </summary>
         public string GoogleProjectId { set; get; }
+    }
+
+    public record BotToken
+    {
+        public string DiscordToken { set; get; }
+        public string RevoltToken { set; get; }
     }
 }

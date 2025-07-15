@@ -1,9 +1,10 @@
-using System.Web;
 using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Module.Utility;
+using System.Web;
 
 namespace Sanara.Module.Command.Impl;
 
@@ -60,11 +61,11 @@ public class Music : ISubmodule
             .WithButton("Hiragana", $"lyrics-hiragana-{href}")
             .WithButton("Romaji", $"lyrics-romaji-{href}")
             .Build();
-        await ctx.ReplyAsync(embed: new EmbedBuilder()
+        await ctx.ReplyAsync(embed: new CommonEmbedBuilder()
         {
             Title = html.DocumentNode.SelectSingleNode("//h2[contains(@class, 'newLyricTitle__main')]").ChildNodes[0].InnerHtml,
             ImageUrl = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'lyricData__sub')]//img").Attributes["src"].Value,
             Description = await Lyrics.GetRawLyricsAsync(html, Lyrics.DisplayMode.Kanji),
-        }.Build(), components: comp);
+        }, components: comp);
     }
 }

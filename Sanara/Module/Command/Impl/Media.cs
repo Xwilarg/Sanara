@@ -1,8 +1,9 @@
 ﻿using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Module.Utility;
 using System.Net;
@@ -153,11 +154,11 @@ public class Media : ISubmodule
 
     public async Task InspireAsync(IContext ctx)
     {
-        await ctx.ReplyAsync(embed: new EmbedBuilder
+        await ctx.ReplyAsync(embed: new CommonEmbedBuilder
         {
             Color = Color.Blue,
             ImageUrl = await Inspire.GetInspireAsync(ctx.Provider.GetRequiredService<HttpClient>())
-        }.Build());
+        });
     }
 
     public async Task VNQuoteAsync(IContext ctx)
@@ -165,13 +166,13 @@ public class Media : ISubmodule
         var quoteTag = ctx.Provider.GetRequiredService<HtmlWeb>().Load("https://vndb.org").DocumentNode.SelectSingleNode("//footer/span/a");
         var id = quoteTag.Attributes["href"].Value;
         var vn = (await ctx.Provider.GetRequiredService<Vndb>().GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id[2..])), VndbFlags.FullVisualNovel)).First();
-        await ctx.ReplyAsync(embed: new EmbedBuilder
+        await ctx.ReplyAsync(embed: new CommonEmbedBuilder
         {
             Title = $"From {vn.Name}",
             Url = $"https://vndb.org{id}",
             Description = quoteTag.InnerHtml,
             Color = Color.Blue
-        }.Build());
+        });
     }
 
     public async Task SourceAsync(IContext ctx)
@@ -251,7 +252,7 @@ public class Media : ISubmodule
             throw;
         }
 
-        var embed = new EmbedBuilder()
+        var embed = new CommonEmbedBuilder()
         {
             Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
             Url = "https://vndb.org/v" + vn.Id,
@@ -290,7 +291,7 @@ public class Media : ISubmodule
         }
         embed.AddField("Release Date", releaseDate, true);
         response.Dispose();
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
     }
 
     public async Task DramaAsync(IContext ctx)
@@ -317,7 +318,7 @@ public class Media : ISubmodule
         var id = searchResults.First().Value<int>("id");
         var drama = await GetDramaAsync(apiKey, ctx.Provider.GetRequiredService<HttpClient>(), id);
 
-        var embed = new EmbedBuilder()
+        var embed = new CommonEmbedBuilder()
         {
             Title = drama.Value<string>("original_title"),
             Description = drama.Value<string>("synopsis"),
@@ -328,7 +329,7 @@ public class Media : ISubmodule
 
         embed.AddField("English Title", drama.Value<string>("title"), true);
         embed.AddField("Country", drama.Value<string>("country"), true);
-        embed.AddField("Episode Count", drama.Value<int>("episodes"), true);
+        embed.AddField("Episode Count", drama.Value<int>("episodes").ToString(), true);
 
         if (drama["released"] != null)
         {
@@ -345,7 +346,7 @@ public class Media : ISubmodule
             embed.AddField("MyDramaList User Rating", drama.Value<double>("rating") + "/10", true);
         }
 
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
     }
 
     public static async Task<JObject> GetDramaAsync(string token, HttpClient client, int id)
@@ -382,7 +383,7 @@ public class Media : ISubmodule
             description = answer.description.Length > 1000 ? answer.description[..1000] + " [...]" : answer.description; // Description that fill the whole screen are a pain
         description = Utils.CleanHtml(description);
 
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Title = answer.title.romaji,
             Color = answer.isAdult ? new Color(255, 20, 147) : Color.Green,
@@ -396,7 +397,7 @@ public class Media : ISubmodule
         if (!string.IsNullOrEmpty(answer.title.english)) // No use displaying this if it's the same as the embed title
             embed.AddField("English Title", answer.title.english, true);
         if (answer.averageScore != null)
-            embed.AddField("User Average Rating", answer.averageScore, true);
+            embed.AddField("User Average Rating", answer.averageScore?.ToString(), true);
         if (media == JapaneseMedia.Anime && answer.episodes != null)
             embed.AddField("Episode Count", answer.episodes + (answer.duration != null ? $" ({answer.duration} min per episode)" : ""), true);
         if (answer.startDate.year == null)
@@ -421,6 +422,6 @@ public class Media : ISubmodule
         if (answer.genres.Any())
             embed.AddField("Genres", string.Join(", ", answer.genres), true);
 
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
     }
 }

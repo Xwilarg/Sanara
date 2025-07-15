@@ -4,6 +4,7 @@ using BooruSharp.Search.Post;
 using Discord;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Utility;
@@ -121,7 +122,7 @@ public sealed class Doujin : ISubmodule
     {
         var info = JsonSerializer.Deserialize<WholesomeList>(await ctx.Provider.GetRequiredService<HttpClient>().GetStringAsync("https://wholesomelist.com/api/random"), ctx.Provider.GetRequiredService<JsonSerializerOptions>()).Entry;
 
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Color = new Color(255, 20, 147),
             Title = info.Title,
@@ -149,7 +150,7 @@ public sealed class Doujin : ISubmodule
         }
         embed.WithFooter($"Tier: {info.Tier}");
 
-        await ctx.ReplyAsync(embed: embed.Build(), components: components.Build());
+        await ctx.ReplyAsync(embed: embed, components: components.Build());
     }
 
     private HtmlNode? GetCategory(string text, HtmlNode parentNode)
@@ -164,7 +165,7 @@ public sealed class Doujin : ISubmodule
         return null;
     }
 
-    public async Task AdultVideoAsync(IContext ctx)
+    /*public async Task AdultVideoAsync(IContext ctx)
     {
         await ctx.ReplyAsync("The website used for this command was shut-down", ephemeral: true);
 
@@ -225,7 +226,7 @@ public sealed class Doujin : ISubmodule
             .WithFields([.. fields]);
 
         await ctx.ReplyAsync(embed: embed.Build());
-    }
+    }*/
 
     public async Task CosplayAsync(IContext ctx)
     {
@@ -325,7 +326,7 @@ public sealed class Doujin : ISubmodule
 
         var guid = Guid.NewGuid();
         ctx.Provider.GetRequiredService<BooruService>().Results.Add(guid.ToString(), post);
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Color = post.Rating switch
             {
@@ -366,17 +367,17 @@ public sealed class Doujin : ISubmodule
         if (post.FileUrl == null)
         {
             embed.Description = "This post doesn't have any image associated";
-            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
+            await ctx.ReplyAsync(embed: embed, components: comp);
         }
         else if (Utils.IsImage(ext))
         {
             embed.ImageUrl = post.FileUrl.AbsoluteUri;
-            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
+            await ctx.ReplyAsync(embed: embed, components: comp);
         }
         else if (ext == ".swf")
         {
             embed.Description = "Flash games cannot be previewed";
-            await ctx.ReplyAsync(embed: embed.Build(), components: comp);
+            await ctx.ReplyAsync(embed: embed, components: comp);
         }
         else
         {
@@ -385,11 +386,11 @@ public sealed class Doujin : ISubmodule
             if (arr.Length > 8000000)
             {
                 embed.Description = "This post was too heavy to be previewed";
-                await ctx.ReplyAsync(embed: embed.Build(), components: comp);
+                await ctx.ReplyAsync(embed: embed, components: comp);
             }
             else
             {
-                await ctx.ReplyAsync(ms, $"image{ext}", embed: embed.Build(), components: comp);
+                await ctx.ReplyAsync(ms, $"image{ext}", embed: embed, components: comp);
             }
         }
 

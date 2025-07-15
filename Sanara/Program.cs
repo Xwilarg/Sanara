@@ -5,21 +5,25 @@ using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Sanara.Service;
+using RevoltSharp;
+using Sanara.Compatibility;
+using Sanara.Database;
 using Sanara.Exception;
+using Sanara.Game;
 using Sanara.Module.Command;
-using Sanara.Module.Command.Context;
+using Sanara.Module.Command.Context.Discord;
+using Sanara.Module.Command.Context.Revolt;
 using Sanara.Module.Command.Impl;
+using Sanara.Module.Utility;
+using Sanara.Service;
+using Sanara.Subscription;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
-using VndbSharp;
-using Sanara.Database;
-using Sanara.Subscription;
-using Sanara.Game;
-using Sanara.Module.Utility;
 using System.Web;
+using VndbSharp;
 
 namespace Sanara;
 
@@ -29,7 +33,8 @@ public sealed class Program
     private readonly Dictionary<string, CommandData> _commandsAssociations = [];
 
     private IServiceProvider _provider;
-    private DiscordSocketClient _client;
+    private DiscordSocketClient _discordClient;
+    private RevoltClient _revoltClient;
 
     private ulong _debugGuildId;
 
@@ -118,22 +123,35 @@ public sealed class Program
 
     public async Task StartAsync()
     {
-        _client = new(new()
+        _discordClient = new(new()
         {
 #if DEBUG
             LogLevel = LogSeverity.Verbose,
 #endif
             GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.MessageContent
         });
-        _client.Log += Log.LogAsync;
+        _revoltClient = new(ClientMode.WebSocket, new ClientConfig()
+        {
+            LogMode = RevoltLogSeverity.Info
+        });
+        _discordClient.Log += Log.LogAsync;
 
         // Setting Logs callback
         await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
 
         // Load credentials
         if (!File.Exists("Keys/Credentials.json"))
+        {
+            if (!Directory.Exists("Keys")) Directory.CreateDirectory("Keys");
+            File.WriteAllText("Keys/Credentials.json", JsonSerializer.Serialize(new Credentials(), new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            }));
             throw new FileNotFoundException("Missing Credentials file");
+        }
         var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
+
+        if (credentials.BotToken.DiscordToken == null && credentials.BotToken.RevoltToken == null) throw new FileNotFoundException("Missing bot token");
 
         if (credentials.UploadWebsiteLocation != null)
         {
@@ -153,7 +171,7 @@ public sealed class Program
             SentrySdk.Init(credentials.SentryKey);
         }
 
-        _provider = await CreateProviderAsync(_client, credentials);
+        _provider = await CreateProviderAsync(_discordClient, credentials);
 
         await _provider.GetRequiredService<Db>().InitAsync();
 
@@ -194,37 +212,49 @@ public sealed class Program
                 Environment.Exit(1);
         });
 
-        // Discord callbacks
-
-        // Reactions to messages
-        _client.ReactionAdded += async (Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react) =>
+        if (credentials.BotToken.DiscordToken != null)
         {
-            await Module.Utility.Language.TranslateFromReactionAsync(_provider, msg, chan, react);
-        };
+            // Discord callbacks
 
-        // Games
-        _client.MessageReceived += HandleCommandAsync;
+            // Reactions to messages
+            _discordClient.ReactionAdded += async (Cacheable<IUserMessage, ulong> msg, Cacheable<IMessageChannel, ulong> chan, SocketReaction react) =>
+            {
+                await Module.Utility.Language.TranslateFromReactionAsync(_provider, msg, chan, react);
+            };
 
-        // Ready the bot
-        _client.Connected += ConnectedAsync;
-        _client.Ready += Ready;
-        _client.Disconnected += Disconnected;
+            // Games
+            _discordClient.MessageReceived += HandleCommandAsync;
 
-        // Db
-        _client.GuildAvailable += GuildJoined;
-        _client.JoinedGuild += GuildJoined;
+            // Ready the bot
+            _discordClient.Connected += ConnectedAsync;
+            _discordClient.Ready += Ready;
+            _discordClient.Disconnected += Disconnected;
 
-        // Guild count
-        _client.JoinedGuild += ChangeGuildCountAsync;
-        _client.LeftGuild += ChangeGuildCountAsync;
+            // Db
+            _discordClient.GuildAvailable += GuildJoined;
+            _discordClient.JoinedGuild += GuildJoined;
 
-        // Interactions
-        _client.SlashCommandExecuted += SlashCommandExecuted;
-        _client.ButtonExecuted += ButtonExecuted;
-        _client.SelectMenuExecuted += SelectMenuExecuted;
+            // Guild count
+            _discordClient.JoinedGuild += ChangeGuildCountAsync;
+            _discordClient.LeftGuild += ChangeGuildCountAsync;
 
-        await _client.LoginAsync(TokenType.Bot, credentials.BotToken);
-        await _client.StartAsync();
+            // Interactions
+            _discordClient.SlashCommandExecuted += SlashCommandExecuted;
+            _discordClient.ButtonExecuted += ButtonExecuted;
+            _discordClient.SelectMenuExecuted += SelectMenuExecuted;
+
+            await _discordClient.LoginAsync(TokenType.Bot, credentials.BotToken.DiscordToken);
+            await _discordClient.StartAsync();
+        }
+        if (credentials.BotToken.RevoltToken != null)
+        {
+            _revoltClient.OnMessageRecieved += OnMessageReceivedRevolt;
+
+            _revoltClient.OnReady += OnReadyRevolt;
+
+            await _revoltClient.LoginAsync(credentials.BotToken.RevoltToken, AccountType.Bot);
+            await _revoltClient.StartAsync();
+        }
 
         // We keep the bot online
         await Task.Delay(-1);
@@ -235,21 +265,21 @@ public sealed class Program
         var auth = _provider.GetService<TopGGClient>();
         if (auth != null && auth.ShouldSend) // Make sure to not spam the API
         {
-            await auth.SendAsync(_client.Guilds.Count);
+            await auth.SendAsync(_discordClient.Guilds.Count);
         }
     }
 
-    private bool DoesFailAdminOnlyPrecondition(ITextChannel? tChan, IUser user)
+    private bool DoesFailAdminOnlyPrecondition(CommonTextChannel? tChan, CommonUser user)
     {
-        return tChan != null && tChan.Guild.OwnerId != user.Id && !((IGuildUser)user).GuildPermissions.ManageGuild;
+        return tChan != null && tChan.OwnerId != user.Id && !user.IsAdmin;
     }
 
-    private bool DoesFailNsfwOnlyPrecondition(ITextChannel? tChan)
+    private bool DoesFailNsfwOnlyPrecondition(CommonTextChannel? tChan)
     {
         return tChan != null && !tChan.IsNsfw;
     }
 
-    private async Task LaunchCommandAsync(CommandData cmd, IUser user, ITextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync)
+    private async Task LaunchCommandAsync(CommandData cmd, CommonUser? user, CommonTextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync)
     {
         if (cmd.IsAdminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
         {
@@ -335,7 +365,7 @@ public sealed class Program
         {
             if (arg.Data.CustomId == "globalStats")
             {
-                var embed = new EmbedBuilder();
+                var embed = new CommonEmbedBuilder();
 
                 // Get informations about games
                 StringBuilder str = new();
@@ -372,23 +402,23 @@ public sealed class Program
                 "**Anime**: " + subs["anime"]);
 #endif
 
-                await ctx.ReplyAsync(embed: embed.Build());
+                await ctx.ReplyAsync(embed: embed);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId.StartsWith("tr-") && _provider.GetRequiredService<TranslatorService>().TranslationOriginalText.ContainsKey(arg.Data.CustomId[3..]))
             {
-                await ctx.ReplyAsync(embed: new EmbedBuilder
+                await ctx.ReplyAsync(embed: new CommonEmbedBuilder
                 {
                     Title = "Original Text",
                     Description = _provider.GetRequiredService<TranslatorService>().TranslationOriginalText[arg.Data.CustomId[3..]],
                     Color = Color.Blue,
-                }.Build());
+                });
                 _provider.GetRequiredService<TranslatorService>().TranslationOriginalText.Remove(arg.Data.CustomId[3..]);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId == "dump")
             {
-                if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                if (!DoesFailAdminOnlyPrecondition(arg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, new CommonUser(arg.User)))
                 {
                     await Module.Button.Settings.DatabaseDump(ctx);
                 }
@@ -400,10 +430,10 @@ public sealed class Program
             }
             else if (arg.Data.CustomId == "flag")
             {
-                if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                if (!DoesFailAdminOnlyPrecondition(arg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, new CommonUser(arg.User)))
                 {
-                    var tChan = (ITextChannel)ctx.Channel;
-                    var guildId = tChan.GuildId;
+                    var c = (ITextChannel)ctx.Channel;
+                    var guildId = c.GuildId;
                     var newValue = !_provider.GetRequiredService<Db>().GetGuild(guildId).TranslateUsingFlags;
                     await _provider.GetRequiredService<Db>().UpdateFlagAsync(guildId, newValue);
                     await ctx.ReplyAsync($"Translation from flag is now {(newValue ? "enabled" : "disabled")}", ephemeral: true);
@@ -418,7 +448,7 @@ public sealed class Program
             else if (arg.Data.CustomId.StartsWith("delSub-"))
             {
                 await arg.DeferLoadingAsync();
-                if (!DoesFailAdminOnlyPrecondition(arg.Channel as ITextChannel, arg.User))
+                if (!DoesFailAdminOnlyPrecondition(arg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, new CommonUser(arg.User)))
                 {
                     await Module.Button.Settings.RemoveSubscription(ctx, arg.Data.CustomId[7..]);
                 }
@@ -431,19 +461,19 @@ public sealed class Program
             else if (arg.Data.CustomId.StartsWith("error-") && Log.Errors.ContainsKey(arg.Data.CustomId))
             {
                 var e = Log.Errors[arg.Data.CustomId];
-                await ctx.ReplyAsync(embed: new EmbedBuilder
+                await ctx.ReplyAsync(embed: new CommonEmbedBuilder
                 {
                     Color = Color.Red,
                     Title = e.GetType().ToString(),
                     Description = e.Message
-                }.Build(), ephemeral: true);
+                }, ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId.StartsWith("booru-"))
             {
                 var target = arg.Data.CustomId[6..];
                 var data = _provider.GetRequiredService<BooruService>().Results[target];
-                var embed = new EmbedBuilder
+                var embed = new CommonEmbedBuilder
                 {
                     Color = Color.Blue,
                     Description = $"Tags\n{string.Join(", ", data.Tags)}",
@@ -451,7 +481,7 @@ public sealed class Program
                 };
                 embed.AddField("Size", $"{data.Width}x{data.Height}", true);
                 if (!string.IsNullOrEmpty(data.Source)) embed.AddField("Source", HttpUtility.HtmlDecode(data.Source), true);
-                await ctx.ReplyAsync(embed: embed.Build(), ephemeral: true);
+                await ctx.ReplyAsync(embed: embed, ephemeral: true);
                 _pendingRequests.Remove(arg.User.Id);
             }
             else if (arg.Data.CustomId.StartsWith("lyrics-"))
@@ -480,7 +510,7 @@ public sealed class Program
 
                 var d = await Lyrics.GetRawLyricsAsync(html, mode);
                 var embed = arg.Message.Embeds.First();
-                await arg.Message.ModifyAsync(x => x.Embed = new EmbedBuilder() {
+                await arg.Message.ModifyAsync(x => x.Embed = new Discord.EmbedBuilder() {
                     Description = d,
                     Title = embed.Title,
                     ImageUrl = embed.Image?.Url
@@ -624,7 +654,7 @@ public sealed class Program
                                 await arg.DeferLoadingAsync();
                                 var state = lobby.ToggleUser(ctx.User);
                                 await ctx.ReplyAsync($"You {(state ? "joined" : "leaved")} the lobby", ephemeral: true);
-                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed().ToDiscord());
                             }
                             break;
 
@@ -633,7 +663,7 @@ public sealed class Program
                             {
                                 lobby.ToggleMultiplayerMode();
                                 await ctx.ReplyAsync("You changed the multiplayer type", ephemeral: true);
-                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed());
+                                await arg.Message.ModifyAsync(x => x.Embed = lobby.GetIntroEmbed().ToDiscord());
                             }
                             else
                             {
@@ -685,7 +715,7 @@ public sealed class Program
             throw new NotImplementedException($"Unknown command {arg.CommandName}");
         }
         var cmd = _commandsAssociations[arg.CommandName.ToUpperInvariant()];
-        await LaunchCommandAsync(cmd, arg.User, arg.Channel as ITextChannel, true, async (string content, bool ephemeral) =>
+        await LaunchCommandAsync(cmd, new CommonUser(arg.User), arg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, true, async (string content, bool ephemeral) =>
         {
             if (arg.HasResponded)
             {
@@ -715,6 +745,11 @@ public sealed class Program
         new Module.Command.Impl.Subscription()
     ];
 
+    private void OnReadyRevolt(SelfUser _)
+    {
+        Ready().GetAwaiter().GetResult();
+    }
+
     private async Task Ready()
     {
         if (_commandsAssociations.Count != 0)
@@ -731,7 +766,7 @@ public sealed class Program
                 SocketGuild? debugGuild = null;
                 if (_debugGuildId != 0 && Debugger.IsAttached)
                 {
-                    debugGuild = _client.GetGuild(_debugGuildId);
+                    debugGuild = _discordClient?.GetGuild(_debugGuildId);
                 }
 
                 // Preload commands
@@ -751,26 +786,32 @@ public sealed class Program
                 }
 
                 // Send everything to Discord
-                foreach (var c in _commandsAssociations.Values.Select(x => x.SlashCommand.Build()))
+                if (_discordClient.ConnectionState != ConnectionState.Disconnected)
                 {
-                    if (debugGuild != null)
+                    foreach (var c in _commandsAssociations.Values.Select(x => x.SlashCommand.Build()))
                     {
-                        await debugGuild.CreateApplicationCommandAsync(c);
-                    }
-                    else
-                    {
-                        await _client.CreateGlobalApplicationCommandAsync(c);
+                        if (debugGuild != null)
+                        {
+                            await debugGuild.CreateApplicationCommandAsync(c);
+                        }
+                        else
+                        {
+                            await _discordClient.CreateGlobalApplicationCommandAsync(c);
+                        }
                     }
                 }
 
-                var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand.Build());
-                if (debugGuild != null)
+                if (_discordClient.ConnectionState != ConnectionState.Disconnected)
                 {
-                    await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
-                }
-                else
-                {
-                    await _client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
+                    var cmds = _commandsAssociations.Values.Select(x => x.SlashCommand.Build());
+                    if (debugGuild != null)
+                    {
+                        await debugGuild.BulkOverwriteApplicationCommandAsync(cmds.ToArray());
+                    }
+                    else
+                    {
+                        await _discordClient.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
+                    }
                 }
                 await Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready Handler", "Commands loaded"));
             }
@@ -783,7 +824,7 @@ public sealed class Program
             // The bot is now really ready to interact with people
             _provider.GetRequiredService<StatData>().Started = DateTime.UtcNow;
 
-            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_client);
+            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient);
         });
     }
 
@@ -797,8 +838,8 @@ public sealed class Program
 
     private async Task ChangeGuildCountAsync(SocketGuild _)
     {
-        await _provider.GetRequiredService<TopGGClient>().SendAsync(_client.Guilds.Count);
-        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_client);
+        await _provider.GetRequiredService<TopGGClient>().SendAsync(_discordClient.Guilds.Count);
+        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient);
     }
 
     private async Task GuildJoined(SocketGuild guild)
@@ -806,13 +847,53 @@ public sealed class Program
         await _provider.GetRequiredService<Db>().InitGuildAsync(_provider, guild);
     }
 
+    private async void OnMessageReceivedRevolt(Message arg) // TODO: Need to Task.Run?
+    {
+        if (arg.Author.IsBot || arg is not UserMessage msg || string.IsNullOrWhiteSpace(msg.Content)) return;
+
+        var myMention = $"<@{_revoltClient.CurrentUser.Id}>";
+        if (msg.Content.StartsWith(myMention))
+        {
+            var content = msg.Content[myMention.Length..].TrimStart();
+            var commandStr = content.Split(' ')[0].ToUpperInvariant();
+            CommandData? cmd = null;
+            if (_commandsAssociations.ContainsKey(commandStr))
+            {
+                cmd = _commandsAssociations[commandStr];
+            }
+            if (cmd == null && _commandsAssociations.Any(x => x.Value.Aliases.Contains(commandStr)))
+            {
+                cmd = _commandsAssociations.FirstOrDefault(x => x.Value.Aliases.Contains(commandStr)).Value;
+            }
+            if (cmd != null)
+            {
+                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is RevoltSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
+                {
+                    await msg.Channel.SendMessageAsync(content);
+                }, async () =>
+                {
+                    var newContent = content[commandStr.Length..].TrimStart();
+                    if (msg.Attachments.Any())
+                    {
+                        // newContent += " " + msg.Attachments.ElementAt(0).Url; TODO
+                    }
+                    return new RevoltMessageCommandContext(_provider, msg, newContent, cmd);
+                });
+            }
+        }
+        else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
+        {
+            // TODO: Implement game stuffs
+        }
+    }
+
     private async Task HandleCommandAsync(SocketMessage arg)
     {
-        if (arg.Author.IsBot || arg is not SocketUserMessage msg || msg.Content == null || msg.Content == "") return; // The message received isn't one we can deal with
+        if (arg.Author.IsBot || arg is not SocketUserMessage msg || string.IsNullOrWhiteSpace(msg.Content)) return; // The message received isn't one we can deal with
 
         // Deprecation warning
         int pos = 0;
-        if (msg.HasMentionPrefix(_client.CurrentUser, ref pos))
+        if (msg.HasMentionPrefix(_discordClient.CurrentUser, ref pos))
         {
             var content = msg.Content[pos..];
             var commandStr = content.Split(' ')[0].ToUpperInvariant();
@@ -827,7 +908,7 @@ public sealed class Program
             }
             if (cmd != null)
             {
-                await LaunchCommandAsync(cmd, msg.Author, msg.Channel as ITextChannel, false, async (string content, bool ephemeral) =>
+                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
                 {
                     await msg.ReplyAsync(content);
                 }, async () =>
@@ -837,7 +918,7 @@ public sealed class Program
                     {
                         newContent += " " + msg.Attachments.ElementAt(0).Url;
                     }
-                    return new MessageCommandContext(_provider, msg, newContent, cmd);
+                    return new DiscordMessageCommandContext(_provider, msg, newContent, cmd);
                 });
             }
         }
@@ -855,9 +936,9 @@ public sealed class Program
     private async Task ConnectedAsync()
     {
         _didStart = true;
-        ClientId = _client.CurrentUser.Id;
+        ClientId = _discordClient.CurrentUser.Id;
         var drama = _provider.GetService<TopGGClient>();
-        if (drama != null) drama.Init(_client.CurrentUser.Id, _provider.GetRequiredService<Credentials>().TopGgToken);
-        await _provider.GetService<TopGGClient>().SendAsync(_client.Guilds.Count);
+        if (drama != null) drama.Init(_discordClient.CurrentUser.Id, _provider.GetRequiredService<Credentials>().TopGgToken);
+        await _provider.GetService<TopGGClient>().SendAsync(_discordClient.Guilds.Count);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Module.Command;
 
 namespace Sanara.UnitTests
@@ -57,6 +58,16 @@ namespace Sanara.UnitTests
         }
 
         public Task AddReactionAsync(IEmote emote)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
         {
             throw new NotImplementedException();
         }

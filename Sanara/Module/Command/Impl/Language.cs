@@ -4,16 +4,17 @@ using Google.Cloud.Vision.V1;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sanara.Compatibility;
 using Sanara.Exception;
+using Sanara.Module.Utility;
 using Sanara.Service;
-using System.Text.Json;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Processing;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
-using Sanara.Module.Utility;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Processing;
 
 namespace Sanara.Module.Command.Impl;
 
@@ -139,7 +140,7 @@ public class Language : ISubmodule
         if (response == null)
             throw new CommandFailed("There is no text on the image.");
 
-        var embed = new EmbedBuilder();
+        var embed = new CommonEmbedBuilder();
         var img = SixLabors.ImageSharp.Image.Load(await ctx.Provider.GetRequiredService<HttpClient>().GetStreamAsync(input.Url));
         var pen = new SolidPen(SixLabors.ImageSharp.Color.Red, 2f);
 
@@ -161,7 +162,7 @@ public class Language : ISubmodule
             }
         }
 
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
         using var mStream = new MemoryStream();
         img.Save(mStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
         mStream.Position = 0;
@@ -259,35 +260,17 @@ public class Language : ISubmodule
             "<a[^>]+>([^<]+)<\\/a>").Cast<Match>())
                 kunyomi.Add(match.Groups[1].Value, converter.ToRomaji(match.Groups[1].Value));
 
-        await ctx.ReplyAsync(embed: new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Title = finalKanji.Value.ToString(),
             Url = url,
-            Description = meaning,
-            Fields =
-            [
-                new EmbedFieldBuilder
-                {
-                    Name = "Radical",
-                    Value = radicalMatch.Groups[2].Value.Trim() + ": " + radicalMatch.Groups[1].Value.Trim()
-                },
-                new EmbedFieldBuilder
-                {
-                    Name = "Parts",
-                    Value = string.Join("\n", parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value))
-                },
-                new EmbedFieldBuilder
-                {
-                    Name = "Onyomi",
-                    Value = onyomi.Count == 0 ? "None" : string.Join("\n", onyomi.Select(x => x.Key + " (" + x.Value + ")"))
-                },
-                new EmbedFieldBuilder
-                {
-                    Name = "Kunyomi",
-                    Value = kunyomi.Count == 0 ? "None" : string.Join("\n", kunyomi.Select(x => x.Key + " (" + x.Value + ")"))
-                },
-            ]
-        }.Build());
+            Description = meaning
+        };
+        embed.AddField("Radical", radicalMatch.Groups[2].Value.Trim() + ": " + radicalMatch.Groups[1].Value.Trim());
+        embed.AddField("Parts", string.Join("\n", parts.Select(x => x.Value == "" ? x.Key : x.Key + ": " + x.Value)));
+        embed.AddField("Onyomi", onyomi.Count == 0 ? "None" : string.Join("\n", onyomi.Select(x => x.Key + " (" + x.Value + ")")));
+        embed.AddField("Kunyomi", kunyomi.Count == 0 ? "None" : string.Join("\n", kunyomi.Select(x => x.Key + " (" + x.Value + ")")));
+        await ctx.ReplyAsync(embed: embed);
     }
 
     public async Task JapaneseAsync(IContext ctx)
@@ -304,7 +287,7 @@ public class Language : ISubmodule
 
         var target = data[0];
 
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Color = Color.Blue,
             Title = target.Slug,
@@ -346,6 +329,6 @@ public class Language : ISubmodule
         }
         embed.WithFooter(builder.ToString());
 
-        await ctx.ReplyAsync(embed: embed.Build());
+        await ctx.ReplyAsync(embed: embed);
     }
 }

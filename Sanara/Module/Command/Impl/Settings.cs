@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Game;
 using Sanara.Service;
@@ -72,7 +73,7 @@ public class Settings : ISubmodule
 
     public async Task BotInfoAsync(IContext ctx)
     {
-        var embed = new EmbedBuilder
+        var embed = new CommonEmbedBuilder
         {
             Title = "Status",
             Color = Color.Purple
@@ -80,7 +81,7 @@ public class Settings : ISubmodule
         embed.AddField("Latest version", Utils.ToDiscordTimestamp(new FileInfo(Assembly.GetEntryAssembly().Location).LastWriteTimeUtc, Utils.TimestampInfo.None), true);
         embed.AddField("Last command received", Utils.ToDiscordTimestamp(ctx.Provider.GetRequiredService<StatData>().LastMessage, Utils.TimestampInfo.TimeAgo), true);
         embed.AddField("Uptime", Utils.ToDiscordTimestamp(ctx.Provider.GetRequiredService<StatData>().Started, Utils.TimestampInfo.TimeAgo), true);
-        embed.AddField("Guild count", ctx.Provider.GetRequiredService<DiscordSocketClient>().Guilds.Count, true);
+        embed.AddField("Guild count", ctx.Provider.GetRequiredService<DiscordSocketClient>().Guilds.Count.ToString(), true);
 
         var options = new ComponentBuilder();
         if (Program.IsBotOwner(ctx.User))
@@ -89,7 +90,7 @@ public class Settings : ISubmodule
         }
         options.WithButton("Show Global Stats", "globalStats");
 
-        await ctx.ReplyAsync(embed: embed.Build(), components: options.Build(), ephemeral: true);
+        await ctx.ReplyAsync(embed: embed, components: options.Build(), ephemeral: true);
 
         var orMsg = await ctx.GetOriginalAnswerAsync();
         embed.AddField("Ping", $"Latency: {orMsg.CreatedAt.Subtract(ctx.CreatedAt).TotalMilliseconds}ms", true);
@@ -126,7 +127,7 @@ public class Settings : ISubmodule
         }
         embed.AddField("Latest changes", str.ToString());
 
-        await ctx.ReplyAsync(embed: embed.Build(), components: options.Build());
+        await ctx.ReplyAsync(embed: embed, components: options.Build());
 #endif
     }
 }
