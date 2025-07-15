@@ -8,3 +8,10 @@ public class Command
     public string[] Restrictions { set; get; }
     public string Aliases { set; get; }
 }
+
+public enum Support
+{
+    Supported,
+    Partial,
+    Unsupported
+}

@@ -1,4 +1,5 @@
 ﻿using Discord;
+using System.Text;
 
 namespace Sanara.Compatibility;
 
@@ -50,13 +51,22 @@ public class CommonEmbedBuilder
 
     public RevoltSharp.Embed ToRevolt()
     {
+        StringBuilder str = new();
+        if (Title != null)
+        {
+            if (Url != null) str.AppendLine($"[{Title}]({Url})");
+            else str.AppendLine(Title);
+
+            str.AppendLine();
+        }
+
+        str.AppendLine(Description);
+
         return new RevoltSharp.EmbedBuilder()
         {
-            Title = Title,
-            Description = Description,
+            Description = str.ToString(),
             Color = Color == null ? null : new RevoltSharp.RevoltColor(Color.Value.R, Color.Value.G, Color.Value.B),
-            Image = ImageUrl,
-            Url = Url
+            Image = ImageUrl
         }.Build();
     }
 }

@@ -74,13 +74,13 @@ public sealed class Doujin : ISubmodule
                         .WithDescription("Where the image is coming from")
                         .WithType(ApplicationCommandOptionType.Integer)
                         .WithRequired(false)
-                        .AddChoice("Safebooru", (int)BooruType.Safebooru)
-                        .AddChoice("E926", (int)BooruType.E926)
+                        .AddChoice("Safebooru (SFW)", (int)BooruType.Safebooru)
+                        .AddChoice("E926 (SFW, furry)", (int)BooruType.E926)
                         .AddChoice("Sakugabooru (anime clips)", (int)BooruType.Sakugabooru)
 #if NSFW_BUILD
-                        .AddChoice("Danbooru (NSFW)", (int)BooruType.DanbooruDonmai)
+                        //.AddChoice("Danbooru (NSFW)", (int)BooruType.DanbooruDonmai)
                         .AddChoice("E621 (NSFW, furry)", (int)BooruType.E621)
-                        .AddChoice("Rule34 (NSFW, more variety of content)", (int)BooruType.Rule34)
+                        .AddChoice("Rule34 (NSFW)", (int)BooruType.Rule34)
                         .AddChoice("Konachan (NSFW, wallpaper format)", (int)BooruType.Konachan)
 #endif
                         ,
