@@ -1,10 +1,11 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 
 namespace Sanara.Game.MultiplayerMode
 {
     public class ScoreUser
     {
-        public ScoreUser(IUser user)
+        public ScoreUser(CommonUser user)
         {
             User = user;
         }
@@ -14,6 +15,6 @@ namespace Sanara.Game.MultiplayerMode
             Score++;
         }
         public int Score { private set; get; }
-        public IUser User { private set; get; }
+        public CommonUser User { private set; get; }
     }
 }

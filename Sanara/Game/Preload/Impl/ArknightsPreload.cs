@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Impl.Static;
 using Sanara.Game.Preload.Result;
@@ -22,7 +23,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Arknights Quizz";
 
-        public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
+        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
             => new Quizz(_provider, chan, user, this, settings);
 
         public string GetRules()

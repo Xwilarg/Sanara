@@ -1,11 +1,12 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Preload;
 
 namespace Sanara.Game
 {
     public class ReplayLobby
     {
-        public ReplayLobby(IPreload preload, IUser lastHost, List<IUser> users, MultiplayerType versusType)
+        public ReplayLobby(IPreload preload, CommonUser lastHost, List<CommonUser> users, MultiplayerType versusType)
         {
             Preload = preload;
             LastHost = lastHost;
@@ -25,7 +26,7 @@ namespace Sanara.Game
             }.Build();
         }
 
-        public bool ToggleReady(IUser user)
+        public bool ToggleReady(CommonUser user)
         {
             if (_users.Any(x => x.Id == user.Id))
             {
@@ -63,8 +64,8 @@ namespace Sanara.Game
         public IUserMessage Message { set; get; }
 
         public IPreload Preload { private set; get; }
-        private List<IUser> _users, _ready;
-        public IUser LastHost { private set; get; }
+        private List<CommonUser> _users, _ready;
+        public CommonUser LastHost { private set; get; }
         private DateTime _creationTime;
         private MultiplayerType _versusType;
     }

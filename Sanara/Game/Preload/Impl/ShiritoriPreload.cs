@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Impl;
 using Sanara.Game.Preload.Result;
 using System.Collections.ObjectModel;
@@ -18,7 +19,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Shiritori";
 
-        public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
+        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
             => new Shiritori(_provider, chan, user, this, settings);
 
         public string GetRules()

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
@@ -11,7 +12,7 @@ namespace Sanara.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IServiceProvider provider, IMessageChannel textChan, IUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
+        protected AGame(IServiceProvider provider, IMessageChannel textChan, CommonUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
         {
             _provider = provider;
 
@@ -31,7 +32,7 @@ namespace Sanara.Game
             _messages = new List<IContext>();
             _preload = preload;
 
-            _contributors = new List<ulong>();
+            _contributors = new List<string>();
             _score = 0;
 
             _lobby.InitVersusRules(_versusMode.GetRules());
@@ -41,7 +42,7 @@ namespace Sanara.Game
         protected abstract Task CheckAnswerInternalAsync(IContext answer); // Check if user answer is right
         protected abstract string GetAnswer(); // Get the right answer (to display when we loose)
         protected abstract int GetGameTime(); // The timer an user have to answer
-        protected abstract string GetSuccessMessage(IUser user); // Congratulation message, empty string to ignore
+        protected abstract string GetSuccessMessage(CommonUser user); // Congratulation message, empty string to ignore
         protected virtual void DisposeInternal() // By default there isn't much to dispose but some child class might need it
         { }
         protected virtual string GetHelp() // Does display help in format X*****
@@ -60,7 +61,7 @@ namespace Sanara.Game
             return null;
         }
 
-        public bool CanPlay(IUser user)
+        public bool CanPlay(CommonUser user)
             => _lobby.ContainsUser(user);
 
         public async Task ReplayAsync()
@@ -374,7 +375,7 @@ namespace Sanara.Game
         List<IContext> _messages;
 
         // SCORES
-        private List<ulong> _contributors; // Users that contributed
+        private List<string> _contributors; // Users that contributed
         protected int _score;
         private bool _isCustomGame;
 

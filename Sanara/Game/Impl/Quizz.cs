@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -17,14 +18,14 @@ namespace Sanara.Game.Impl
         /// <summary>
         /// Called by QuizzAudio
         /// </summary>
-        public Quizz(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, IPostMode mode, bool doesCongratulate) : base(provider, textChan, user, preload, mode, new SpeedMode(), settings)
+        public Quizz(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings, IPostMode mode, bool doesCongratulate) : base(provider, textChan, user, preload, mode, new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
             _doesCongratulate = doesCongratulate;
         }
 
-        public Quizz(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider,textChan, user, preload, new UrlMode(), new SpeedMode(), settings)
+        public Quizz(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider,textChan, user, preload, new UrlMode(), new SpeedMode(), settings)
         {
             _words = new List<QuizzPreloadResult>(preload.Load().Cast<QuizzPreloadResult>());
             _allValidNames = _words.SelectMany(x => x.Answers).ToArray();
@@ -64,7 +65,7 @@ namespace Sanara.Game.Impl
         protected override int GetGameTime()
             => 15;
 
-        protected override string GetSuccessMessage(IUser user)
+        protected override string GetSuccessMessage(CommonUser user)
         {
             if (!_doesCongratulate)
                 return null;

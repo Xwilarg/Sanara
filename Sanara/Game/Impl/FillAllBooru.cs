@@ -1,6 +1,7 @@
 ﻿using BooruSharp.Booru;
 using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -15,7 +16,7 @@ namespace Sanara.Game.Impl
     /// </summary>
     public class FillAllBooru : AGame
     {
-        public FillAllBooru(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new UrlMode(), new SpeedFillAllBooruMode(), settings)
+        public FillAllBooru(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new UrlMode(), new SpeedFillAllBooruMode(), settings)
         { }
 
         protected override string[] GetPostInternal()
@@ -69,7 +70,7 @@ namespace Sanara.Game.Impl
         protected override int GetGameTime()
             => 60;
 
-        protected override string GetSuccessMessage(IUser _)
+        protected override string GetSuccessMessage(CommonUser _)
             => _lobby.MultiplayerType != MultiplayerType.VERSUS ? "You found at least 75% of the tags on the image!" : null;
 
         protected override string GetHelp()

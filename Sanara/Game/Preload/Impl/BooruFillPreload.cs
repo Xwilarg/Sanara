@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Impl;
 using System.Collections.ObjectModel;
 
@@ -16,7 +17,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Booru Fill";
 
-        public AGame CreateGame(IMessageChannel chan, IUser user, GameSettings settings)
+        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
             => new FillAllBooru(_provider, chan, user, this, settings);
 
         public string GetRules()

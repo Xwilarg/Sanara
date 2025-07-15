@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Preload;
 using Sanara.Game.Preload.Impl;
 using Sanara.Module.Command;
@@ -120,7 +121,7 @@ namespace Sanara.Game
         }
 
         /// <returns>Updated embed or null if user not in lobby</returns>
-        public Embed? ToggleReadyLobby(ReplayLobby rLobby, IUser user)
+        public Embed? ToggleReadyLobby(ReplayLobby rLobby, CommonUser user)
         {
             var result = rLobby.ToggleReady(user);
             return result ? rLobby.GetEmbed() : null;

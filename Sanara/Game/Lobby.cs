@@ -6,7 +6,7 @@ namespace Sanara.Game
 {
     public sealed class Lobby
     {
-        public Lobby(IUser host, IPreload preload)
+        public Lobby(CommonUser host, IPreload preload)
         {
             _users = new() { host };
             _lobbyOwner = host;
@@ -21,10 +21,10 @@ namespace Sanara.Game
         public MultiplayerType MultiplayerType
             => _users.Count <= 1 ? MultiplayerType.COOPERATION : _multiType;
 
-        public bool ContainsUser(IUser user)
+        public bool ContainsUser(CommonUser user)
             => _users.Any(x => x.Id == user.Id);
 
-        public void AddUser(IUser user)
+        public void AddUser(CommonUser user)
         {
             if (!ContainsUser(user))
             {
@@ -33,7 +33,7 @@ namespace Sanara.Game
         }
 
         /// <returns>True is joined, false if leaved</returns>
-        public bool ToggleUser(IUser user)
+        public bool ToggleUser(CommonUser user)
         {
             if (ContainsUser(user))
             {
@@ -65,13 +65,13 @@ namespace Sanara.Game
         public int GetUserCount()
             => _users.Count;
 
-        public List<IUser> GetUsers()
+        public List<CommonUser> GetUsers()
             => _users;
 
-        public bool IsHost(IUser user)
+        public bool IsHost(CommonUser user)
             => user.Id == _lobbyOwner.Id;
 
-        public IUser Host => _lobbyOwner;
+        public CommonUser Host => _lobbyOwner;
 
         public CommonEmbedBuilder GetIntroEmbed()
         {
@@ -106,11 +106,11 @@ namespace Sanara.Game
         /// <summary>
         /// List of users in the lobby
         /// </summary>
-        private readonly List<IUser> _users;
+        private readonly List<CommonUser> _users;
         /// <summary>
         /// User that created the lobby
         /// </summary>
-        private readonly IUser _lobbyOwner;
+        private readonly CommonUser _lobbyOwner;
         /// <summary>
         /// Game preload information
         /// </summary>

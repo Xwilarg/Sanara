@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using System.Text;
 
@@ -6,7 +7,7 @@ namespace Sanara.Game.MultiplayerMode
 {
     public class SpeedFillAllBooruMode : IMultiplayerMode
     {
-        public void Init(Random _, List<IUser> users)
+        public void Init(Random _, List<CommonUser> users)
         {
             _scores = new();
             foreach (var u in users)
@@ -22,10 +23,10 @@ namespace Sanara.Game.MultiplayerMode
             return null;
         }
 
-        public void PreAnswerCheck(IUser user)
+        public void PreAnswerCheck(CommonUser user)
         { }
 
-        public void AnswerIsCorrect(IUser user)
+        public void AnswerIsCorrect(CommonUser user)
         {
             _scores[user.Id].IncreaseScore();
         }
@@ -57,7 +58,7 @@ namespace Sanara.Game.MultiplayerMode
             return str.ToString();
         }
 
-        private Dictionary<ulong, ScoreUser> _scores;
+        private Dictionary<string, ScoreUser> _scores;
         protected bool _isDone;
     }
 }

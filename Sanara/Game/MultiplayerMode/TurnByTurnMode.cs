@@ -1,14 +1,15 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Exception;
 
 namespace Sanara.Game.MultiplayerMode
 {
     public sealed class TurnByTurnMode : IMultiplayerMode
     {
-        public void Init(Random rand, List<IUser> users)
+        public void Init(Random rand, List<CommonUser> users)
         {
-            var tmp = new List<IUser>(users);
-            _users = new List<IUser>();
+            var tmp = new List<CommonUser>(users);
+            _users = new List<CommonUser>();
             while (tmp.Count > 0)
             {
                 var index = rand.Next(0, tmp.Count);
@@ -28,13 +29,13 @@ namespace Sanara.Game.MultiplayerMode
             return mention + " turns to play";
         }
 
-        public void PreAnswerCheck(IUser user)
+        public void PreAnswerCheck(CommonUser user)
         {
             if (_currentTurn >= _users.Count || _users[_currentTurn].Id != user.Id)
                 throw new InvalidGameAnswer("");
         }
 
-        public void AnswerIsCorrect(IUser user)
+        public void AnswerIsCorrect(CommonUser user)
         {
             // We assume that the user who answer is the current one (check done in PreAnswerCheck)
             lock (_users)
@@ -67,7 +68,7 @@ namespace Sanara.Game.MultiplayerMode
         public string GetRules()
             => "You must answer turn by turn, the last player standing win.";
 
-        private List<IUser> _users;
+        private List<CommonUser> _users;
         private int _currentTurn;
     }
 }

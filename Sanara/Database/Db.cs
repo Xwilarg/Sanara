@@ -318,7 +318,7 @@ namespace Sanara.Database
             return 0;
         }
 
-        public async Task SaveGameScoreAsync(ulong guildId, int score, List<ulong> contributors, string name, string argument)
+        public async Task SaveGameScoreAsync(ulong guildId, int score, List<string> contributors, string name, string argument)
         {
             string fullName = argument == null ? GetCacheName(name) : (GetCacheName(name) + "-" + argument);
             _guilds[guildId].UpdateScore(fullName, score);

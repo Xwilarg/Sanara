@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Sanara.Compatibility;
 using Sanara.Game.Preload;
 using System.Web;
 
@@ -6,7 +7,7 @@ namespace Sanara.Game.Impl
 {
     public sealed class QuizzBooruTags : QuizzBooru
     {
-        public QuizzBooruTags(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings)
+        public QuizzBooruTags(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings)
         { }
 
         protected override string[] GetPostInternal()

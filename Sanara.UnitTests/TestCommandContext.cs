@@ -19,7 +19,7 @@ namespace Sanara.UnitTests
 
         public IMessageChannel Channel => new TestChannel(this);
 
-        public IUser User => throw new NotImplementedException();
+        public CommonUser User => throw new NotImplementedException();
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();
 

@@ -338,14 +338,14 @@ public sealed class Program
         }
     }
 
-    public static bool IsBotOwner(IUser user) => user.Id == 144851584478740481; // TODO: ew
+    public static bool IsBotOwner(CommonUser user) => user.Id == "144851584478740481"; // TODO: ew, and won't work on Revolt
 
     private readonly List<ulong> _pendingRequests = [];
     private readonly List<string> _downloadRequests = [];
 
     private async Task SelectMenuExecuted(SocketMessageComponent arg)
     {
-        if (arg.Data.CustomId == "delCache" && IsBotOwner(arg.User))
+        if (arg.Data.CustomId == "delCache" && IsBotOwner(new CommonUser(arg.User)))
         {
             await _provider.GetRequiredService<Db>().DeleteCacheAsync(arg.Data.Values.ElementAt(0));
             await arg.RespondAsync("Cache deleted", ephemeral: true);
@@ -926,7 +926,7 @@ public sealed class Program
         {
             var context = new GameCommandContext(_provider, msg);
             var game = _provider.GetRequiredService<GameManager>().GetGame(msg.Channel);
-            if (game != null && game.CanPlay(msg.Author))
+            if (game != null && game.CanPlay(new CommonUser(msg.Author)))
             {
                 game.AddAnswer(context);
             }

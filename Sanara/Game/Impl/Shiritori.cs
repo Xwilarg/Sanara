@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Game.MultiplayerMode;
 using Sanara.Game.PostMode;
@@ -14,7 +15,7 @@ namespace Sanara.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings, int minWordLength) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings, int minWordLength) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
@@ -23,7 +24,7 @@ namespace Sanara.Game.Impl
             _minWordLength = minWordLength;
         }
 
-        public Shiritori(IServiceProvider provider, IMessageChannel textChan, IUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
@@ -159,7 +160,7 @@ namespace Sanara.Game.Impl
             return $"Here's a word you could have said: {word.Word} ({word.WordEnglish}) - Meaning: {word.Meanings}";
         }
 
-        protected override string GetSuccessMessage(IUser _)
+        protected override string GetSuccessMessage(CommonUser _)
             => null;
 
         private ShiritoriPreloadResult GetRandomValidWord(string ending)
