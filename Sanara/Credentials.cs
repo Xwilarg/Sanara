@@ -13,6 +13,7 @@
         /// Need to be created on Google console
         /// </summary>
         public string GoogleProjectId { set; get; }
+        public string VndbToken { set; get; }
     }
 
     public record BotToken

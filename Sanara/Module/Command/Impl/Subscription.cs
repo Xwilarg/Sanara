@@ -63,7 +63,9 @@ public class Subscription : ISubmodule
                 },
                 callback: SubscribeAsync,
                 aliases: [],
-                adminOnly: true
+                adminOnly: true,
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
             )
         };
     }

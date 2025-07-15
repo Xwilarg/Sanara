@@ -31,7 +31,9 @@ public class Settings : ISubmodule
                     IsNsfw = false
                 },
                 callback: HelpAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
 #endif
             new CommandData(
@@ -42,7 +44,9 @@ public class Settings : ISubmodule
                     IsNsfw = false
                 },
                 callback: BotInfoAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Partial
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -54,7 +58,9 @@ public class Settings : ISubmodule
                 },
                 callback: ConfigureAsync,
                 adminOnly: true,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
             )
         };
     }

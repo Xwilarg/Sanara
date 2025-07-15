@@ -35,7 +35,9 @@ public class Music : ISubmodule
                 },
                 callback: LyricsAsync,
                 adminOnly: false,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
             )
         };
     }

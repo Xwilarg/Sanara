@@ -2,7 +2,7 @@
 
 namespace Sanara.Module.Command;
 
-public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task> callback, string[] aliases, bool adminOnly = false)
+public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task> callback, string[] aliases, Support revoltSupport = Support.Unsupported, Support discordSupport = Support.Supported, bool adminOnly = false)
 {
     /// <summary>
     /// Slash command info
@@ -17,4 +17,14 @@ public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task>
     /// </summary>
     public string[] Aliases { get; } = aliases.Select(x => x.ToUpperInvariant()).ToArray();
     public bool IsAdminOnly { get; } = adminOnly;
+
+    public Support DiscordSupport { get; }
+    public Support RevoltSupport { get; }
+}
+
+public enum Support
+{
+    Supported,
+    Partial,
+    Unsupported
 }

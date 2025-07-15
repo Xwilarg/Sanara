@@ -53,7 +53,9 @@ public class Game : ISubmodule
                    IsNsfw = false
                },
                callback: PlayAsync,
-               aliases: []
+               aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
            ),
            new CommandData(
                slashCommand: new SlashCommandBuilder()
@@ -64,7 +66,9 @@ public class Game : ISubmodule
                    ContextTypes = [ InteractionContextType.Guild ]
                },
                callback: LeaderboardAsync,
-               aliases: []
+               aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
            ),
            new CommandData(
                slashCommand: new SlashCommandBuilder()
@@ -74,7 +78,9 @@ public class Game : ISubmodule
                    IsNsfw = false
                },
                callback: CancelAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
            )
         };
     }

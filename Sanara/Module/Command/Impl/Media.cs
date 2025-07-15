@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -7,6 +8,8 @@ using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Module.Utility;
 using System.Net;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
 using VndbSharp;
@@ -32,7 +35,9 @@ public class Media : ISubmodule
                     IsNsfw = false
                 },
                 callback: InspireAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -42,7 +47,9 @@ public class Media : ISubmodule
                     IsNsfw = true
                 },
                 callback: VNQuoteAsync,
-                aliases: Array.Empty<string>()
+                aliases: Array.Empty<string>(),
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported    
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -62,7 +69,9 @@ public class Media : ISubmodule
                     IsNsfw = false
                 },
                 callback: SourceAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -107,7 +116,9 @@ public class Media : ISubmodule
                     IsNsfw = false
                 },
                 callback: AnimeAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -127,7 +138,9 @@ public class Media : ISubmodule
                     IsNsfw = false
                 },
                 callback: DramaAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -147,7 +160,9 @@ public class Media : ISubmodule
                     IsNsfw = false
                 },
                 callback: VisualNovelAsync,
-                aliases: [ "vn" ]
+                aliases: [ "vn" ],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             )
         };
     }
@@ -161,16 +176,28 @@ public class Media : ISubmodule
         });
     }
 
+    private static HttpClient _vndbClient = new HttpClient();
     public async Task VNQuoteAsync(IContext ctx)
     {
-        var quoteTag = ctx.Provider.GetRequiredService<HtmlWeb>().Load("https://vndb.org").DocumentNode.SelectSingleNode("//footer/span/a");
-        var id = quoteTag.Attributes["href"].Value;
-        var vn = (await ctx.Provider.GetRequiredService<Vndb>().GetVisualNovelAsync(VndbFilters.Id.Equals(uint.Parse(id[2..])), VndbFlags.FullVisualNovel)).First();
+        var c = ctx.Provider.GetRequiredService<Credentials>();
+        if (c.VndbToken == null) throw new CommandFailed("VNDB token is missing");
+        if (!_vndbClient.DefaultRequestHeaders.Any()) _vndbClient.DefaultRequestHeaders.Add("Authorization", $"Token {c.VndbToken}");
+
+        var resp = await _vndbClient.PostAsync("https://api.vndb.org/kana/quote", new StringContent("""{"fields": "vn{id,title,image{url}},quote","filters": [ "random", "=", 1 ]}""", Encoding.UTF8, "application/json"));
+
+        resp.EnsureSuccessStatusCode();
+
+        var vnInfo = System.Text.Json.JsonSerializer.Deserialize<VndbReq>(
+            await resp.Content.ReadAsStringAsync(),
+            ctx.Provider.GetRequiredService<JsonSerializerOptions>()
+        ).Results[0];
+
         await ctx.ReplyAsync(embed: new CommonEmbedBuilder
         {
-            Title = $"From {vn.Name}",
-            Url = $"https://vndb.org{id}",
-            Description = quoteTag.InnerHtml,
+            Title = $"From {vnInfo.Vn.Title}",
+            Url = $"https://vndb.org{vnInfo.Vn.Id}",
+            Description = vnInfo.Quote,
+            //ImageUrl = vnInfo.Vn.Image?.Url,
             Color = Color.Blue
         });
     }

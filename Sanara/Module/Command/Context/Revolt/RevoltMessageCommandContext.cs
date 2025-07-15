@@ -5,72 +5,72 @@ using RevoltSharp.Rest;
 using Sanara.Compatibility;
 using Sanara.Exception;
 
-namespace Sanara.Module.Command.Context.Revolt
+namespace Sanara.Module.Command.Context.Revolt;
+
+public class RevoltMessageCommandContext : AMessageCommandContext, IContext
 {
-    public class RevoltMessageCommandContext : AMessageCommandContext, IContext
+    public RevoltMessageCommandContext(IServiceProvider provider, UserMessage msg, string arguments, CommandData command) : base(arguments, command)
     {
-        public RevoltMessageCommandContext(IServiceProvider provider, UserMessage msg, string arguments, CommandData command) : base(arguments, command)
+        Provider = provider;
+        _message = msg;
+    }
+
+    protected override void ParseChannel(string data, string name)
+    {
+        var guild = _message.Server;
+        if (guild == null)
         {
-            Provider = provider;
-            _message = msg;
+            throw new CommandFailed("Command must be done is a guild");
         }
-
-        protected override void ParseChannel(string data, string name)
+        var chan = guild.GetTextChannelAsync(data).GetAwaiter().GetResult();
+        if (chan == null)
         {
-            var guild = _message.Server;
-            if (guild == null)
-            {
-                throw new CommandFailed("Command must be done is a guild");
-            }
-            var chan = guild.GetTextChannelAsync(data).GetAwaiter().GetResult();
-            if (chan == null)
-            {
-                throw new CommandFailed($"Argument {name} must be an ID to a text channel");
-            }
-            argsDict.Add(name, chan);
+            throw new CommandFailed($"Argument {name} must be an ID to a text channel");
         }
+        argsDict.Add(name, chan);
+    }
 
-        private UserMessage _message;
+    private UserMessage _message;
 
-        public IServiceProvider Provider { private init; get; }
-        public DateTimeOffset CreatedAt => _message.CreatedAt;
+    public IServiceProvider Provider { private init; get; }
+    public DateTimeOffset CreatedAt => _message.CreatedAt;
 
-        public CommonMessageChannel Channel => new(_message.Channel);
-        public CommonUser User => new(_message.Author);
+    public CommonMessageChannel Channel => new(_message.Channel);
+    public CommonUser User => new(_message.Author);
 
-        public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
+    public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
+    {
+        RevoltSharp.FileAttachment att = null;
+        if (!string.IsNullOrWhiteSpace(embed?.ImageUrl))
         {
-            RevoltSharp.FileAttachment att = null;
-            if (!string.IsNullOrWhiteSpace(embed.ImageUrl))
-            {
-                att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
-                embed.ImageUrl = null;
-            }
-            await _message.Channel.SendMessageAsync(text, embeds: embed == null ? null : [embed.ToRevolt()], replies: [ new MessageReply(_message.Id, true) ], attachments: att == null ? null : [ att.Id ]);
+            att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
+            embed.ImageUrl = null;
         }
+        var revoltEmbed = embed?.ToRevolt();
+        await _message.Channel.SendMessageAsync(text, embeds: revoltEmbed == null ? null : [revoltEmbed], replies: [ new MessageReply(_message.Id, true) ], attachments: att == null ? null : [ att.Id ]);
+    }
 
-        public async Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
-        {
-            await _message.Channel.SendFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), fileName, text);
-        }
+    public async Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
+    {
+        await _message.Channel.SendFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), fileName, text);
+    }
 
-        public Task AddReactionAsync(IEmote emote)
-        {
-            throw new NotImplementedException();
-        }
+    public Task AddReactionAsync(IEmote emote)
+    {
+        throw new NotImplementedException();
+    }
 
-        public T? GetArgument<T>(string key)
+    public T? GetArgument<T>(string key)
+    {
+        if (!argsDict.ContainsKey(key))
         {
-            if (!argsDict.ContainsKey(key))
-            {
-                return default;
-            }
-            return (T)argsDict[key];
+            return default;
         }
+        return (T)argsDict[key];
+    }
 
-        Task<global::Discord.IMessage> IContext.GetOriginalAnswerAsync()
-        {
-            throw new NotImplementedException();
-        }
+    Task<IMessage> IContext.GetOriginalAnswerAsync()
+    {
+        throw new NotImplementedException();
     }
 }

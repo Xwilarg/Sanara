@@ -49,7 +49,7 @@ public class CommonEmbedBuilder
         }.Build();
     }
 
-    public RevoltSharp.Embed ToRevolt()
+    private string GetEmbedDescription(bool includeDescription)
     {
         StringBuilder str = new();
         if (Title != null)
@@ -58,7 +58,7 @@ public class CommonEmbedBuilder
             else str.Append($"### {Title}");
         }
 
-        if (Description != null)
+        if (Description != null && includeDescription)
         {
             if (Title != null)
             {
@@ -69,11 +69,33 @@ public class CommonEmbedBuilder
             str.Append(Description);
         }
 
+        if (_fields.Count > 0)
+        {
+            if (str.ToString() != string.Empty)
+            {
+                str.AppendLine();
+            }
+
+            str.Append(string.Join("\n\n", _fields.Select(x =>
+            {
+                return $"#### {x.Name}\n{x.Content}";
+            })));
+        }
+
+        return str.ToString();
+    }
+
+    public RevoltSharp.Embed ToRevolt()
+    {
+        var desc = GetEmbedDescription(true);
+        if (desc.Length > 1000) desc = GetEmbedDescription(false);
+        if (string.IsNullOrWhiteSpace(desc)) return null;
+
         return new RevoltSharp.EmbedBuilder()
         {
-            Description = str.ToString(),
+            Description = desc,
             Color = Color == null ? null : new RevoltSharp.RevoltColor(Color.Value.R, Color.Value.G, Color.Value.B),
-            Image = ImageUrl
+            Image = null
         }.Build();
     }
 }

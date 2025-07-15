@@ -11,7 +11,7 @@ public class TestBase
     [SetUp]
     public async Task Setup()
     {
-        _provider = await Program.CreateProviderAsync(null, null);
+        _provider = await Program.CreateProviderAsync(null, null, null);
     }
 
     protected async Task<bool> AssertLinkAsync(string url)

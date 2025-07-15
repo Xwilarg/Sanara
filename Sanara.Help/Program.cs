@@ -26,7 +26,9 @@ internal class Program
                 Description = c.SlashCommand.Description,
                 Restrictions = BuildPreconditions(c),
                 Aliases = string.Join(", ", c.Aliases).ToLowerInvariant(),
-                Arguments = c.SlashCommand.Options == null ? string.Empty : string.Join(" ", c.SlashCommand.Options.Select(x => x.IsRequired == true ? $"[{x.Name}]" : $"<{x.Name}>"))
+                Arguments = c.SlashCommand.Options == null ? string.Empty : string.Join(" ", c.SlashCommand.Options.Select(x => x.IsRequired == true ? $"[{x.Name}]" : $"<{x.Name}>")),
+                DiscordSupport = (int)c.DiscordSupport,
+                RevoltSupport = (int)c.RevoltSupport
             })
         });
 

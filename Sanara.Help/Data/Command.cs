@@ -7,11 +7,6 @@ public class Command
     public string Description { set; get; }
     public string[] Restrictions { set; get; }
     public string Aliases { set; get; }
-}
-
-public enum Support
-{
-    Supported,
-    Partial,
-    Unsupported
+    public int DiscordSupport { set; get; }
+    public int RevoltSupport { set; get; }
 }

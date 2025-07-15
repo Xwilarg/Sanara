@@ -59,7 +59,9 @@ public class Language : ISubmodule
                     IsNsfw = false
                 },
                 callback: TranslateAsync,
-                aliases: [ "tr" ]
+                aliases: [ "tr" ],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Unsupported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -79,7 +81,9 @@ public class Language : ISubmodule
                     IsNsfw = false
                 },
                 callback: KanjiAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -99,7 +103,9 @@ public class Language : ISubmodule
                     IsNsfw = false
                 },
                 callback: JapaneseAsync,
-                aliases: [ "ja" ]
+                aliases: [ "ja" ],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
@@ -119,7 +125,9 @@ public class Language : ISubmodule
                     IsNsfw = false
                 },
                 callback: OCRAsync,
-                aliases: []
+                aliases: [],
+                discordSupport: Support.Supported,
+                revoltSupport: Support.Supported
             )
         };
     }

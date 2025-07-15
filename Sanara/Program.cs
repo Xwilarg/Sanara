@@ -875,7 +875,7 @@ public sealed class Program
                     var newContent = content[commandStr.Length..].TrimStart();
                     if (msg.Attachments.Any())
                     {
-                        // newContent += " " + msg.Attachments.ElementAt(0).Url; TODO
+                        newContent += " " + msg.Attachments.ElementAt(0).GetUrl();
                     }
                     return new RevoltMessageCommandContext(_provider, msg, newContent, cmd);
                 }, "Revolt");
@@ -905,6 +905,10 @@ public sealed class Program
             if (cmd == null && _commandsAssociations.Any(x => x.Value.Aliases.Contains(commandStr)))
             {
                 cmd = _commandsAssociations.FirstOrDefault(x => x.Value.Aliases.Contains(commandStr)).Value;
+            }
+            if (cmd != null && cmd.RevoltSupport == Support.Unsupported)
+            {
+                cmd = null;
             }
             if (cmd != null)
             {

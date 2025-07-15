@@ -29,7 +29,9 @@ public sealed class Doujin : ISubmodule
                 .WithNsfw(true)
                 .AddOptions(GetEHentaiOptions()),
             callback: CosplayAsync,
-            aliases: []
+            aliases: [],
+            discordSupport: Support.Supported,
+            revoltSupport: Support.Partial
         ),
         new CommandData(
             slashCommand: new SlashCommandBuilder()
@@ -38,7 +40,9 @@ public sealed class Doujin : ISubmodule
                 .WithNsfw(true)
                 .AddOptions(GetEHentaiOptions()),
             callback: DoujinshiAsync,
-            aliases: [ "doujin" ]
+            aliases: [ "doujin" ],
+            discordSupport: Support.Supported,
+            revoltSupport: Support.Partial
         ),
         new CommandData(
             slashCommand: new SlashCommandBuilder()
@@ -46,7 +50,9 @@ public sealed class Doujin : ISubmodule
                 .WithDescription("Get a random wholesome NSFW fan-made manga")
                 .WithNsfw(true),
             callback: WholesomeAsync,
-            aliases: []
+            aliases: [],
+            discordSupport: Support.Supported,
+            revoltSupport: Support.Partial
         ),
         /*new CommandData(
             slashCommand: new SlashCommandBuilder()
@@ -91,7 +97,9 @@ public sealed class Doujin : ISubmodule
                         .WithRequired(false)
                 ),
             callback: BooruAsync,
-            aliases: []
+            aliases: [],
+            discordSupport: Support.Supported,
+            revoltSupport: Support.Partial
         )
     ];
     }
