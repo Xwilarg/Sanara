@@ -28,9 +28,14 @@ namespace Sanara.Module.Command.Context.Discord
             throw new NotImplementedException();
         }
 
-        public async Task<IMessage> GetOriginalAnswerAsync()
+        public async Task<CommonMessage> GetOriginalAnswerAsync()
         {
-            return _message;
+            return new(_message);
+        }
+
+        public async Task DeleteAnswerAsync()
+        {
+            await _message.DeleteAsync();
         }
 
         public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)

@@ -61,9 +61,14 @@ namespace Sanara.Module.Command.Context.Discord
             return (T?)(_ctx.Data.Options.FirstOrDefault(x => x.Name == key)?.Value ?? default);
         }
 
-        public async Task<IMessage> GetOriginalAnswerAsync()
+        public async Task<CommonMessage> GetOriginalAnswerAsync()
         {
-            return await _ctx.GetOriginalResponseAsync();
+            return new(await _ctx.GetOriginalResponseAsync());
+        }
+
+        public async Task DeleteAnswerAsync()
+        {
+            await (await _ctx.GetOriginalResponseAsync()).DeleteAsync();
         }
 
         public override string ToString()

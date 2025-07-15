@@ -81,7 +81,7 @@ public static class EHentai
                 foreach (var c in Path.GetInvalidFileNameChars()) finalName = finalName.Replace(c.ToString(), string.Empty);
                 finalName += ".zip";
                 await ctx.ReplyAsync(new FileStream(finalPath, FileMode.Open), finalName);
-                await (await ctx.GetOriginalAnswerAsync()).DeleteAsync();
+                await ctx.DeleteAnswerAsync();
             }
             else
             {

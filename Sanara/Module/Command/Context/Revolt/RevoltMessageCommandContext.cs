@@ -31,6 +31,7 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
     }
 
     private UserMessage _message;
+    private UserMessage? _sentMessage = null;
 
     public IServiceProvider Provider { private init; get; }
     public DateTimeOffset CreatedAt => _message.CreatedAt;
@@ -47,12 +48,22 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
             embed.ImageUrl = null;
         }
         var revoltEmbed = embed?.ToRevolt();
-        await _message.Channel.SendMessageAsync(text, embeds: revoltEmbed == null ? null : [revoltEmbed], replies: [ new MessageReply(_message.Id, true) ], attachments: att == null ? null : [ att.Id ]);
+
+        if (_sentMessage == null)
+        {
+            _sentMessage = await _message.Channel.SendMessageAsync(text, embeds: revoltEmbed == null ? null : [revoltEmbed], replies: [new MessageReply(_message.Id, true)], attachments: att == null ? null : [att.Id]);
+        }
+        else
+        {
+            await _sentMessage.EditMessageAsync(content: text == null ? null : new(text), embeds: revoltEmbed == null ? null : new([revoltEmbed]));
+        }
     }
 
     public async Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
     {
-        await _message.Channel.SendFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), fileName, text);
+        if (_sentMessage != null) throw new NotImplementedException();
+
+        _sentMessage = await _message.Channel.SendFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), fileName, text);
     }
 
     public Task AddReactionAsync(IEmote emote)
@@ -69,8 +80,13 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
         return (T)argsDict[key];
     }
 
-    Task<IMessage> IContext.GetOriginalAnswerAsync()
+    public Task<CommonMessage> GetOriginalAnswerAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new CommonMessage(_sentMessage));
+    }
+
+    public async Task DeleteAnswerAsync()
+    {
+        await _sentMessage.DeleteAsync();
     }
 }

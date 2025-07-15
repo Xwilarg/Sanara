@@ -1,4 +1,5 @@
 ﻿using Discord;
+using System.Dynamic;
 using System.Text;
 
 namespace Sanara.Compatibility;
@@ -49,7 +50,7 @@ public class CommonEmbedBuilder
         }.Build();
     }
 
-    private string GetEmbedDescription(bool includeDescription)
+    private string GetEmbedDescription(bool includeDescription, int maxFieldCount = -1)
     {
         StringBuilder str = new();
         if (Title != null)
@@ -76,10 +77,15 @@ public class CommonEmbedBuilder
                 str.AppendLine();
             }
 
-            str.Append(string.Join("\n\n", _fields.Select(x =>
+            str.Append(string.Join("\n\n", _fields.Take(maxFieldCount == -1 ? _fields.Count : maxFieldCount).Select(x =>
             {
                 return $"#### {x.Name}\n{x.Content}";
             })));
+
+            if (!includeDescription && str.ToString().Length > 1000 && maxFieldCount > 2)
+            {
+                return GetEmbedDescription(false, maxFieldCount - 1);
+            }
         }
 
         return str.ToString();
@@ -88,7 +94,7 @@ public class CommonEmbedBuilder
     public RevoltSharp.Embed ToRevolt()
     {
         var desc = GetEmbedDescription(true);
-        if (desc.Length > 1000) desc = GetEmbedDescription(false);
+        if (desc.Length > 1000) desc = GetEmbedDescription(false, _fields.Count);
         if (string.IsNullOrWhiteSpace(desc)) return null;
 
         return new RevoltSharp.EmbedBuilder()

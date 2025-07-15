@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using RethinkDb.Driver.Ast;
 using Sanara.Compatibility;
 
 namespace Sanara.Module.Command.Context.Discord
@@ -61,9 +62,14 @@ namespace Sanara.Module.Command.Context.Discord
             throw new NotImplementedException();
         }
 
-        public async Task<IMessage> GetOriginalAnswerAsync()
+        public async Task<CommonMessage> GetOriginalAnswerAsync()
         {
-            return await _ctx.GetOriginalResponseAsync();
+            return new(await _ctx.GetOriginalResponseAsync());
+        }
+
+        public async Task DeleteAnswerAsync()
+        {
+            await (await _ctx.GetOriginalResponseAsync()).DeleteAsync();
         }
 
         public override string ToString()

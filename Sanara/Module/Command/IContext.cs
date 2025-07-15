@@ -11,7 +11,8 @@ namespace Sanara.Module.Command
         public Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null);
         public Task AddReactionAsync(IEmote emote);
         public T? GetArgument<T>(string key);
-        public Task<IMessage> GetOriginalAnswerAsync();
+        public Task<CommonMessage> GetOriginalAnswerAsync();
+        public Task DeleteAnswerAsync();
         public CommonMessageChannel Channel { get; }
         public CommonUser User { get; }
         public DateTimeOffset CreatedAt { get; }
