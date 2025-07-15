@@ -864,6 +864,10 @@ public sealed class Program
             {
                 cmd = _commandsAssociations.FirstOrDefault(x => x.Value.Aliases.Contains(commandStr)).Value;
             }
+            if (cmd != null && cmd.RevoltSupport == Support.Unsupported)
+            {
+                cmd = null;
+            }
             if (cmd != null)
             {
                 await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is RevoltSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
@@ -904,10 +908,6 @@ public sealed class Program
             if (cmd == null && _commandsAssociations.Any(x => x.Value.Aliases.Contains(commandStr)))
             {
                 cmd = _commandsAssociations.FirstOrDefault(x => x.Value.Aliases.Contains(commandStr)).Value;
-            }
-            if (cmd != null && cmd.RevoltSupport == Support.Unsupported)
-            {
-                cmd = null;
             }
             if (cmd != null)
             {

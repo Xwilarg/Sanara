@@ -32,11 +32,6 @@ namespace Sanara.UnitTests
             return (T?)_args[key];
         }
 
-        public Task<IMessage> GetOriginalAnswerAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task AddReactionAsync(IEmote emote)
         {
             throw new NotImplementedException();
@@ -60,6 +55,16 @@ namespace Sanara.UnitTests
                 Embed = embed.ToDiscord()
             };
             return Task.CompletedTask;
+        }
+
+        Task<CommonMessage> IContext.GetOriginalAnswerAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAnswerAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

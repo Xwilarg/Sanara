@@ -55,7 +55,7 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
         }
         else
         {
-            await _sentMessage.EditMessageAsync(content: text == null ? null : new(text), embeds: revoltEmbed == null ? null : new([revoltEmbed]));
+            await _sentMessage.EditMessageAsync(content: new(text), embeds: revoltEmbed == null ? null : new([revoltEmbed]));
         }
     }
 

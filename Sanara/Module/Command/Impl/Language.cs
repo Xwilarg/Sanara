@@ -61,7 +61,7 @@ public class Language : ISubmodule
                 callback: TranslateAsync,
                 aliases: [ "tr" ],
                 discordSupport: Support.Supported,
-                revoltSupport: Support.Unsupported
+                revoltSupport: Support.Partial
             ),
             new CommandData(
                 slashCommand: new SlashCommandBuilder()
