@@ -10,8 +10,8 @@ namespace Sanara.Module.Command.Impl;
 
 public class Music : ISubmodule
 {
-    public string Name => "Settings";
-    public string Description => "Configure and get information about the bot";
+    public string Name => "Music";
+    public string Description => "Commands about Japanese music";
 
     public CommandData[] GetCommands(IServiceProvider _)
     {

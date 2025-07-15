@@ -40,7 +40,11 @@ internal class Program
         List<string> conditions = new();
         if (c.SlashCommand.IsNsfw)
         {
-            conditions.Add("nsfw");
+            conditions.Add("NSFW");
+        }
+        if (c.adminOnly)
+        {
+            conditions.Add("Admin");
         }
         return conditions.ToArray();
     }

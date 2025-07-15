@@ -18,8 +18,8 @@ public record CommandData(SlashCommandBuilder slashCommand, Func<IContext, Task>
     public string[] Aliases { get; } = aliases.Select(x => x.ToUpperInvariant()).ToArray();
     public bool IsAdminOnly { get; } = adminOnly;
 
-    public Support DiscordSupport { get; }
-    public Support RevoltSupport { get; }
+    public Support DiscordSupport { get; } = discordSupport;
+    public Support RevoltSupport { get; } = revoltSupport;
 }
 
 public enum Support
