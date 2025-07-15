@@ -22,7 +22,6 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Web;
-using VndbSharp;
 
 namespace Sanara;
 
@@ -54,7 +53,6 @@ public sealed class Program
         coll
             .AddSingleton(http)
             .AddSingleton<HtmlWeb>() // HTML Parser
-            .AddSingleton<Vndb>() // VNDB Client
             .AddSingleton<Random>()
             .AddSingleton<Db>()
             .AddSingleton<StatData>()

@@ -1,20 +1,14 @@
 ﻿using Discord;
-using Google.Cloud.Vision.V1;
-using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sanara.Compatibility;
 using Sanara.Exception;
 using Sanara.Module.Utility;
-using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
-using VndbSharp;
-using VndbSharp.Models;
-using VndbSharp.Models.VisualNovel;
 
 namespace Sanara.Module.Command.Impl;
 
@@ -187,7 +181,7 @@ public class Media : ISubmodule
 
         resp.EnsureSuccessStatusCode();
 
-        var vnInfo = System.Text.Json.JsonSerializer.Deserialize<VndbReq>(
+        var vnInfo = System.Text.Json.JsonSerializer.Deserialize<VndbReq<VnResult>>(
             await resp.Content.ReadAsStringAsync(),
             ctx.Provider.GetRequiredService<JsonSerializerOptions>()
         ).Results[0];
@@ -195,7 +189,7 @@ public class Media : ISubmodule
         await ctx.ReplyAsync(embed: new CommonEmbedBuilder
         {
             Title = $"From {vnInfo.Vn.Title}",
-            Url = $"https://vndb.org{vnInfo.Vn.Id}",
+            Url = $"https://vndb.org/{vnInfo.Vn.Id}",
             Description = vnInfo.Quote,
             //ImageUrl = vnInfo.Vn.Image?.Url,
             Color = Color.Blue
@@ -212,82 +206,35 @@ public class Media : ISubmodule
     public async Task VisualNovelAsync(IContext ctx)
     {
         var name = ctx.GetArgument<string>("name");
-        string originalName = name;
-        name = Utils.CleanWord(name);
-        HttpWebRequest http = (HttpWebRequest)WebRequest.Create("https://vndb.org/v/all?sq=" + HttpUtility.UrlEncode(originalName).Replace("%20", "+"));
-        http.AllowAutoRedirect = false;
+        var cleanName = Utils.CleanWord(name);
 
-        string html;
-        HttpWebResponse response;
-        // HttpClient doesn't really look likes to handle redirection properly
-        try
-        {
-            response = (HttpWebResponse)http.GetResponse();
-        }
-        catch (WebException ex)
-        {
-            if (ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError)
-                throw;
+        var c = ctx.Provider.GetRequiredService<Credentials>();
+        if (c.VndbToken == null) throw new CommandFailed("VNDB token is missing");
+        if (!_vndbClient.DefaultRequestHeaders.Any()) _vndbClient.DefaultRequestHeaders.Add("Authorization", $"Token {c.VndbToken}");
 
-            response = (HttpWebResponse)ex.Response;
-        }
-        using Stream stream = response.GetResponseStream();
-        using StreamReader reader = new(stream);
-        html = reader.ReadToEnd();
+        var query = """{"fields": "id,title,image{url,sexual,violence},length,languages,platforms,rating,released","filters":["search","=","{0}"]}""".Replace("{0}", cleanName);
+        var resp = await _vndbClient.PostAsync("https://api.vndb.org/kana/vn", new StringContent(query, Encoding.UTF8, "application/json"));
 
-        uint id = 0;
-        if (response.StatusCode == HttpStatusCode.OK) // Search succeed
-        {
-            // Parse HTML and go though every VN, check the original name and translated name to get the VN id
-            // TODO: Use string length for comparison
-            MatchCollection matches = Regex.Matches(html, "<a href=\"\\/v([0-9]+)\" lang=\"[^\"]+\" title=\"([^\\\"]+)\">([^<]+)<\\/a>");
-            foreach (Match match in matches)
-            {
-                string titleName = Utils.CleanWord(match.Groups[3].Value);
-                string titleNameBase = match.Groups[2].Value;
-                if (id == 0 && (titleName.Contains(name) || titleNameBase.Contains(originalName)))
-                    id = uint.Parse(match.Groups[1].Value);
-                if (titleName == name || titleNameBase == name)
-                {
-                    id = uint.Parse(match.Groups[1].Value);
-                    break;
-                }
-            }
-            // If no matching name, we take the first one in the search list, if none these NotFound
-            if (id == 0)
-            {
-                if (matches.Count == 0)
-                    throw new CommandFailed("Nothing was found with this name.");
-                id = uint.Parse(matches[0].Groups[1].Value);
-            }
-        }
-        else // Only one VN found, search is trying to redirect us
-        {
-            id = uint.Parse(response.Headers["Location"][2..]); // VN ID is the location which is in format /VXXXX, XXXX being our numbers
-        }
+        resp.EnsureSuccessStatusCode();
 
+        var res = System.Text.Json.JsonSerializer.Deserialize<VndbReq<VnInfo>>(
+            await resp.Content.ReadAsStringAsync(),
+            ctx.Provider.GetRequiredService<JsonSerializerOptions>()
+        ).Results;
 
-        VisualNovel? vn;
+        if (res.Length == 0) throw new CommandFailed("No visual novel were found with this name");
 
-        try
-        {
-            vn = (await ctx.Provider.GetRequiredService<Vndb>().GetVisualNovelAsync(VndbFilters.Id.Equals(id), VndbFlags.FullVisualNovel)).ToArray()[0];
-        }
-        catch (UnexpectedResponseException ure)
-        {
-            Console.WriteLine($"An error occurred searching for a VN: {ure.Message}");
-            throw;
-        }
+        var vn = res[0];
 
         var embed = new CommonEmbedBuilder()
         {
-            Title = vn.OriginalName == null ? vn.Name : vn.OriginalName + " (" + vn.Name + ")",
-            Url = "https://vndb.org/v" + vn.Id,
+            Title = vn.Title,
+            Url = "https://vndb.org/" + vn.Id,
             ImageUrl =
 #if NSFW_BUILD
-            ctx.Channel is ITextChannel channel && !channel.IsNsfw && (vn.ImageRating.SexualAvg >= 1 || vn.ImageRating.ViolenceAvg >= 1) ? null : vn.Image,
+            ctx.Channel is ITextChannel channel && vn.Image != null && !channel.IsNsfw && (vn.Image.Sexual >= 1 || vn.Image.Violence >= 1) ? null : vn.Image?.Url,
 #else
-        (vn.ImageRating.SexualAvg >= 1 || vn.ImageRating.ViolenceAvg >= 1) ? null : vn.Image,
+        vn.Image != null && (vn.Image.Sexual >= 1 || vn.Image.Violence >= 1) ? null : vn.Image?.Url,
 #endif
             Description = vn.Description == null ? null : Regex.Replace(vn.Description.Length > 1000 ? vn.Description[0..1000] + " [...]" : vn.Description, "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]", "[$2]($1)"),
             Color = Color.Blue
@@ -297,27 +244,15 @@ public class Media : ISubmodule
         string length = "???";
         switch (vn.Length)
         {
-            case VisualNovelLength.VeryShort: length = "<2 Hours"; break;
-            case VisualNovelLength.Short: length = "2 - 10  Hours"; break;
-            case VisualNovelLength.Medium: length = "10 - 30 Hours"; break;
-            case VisualNovelLength.Long: length = "30 - 50 Hours"; break;
-            case VisualNovelLength.VeryLong: length = "\\> 50 Hours"; break;
+            case 1: length = "<2 Hours"; break;
+            case 2: length = "2 - 10  Hours"; break;
+            case 3: length = "10 - 30 Hours"; break;
+            case 4: length = "30 - 50 Hours"; break;
+            case 5: length = "\\> 50 Hours"; break;
         }
         embed.AddField("Length", length, true);
         embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
-        string releaseDate;
-        if (vn.Released?.Year == null)
-            releaseDate = "TBA";
-        else
-        {
-            releaseDate = vn.Released.Year.Value.ToString();
-            if (!vn.Released.Month.HasValue)
-                releaseDate = $"{vn.Released.Month.Value:D2}/{releaseDate}";
-            if (!vn.Released.Day.HasValue)
-                releaseDate = $"{vn.Released.Day.Value:D2}/{releaseDate}";
-        }
-        embed.AddField("Release Date", releaseDate, true);
-        response.Dispose();
+        embed.AddField("Release Date", vn.Released ?? "TBA", true);
         await ctx.ReplyAsync(embed: embed);
     }
 

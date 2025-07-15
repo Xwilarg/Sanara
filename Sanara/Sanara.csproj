@@ -22,7 +22,6 @@
     <PackageReference Include="Sentry" Version="5.12.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
-    <PackageReference Include="VndbSharp" Version="1.1.1" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
