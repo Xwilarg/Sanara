@@ -1,5 +1,7 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using RevoltSharp;
+using RevoltSharp.Rest;
 using Sanara.Compatibility;
 using Sanara.Exception;
 
@@ -38,7 +40,13 @@ namespace Sanara.Module.Command.Context.Revolt
 
         public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
         {
-            await _message.Channel.SendMessageAsync(text, embeds: embed == null ? null : [embed.ToRevolt()], replies: [ new MessageReply(_message.Id, true) ]);
+            RevoltSharp.FileAttachment att = null;
+            if (embed.ImageUrl != null)
+            {
+                att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment.{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
+                embed.ImageUrl = null;
+            }
+            await _message.Channel.SendMessageAsync(text, embeds: embed == null ? null : [embed.ToRevolt()], replies: [ new MessageReply(_message.Id, true) ], attachments: att == null ? null : [ att.Id ]);
         }
 
         public async Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)

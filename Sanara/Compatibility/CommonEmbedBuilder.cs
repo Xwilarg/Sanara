@@ -54,13 +54,20 @@ public class CommonEmbedBuilder
         StringBuilder str = new();
         if (Title != null)
         {
-            if (Url != null) str.AppendLine($"[{Title}]({Url})");
-            else str.AppendLine(Title);
-
-            str.AppendLine();
+            if (Url != null) str.Append($"### [{Title}]({Url})");
+            else str.Append($"### {Title}");
         }
 
-        str.AppendLine(Description);
+        if (Description != null)
+        {
+            if (Title != null)
+            {
+                str.AppendLine();
+                str.AppendLine();
+            }
+
+            str.Append(Description);
+        }
 
         return new RevoltSharp.EmbedBuilder()
         {

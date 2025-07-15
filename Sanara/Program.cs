@@ -19,7 +19,6 @@ using Sanara.Service;
 using Sanara.Subscription;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 using System.Web;
@@ -40,7 +39,7 @@ public sealed class Program
 
     public static ulong ClientId;
 
-    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient client, Credentials credentials)
+    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, RevoltClient revoltClient, Credentials credentials)
     {
         Db db = new();
 
@@ -87,7 +86,8 @@ public sealed class Program
         }
 
         // May only be null in test context
-        if (client != null) coll.AddSingleton(client);
+        if (discordClient != null) coll.AddSingleton(discordClient);
+        if (revoltClient != null) coll.AddSingleton(revoltClient);
         if (credentials != null) coll.AddSingleton(credentials);
 
         return coll.BuildServiceProvider();
@@ -171,7 +171,7 @@ public sealed class Program
             SentrySdk.Init(credentials.SentryKey);
         }
 
-        _provider = await CreateProviderAsync(_discordClient, credentials);
+        _provider = await CreateProviderAsync(_discordClient, _revoltClient, credentials);
 
         await _provider.GetRequiredService<Db>().InitAsync();
 
