@@ -402,6 +402,10 @@ public sealed class Doujin : ISubmodule
             }
         }
 
-        await ctx.Provider.GetRequiredService<Db>().AddBooruAsync(type.ToString());
+        var db = ctx.Provider.GetService<Db>();
+        if (db != null)
+        {
+            await db.AddBooruAsync(type.ToString());
+        }
     }
 }

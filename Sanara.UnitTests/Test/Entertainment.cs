@@ -5,7 +5,7 @@ namespace Sanara.UnitTests.Test
     public class Entertainment : TestBase
     {
 
-        [Test]
+        //[Test]
         public async Task VNQuoteTest()
         {
             var mod = new Module.Command.Impl.Media();

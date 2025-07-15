@@ -35,7 +35,7 @@ namespace Sanara.UnitTests
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();
 
-        public ulong Id => throw new NotImplementedException();
+        public ulong Id => 0;
 
         public ChannelType ChannelType => throw new NotImplementedException();
 

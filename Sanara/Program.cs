@@ -38,10 +38,8 @@ public sealed class Program
 
     public static ulong ClientId;
 
-    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, RevoltClient revoltClient, Credentials credentials)
+    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, RevoltClient revoltClient, Credentials credentials, bool addDb)
     {
-        Db db = new();
-
         GameManager gameManager = new();
 
         SubscriptionManager sub = new();
@@ -54,10 +52,8 @@ public sealed class Program
             .AddSingleton(http)
             .AddSingleton<HtmlWeb>() // HTML Parser
             .AddSingleton<Random>()
-            .AddSingleton<Db>()
             .AddSingleton<StatData>()
             .AddSingleton(sub)
-            .AddSingleton(db)
             .AddSingleton(gameManager)
             .AddSingleton<BooruService>()
             .AddSingleton<TranslatorService>()
@@ -67,6 +63,11 @@ public sealed class Program
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
             })
             .AddSingleton<JapaneseConverter>();
+
+        if (addDb)
+        {
+            coll.AddSingleton(new Db());
+        }
 
         if (File.Exists("Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
         {
@@ -169,7 +170,7 @@ public sealed class Program
             SentrySdk.Init(credentials.SentryKey);
         }
 
-        _provider = await CreateProviderAsync(_discordClient, _revoltClient, credentials);
+        _provider = await CreateProviderAsync(_discordClient, _revoltClient, credentials, true);
 
         await _provider.GetRequiredService<Db>().InitAsync();
 

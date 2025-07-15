@@ -37,26 +37,6 @@ namespace Sanara.UnitTests
             throw new NotImplementedException();
         }
 
-        public Task ReplyAsync(string text = "", Embed? embed = null, MessageComponent? components = null, bool ephemeral = false)
-        {
-            Result = new()
-            {
-                Text = text,
-                Embed = embed
-            };
-            return Task.CompletedTask;
-        }
-
-        public Task ReplyAsync(Stream file, string fileName, string text = "", Embed? embed = null, MessageComponent? components = null)
-        {
-            Result = new()
-            {
-                Text = text,
-                Embed = embed
-            };
-            return Task.CompletedTask;
-        }
-
         public Task AddReactionAsync(IEmote emote)
         {
             throw new NotImplementedException();
@@ -64,12 +44,22 @@ namespace Sanara.UnitTests
 
         public Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
         {
-            throw new NotImplementedException();
+            Result = new()
+            {
+                Text = text,
+                Embed = embed.ToDiscord()
+            };
+            return Task.CompletedTask;
         }
 
         public Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
         {
-            throw new NotImplementedException();
+            Result = new()
+            {
+                Text = text,
+                Embed = embed.ToDiscord()
+            };
+            return Task.CompletedTask;
         }
     }
 }
