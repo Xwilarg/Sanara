@@ -47,7 +47,7 @@ public sealed class Doujin : ISubmodule
             callback: WholesomeAsync,
             aliases: []
         ),
-        new CommandData(
+        /*new CommandData(
             slashCommand: new SlashCommandBuilder()
                 .WithName("adultvideo")
                 .WithDescription("Get a random Japanese Adult Video")
@@ -61,7 +61,7 @@ public sealed class Doujin : ISubmodule
                 .WithNsfw(true),
             callback: AdultVideoAsync,
             aliases: [ "av", "jav" ]
-        ),
+        ),*/
         new CommandData(
             slashCommand: new SlashCommandBuilder()
                 .WithName("booru")
