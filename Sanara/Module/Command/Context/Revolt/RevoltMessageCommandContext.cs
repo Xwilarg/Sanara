@@ -41,9 +41,9 @@ namespace Sanara.Module.Command.Context.Revolt
         public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
         {
             RevoltSharp.FileAttachment att = null;
-            if (embed.ImageUrl != null)
+            if (!string.IsNullOrWhiteSpace(embed.ImageUrl))
             {
-                att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment.{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
+                att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
                 embed.ImageUrl = null;
             }
             await _message.Channel.SendMessageAsync(text, embeds: embed == null ? null : [embed.ToRevolt()], replies: [ new MessageReply(_message.Id, true) ], attachments: att == null ? null : [ att.Id ]);
@@ -51,7 +51,7 @@ namespace Sanara.Module.Command.Context.Revolt
 
         public async Task ReplyAsync(Stream file, string fileName, string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null)
         {
-            throw new NotImplementedException();
+            await _message.Channel.SendFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), fileName, text);
         }
 
         public Task AddReactionAsync(IEmote emote)

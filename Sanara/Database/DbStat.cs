@@ -14,6 +14,7 @@ namespace Sanara.Database
             await CreateIfDontExistsAsync(_statDbName, "GamesPlayers");
             await CreateIfDontExistsAsync(_statDbName, "Booru");
             await CreateIfDontExistsAsync(_statDbName, "Download");
+            await CreateIfDontExistsAsync(_statDbName, "Platform");
         }
 
         private string GetStatKey(string format)
@@ -37,9 +38,9 @@ namespace Sanara.Database
                     ).RunAsync(_conn);
         }
 
-        public async Task AddNewCommandAsync(string name, bool isSlashCommand)
+        public async Task AddNewCommandAsync(string name, bool isSlashCommand, string platform)
         {
-            var data = $"{name};{(isSlashCommand ? 0 : 1)}";
+            var data = $"{name};{(isSlashCommand ? 0 : 1)};{platform}";
             await InsertOrAddAsync("Commands", Hourly, data);
             await InsertOrAddAsync("CommandsDaily", Daily, data);
         }

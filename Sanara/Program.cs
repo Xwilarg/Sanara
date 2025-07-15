@@ -279,7 +279,7 @@ public sealed class Program
         return tChan != null && !tChan.IsNsfw;
     }
 
-    private async Task LaunchCommandAsync(CommandData cmd, CommonUser? user, CommonTextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync)
+    private async Task LaunchCommandAsync(CommandData cmd, CommonUser? user, CommonTextChannel? tChan, bool isSlashCommand, Func<string, bool, Task> errorMsgAsync, Func<Task<IContext>> ctxCreatorAsync, string platform)
     {
         if (cmd.IsAdminOnly && DoesFailAdminOnlyPrecondition(tChan, user))
         {
@@ -305,7 +305,7 @@ public sealed class Program
                     {
                         var db = _provider.GetRequiredService<Db>();
 
-                        await db.AddNewCommandAsync(cmd.SlashCommand.Name.ToUpperInvariant(), isSlashCommand);
+                        await db.AddNewCommandAsync(cmd.SlashCommand.Name.ToUpperInvariant(), isSlashCommand, platform);
                         _provider.GetRequiredService<StatData>().LastMessage = DateTime.UtcNow;
                         await cmd.Callback(context);
                         await db.AddCommandSucceed();
@@ -732,7 +732,7 @@ public sealed class Program
                 await arg.DeferAsync(); // Somehow all commands not defer-ed fail
             }
             return new SlashCommandContext(_provider, arg);
-        });
+        }, "Discord");
     }
 
     public static ISubmodule[] Submodules => [
@@ -878,7 +878,7 @@ public sealed class Program
                         // newContent += " " + msg.Attachments.ElementAt(0).Url; TODO
                     }
                     return new RevoltMessageCommandContext(_provider, msg, newContent, cmd);
-                });
+                }, "Revolt");
             }
         }
         else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
@@ -919,7 +919,7 @@ public sealed class Program
                         newContent += " " + msg.Attachments.ElementAt(0).Url;
                     }
                     return new DiscordMessageCommandContext(_provider, msg, newContent, cmd);
-                });
+                }, "Discord");
             }
         }
         else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
