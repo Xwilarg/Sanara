@@ -12,7 +12,7 @@ namespace Sanara.Module.Command.Context.Discord
         private SocketMessageComponent _ctx;
 
         public IServiceProvider Provider { private init; get; }
-        public IMessageChannel Channel => _ctx.Channel;
+        public CommonMessageChannel Channel => new(_ctx.Channel);
         public CommonUser User => new(_ctx.User);
         public DateTimeOffset CreatedAt => _ctx.CreatedAt;
 

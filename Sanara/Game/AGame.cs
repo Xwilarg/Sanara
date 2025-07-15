@@ -12,7 +12,7 @@ namespace Sanara.Game
 {
     public abstract class AGame : IDisposable
     {
-        protected AGame(IServiceProvider provider, IMessageChannel textChan, CommonUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
+        protected AGame(IServiceProvider provider, CommonMessageChannel textChan, CommonUser _, IPreload preload, IPostMode postMode, IMultiplayerMode versusMode, GameSettings settings)
         {
             _provider = provider;
 
@@ -359,14 +359,14 @@ namespace Sanara.Game
         public bool AsLost()
             => _state == GameState.Lost || (_state == GameState.Prepare && _lobby.HasExpired);
 
-        public bool IsMyGame(ulong chanId)
+        public bool IsMyGame(string chanId)
             => _textChan.Id == chanId;
 
         private string _gameName; // Name of the game
         private string _argument; // Game option (audio, shadow, etc...)
         private GameState _state; // Current state of the game
         private readonly ulong _guildId;
-        private readonly IMessageChannel _textChan; // Textual channel where the game is happening
+        private readonly CommonMessageChannel _textChan; // Textual channel where the game is happening
         private readonly IPostMode _postMode; // How things should be posted
         private DateTime _lastPost; // Used to know when the user lost because of the time
         private string _current; // Current value, used for Replay command

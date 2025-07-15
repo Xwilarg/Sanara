@@ -82,10 +82,10 @@ namespace Sanara.Game
             }
         }
 
-        public AGame? GetGame(IChannel chan)
+        public AGame? GetGame(CommonMessageChannel chan)
             => _games.FirstOrDefault(x => x.IsMyGame(chan.Id));
 
-        public async Task CreateGameAsync(IChannel channel, AGame game)
+        public async Task CreateGameAsync(CommonMessageChannel channel, AGame game)
         {
             var chanId = channel.Id.ToString();
             if (_replayLobby.ContainsKey(chanId))
@@ -111,17 +111,17 @@ namespace Sanara.Game
             return _pendingGames[id].GetLobby();
         }
 
-        public ReplayLobby? GetReplayLobby(IChannel chan)
+        public ReplayLobby? GetReplayLobby(CommonMessageChannel chan)
         {
-            if (_replayLobby.ContainsKey(chan.Id.ToString()))
+            if (_replayLobby.ContainsKey(chan.Id))
             {
-                return _replayLobby[chan.Id.ToString()];
+                return _replayLobby[chan.Id];
             }
             return null;
         }
 
         /// <returns>Updated embed or null if user not in lobby</returns>
-        public Embed? ToggleReadyLobby(ReplayLobby rLobby, CommonUser user)
+        public CommonEmbedBuilder? ToggleReadyLobby(ReplayLobby rLobby, CommonUser user)
         {
             var result = rLobby.ToggleReady(user);
             return result ? rLobby.GetEmbed() : null;
@@ -129,12 +129,12 @@ namespace Sanara.Game
 
         public async Task<bool> CheckRestartLobbyFullAsync(IContext ctx)
         {
-            var rLobby = _replayLobby[ctx.Channel.Id.ToString()];
+            var rLobby = _replayLobby[ctx.Channel.Id];
             if (rLobby.IsAllReady)
             {
                 var lobby = rLobby.CreateLobby();
                 DeleteReadyLobby(ctx.Channel);
-                var game = rLobby.Preload.CreateGame((IMessageChannel)ctx.Channel, rLobby.LastHost, new GameSettings(lobby, false));
+                var game = rLobby.Preload.CreateGame(ctx.Channel, rLobby.LastHost, new GameSettings(lobby, false));
                 _games.Add(game);
                 await game.StartAsync(ctx);
                 return true;
@@ -142,9 +142,9 @@ namespace Sanara.Game
             return false;
         }
 
-        public void DeleteReadyLobby(IChannel chan)
+        public void DeleteReadyLobby(CommonMessageChannel chan)
         {
-            var chanId = chan.Id.ToString();
+            var chanId = chan.Id;
             _replayLobby.Remove(chanId);
         }
 
@@ -156,14 +156,14 @@ namespace Sanara.Game
             _pendingGames.Remove(chanId);
         }
 
-        public ReplayLobby AddReplayLobby(IChannel chan, IPreload preload, Lobby lobby)
+        public ReplayLobby AddReplayLobby(CommonMessageChannel chan, IPreload preload, Lobby lobby)
         {
             var rLobby = new ReplayLobby(preload, lobby.Host, lobby.GetUsers(), lobby.GetMultiplayerMode());
             _replayLobby.Add(chan.Id.ToString(), rLobby);
             return rLobby;
         }
 
-        public bool IsChannelBusy(IChannel chan)
+        public bool IsChannelBusy(CommonMessageChannel chan)
             => GetGame(chan) != null || _pendingGames.ContainsKey(chan.Id.ToString());
 
         private readonly Thread thread;

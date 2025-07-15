@@ -16,14 +16,14 @@ namespace Sanara.Game
             _creationTime = DateTime.Now;
         }
 
-        public Embed GetEmbed()
+        public CommonEmbedBuilder GetEmbed()
         {
-            return new EmbedBuilder
+            return new CommonEmbedBuilder
             {
                 Title = "Replay?",
                 Description = string.Join("\n", _users.Select(x => x.ToString() + ": " + (_ready.Any(r => r.Id == x.Id) ? "Ready" : "**Not ready**"))),
                 Color = Color.Orange
-            }.Build();
+            };
         }
 
         public bool ToggleReady(CommonUser user)

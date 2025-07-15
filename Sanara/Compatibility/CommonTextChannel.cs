@@ -1,14 +1,14 @@
 ﻿namespace Sanara.Compatibility;
 
-public class CommonTextChannel
+public class CommonTextChannel : CommonMessageChannel
 {
-    public CommonTextChannel(Discord.ITextChannel tChan)
+    public CommonTextChannel(Discord.ITextChannel tChan) : base(tChan)
     {
         OwnerId = tChan.Guild.OwnerId.ToString();
         IsNsfw = tChan.IsNsfw;
     }
 
-    public CommonTextChannel(RevoltSharp.TextChannel tChan)
+    public CommonTextChannel(RevoltSharp.TextChannel tChan) : base(tChan)
     {
         OwnerId = tChan.Server.OwnerId;
         IsNsfw = tChan.IsNsfw;

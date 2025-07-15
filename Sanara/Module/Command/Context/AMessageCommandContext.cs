@@ -2,7 +2,6 @@
 using Sanara.Exception;
 using Sanara.Module.Command.Context.Discord;
 using System.Text.RegularExpressions;
-using static Google.Api.Gax.Grpc.Gcp.AffinityConfig.Types;
 
 namespace Sanara.Module.Command.Context
 {

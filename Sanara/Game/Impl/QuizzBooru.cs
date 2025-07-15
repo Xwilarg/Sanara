@@ -10,7 +10,7 @@ namespace Sanara.Game.Impl
 {
     public abstract class QuizzBooru : Quizz
     {
-        public QuizzBooru(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings)
+        public QuizzBooru(IServiceProvider provider, CommonMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings)
         {
             var info = new List<BooruQuizzPreloadResult>(preload.Load().Cast<BooruQuizzPreloadResult>())[0];
             _booru = info.Booru;

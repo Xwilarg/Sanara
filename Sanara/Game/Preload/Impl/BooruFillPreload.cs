@@ -17,7 +17,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Booru Fill";
 
-        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
+        public AGame CreateGame(CommonMessageChannel chan, CommonUser user, GameSettings settings)
             => new FillAllBooru(_provider, chan, user, this, settings);
 
         public string GetRules()

@@ -1,12 +1,13 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using Sanara.Exception;
 
 namespace Sanara.Game.PostMode
 {
     public class UrlMode : IPostMode
     {
-        public async Task PostAsync(IServiceProvider provider, IMessageChannel chan, string text, AGame _)
+        public async Task PostAsync(IServiceProvider provider, CommonMessageChannel chan, string text, AGame _)
         {
             try
             {

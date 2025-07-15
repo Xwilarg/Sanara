@@ -7,8 +7,6 @@ namespace Sanara.Module.Command.Context.Revolt
 {
     public class RevoltMessageCommandContext : AMessageCommandContext, IContext
     {
-        private Dictionary<string, object> argsDict = new();
-
         public RevoltMessageCommandContext(IServiceProvider provider, UserMessage msg, string arguments, CommandData command) : base(arguments, command)
         {
             Provider = provider;
@@ -35,7 +33,7 @@ namespace Sanara.Module.Command.Context.Revolt
         public IServiceProvider Provider { private init; get; }
         public DateTimeOffset CreatedAt => _message.CreatedAt;
 
-        public IMessageChannel Channel => throw new NotImplementedException();
+        public CommonMessageChannel Channel => new(_message.Channel);
         public CommonUser User => new(_message.Author);
 
         public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)

@@ -12,7 +12,7 @@ namespace Sanara.Module.Command
         public Task AddReactionAsync(IEmote emote);
         public T? GetArgument<T>(string key);
         public Task<IMessage> GetOriginalAnswerAsync();
-        public IMessageChannel Channel { get; }
+        public CommonMessageChannel Channel { get; }
         public CommonUser User { get; }
         public DateTimeOffset CreatedAt { get; }
     }

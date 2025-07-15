@@ -576,7 +576,7 @@ public sealed class Program
             else if (arg.Data.CustomId.StartsWith("replay/"))
             {
                 var id = arg.Data.CustomId[7..];
-                var chanId = ctx.Channel.Id.ToString();
+                var chanId = ctx.Channel.Id;
                 switch (id)
                 {
                     case "ready":
@@ -597,7 +597,7 @@ public sealed class Program
                                 }
                                 else
                                 {
-                                    await arg.Message.ModifyAsync(x => x.Embed = embed);
+                                    await arg.Message.ModifyAsync(x => x.Embed = embed.ToDiscord());
                                 }
                             }
                             else
@@ -925,7 +925,7 @@ public sealed class Program
         else if (!msg.Content.StartsWith("//") && !msg.Content.StartsWith("#"))
         {
             var context = new GameCommandContext(_provider, msg);
-            var game = _provider.GetRequiredService<GameManager>().GetGame(msg.Channel);
+            var game = _provider.GetRequiredService<GameManager>().GetGame(new(msg.Channel));
             if (game != null && game.CanPlay(new CommonUser(msg.Author)))
             {
                 game.AddAnswer(context);

@@ -16,7 +16,7 @@ namespace Sanara.Game.Impl
     /// </summary>
     public class FillAllBooru : AGame
     {
-        public FillAllBooru(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new UrlMode(), new SpeedFillAllBooruMode(), settings)
+        public FillAllBooru(IServiceProvider provider, CommonMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new UrlMode(), new SpeedFillAllBooruMode(), settings)
         { }
 
         protected override string[] GetPostInternal()

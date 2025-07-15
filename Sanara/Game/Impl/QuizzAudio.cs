@@ -13,7 +13,7 @@ namespace Sanara.Game.Impl
     /// </summary>
     public class QuizzAudio : Quizz, IAudioGame
     {
-        public QuizzAudio(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings, new AudioMode(), true)
+        public QuizzAudio(IServiceProvider provider, CommonMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, settings, new AudioMode(), true)
         {
             var gUser = user as IGuildUser;
             if (gUser == null)

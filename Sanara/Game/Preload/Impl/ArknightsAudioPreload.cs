@@ -23,7 +23,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Arknights Audio Quizz";
 
-        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
+        public AGame CreateGame(CommonMessageChannel chan, CommonUser user, GameSettings settings)
             => new QuizzAudio(_provider, chan, user, this, settings);
 
         public string GetRules()

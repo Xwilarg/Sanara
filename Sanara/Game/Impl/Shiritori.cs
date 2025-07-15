@@ -15,7 +15,7 @@ namespace Sanara.Game.Impl
 {
     public sealed class Shiritori : AGame
     {
-        public Shiritori(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings, int minWordLength) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, CommonMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings, int minWordLength) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;
@@ -24,7 +24,7 @@ namespace Sanara.Game.Impl
             _minWordLength = minWordLength;
         }
 
-        public Shiritori(IServiceProvider provider, IMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
+        public Shiritori(IServiceProvider provider, CommonMessageChannel textChan, CommonUser user, IPreload preload, GameSettings settings) : base(provider, textChan, user, preload, new TextMode(), new TurnByTurnMode(), settings)
         {
             _words = new List<ShiritoriPreloadResult>(preload.Load().Cast<ShiritoriPreloadResult>());
             _isFirst = true;

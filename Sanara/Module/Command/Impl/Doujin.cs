@@ -78,7 +78,7 @@ public sealed class Doujin : ISubmodule
                         .AddChoice("E926", (int)BooruType.E926)
                         .AddChoice("Sakugabooru (anime clips)", (int)BooruType.Sakugabooru)
 #if NSFW_BUILD
-                        .AddChoice("Gelbooru (NSFW)", (int)BooruType.Gelbooru)
+                        .AddChoice("Danbooru (NSFW)", (int)BooruType.DanbooruDonmai)
                         .AddChoice("E621 (NSFW, furry)", (int)BooruType.E621)
                         .AddChoice("Rule34 (NSFW, more variety of content)", (int)BooruType.Rule34)
                         .AddChoice("Konachan (NSFW, wallpaper format)", (int)BooruType.Konachan)
@@ -261,7 +261,7 @@ public sealed class Doujin : ISubmodule
         var tags = (ctx.GetArgument<string>("tags") ?? string.Empty).Split(' ');
         var type = (BooruType)(ctx.GetArgument<long?>("source") ??
 #if NSFW_BUILD
-            (ctx.Channel is ITextChannel tChan && !tChan.IsNsfw ? (int)BooruType.Safebooru : (int)BooruType.Gelbooru)
+            (ctx.Channel is ITextChannel tChan && !tChan.IsNsfw ? (int)BooruType.Safebooru : (int)BooruType.Rule34)
 
 #else
         (int)BooruType.Safebooru
@@ -275,7 +275,7 @@ public sealed class Doujin : ISubmodule
             BooruType.E926 => new E926(),
             BooruType.Sakugabooru => new Sakugabooru(),
 #if NSFW_BUILD
-            BooruType.Gelbooru => new Gelbooru(),
+            //BooruType.DanbooruDonmai => new DanbooruDonmai(),
             BooruType.E621 => new E621(),
             BooruType.Rule34 => new Rule34(),
             BooruType.Konachan => new Konachan(),

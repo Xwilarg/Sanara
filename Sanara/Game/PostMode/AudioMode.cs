@@ -1,12 +1,13 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Sanara.Compatibility;
 using System.Diagnostics;
 
 namespace Sanara.Game.PostMode
 {
     public class AudioMode : IPostMode
     {
-        public Task PostAsync(IServiceProvider provider, IMessageChannel chan, string text, AGame sender)
+        public Task PostAsync(IServiceProvider provider, CommonMessageChannel chan, string text, AGame sender)
         {
             var quizzAudio = (IAudioGame)sender;
             quizzAudio.GetNewProcess();

@@ -19,7 +19,7 @@ namespace Sanara.Game.Preload.Impl
 
         public string Name => "Shiritori";
 
-        public AGame CreateGame(IMessageChannel chan, CommonUser user, GameSettings settings)
+        public AGame CreateGame(CommonMessageChannel chan, CommonUser user, GameSettings settings)
             => new Shiritori(_provider, chan, user, this, settings);
 
         public string GetRules()
