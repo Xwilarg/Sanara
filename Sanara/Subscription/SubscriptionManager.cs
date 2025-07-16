@@ -117,7 +117,7 @@ public sealed class SubscriptionManager
                         catch (HttpException http)
                         {
                             if (!http.DiscordCode.HasValue ||
-                                (http.DiscordCode.Value != DiscordErrorCode.MissingPermissions && http.DiscordCode.Value != DiscordErrorCode.UnknownChannel))
+                                (http.DiscordCode.Value != DiscordErrorCode.InsufficientPermissions && http.DiscordCode.Value != DiscordErrorCode.UnknownChannel))
                                 throw;
                         }
                         catch (System.Exception e)
