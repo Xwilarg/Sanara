@@ -8,6 +8,7 @@ using Sanara.Game;
 using Sanara.Game.Preload.Result;
 using Sanara.Subscription;
 using Sanara.Subscription.Tags;
+using System.Net.Sockets;
 using System.Text.Json;
 
 namespace Sanara.Database
@@ -32,8 +33,11 @@ namespace Sanara.Database
 
         public async Task InitAsync()
         {
-            _conn = await _r.Connection().ConnectAsync();
-            if (_conn == null)
+            try
+            {
+                _conn = await _r.Connection().ConnectAsync();
+            }
+            catch (SocketException)
             {
                 throw new InvalidOperationException("Failed to connect to db, make sure rethinkdb is started");
             }

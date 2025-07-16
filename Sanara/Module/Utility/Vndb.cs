@@ -17,9 +17,9 @@ public class VnInfo
     public string Title { set; get; }
     public VnImage Image { set; get; }
     public string[] Languages { set; get; }
-    public int Length { set; get; }
+    public int? Length { set; get; }
     public string[] Platforms { set; get; }
-    public float Rating { set; get; }
+    public float? Rating { set; get; }
     public string Released { set; get; }
     public string Description { set; get; }
 }

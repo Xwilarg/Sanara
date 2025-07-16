@@ -217,14 +217,16 @@ public class Media : ISubmodule
 
         resp.EnsureSuccessStatusCode();
 
+        var raw = await resp.Content.ReadAsStringAsync();
+        Console.WriteLine(raw);
         var res = System.Text.Json.JsonSerializer.Deserialize<VndbReq<VnInfo>>(
-            await resp.Content.ReadAsStringAsync(),
+           raw,
             ctx.Provider.GetRequiredService<JsonSerializerOptions>()
         ).Results;
 
         if (res.Length == 0) throw new CommandFailed("No visual novel were found with this name");
 
-        var vn = res[0];
+        var vn = res.OrderBy(x => Utils.GetStringDistance(x.Title, name)).First();
 
         var embed = new CommonEmbedBuilder()
         {
@@ -251,7 +253,7 @@ public class Media : ISubmodule
             case 5: length = "\\> 50 Hours"; break;
         }
         embed.AddField("Length", length, true);
-        embed.AddField("Vndb Rating", vn.Rating + " / 10", true);
+        if (vn.Rating != null) embed.AddField("Vndb Rating", vn.Rating + " / 100", true);
         embed.AddField("Release Date", vn.Released ?? "TBA", true);
         await ctx.ReplyAsync(embed: embed);
     }

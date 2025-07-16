@@ -1,7 +1,6 @@
 ﻿using Discord;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
-using Sanara.Module.Command.Impl;
 
 namespace Sanara.UnitTests.Test
 {
