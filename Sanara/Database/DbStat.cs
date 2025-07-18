@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using RevoltSharp;
 using Sanara.Game;
 
 namespace Sanara.Database
@@ -75,24 +76,41 @@ namespace Sanara.Database
             await InsertOrAddAsync("Booru", Daily, name);
         }
 
-        public async Task UpdateGuildCountAsync(DiscordSocketClient client)
+        public async Task UpdateGuildCountAsync(DiscordSocketClient discordClient, RevoltClient revoltClient)
         {
             if (await _r.Db(_statDbName).Table("GuildCount").GetAll(Daily).Count().Eq(0).RunAsync<bool>(_conn))
-                await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", Daily)
-                    .With("count", client.Guilds.Count)
-                ).RunAsync(_conn);
-            else
+            {
+                await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", Daily)).RunAsync(_conn);
+            }
+            if (discordClient != null)
+            {
                 await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", Daily)
-                    .With("count", client.Guilds.Count)
+                    .With("discord", discordClient.Guilds.Count)
                 ).RunAsync(_conn);
+            }
+            if (revoltClient != null)
+            {
+                await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", Daily)
+                    .With("revolt", revoltClient.Servers.Count)
+                ).RunAsync(_conn);
+            }
+
             if (await _r.Db(_statDbName).Table("GuildCount").GetAll("Latest").Count().Eq(0).RunAsync<bool>(_conn))
-                await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", "Latest")
-                    .With("count", client.Guilds.Count)
-                ).RunAsync(_conn);
-            else
+            {
+                await _r.Db(_statDbName).Table("GuildCount").Insert(_r.HashMap("id", "Latest")).RunAsync(_conn);
+            }
+            if (discordClient != null)
+            {
                 await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", "Latest")
-                    .With("count", client.Guilds.Count)
+                    .With("discord", discordClient.Guilds.Count)
                 ).RunAsync(_conn);
+            }
+            if (revoltClient != null)
+            {
+                await _r.Db(_statDbName).Table("GuildCount").Update(_r.HashMap("id", "Latest")
+                    .With("revolt", revoltClient.Servers.Count)
+                ).RunAsync(_conn);
+            }
         }
 
         public string Daily => GetStatKey("yyyyMMdd");

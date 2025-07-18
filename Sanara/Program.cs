@@ -823,7 +823,7 @@ public sealed class Program
             // The bot is now really ready to interact with people
             _provider.GetRequiredService<StatData>().Started = DateTime.UtcNow;
 
-            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient);
+            await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient, _revoltClient);
         });
     }
 
@@ -838,7 +838,7 @@ public sealed class Program
     private async Task ChangeGuildCountAsync(SocketGuild _)
     {
         await _provider.GetRequiredService<TopGGClient>().SendAsync(_discordClient.Guilds.Count);
-        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient);
+        await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient, _revoltClient);
     }
 
     private async Task GuildJoined(SocketGuild guild)
