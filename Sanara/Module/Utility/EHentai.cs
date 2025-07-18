@@ -6,6 +6,7 @@ using Sanara.Database;
 using Sanara.Exception;
 using Sanara.Module.Command;
 using System.IO.Compression;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -22,8 +23,18 @@ public static class EHentai
 
     public static async Task EHentaiDownloadAsync(IContext ctx, IServiceProvider provider, string urlId, EHentaiType type)
     {
+        var cc = new CookieContainer();
+        cc.Add(new Cookie("nw", "1") { Domain = "e-hentai.org" }); // Skip content warning page
+
         var web = provider.GetRequiredService<HtmlWeb>();
-        var html = web.Load($"https://e-hentai.org/g/{urlId}/");
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"https://e-hentai.org/g/{urlId}");
+        request.Method = "GET";
+        request.CookieContainer = cc;
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        var stream = response.GetResponseStream();
+
+        var html = new HtmlDocument();
+        html.Load(stream);
 
         // Get all pages
         var name = html.GetElementbyId("gn").InnerHtml;
@@ -56,7 +67,14 @@ public static class EHentai
 
                 if (i < count - 1)
                 {
-                    html = web.Load($"https://e-hentai.org/g/{urlId}/?p={i + 1}");
+                    request = (HttpWebRequest)WebRequest.Create($"https://e-hentai.org/g/{urlId}/?p={i + 1}");
+                    request.Method = "GET";
+                    request.CookieContainer = cc;
+                    response = (HttpWebResponse)request.GetResponse();
+                    stream = response.GetResponseStream();
+
+                    html = new HtmlDocument();
+                    html.Load(stream);
                 }
             }
             ZipFile.CreateFromDirectory($"Saves/Download/{dirName}", finalPath);
