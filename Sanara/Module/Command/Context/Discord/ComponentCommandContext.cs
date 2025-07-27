@@ -10,6 +10,8 @@ namespace Sanara.Module.Command.Context.Discord
         public ComponentCommandContext(IServiceProvider provider, SocketMessageComponent ctx)
             => (Provider, _ctx) = (provider, ctx);
 
+        public ContextSourceType SourceType => ContextSourceType.Discord;
+
         private SocketMessageComponent _ctx;
 
         public IServiceProvider Provider { private init; get; }

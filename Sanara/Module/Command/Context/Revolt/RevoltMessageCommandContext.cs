@@ -15,6 +15,8 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
         _message = msg;
     }
 
+    public ContextSourceType SourceType => ContextSourceType.Revolt;
+
     protected override void ParseChannel(string data, string name)
     {
         var guild = _message.Server;

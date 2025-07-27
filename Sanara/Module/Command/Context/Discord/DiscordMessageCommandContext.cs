@@ -12,6 +12,8 @@ namespace Sanara.Module.Command.Context.Discord
             _message = message;
         }
 
+        public ContextSourceType SourceType => ContextSourceType.Discord;
+
         protected override void ParseChannel(string data, string name)
         {
             var guild = (_message.Channel as ITextChannel)?.Guild;

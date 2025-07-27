@@ -9,6 +9,8 @@ namespace Sanara.Module.Command.Context.Discord
         public SlashCommandContext(IServiceProvider provider, SocketSlashCommand ctx)
             => (Provider, _ctx) = (provider, ctx);
 
+        public ContextSourceType SourceType => ContextSourceType.Discord;
+
         private SocketSlashCommand _ctx;
 
         public IServiceProvider Provider { private init; get; }

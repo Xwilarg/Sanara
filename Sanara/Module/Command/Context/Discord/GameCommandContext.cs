@@ -11,6 +11,8 @@ namespace Sanara.Module.Command.Context.Discord
             _message = message;
         }
 
+        public ContextSourceType SourceType => ContextSourceType.Discord;
+
         public IServiceProvider Provider { private init; get; }
         private IMessage _message;
         private IUserMessage? _reply;

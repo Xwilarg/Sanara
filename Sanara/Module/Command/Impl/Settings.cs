@@ -67,7 +67,14 @@ public class Settings : ISubmodule
 
     public async Task HelpAsync(IContext ctx)
     {
-        await ctx.ReplyAsync("Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
+        if (ctx.SourceType == Context.ContextSourceType.Discord)
+        {
+            await ctx.ReplyAsync("Type / to see the full list of commands for all bots\nYou can also visit <https://sanara.zirk.eu/commands.html>");
+        }
+        else
+        {
+            await ctx.ReplyAsync("To use Sanara, tag her followed by your command\nExample: <@01JWZMD7W3D14NG8846QB1YD0Z> booru 0 sheep_horns sword\nWill get an image from Safebooru with the tags \"sheep_horns\" and \"sword\"\n\nYou can also visit <https://sanara.zirk.eu/commands.html>");
+        }
     }
 
     public async Task ConfigureAsync(IContext ctx)
@@ -106,7 +113,11 @@ public class Settings : ISubmodule
             " - [Source Code](https://github.com/Xwilarg/Sanara)\n" +
             " - [Website](https://sanara.zirk.eu/)\n" +
 #endif
-            " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + Program.ClientId + "&permissions=51264&scope=bot%20applications.commands)\n"
+            (
+            ctx.SourceType == Context.ContextSourceType.Discord
+            ? " - [Invitation Link](https://discord.com/api/oauth2/authorize?client_id=" + Program.ClientId + "&permissions=51264&scope=bot%20applications.commands)\n"
+            : " - [Invitation Link](https://app.revolt.chat/bot/01JWZMD7W3D14NG8846QB1YD0Z)\n"
+            )
 #if NSFW_BUILD
             +
             " - [Support Server](https://discordapp.com/invite/H6wMRYV)\n" +

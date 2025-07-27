@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Sanara.Compatibility;
 using Sanara.Module.Command;
+using Sanara.Module.Command.Context;
 
 namespace Sanara.UnitTests
 {
@@ -11,6 +12,8 @@ namespace Sanara.UnitTests
             Provider = provider;
             _args = args;
         }
+
+        public ContextSourceType SourceType => ContextSourceType.Discord;
 
         public IServiceProvider Provider { init; get; }
 
