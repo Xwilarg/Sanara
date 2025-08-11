@@ -18,8 +18,9 @@ namespace Sanara.Game
 
             _state = GameState.Prepare;
             _textChan = textChan;
-            if (_textChan is ITextChannel)
-                _guildId = ((ITextChannel)_textChan).GuildId;
+            var discordChan = textChan.As<ITextChannel>();
+            if (discordChan != null)
+                _guildId = discordChan.GuildId;
             else
                 throw new CommandFailed("Games are not yet available in private message."); // TODO!
             _postMode = postMode;

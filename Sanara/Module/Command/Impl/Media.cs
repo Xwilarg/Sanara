@@ -356,7 +356,7 @@ public class Media : ISubmodule
             ImageUrl = answer.coverImage.large
         };
 
-        if (answer.tags.Any())
+        if (answer.tags.Any() && answer.tags.Any(x => x.rank > 50))
             embed.AddField("Tags", string.Join(", ", answer.tags.Where(x => x.rank > 50).Select(x => x.name)));
         if (!string.IsNullOrEmpty(answer.title.english)) // No use displaying this if it's the same as the embed title
             embed.AddField("English Title", answer.title.english, true);

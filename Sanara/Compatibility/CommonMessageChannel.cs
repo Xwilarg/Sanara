@@ -31,5 +31,7 @@ public class CommonMessageChannel
         return await _dChan.SendFileAsync(stream, name);
     }
 
+    public T As<T>() where T : class, IMessageChannel => _dChan as T;
+
     private IMessageChannel? _dChan;
 }
