@@ -269,7 +269,7 @@ public sealed class Doujin : ISubmodule
         var tags = (ctx.GetArgument<string>("tags") ?? string.Empty).Split(' ');
         var type = (BooruType)(ctx.GetArgument<long?>("source") ??
 #if NSFW_BUILD
-        ((ctx.TextChannel?.IsNsfw ?? true) ? (int)BooruType.Rule34 : (int)BooruType.Safebooru)
+        ((ctx.TextChannel?.IsNsfw ?? true) ? (int)BooruType.Konachan : (int)BooruType.Safebooru)
 
 #else
         (int)BooruType.Safebooru
