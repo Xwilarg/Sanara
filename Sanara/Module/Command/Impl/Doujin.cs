@@ -269,7 +269,7 @@ public sealed class Doujin : ISubmodule
         var tags = (ctx.GetArgument<string>("tags") ?? string.Empty).Split(' ');
         var type = (BooruType)(ctx.GetArgument<long?>("source") ??
 #if NSFW_BUILD
-            (ctx.Channel is CommonTextChannel tChan && !tChan.IsNsfw ? (int)BooruType.Safebooru : (int)BooruType.Rule34)
+        ((ctx.TextChannel?.IsNsfw ?? true) ? (int)BooruType.Rule34 : (int)BooruType.Safebooru)
 
 #else
         (int)BooruType.Safebooru
@@ -292,7 +292,8 @@ public sealed class Doujin : ISubmodule
         };
         booru.HttpClient = ctx.Provider.GetRequiredService<HttpClient>();
 
-        var isChanSfw = ctx.Channel is CommonTextChannel textC && !textC.IsNsfw;
+        var isChanSfw = !(ctx.TextChannel?.IsNsfw ?? true);
+        Console.WriteLine($"{isChanSfw}");
         if (isChanSfw && !booru.IsSafe && type != BooruType.Sakugabooru)
         {
             throw new CommandFailed("NSFW booru can only be requested in NSFW channels", ephemeral: true);

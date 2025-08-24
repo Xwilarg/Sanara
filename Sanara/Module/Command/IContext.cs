@@ -17,6 +17,7 @@ namespace Sanara.Module.Command
         public Task<CommonMessage> GetOriginalAnswerAsync();
         public Task DeleteAnswerAsync();
         public CommonMessageChannel Channel { get; }
+        public CommonTextChannel? TextChannel { get; }
         public CommonUser User { get; }
         public DateTimeOffset CreatedAt { get; }
     }

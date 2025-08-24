@@ -15,6 +15,7 @@ namespace Sanara.Module.Command.Context.Discord
 
         public IServiceProvider Provider { private init; get; }
         public CommonMessageChannel Channel => new(_ctx.Channel);
+        public CommonTextChannel? TextChannel => _ctx.Channel is ITextChannel tChan ? new(tChan) : null;
         public CommonUser User => new(_ctx.User);
         public DateTimeOffset CreatedAt => _ctx.CreatedAt;
 

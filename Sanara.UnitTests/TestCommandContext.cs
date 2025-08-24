@@ -21,6 +21,7 @@ namespace Sanara.UnitTests
         public Result Result { internal set; get; }
 
         public CommonMessageChannel Channel => new(new TestChannel(this));
+        public CommonTextChannel? TextChannel => null; // TODO
 
         public CommonUser User => throw new NotImplementedException();
 

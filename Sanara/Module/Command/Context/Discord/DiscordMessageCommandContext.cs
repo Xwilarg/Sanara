@@ -37,6 +37,7 @@ namespace Sanara.Module.Command.Context.Discord
         private IUserMessage? _reply;
 
         public CommonMessageChannel Channel => new(_message.Channel);
+        public CommonTextChannel? TextChannel => _message.Channel is ITextChannel tChan ? new(tChan) : null;
 
         public CommonUser User => new(_message.Author);
 

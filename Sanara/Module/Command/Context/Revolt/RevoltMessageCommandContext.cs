@@ -39,6 +39,7 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
     public DateTimeOffset CreatedAt => _message.CreatedAt;
 
     public CommonMessageChannel Channel => new(_message.Channel);
+    public CommonTextChannel? TextChannel => _message.Channel is RevoltSharp.TextChannel tChan ? new(tChan) : null;
     public CommonUser User => new(_message.Author);
 
     public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
