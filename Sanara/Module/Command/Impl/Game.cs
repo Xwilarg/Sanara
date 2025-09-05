@@ -141,7 +141,7 @@ public class Game : ISubmodule
         var db = ctx.Provider.GetRequiredService<Db>();
         var gm = ctx.Provider.GetRequiredService<GameManager>();
 
-        var guild = db.GetGuild(((ITextChannel)ctx.Channel).GuildId);
+        var guild = db.GetGuild(ulong.Parse(ctx.TextChannel.GuildId));
         var embed = new CommonEmbedBuilder
         {
             Title = "Scores",

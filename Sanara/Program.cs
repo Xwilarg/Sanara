@@ -431,8 +431,8 @@ public sealed class Program
             {
                 if (!DoesFailAdminOnlyPrecondition(arg.Channel is ITextChannel tChan ? new CommonTextChannel(tChan) : null, new CommonUser(arg.User)))
                 {
-                    var c = (ITextChannel)ctx.Channel;
-                    var guildId = c.GuildId;
+                    var c = ctx.TextChannel;
+                    var guildId = ulong.Parse(c.GuildId);
                     var newValue = !_provider.GetRequiredService<Db>().GetGuild(guildId).TranslateUsingFlags;
                     await _provider.GetRequiredService<Db>().UpdateFlagAsync(guildId, newValue);
                     await ctx.ReplyAsync($"Translation from flag is now {(newValue ? "enabled" : "disabled")}", ephemeral: true);

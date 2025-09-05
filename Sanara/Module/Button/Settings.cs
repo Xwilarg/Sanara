@@ -11,13 +11,13 @@ namespace Sanara.Module.Button
         public static async Task DatabaseDump(IContext ctx)
         {
             await ctx.ReplyAsync("```json\n" +
-                await ctx.Provider.GetRequiredService<Db>().DumpAsync(((ITextChannel)ctx.Channel).Guild.Id) +
+                await ctx.Provider.GetRequiredService<Db>().DumpAsync(ulong.Parse(ctx.TextChannel.GuildId)) +
                 "\n```", ephemeral: true);
         }
 
         public static async Task RemoveSubscription(IContext ctx, string key)
         {
-            var guildId = ((ITextChannel)ctx.Channel).Guild.Id;
+            var guildId = ulong.Parse(ctx.TextChannel.GuildId);
             var subs = await ctx.Provider.GetRequiredService<SubscriptionManager>().GetSubscriptionsAsync(ctx.Provider, guildId);
             if (subs == null)
             {
