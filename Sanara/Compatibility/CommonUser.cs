@@ -10,7 +10,7 @@ public class CommonUser
         Username = user.Username;
     }
 
-    public CommonUser(RevoltSharp.User user)
+    public CommonUser(StoatSharp.User user)
     {
         IsAdmin = false;
         Id = user.Id;

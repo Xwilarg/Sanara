@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
-using RevoltSharp;
-using RevoltSharp.Rest;
+using StoatSharp;
+using StoatSharp.Rest;
 using Sanara.Compatibility;
 using Sanara.Exception;
 
@@ -39,15 +39,15 @@ public class RevoltMessageCommandContext : AMessageCommandContext, IContext
     public DateTimeOffset CreatedAt => _message.CreatedAt;
 
     public CommonMessageChannel Channel => new(_message.Channel);
-    public CommonTextChannel? TextChannel => _message.Channel is RevoltSharp.TextChannel tChan ? new(tChan) : null;
+    public CommonTextChannel? TextChannel => _message.Channel is StoatSharp.TextChannel tChan ? new(tChan) : null;
     public CommonUser User => new(_message.Author);
 
     public async Task ReplyAsync(string text = "", CommonEmbedBuilder? embed = null, MessageComponent? components = null, bool ephemeral = false)
     {
-        RevoltSharp.FileAttachment att = null;
+        StoatSharp.FileAttachment att = null;
         if (!string.IsNullOrWhiteSpace(embed?.ImageUrl))
         {
-            att = await Provider.GetService<RevoltClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
+            att = await Provider.GetService<StoatClient>().Rest.UploadFileAsync(await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(embed.ImageUrl), $"attachment{Path.GetExtension(embed.ImageUrl)}", UploadFileType.Attachment);
             embed.ImageUrl = null;
         }
         var revoltEmbed = embed?.ToRevolt();

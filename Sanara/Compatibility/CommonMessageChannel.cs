@@ -10,7 +10,7 @@ public class CommonMessageChannel
         _dChan = chan;
     }
 
-    public CommonMessageChannel(RevoltSharp.Channel chan)
+    public CommonMessageChannel(StoatSharp.Channel chan)
     {
         Id = chan.Id;
     }

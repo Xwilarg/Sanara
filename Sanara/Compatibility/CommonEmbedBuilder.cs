@@ -91,16 +91,16 @@ public class CommonEmbedBuilder
         return str.ToString();
     }
 
-    public RevoltSharp.Embed ToRevolt()
+    public StoatSharp.Embed ToRevolt()
     {
         var desc = GetEmbedDescription(true);
         if (desc.Length > 1000) desc = GetEmbedDescription(false, _fields.Count);
         if (string.IsNullOrWhiteSpace(desc)) return null;
 
-        return new RevoltSharp.EmbedBuilder()
+        return new StoatSharp.EmbedBuilder()
         {
             Description = desc,
-            Color = Color == null ? null : new RevoltSharp.RevoltColor(Color.Value.R, Color.Value.G, Color.Value.B),
+            Color = Color == null ? null : new StoatSharp.StoatColor(Color.Value.R, Color.Value.G, Color.Value.B),
             Image = null
         }.Build();
     }

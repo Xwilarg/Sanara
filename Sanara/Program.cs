@@ -5,7 +5,7 @@ using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using RevoltSharp;
+using StoatSharp;
 using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
@@ -32,20 +32,20 @@ public sealed class Program
 
     private IServiceProvider _provider;
     private DiscordSocketClient _discordClient;
-    private RevoltClient _revoltClient;
+    private StoatClient _revoltClient;
 
     private ulong _debugGuildId;
 
     public static ulong ClientId;
 
-    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, RevoltClient revoltClient, Credentials credentials, bool addDb)
+    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, StoatClient revoltClient, Credentials credentials, bool addDb)
     {
         GameManager gameManager = new();
 
         SubscriptionManager sub = new();
 
         var http = new HttpClient();
-        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
 
         var coll = new ServiceCollection();
         coll
@@ -133,7 +133,7 @@ public sealed class Program
         });
         _revoltClient = new(ClientMode.WebSocket, new ClientConfig()
         {
-            LogMode = RevoltLogSeverity.Info
+            LogMode = StoatLogSeverity.Info
         });
         _discordClient.Log += Log.LogAsync;
 
@@ -879,7 +879,7 @@ public sealed class Program
             }
             if (cmd != null)
             {
-                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is RevoltSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
+                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is StoatSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
                 {
                     await msg.Channel.SendMessageAsync(content);
                 }, async () =>

@@ -9,7 +9,7 @@ public class CommonTextChannel : CommonMessageChannel
         GuildId = tChan.GuildId.ToString();
     }
 
-    public CommonTextChannel(RevoltSharp.TextChannel tChan) : base(tChan)
+    public CommonTextChannel(StoatSharp.TextChannel tChan) : base(tChan)
     {
         OwnerId = tChan.Server.OwnerId;
         IsNsfw = tChan.IsNsfw;

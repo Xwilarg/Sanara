@@ -9,7 +9,7 @@ public class CommonMessage
         CreatedAt = msg.CreatedAt;
     }
 
-    public CommonMessage(RevoltSharp.Message msg)
+    public CommonMessage(StoatSharp.Message msg)
     {
         CreatedAt = msg.CreatedAt;
     }
