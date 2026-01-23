@@ -5,7 +5,7 @@ public enum BooruType
     Safebooru,
     E926,
     Sakugabooru,
-    Unused,
+    DanbooruDonmai,
     E621,
     Rule34,
     Konachan

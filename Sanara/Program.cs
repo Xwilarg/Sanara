@@ -103,14 +103,16 @@ public sealed class Program
 
             await new Program().StartAsync();
         }
-        catch (FileNotFoundException) // This probably means a dll is missing
+        catch (FileNotFoundException fe) // This probably means a dll is missing
         {
+            await Log.LogErrorAsync(fe, null);
             throw;
         }
         catch (System.Exception e)
         {
             if (!Debugger.IsAttached)
             {
+                await Log.LogErrorAsync(e, null);
                 if (!Directory.Exists("Logs"))
                     Directory.CreateDirectory("Logs");
                 File.WriteAllText("Logs/Crash-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-ff") + ".txt", e.ToString());
@@ -136,7 +138,7 @@ public sealed class Program
         _discordClient.Log += Log.LogAsync;
 
         // Setting Logs callback
-        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading credentials"));
 
         // Load credentials
         if (!File.Exists("Keys/Credentials.json"))
@@ -164,18 +166,19 @@ public sealed class Program
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-
         if (credentials.SentryKey != null)
         {
             SentrySdk.Init(credentials.SentryKey);
         }
 
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading providers"));
         _provider = await CreateProviderAsync(_discordClient, _revoltClient, credentials, true);
 
         await _provider.GetRequiredService<Db>().InitAsync();
 
         Log.Init(_provider.GetRequiredService<Db>());
 
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading others services"));
         _ = Task.Run(async () => { try { await _provider.GetRequiredService<SubscriptionManager>().InitAsync(_provider); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
         _ = Task.Run(async () => { try {
                 Action<IServiceProvider>[] targets = [
@@ -208,11 +211,15 @@ public sealed class Program
         {
             await Task.Delay(Constants.PROGRAM_TIMEOUT);
             if (!_didStart)
+            {
+                await Log.LogAsync(new LogMessage(LogSeverity.Critical, "Timeout", "Program timed-out... Closing"));
                 Environment.Exit(1);
+            }
         });
 
         if (credentials.BotToken.DiscordToken != null)
         {
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Starting Discord bot"));
             // Discord callbacks
 
             // Reactions to messages
@@ -247,6 +254,7 @@ public sealed class Program
         }
         if (credentials.BotToken.RevoltToken != null)
         {
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Starting Revolt bot"));
             _revoltClient.OnMessageRecieved += OnMessageReceivedRevolt;
 
             _revoltClient.OnReady += OnReadyRevolt;
@@ -256,7 +264,9 @@ public sealed class Program
         }
 
         // We keep the bot online
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Setup complete"));
         await Task.Delay(-1);
+        await Log.LogAsync(new LogMessage(LogSeverity.Warning, "Setup", "Task.Delay was passed"));
     }
 
     public async Task UpdateTopGgAsync()
@@ -504,7 +514,6 @@ public sealed class Program
                 }
                 else throw new NotImplementedException();
                 var web = ctx.Provider.GetRequiredService<HtmlWeb>();
-                Console.WriteLine($"https://utaten.com{target}");
                 var html = web.Load($"https://utaten.com{target}");
 
                 var d = await Lyrics.GetRawLyricsAsync(html, mode);

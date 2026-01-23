@@ -84,7 +84,7 @@ public sealed class Doujin : ISubmodule
                         .AddChoice("E926 (SFW, furry)", (int)BooruType.E926)
                         .AddChoice("Sakugabooru (anime clips)", (int)BooruType.Sakugabooru)
 #if NSFW_BUILD
-                        //.AddChoice("Danbooru (NSFW)", (int)BooruType.DanbooruDonmai)
+                        .AddChoice("Danbooru (NSFW)", (int)BooruType.DanbooruDonmai)
                         .AddChoice("E621 (NSFW, furry)", (int)BooruType.E621)
                         //.AddChoice("Rule34 (NSFW)", (int)BooruType.Rule34)
                         .AddChoice("Konachan (NSFW, wallpaper format)", (int)BooruType.Konachan)
@@ -283,7 +283,7 @@ public sealed class Doujin : ISubmodule
             BooruType.E926 => new E926(),
             BooruType.Sakugabooru => new Sakugabooru(),
 #if NSFW_BUILD
-            //BooruType.DanbooruDonmai => new DanbooruDonmai(),
+            BooruType.DanbooruDonmai => new DanbooruDonmai(),
             BooruType.E621 => new E621(),
             BooruType.Rule34 => new Rule34(),
             BooruType.Konachan => new Konachan(),
