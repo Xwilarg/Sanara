@@ -22,7 +22,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -58,4 +58,4 @@ jobs:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage.xml
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
