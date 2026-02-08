@@ -5,7 +5,7 @@ using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using RevoltSharp;
+using StoatSharp;
 using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
@@ -32,20 +32,20 @@ public sealed class Program
 
     private IServiceProvider _provider;
     private DiscordSocketClient _discordClient;
-    private RevoltClient _revoltClient;
+    private StoatClient _revoltClient;
 
     private ulong _debugGuildId;
 
     public static ulong ClientId;
 
-    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, RevoltClient revoltClient, Credentials credentials, bool addDb)
+    public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, StoatClient revoltClient, Credentials credentials, bool addDb)
     {
         GameManager gameManager = new();
 
         SubscriptionManager sub = new();
 
         var http = new HttpClient();
-        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 Sanara");
+        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
 
         var coll = new ServiceCollection();
         coll
@@ -103,14 +103,16 @@ public sealed class Program
 
             await new Program().StartAsync();
         }
-        catch (FileNotFoundException) // This probably means a dll is missing
+        catch (FileNotFoundException fe) // This probably means a dll is missing
         {
+            await Log.LogErrorAsync(fe, null);
             throw;
         }
         catch (System.Exception e)
         {
             if (!Debugger.IsAttached)
             {
+                await Log.LogErrorAsync(e, null);
                 if (!Directory.Exists("Logs"))
                     Directory.CreateDirectory("Logs");
                 File.WriteAllText("Logs/Crash-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-ff") + ".txt", e.ToString());
@@ -131,12 +133,12 @@ public sealed class Program
         });
         _revoltClient = new(ClientMode.WebSocket, new ClientConfig()
         {
-            LogMode = RevoltLogSeverity.Info
+            LogMode = StoatLogSeverity.Info
         });
         _discordClient.Log += Log.LogAsync;
 
         // Setting Logs callback
-        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Initialising bot"));
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading credentials"));
 
         // Load credentials
         if (!File.Exists("Keys/Credentials.json"))
@@ -164,18 +166,19 @@ public sealed class Program
         // Set culture to invarriant (so we don't use , instead of . for decimal separator)
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-
         if (credentials.SentryKey != null)
         {
             SentrySdk.Init(credentials.SentryKey);
         }
 
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading providers"));
         _provider = await CreateProviderAsync(_discordClient, _revoltClient, credentials, true);
 
         await _provider.GetRequiredService<Db>().InitAsync();
 
         Log.Init(_provider.GetRequiredService<Db>());
 
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading others services"));
         _ = Task.Run(async () => { try { await _provider.GetRequiredService<SubscriptionManager>().InitAsync(_provider); } catch (System.Exception e) { await Log.LogErrorAsync(e, null); } });
         _ = Task.Run(async () => { try {
                 Action<IServiceProvider>[] targets = [
@@ -208,11 +211,15 @@ public sealed class Program
         {
             await Task.Delay(Constants.PROGRAM_TIMEOUT);
             if (!_didStart)
+            {
+                await Log.LogAsync(new LogMessage(LogSeverity.Critical, "Timeout", "Program timed-out... Closing"));
                 Environment.Exit(1);
+            }
         });
 
         if (credentials.BotToken.DiscordToken != null)
         {
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Starting Discord bot"));
             // Discord callbacks
 
             // Reactions to messages
@@ -247,6 +254,7 @@ public sealed class Program
         }
         if (credentials.BotToken.RevoltToken != null)
         {
+            await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Starting Revolt bot"));
             _revoltClient.OnMessageRecieved += OnMessageReceivedRevolt;
 
             _revoltClient.OnReady += OnReadyRevolt;
@@ -256,7 +264,9 @@ public sealed class Program
         }
 
         // We keep the bot online
+        await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Setup complete"));
         await Task.Delay(-1);
+        await Log.LogAsync(new LogMessage(LogSeverity.Warning, "Setup", "Task.Delay was passed"));
     }
 
     public async Task UpdateTopGgAsync()
@@ -504,7 +514,6 @@ public sealed class Program
                 }
                 else throw new NotImplementedException();
                 var web = ctx.Provider.GetRequiredService<HtmlWeb>();
-                Console.WriteLine($"https://utaten.com{target}");
                 var html = web.Load($"https://utaten.com{target}");
 
                 var d = await Lyrics.GetRawLyricsAsync(html, mode);
@@ -870,7 +879,7 @@ public sealed class Program
             }
             if (cmd != null)
             {
-                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is RevoltSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
+                await LaunchCommandAsync(cmd, new CommonUser(msg.Author), msg.Channel is StoatSharp.TextChannel tChan ? new CommonTextChannel(tChan) : null, false, async (string content, bool ephemeral) =>
                 {
                     await msg.Channel.SendMessageAsync(content);
                 }, async () =>

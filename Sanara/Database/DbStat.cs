@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using RevoltSharp;
+using StoatSharp;
 using Sanara.Game;
 
 namespace Sanara.Database
@@ -76,7 +76,7 @@ namespace Sanara.Database
             await InsertOrAddAsync("Booru", Daily, name);
         }
 
-        public async Task UpdateGuildCountAsync(DiscordSocketClient discordClient, RevoltClient revoltClient)
+        public async Task UpdateGuildCountAsync(DiscordSocketClient discordClient, StoatClient revoltClient)
         {
             if (await _r.Db(_statDbName).Table("GuildCount").GetAll(Daily).Count().Eq(0).RunAsync<bool>(_conn))
             {

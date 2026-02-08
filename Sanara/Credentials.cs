@@ -14,6 +14,13 @@
         /// </summary>
         public string GoogleProjectId { set; get; }
         public string VndbToken { set; get; }
+        public GelbooruAuth Gelbooru { set; get; }
+    }
+
+    public record GelbooruAuth
+    {
+        public string UserId { set; get; }
+        public string ApiKey { set; get; }
     }
 
     public record BotToken
