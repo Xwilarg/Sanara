@@ -12,6 +12,7 @@
     <PackageReference Include="BooruSharp" Version="3.6.0" />
     <PackageReference Include="Discord.Net" Version="3.18.0" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
+    <PackageReference Include="Google.Cloud.Language.V1" Version="3.8.0" />
     <PackageReference Include="Google.Cloud.Translate.V3" Version="3.9.0" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />

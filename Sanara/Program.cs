@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Google.Cloud.Language.V1;
 using Google.Cloud.Translate.V3;
 using Google.Cloud.Vision.V1;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using StoatSharp;
 using Sanara.Compatibility;
 using Sanara.Database;
 using Sanara.Exception;
@@ -17,10 +17,12 @@ using Sanara.Module.Command.Impl;
 using Sanara.Module.Utility;
 using Sanara.Service;
 using Sanara.Subscription;
+using StoatSharp;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Timers;
 using System.Web;
 
 namespace Sanara;
@@ -37,6 +39,8 @@ public sealed class Program
     private ulong _debugGuildId;
 
     public static ulong ClientId;
+
+    private System.Timers.Timer _statusTimer;
 
     public static async Task<IServiceProvider> CreateProviderAsync(DiscordSocketClient discordClient, StoatClient revoltClient, Credentials credentials, bool addDb)
     {
@@ -81,7 +85,11 @@ public sealed class Program
                 CredentialsPath = "Keys/GoogleAPI.json"
             };
             coll.AddSingleton(visionBuilder.Build());
-
+            var naturalLangBuilder = new LanguageServiceClientBuilder
+            {
+                CredentialsPath = "Keys/GoogleAPI.json"
+            };
+            coll.AddSingleton(naturalLangBuilder.Build());
         }
 
         // May only be null in test context
@@ -765,6 +773,11 @@ public sealed class Program
             return;
         }
 
+        if (_discordClient != null)
+        {
+            Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready", $"Connected as {_discordClient.CurrentUser.Username}"));
+        }
+
         _ = Task.Run(async () =>
         {
             try
@@ -833,6 +846,83 @@ public sealed class Program
             _provider.GetRequiredService<StatData>().Started = DateTime.UtcNow;
 
             await _provider.GetRequiredService<Db>().UpdateGuildCountAsync(_discordClient, _revoltClient);
+        });
+
+        if (_discordClient != null)
+        {
+            _statusTimer = new System.Timers.Timer(TimeSpan.FromHours(2));
+            _statusTimer.Elapsed += SetRandomStatus;
+            _statusTimer.AutoReset = true;
+            _statusTimer.Start();
+            SetRandomStatus(null, null);
+        }
+    }
+
+    private void SetRandomStatus(object? sender, ElapsedEventArgs e)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var inspire = await Inspire.GetInspireAsync(_provider.GetRequiredService<HttpClient>());
+
+
+                var image = await Google.Cloud.Vision.V1.Image.FetchFromUriAsync(inspire);
+                var annotatorClient = _provider.GetRequiredService<ImageAnnotatorClient>();
+                var text = annotatorClient.DetectDocumentText(image);
+                var langService = _provider.GetRequiredService<LanguageServiceClient>();
+
+                StringBuilder str = new();
+
+                foreach (var p in text.Pages.SelectMany(x => x.Blocks.SelectMany(y => y.Paragraphs)))
+                {
+                    var words = p.Words.Select(y => string.Join("", y.Symbols.Select(s => s.Text)));
+                    var confidence = p.Confidence;
+
+                    if (p.Confidence < .95f)
+                    {
+                        Log.LogAsync(new LogMessage(LogSeverity.Warning, "Status", "Inspiration failed (not confidence enough)"));
+                        await _discordClient.SetCustomStatusAsync("🔌 I'm not very inspired for now...");
+                        return;
+                    }
+
+                    str.Append($" {string.Join(" ", words)}");
+                }
+
+                var res = str.ToString().Trim().Replace(" .", ".").Replace(" ,", ",");
+
+                if (res.Where(char.IsLetter).All(char.IsUpper))
+                {
+                    res = res[0] + string.Join("", res.Skip(1)).ToLowerInvariant();
+                }
+
+                var mod = langService.ModerateText(Document.FromPlainText(res));
+
+                StringBuilder debug = new();
+                debug.AppendLine($"Source: {inspire}");
+                debug.AppendLine($"Text: {res}");
+                foreach (var m in mod.ModerationCategories)
+                {
+                    debug.AppendLine($"{m.Name}: {m.Confidence}");
+                }
+                Console.WriteLine(debug.ToString());
+
+                var sexual = mod.ModerationCategories.First(x => x.Name == "Sexual");
+                var legal = mod.ModerationCategories.First(x => x.Name == "Legal");
+                var drugs = mod.ModerationCategories.First(x => x.Name == "Illicit Drugs");
+                var toxic = mod.ModerationCategories.First(x => x.Name == "Toxic");
+                if (sexual.Confidence > .9f || legal.Confidence > .5f || drugs.Confidence > .5f || toxic.Confidence > .5f)
+                {
+                    await _discordClient.SetCustomStatusAsync("🔌 I'm not wisely inspired for now...");
+                    return;
+                }
+
+                await _discordClient.SetCustomStatusAsync($"💡 {res}");
+            }
+            catch (System.Exception e)
+            {
+                await Log.LogErrorAsync(e, null);
+            }
         });
     }
 
