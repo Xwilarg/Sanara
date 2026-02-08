@@ -20,7 +20,7 @@ public class TranslatorService
         { "ko", "korean" },
         { "ge", "german" },
         { "es", "spanish" },
-        { "nl", "dutch" }
+        { "nl", "dutch" },
     };
     public Dictionary<string, string> Flags { set; get; } = new()
     {
