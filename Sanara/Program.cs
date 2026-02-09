@@ -881,15 +881,19 @@ public sealed class Program
 
                     if (p.Confidence < .95f)
                     {
-                        Log.LogAsync(new LogMessage(LogSeverity.Warning, "Status", "Inspiration failed (not confidence enough)"));
-                        await _discordClient.SetCustomStatusAsync("🔌 I'm not very inspired for now...");
-                        return;
+                        continue;
                     }
 
                     str.Append($" {string.Join(" ", words)}");
                 }
 
                 var res = str.ToString().Trim().Replace(" .", ".").Replace(" ,", ",");
+
+                if (string.IsNullOrEmpty(res))
+                {
+                    await _discordClient.SetCustomStatusAsync("🔌 I'm not very inspired for now...");
+                    return;
+                }
 
                 if (res.Where(char.IsLetter).All(char.IsUpper))
                 {
@@ -911,7 +915,13 @@ public sealed class Program
                 var legal = mod.ModerationCategories.First(x => x.Name == "Legal");
                 var drugs = mod.ModerationCategories.First(x => x.Name == "Illicit Drugs");
                 var toxic = mod.ModerationCategories.First(x => x.Name == "Toxic");
-                if (sexual.Confidence > .9f || legal.Confidence > .5f || drugs.Confidence > .5f || toxic.Confidence > .5f)
+                if (
+#if NSFW_BUILD
+                    sexual.Confidence > .9f
+#else
+                    sexual.Confidence > .5f
+#endif
+                    || legal.Confidence > .5f || drugs.Confidence > .5f || toxic.Confidence > .5f)
                 {
                     await _discordClient.SetCustomStatusAsync("🔌 I'm not wisely inspired for now...");
                     return;
