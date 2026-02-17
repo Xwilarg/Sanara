@@ -156,7 +156,7 @@ public sealed class Program
             {
                 WriteIndented = true
             }));
-            throw new FileNotFoundException("Missing Credentials file");
+            throw new FileNotFoundException($"Missing Credentials file in {PathManager.Path}Keys/Credentials.json");
         }
         var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText($"{PathManager.Path}Keys/Credentials.json"))!;
 

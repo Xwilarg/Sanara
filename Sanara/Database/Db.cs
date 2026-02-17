@@ -33,13 +33,23 @@ namespace Sanara.Database
 
         public async Task InitAsync()
         {
-            try
+            int nbTries = 0;
+            while (nbTries < 10)
             {
-                _conn = await _r.Connection().Hostname("rethinkdb").ConnectAsync();
-            }
-            catch (SocketException)
-            {
-                throw new InvalidOperationException("Failed to connect to db, make sure rethinkdb is started");
+                try
+                {
+                    _conn = await _r.Connection().Hostname("rethinkdb").ConnectAsync();
+                    break;
+                }
+                catch (SocketException)
+                {
+                    throw new InvalidOperationException("Failed to connect to db, make sure rethinkdb is started");
+                }
+                catch (ReqlOpFailedError)
+                {
+                    nbTries++;
+                    await Task.Delay(1_000);
+                }
             }
 
             // Creating dbs
