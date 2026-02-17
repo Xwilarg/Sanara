@@ -123,7 +123,7 @@ public sealed class Program
                 await Log.LogErrorAsync(e, null);
                 if (!Directory.Exists("Logs"))
                     Directory.CreateDirectory("Logs");
-                File.WriteAllText("Logs/Crash-" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-ff") + ".txt", e.ToString());
+                File.WriteAllText("Logs/Crash.txt", e.ToString());
             }
             else // If an exception occur, the program exit and is relaunched
                 throw;
@@ -771,11 +771,6 @@ public sealed class Program
         if (_commandsAssociations.Count != 0)
         {
             return;
-        }
-
-        if (_discordClient != null)
-        {
-            Log.LogAsync(new LogMessage(LogSeverity.Info, "Ready", $"Connected as {_discordClient.CurrentUser.Username}"));
         }
 
         _ = Task.Run(async () =>
