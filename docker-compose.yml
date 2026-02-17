@@ -11,4 +11,4 @@ services:
   rethinkdb:
     image: rethinkdb
     volumes:
-      - ./data:/data/rethinkdb
+      - ./rethinkdb:/data

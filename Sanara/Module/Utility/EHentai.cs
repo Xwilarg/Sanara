@@ -42,8 +42,8 @@ public static class EHentai
         var count = int.Parse(pages[pages.Count - 2].SelectSingleNode("a").InnerHtml);
         var dirName = Guid.NewGuid();
 
-        Directory.CreateDirectory("Saves/Download/" + dirName);
-        var finalPath = $"Saves/Download/{Guid.NewGuid()}.zip";
+        Directory.CreateDirectory($"{PathManager.Path}Saves/Download/" + dirName);
+        var finalPath = $"{PathManager.Path}Saves/Download/{Guid.NewGuid()}.zip";
 
         try
         {
