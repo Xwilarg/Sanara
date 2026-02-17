@@ -49,7 +49,7 @@ public sealed class Program
         SubscriptionManager sub = new();
 
         var http = new HttpClient();
-        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
+        http.DefaultRequestHeaders.Add("User-Agent", "Sanara");
 
         var coll = new ServiceCollection();
         coll

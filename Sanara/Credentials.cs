@@ -14,12 +14,12 @@
         /// </summary>
         public string GoogleProjectId { set; get; }
         public string VndbToken { set; get; }
-        public GelbooruAuth Gelbooru { set; get; }
+        public DanbooruAuth Danbooru { set; get; }
     }
 
-    public record GelbooruAuth
+    public record DanbooruAuth
     {
-        public string UserId { set; get; }
+        public string Username { set; get; }
         public string ApiKey { set; get; }
     }
 

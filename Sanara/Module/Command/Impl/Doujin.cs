@@ -84,7 +84,7 @@ public sealed class Doujin : ISubmodule
                         .AddChoice("E926 (SFW, furry)", (int)BooruType.E926)
                         .AddChoice("Sakugabooru (anime clips)", (int)BooruType.Sakugabooru)
 #if NSFW_BUILD
-                        .AddChoice("Gelbooru (NSFW)", (int)BooruType.Gelbooru)
+                        .AddChoice("Gelbooru (NSFW)", (int)BooruType.Danbooru)
                         .AddChoice("E621 (NSFW, furry)", (int)BooruType.E621)
                         //.AddChoice("Rule34 (NSFW)", (int)BooruType.Rule34)
                         .AddChoice("Konachan (NSFW, wallpaper format)", (int)BooruType.Konachan)
@@ -269,7 +269,7 @@ public sealed class Doujin : ISubmodule
         var tags = (ctx.GetArgument<string>("tags") ?? string.Empty).Split(' ');
         var type = (BooruType)(ctx.GetArgument<long?>("source") ??
 #if NSFW_BUILD
-        ((ctx.TextChannel?.IsNsfw ?? true) ? (int)BooruType.Gelbooru : (int)BooruType.Safebooru)
+        ((ctx.TextChannel?.IsNsfw ?? true) ? (int)BooruType.Danbooru : (int)BooruType.Safebooru)
 
 #else
         (int)BooruType.Safebooru
@@ -283,7 +283,7 @@ public sealed class Doujin : ISubmodule
             BooruType.E926 => new E926(),
             BooruType.Sakugabooru => new Sakugabooru(),
 #if NSFW_BUILD
-            BooruType.Gelbooru => new Gelbooru(),
+            BooruType.Danbooru => new DanbooruDonmai(),
             BooruType.E621 => new E621(),
             BooruType.Rule34 => new Rule34(),
             BooruType.Konachan => new Konachan(),
@@ -293,7 +293,6 @@ public sealed class Doujin : ISubmodule
         booru.HttpClient = ctx.Provider.GetRequiredService<HttpClient>();
 
         var isChanSfw = !(ctx.TextChannel?.IsNsfw ?? true);
-        Console.WriteLine($"{isChanSfw}");
         if (isChanSfw && !booru.IsSafe && type != BooruType.Sakugabooru)
         {
             throw new CommandFailed("NSFW booru can only be requested in NSFW channels", ephemeral: true);
@@ -303,36 +302,34 @@ public sealed class Doujin : ISubmodule
         List<string> newTags = [];
         try
         {
-            if (type == BooruType.Gelbooru)
+            if (type == BooruType.Danbooru)
             {
                 var http = ctx.Provider.GetRequiredService<HttpClient>();
                 var creds = ctx.Provider.GetRequiredService<Credentials>();
-                var url =  $"https://gelbooru.com/index.php?page=dapi&s=post&q=index&api_key={creds.Gelbooru.ApiKey}&user_id={creds.Gelbooru.UserId}&json=1&limit=1&tags={string.Join("+", tags)}+sort:random";
+                var url =  $"https://danbooru.donmai.us/posts/random.json?login={creds.Danbooru.Username}&api_key={creds.Danbooru.ApiKey}&tags={string.Join("+", tags)}";
                 Console.WriteLine(url);
                 var str = await http.GetStringAsync(url);
-                Console.WriteLine(str);
-                var data = JsonSerializer.Deserialize<GelbooruJson>(str).post;
-                if (data == null) throw new CommandFailed("There is no image with those tags");
-                var p = data.First();
+                var p = JsonSerializer.Deserialize<DanbooruJson>(str);
+                if (p.success == false) throw new CommandFailed("There is no image with those tags");
                 post = new(
                     fileUrl: new(p.file_url),
-                    previewUrl: new(p.preview_url),
-                    postUrl: new($"https://gelbooru.com/index.php?page=post&s=view&id={p.id}"),
+                    previewUrl: new(p.preview_file_url),
+                    postUrl: new($"https://danbooru.donmai.us/posts/{p.id}"),
                     sampleUri: null,
                     rating: p.rating switch
                     {
-                        "general" => Rating.General,
-                        "sensitive" => Rating.Safe,
-                        "questionable" => Rating.Questionable,
-                        "explicit" => Rating.Explicit,
+                        "g" => Rating.General,
+                        "s" => Rating.Safe,
+                        "q" => Rating.Questionable,
+                        "e" => Rating.Explicit,
                         _ => throw new NotImplementedException()
                     },
-                    tags: p.tags.Split(' ').ToList(),
+                    tags: p.tag_string.Split(' ').ToList(),
                     detailedTags: null,
                     id: 0,
                     size: null,
-                    height: p.width,
-                    width: p.height,
+                    height: p.image_width,
+                    width: p.image_height,
                     previewHeight: null,
                     previewWidth: null,
                     creation: null,
