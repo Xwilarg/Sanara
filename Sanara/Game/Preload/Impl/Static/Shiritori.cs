@@ -19,9 +19,9 @@ namespace Sanara.Game.Preload.Impl.Static
             var client = provider.GetRequiredService<HttpClient>();
             var lang = provider.GetRequiredService<JapaneseConverter>();
 
-            if (!File.Exists("Saves/Game/ShiritoriJapanese.txt"))
-                File.WriteAllBytes("Saves/Game/ShiritoriJapanese.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/ShiritoriJapanese.txt").GetAwaiter().GetResult());
-            string[] lines = File.ReadAllLines("Saves/Game/ShiritoriJapanese.txt");
+            if (!File.Exists($"{PathManager.Path}Saves/Game/ShiritoriJapanese.txt"))
+                File.WriteAllBytes($"{PathManager.Path}Saves/Game/ShiritoriJapanese.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/ShiritoriJapanese.txt").GetAwaiter().GetResult());
+            string[] lines = File.ReadAllLines($"{PathManager.Path}Saves/Game/ShiritoriJapanese.txt");
             _words = new();
             foreach (var l in lines)
             {
@@ -31,9 +31,9 @@ namespace Sanara.Game.Preload.Impl.Static
             }
             for (int i = 5; i >= 1; i--)
             {
-                if (!File.Exists($"Saves/Game/Jlpt{i}Vocabulary.txt"))
-                    File.WriteAllBytes($"Saves/Game/Jlpt{i}Vocabulary.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i + "Vocabulary.txt").GetAwaiter().GetResult());
-                string[] jlptLines = File.ReadAllLines($"Saves/Game/Jlpt{i}Vocabulary.txt");
+                if (!File.Exists($"{PathManager.Path}Saves/Game/Jlpt{i}Vocabulary.txt"))
+                    File.WriteAllBytes($"{PathManager.Path}Saves/Game/Jlpt{i}Vocabulary.txt", client.GetByteArrayAsync("https://files.zirk.eu/Sanara/Jlpt" + i + "Vocabulary.txt").GetAwaiter().GetResult());
+                string[] jlptLines = File.ReadAllLines($"{PathManager.Path}Saves/Game/Jlpt{i}Vocabulary.txt");
                 foreach (var l in jlptLines)
                 {
                     string[] curr = l.Split('$');

@@ -60,7 +60,7 @@ public static class EHentai
                 {
                     var node = img.Attributes["href"].Value;
                     var image = web.Load(node).GetElementbyId("img").Attributes["src"].Value;
-                    File.WriteAllBytes($"Saves/Download/{dirName}/{pageIndex:000}{Path.GetExtension(image)}",
+                    File.WriteAllBytes($"{PathManager.Path}Saves/Download/{dirName}/{pageIndex:000}{Path.GetExtension(image)}",
                     await provider.GetRequiredService<HttpClient>().GetByteArrayAsync(image));
                     pageIndex++;
                 }
@@ -77,7 +77,7 @@ public static class EHentai
                     html.Load(stream);
                 }
             }
-            ZipFile.CreateFromDirectory($"Saves/Download/{dirName}", finalPath);
+            ZipFile.CreateFromDirectory($"{PathManager.Path}Saves/Download/{dirName}", finalPath);
             FileInfo fi = new(finalPath);
 
             if (type == EHentaiType.Cosplay)
@@ -122,7 +122,7 @@ public static class EHentai
         }
         finally
         {
-            Directory.Delete("Saves/Download/" + dirName, true);
+            Directory.Delete($"{PathManager.Path}Saves/Download/" + dirName, true);
             File.Delete(finalPath);
         }
     }

@@ -1,5 +1,4 @@
 ﻿using BooruSharp.Booru;
-using Discord;
 using Microsoft.Extensions.DependencyInjection;
 using Sanara.Compatibility;
 using Sanara.Game.Impl;
@@ -13,9 +12,9 @@ namespace Sanara.Game.Preload.Impl
         public void Init(IServiceProvider provider)
         {
             _provider = provider;
-            if (!File.Exists("Saves/Game/QuizzAnime.txt"))
-                File.WriteAllBytes("Saves/Game/QuizzAnime.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzAnime.txt").GetAwaiter().GetResult());
-            string[] lines = File.ReadAllLines("Saves/Game/QuizzAnime.txt");
+            if (!File.Exists($"{PathManager.Path}Saves/Game/QuizzAnime.txt"))
+                File.WriteAllBytes($"{PathManager.Path}Saves/Game/QuizzAnime.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzAnime.txt").GetAwaiter().GetResult());
+            string[] lines = File.ReadAllLines($"{PathManager.Path}Saves/Game/QuizzAnime.txt");
             var preload = new List<BooruQuizzPreloadResult>();
             for (int i = 0; i < lines.Length; i++)
             {

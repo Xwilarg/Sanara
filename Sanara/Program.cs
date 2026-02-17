@@ -73,21 +73,21 @@ public sealed class Program
             coll.AddSingleton(new Db());
         }
 
-        if (File.Exists("Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
+        if (File.Exists($"{PathManager.Path}Keys/GoogleAPI.json") && credentials.GoogleProjectId != null) // Requires cloudtranslate.generalModels.predict
         {
             var transBuilder = new TranslationServiceClientBuilder
             {
-                CredentialsPath = "Keys/GoogleAPI.json"
+                CredentialsPath = $"{PathManager.Path}Keys/GoogleAPI.json"
             };
             coll.AddSingleton(transBuilder.Build());
             var visionBuilder = new ImageAnnotatorClientBuilder
             {
-                CredentialsPath = "Keys/GoogleAPI.json"
+                CredentialsPath = $"{PathManager.Path}Keys/GoogleAPI.json"
             };
             coll.AddSingleton(visionBuilder.Build());
             var naturalLangBuilder = new LanguageServiceClientBuilder
             {
-                CredentialsPath = "Keys/GoogleAPI.json"
+                CredentialsPath = $"{PathManager.Path}Keys/GoogleAPI.json"
             };
             coll.AddSingleton(naturalLangBuilder.Build());
         }
@@ -105,9 +105,9 @@ public sealed class Program
         try
         {
             // Create saves directories
-            if (!Directory.Exists("Saves")) Directory.CreateDirectory("Saves");
-            if (!Directory.Exists("Saves/Download")) Directory.CreateDirectory("Saves/Download");
-            if (!Directory.Exists("Saves/Game")) Directory.CreateDirectory("Saves/Game");
+            if (!Directory.Exists($"{PathManager.Path}Saves")) Directory.CreateDirectory($"{PathManager.Path}Saves");
+            if (!Directory.Exists($"{PathManager.Path}Saves/Download")) Directory.CreateDirectory($"{PathManager.Path}Saves/Download");
+            if (!Directory.Exists($"{PathManager.Path}Saves/Game")) Directory.CreateDirectory($"{PathManager.Path}Saves/Game");
 
             await new Program().StartAsync();
         }
@@ -121,9 +121,9 @@ public sealed class Program
             if (!Debugger.IsAttached)
             {
                 await Log.LogErrorAsync(e, null);
-                if (!Directory.Exists("Logs"))
-                    Directory.CreateDirectory("Logs");
-                File.WriteAllText("Logs/Crash.txt", e.ToString());
+                if (!Directory.Exists($"{PathManager.Path}Logs"))
+                    Directory.CreateDirectory($"{PathManager.Path}Logs");
+                File.WriteAllText($"{PathManager.Path}Logs/crash.txt", e.ToString());
             }
             else // If an exception occur, the program exit and is relaunched
                 throw;
@@ -149,16 +149,16 @@ public sealed class Program
         await Log.LogAsync(new LogMessage(LogSeverity.Info, "Setup", "Loading credentials"));
 
         // Load credentials
-        if (!File.Exists("Keys/Credentials.json"))
+        if (!File.Exists($"{PathManager.Path}Keys/Credentials.json"))
         {
-            if (!Directory.Exists("Keys")) Directory.CreateDirectory("Keys");
-            File.WriteAllText("Keys/Credentials.json", JsonSerializer.Serialize(new Credentials(), new JsonSerializerOptions()
+            if (!Directory.Exists($"{PathManager.Path}Keys")) Directory.CreateDirectory($"{PathManager.Path}Keys");
+            File.WriteAllText($"{PathManager.Path}Keys/Credentials.json", JsonSerializer.Serialize(new Credentials(), new JsonSerializerOptions()
             {
                 WriteIndented = true
             }));
             throw new FileNotFoundException("Missing Credentials file");
         }
-        var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText("Keys/Credentials.json"))!;
+        var credentials = JsonSerializer.Deserialize<Credentials>(File.ReadAllText($"{PathManager.Path}Keys/Credentials.json"))!;
 
         if (credentials.BotToken.DiscordToken == null && credentials.BotToken.RevoltToken == null) throw new FileNotFoundException("Missing bot token");
 
@@ -933,9 +933,9 @@ public sealed class Program
 
     private Task Disconnected(System.Exception e)
     {
-        if (!File.Exists("Saves/Logs"))
-            Directory.CreateDirectory("Saves/Logs");
-        File.WriteAllText("Saves/Logs/" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", "Bot disconnected. Exception:\n" + e.ToString());
+        if (!File.Exists($"{PathManager.Path}Saves/Logs"))
+            Directory.CreateDirectory($"{PathManager.Path}Saves/Logs");
+        File.WriteAllText($"{PathManager.Path}Saves/Logs/disconnect.log", "Bot disconnected. Exception:\n" + e.ToString());
         return Task.CompletedTask;
     }
 

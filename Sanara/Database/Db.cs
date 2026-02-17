@@ -35,7 +35,7 @@ namespace Sanara.Database
         {
             try
             {
-                _conn = await _r.Connection().ConnectAsync();
+                _conn = await _r.Connection().Hostname("rethinkdb").ConnectAsync();
             }
             catch (SocketException)
             {

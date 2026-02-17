@@ -13,9 +13,9 @@ namespace Sanara.Game.Preload.Impl
         public void Init(IServiceProvider provider)
         {
             _provider = provider;
-            if (!File.Exists("Saves/Game/QuizzTags.txt"))
-                File.WriteAllBytes("Saves/Game/QuizzTags.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
-            string[] lines = File.ReadAllLines("Saves/Game/QuizzTags.txt");
+            if (!File.Exists($"{PathManager.Path}Saves/Game/QuizzTags.txt"))
+                File.WriteAllBytes($"{PathManager.Path}Saves/Game/QuizzTags.txt", provider.GetRequiredService<HttpClient>().GetByteArrayAsync("https://files.zirk.eu/Sanara/QuizzTags.txt").GetAwaiter().GetResult());
+            string[] lines = File.ReadAllLines($"{PathManager.Path}Saves/Game/QuizzTags.txt");
             var preload = new List<BooruQuizzPreloadResult>();
             for (int i = 0; i < lines.Length; i++)
             {

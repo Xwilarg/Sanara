@@ -1,0 +1,14 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Sanara/Dockerfile
+    user: "1000:1000"
+    volumes:
+      - ./data:/data
+      - ./download:/download
+
+  rethinkdb:
+    image: rethinkdb
+    volumes:
+      - ./data:/data/rethinkdb
