@@ -321,6 +321,7 @@ public class Media : ISubmodule
             Method = HttpMethod.Get
         };
         request.Headers.Add("mdl-api-key", token);
+        request.Headers.Add("Content-Type", "application/json");
 
         var response = await client.SendAsync(request);
         return JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());

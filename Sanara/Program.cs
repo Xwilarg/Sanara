@@ -141,7 +141,7 @@ public sealed class Program
         });
         _revoltClient = new(ClientMode.WebSocket, new ClientConfig()
         {
-            LogMode = StoatLogSeverity.Info
+            LogMode = StoatLogSeverity.Debug
         });
         _discordClient.Log += Log.LogAsync;
 
@@ -763,7 +763,17 @@ public sealed class Program
 
     private void OnReadyRevolt(SelfUser _)
     {
-        Ready().GetAwaiter().GetResult();
+        Task.Run(async () =>
+        {
+            try
+            {
+                await _revoltClient.CurrentUser.ModifySelfAsync(statusType: new(UserStatusType.Online));
+            }
+            catch(System.Exception e)
+            {
+                await Log.LogErrorAsync(e, null);
+            }
+        });
     }
 
     private async Task Ready()
@@ -922,7 +932,8 @@ public sealed class Program
                     return;
                 }
 
-                await _discordClient.SetCustomStatusAsync($"💡 {res}");
+                var finalStatus = $"💡 {res}";
+                if (_revoltClient != null) await _revoltClient.CurrentUser.ModifySelfAsync(statusText: new(finalStatus));
             }
             catch (System.Exception e)
             {

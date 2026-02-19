@@ -307,13 +307,12 @@ public sealed class Doujin : ISubmodule
                 var http = ctx.Provider.GetRequiredService<HttpClient>();
                 var creds = ctx.Provider.GetRequiredService<Credentials>();
                 var url =  $"https://danbooru.donmai.us/posts/random.json?login={creds.Danbooru.Username}&api_key={creds.Danbooru.ApiKey}&tags={string.Join("+", tags)}";
-                Console.WriteLine(url);
                 var str = await http.GetStringAsync(url);
                 var p = JsonSerializer.Deserialize<DanbooruJson>(str);
                 if (p.success == false) throw new CommandFailed("There is no image with those tags");
                 post = new(
-                    fileUrl: new(p.file_url),
-                    previewUrl: new(p.preview_file_url),
+                    fileUrl: p.file_url == null ?  null : new(p.file_url),
+                    previewUrl: p.preview_file_url == null ? null : new(p.preview_file_url),
                     postUrl: new($"https://danbooru.donmai.us/posts/{p.id}"),
                     sampleUri: null,
                     rating: p.rating switch
