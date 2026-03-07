@@ -21,16 +21,9 @@ public class TestBase
         }, false);
     }
 
-    protected async Task<bool> AssertLinkAsync(string url)
+    protected async Task AssertLinkAsync(string url)
     {
-        try
-        {
-            var req = await _provider.GetRequiredService<HttpClient>().SendAsync(new(HttpMethod.Head, url));
-            return req.IsSuccessStatusCode;
-        }
-        catch
-        {
-            return false;
-        }
+        var req = await _provider.GetRequiredService<HttpClient>().SendAsync(new(HttpMethod.Head, url));
+        Assert.That(req.IsSuccessStatusCode, Is.True);
     }
 }

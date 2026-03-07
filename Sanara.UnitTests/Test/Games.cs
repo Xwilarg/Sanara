@@ -13,7 +13,7 @@ namespace Sanara.UnitTests.Test
         public async Task TestHiraganaConvertion(string input, string answer)
         {
             var converter = new JapaneseConverter();
-            ClassicAssert.AreEqual(answer, converter.ToHiragana(input));
+            Assert.That(answer, Is.EqualTo(converter.ToHiragana(input)));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Sanara.UnitTests.Test
             var ctx = new TestCommandContext(_provider, new Dictionary<string, object> { { "name", "maitetsu" } } );
             await mod.VisualNovelAsync(ctx);
             await AssertLinkAsync(ctx.Result.Embed.Url);
-            Assert.Equals("Katawa Shoujo", ctx.Result.Embed.Title);
+            Assert.That("Katawa Shoujo", Is.EqualTo(ctx.Result.Embed.Title));
         }
 
         [Test]

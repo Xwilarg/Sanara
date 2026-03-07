@@ -19,10 +19,10 @@ namespace Sanara.UnitTests.Test
                 { "source", (long)source }
             });
             await mod.BooruAsync(ctx);
-            ClassicAssert.AreEqual($"From {source}", ctx.Result.Embed.Title);
+            Assert.That($"From {source}", Is.EqualTo(ctx.Result.Embed.Title));
             //ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
-            ClassicAssert.IsTrue(ctx.Result.Embed.Image.HasValue);
-            ClassicAssert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
+            Assert.That(ctx.Result.Embed.Image.HasValue, Is.True);
+            await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url);
         }
 
         public async Task BooruDanbooruTest()
@@ -38,10 +38,10 @@ namespace Sanara.UnitTests.Test
                 { "source", (long)BooruType.Danbooru }
             });
             await mod.BooruAsync(ctx);
-            ClassicAssert.AreEqual($"From {BooruType.Danbooru}", ctx.Result.Embed.Title);
+            ClassicAssert.AreEqual($"From {BooruType.Danbooru}", Is.EqualTo(ctx.Result.Embed.Title));
             //ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
-            ClassicAssert.IsTrue(ctx.Result.Embed.Image.HasValue);
-            ClassicAssert.IsTrue(await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url));
+            Assert.That(ctx.Result.Embed.Image.HasValue, Is.True);
+            await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url);
         }
 
         [Test]
