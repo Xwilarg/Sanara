@@ -45,6 +45,10 @@ jobs:
         retention-days: 2
     - name: Test
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+      env:
+        VNDB_TOKEN: ${{ secrets.VNDB_TOKEN }}
+        DANBOORU_APIKEY: ${{ secrets.DANBOORU_APIKEY }}
+        DANBOORU_USERNAME: ${{ secrets.DANBOORU_USERNAME }}
     - name: Copy coverage
       run: sh copy_coverage.sh
     - name: Upload coverage to Codacy
