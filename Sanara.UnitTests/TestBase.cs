@@ -23,7 +23,15 @@ public class TestBase
 
     protected async Task AssertLinkAsync(string url)
     {
-        var req = await _provider.GetRequiredService<HttpClient>().SendAsync(new(HttpMethod.Head, url));
-        Assert.That(req.IsSuccessStatusCode, Is.True);
+        Assert.That(url, Is.Not.Null);
+        try
+        {
+            var req = await _provider.GetRequiredService<HttpClient>().SendAsync(new(HttpMethod.Head, url));
+            Assert.That(req.IsSuccessStatusCode, Is.True, $"{url} failed to return success status code with {req.StatusCode}");
+        }
+        catch
+        {
+            Assert.Fail($"Call to {url} failed");
+        }
     }
 }

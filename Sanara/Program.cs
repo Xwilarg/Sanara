@@ -193,8 +193,8 @@ public sealed class Program
                     Game.Preload.Impl.Static.Shiritori.Init,
                     Game.Preload.Impl.Static.Arknights.Init,
                     Game.Preload.Impl.Static.AzurLane.Init,
-                    Game.Preload.Impl.Static.FateGO.Init,
-                    Game.Preload.Impl.Static.GirlsFrontline.Init,
+                    //Game.Preload.Impl.Static.FateGO.Init,
+                    //Game.Preload.Impl.Static.GirlsFrontline.Init,
                     Game.Preload.Impl.Static.Kancolle.Init,
                     Game.Preload.Impl.Static.Pokemon.Init
                 ];

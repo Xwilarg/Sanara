@@ -1,31 +1,34 @@
 ﻿using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using Sanara.Module.Utility;
 
 namespace Sanara.UnitTests.Test
 {
     public class NSFW : TestBase
     {
-        [TestCase(BooruType.Safebooru)]
-        //[TestCase(BooruType.E926)] // Somehow don't work in tests?
-        [TestCase(BooruType.E621)]
-        [TestCase(BooruType.Konachan)]
-        [TestCase(BooruType.Sakugabooru)]
-        public async Task BooruTest(BooruType source)
+        [TestCase(BooruType.Safebooru, "")]
+        [TestCase(BooruType.E621, "")]
+        [TestCase(BooruType.Konachan, "")]
+        [TestCase(BooruType.Safebooru, "moon")]
+        [TestCase(BooruType.E621, "dragon")]
+        [TestCase(BooruType.Konachan, "kimono")]
+        public async Task BooruTest(BooruType source, string tags)
         {
             var mod = new Module.Command.Impl.Doujin();
             var ctx = new TestCommandContext(_provider, new()
             {
-                { "source", (long)source }
+                { "source", (long)source },
+                { "tags", tags }
             });
             await mod.BooruAsync(ctx);
             Assert.That($"From {source}", Is.EqualTo(ctx.Result.Embed.Title));
             //ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
             Assert.That(ctx.Result.Embed.Image.HasValue, Is.True);
-            await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url);
+            await AssertLinkAsync(ctx.Result.Embed.Image.Value.Url);
         }
 
-        public async Task BooruDanbooruTest()
+        [TestCase("")]
+        [TestCase("futanari")]
+        public async Task BooruDanbooruTest(string tags)
         {
             var username = Environment.GetEnvironmentVariable("DANBOORU_USERNAME");
             var token = Environment.GetEnvironmentVariable("DANBOORU_APIKEY");
@@ -35,13 +38,14 @@ namespace Sanara.UnitTests.Test
             var mod = new Module.Command.Impl.Doujin();
             var ctx = new TestCommandContext(_provider, new()
             {
-                { "source", (long)BooruType.Danbooru }
+                { "source", (long)BooruType.Danbooru },
+                { "tags", tags }
             });
             await mod.BooruAsync(ctx);
-            ClassicAssert.AreEqual($"From {BooruType.Danbooru}", Is.EqualTo(ctx.Result.Embed.Title));
+            Assert.That($"From {BooruType.Danbooru}", Is.EqualTo(ctx.Result.Embed.Title));
             //ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
             Assert.That(ctx.Result.Embed.Image.HasValue, Is.True);
-            await Utils.IsLinkValidAsync(ctx.Result.Embed.Image.Value.Url);
+            await AssertLinkAsync(ctx.Result.Embed.Image.Value.Url);
         }
 
         [Test]

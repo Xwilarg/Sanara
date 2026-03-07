@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using Sanara.Service;
 
 namespace Sanara.UnitTests.Test
