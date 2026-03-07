@@ -4,5 +4,5 @@ namespace Sanara;
 
 public static class PathManager
 {
-    public static string Path => Debugger.IsAttached ? "./" : "/data/";
+    public static string Path => (Debugger.IsAttached || Environment.GetEnvironmentVariable("TEST") == "1") ? "./" : "/data/";
 }
