@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: 'true'
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '8.0.x'
     - name: Initialize CodeQL
@@ -33,20 +33,15 @@ jobs:
       run: dotnet publish -c Release -r linux-x64 -o Release Sanara/Sanara.csproj /p:DefineConstants=TRACE%3BNSFW_BUILD
     - name: Publish Sanara SFW version
       run: dotnet publish -c Release-SFW -r linux-x64 -o Release-SFW Sanara/Sanara.csproj /p:DefineConstants=TRACE
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: Help
         path: ./Help.json
         retention-days: 2
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: Sanara
         path: ./Release
-        retention-days: 2
-    - uses: actions/upload-artifact@v4
-      with:
-        name: Sanara-SFW
-        path: ./Release-SFW
         retention-days: 2
     - name: Test
       run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
