@@ -25,7 +25,7 @@ namespace Sanara.UnitTests.Test
             if (token == null) Assert.Ignore();
 
             var mod = new Module.Command.Impl.Media();
-            var ctx = new TestCommandContext(_provider, new Dictionary<string, object> { { "name", "maitetsu" } } );
+            var ctx = new TestCommandContext(_provider, new Dictionary<string, object> { { "name", "Fatal Twelve" } } );
             await mod.VisualNovelAsync(ctx);
             await AssertLinkAsync(ctx.Result.Embed.Url);
             Assert.That("Katawa Shoujo", Is.EqualTo(ctx.Result.Embed.Title));

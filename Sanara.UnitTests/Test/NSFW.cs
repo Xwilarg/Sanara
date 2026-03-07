@@ -42,7 +42,7 @@ namespace Sanara.UnitTests.Test
                 { "tags", tags }
             });
             await mod.BooruAsync(ctx);
-            Assert.That($"From {BooruType.Danbooru}", Is.EqualTo(ctx.Result.Embed.Title));
+            Assert.That($"From Danboorudonmai", Is.EqualTo(ctx.Result.Embed.Title));
             //ClassicAssert.AreEqual(Color.Green, ctx.Result.Embed.Color);
             Assert.That(ctx.Result.Embed.Image.HasValue, Is.True);
             await AssertLinkAsync(ctx.Result.Embed.Image.Value.Url);
