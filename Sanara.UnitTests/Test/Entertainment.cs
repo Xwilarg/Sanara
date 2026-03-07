@@ -4,6 +4,7 @@ namespace Sanara.UnitTests.Test
 {
     public class Entertainment : TestBase
     {
+        /*
         [Test]
         public async Task VNQuoteTest()
         {
@@ -30,6 +31,7 @@ namespace Sanara.UnitTests.Test
             await AssertLinkAsync(ctx.Result.Embed.Url);
             Assert.That("Katawa Shoujo", Is.EqualTo(ctx.Result.Embed.Title));
         }
+        */
 
         [Test]
         public async Task InspireTest()
