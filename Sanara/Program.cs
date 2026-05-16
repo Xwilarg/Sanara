@@ -935,7 +935,10 @@ public sealed class Program
                 var finalStatus = $"💡 {res}";
                 Console.WriteLine($"Setting final status to {finalStatus}");
                 await _discordClient.SetCustomStatusAsync(finalStatus);
-                if (_revoltClient != null) await _revoltClient.CurrentUser.ModifySelfAsync(statusText: new(finalStatus));
+                if (_revoltClient != null && finalStatus.Length < 128)
+                {
+                    await _revoltClient.CurrentUser.ModifySelfAsync(statusText: new(finalStatus));
+                }
             }
             catch (System.Exception e)
             {
