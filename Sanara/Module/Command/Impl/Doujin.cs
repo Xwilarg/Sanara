@@ -307,7 +307,19 @@ public sealed class Doujin : ISubmodule
                 var http = ctx.Provider.GetRequiredService<HttpClient>();
                 var creds = ctx.Provider.GetRequiredService<Credentials>();
                 var url =  $"https://danbooru.donmai.us/posts/random.json?login={creds.Danbooru.Username}&api_key={creds.Danbooru.ApiKey}&tags={string.Join("+", tags)}";
-                var str = await http.GetStringAsync(url);
+                string str;
+                try
+                {
+                    str = await http.GetStringAsync(url);
+                }
+                catch (HttpRequestException hre)
+                {
+                    if (hre.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        throw new CommandFailed("There is no image with those tags");
+                    }
+                    throw;
+                }
                 var p = JsonSerializer.Deserialize<DanbooruJson>(str);
                 if (p.success == false) throw new CommandFailed("There is no image with those tags");
                 post = new(
@@ -409,7 +421,7 @@ public sealed class Doujin : ISubmodule
             .WithButton("Details", $"booru-{guid}")
             .Build();
 
-        var ext = Path.GetExtension(post.FileUrl.AbsoluteUri);
+        var ext = post.FileUrl == null ? string.Empty : Path.GetExtension(post.FileUrl.AbsoluteUri);
         if (post.FileUrl == null)
         {
             embed.Description = "This post doesn't have any image associated";
