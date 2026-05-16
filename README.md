@@ -20,7 +20,6 @@ You will also have the list of command by typing "/"
 ## How to invite her on my server
 - [Discord (NSFW version)](https://discord.com/oauth2/authorize?client_id=329664361016721408&permissions=51264&scope=bot%20applications.commands)
 - [Revolt (NSFW version)](https://app.revolt.chat/bot/01JWZMD7W3D14NG8846QB1YD0Z)
-- [Discord (SFW version)](https://discord.com/api/oauth2/authorize?client_id=883767204733157397&permissions=51264&scope=bot%20applications.commands)
 
 ## Contact
 If you need anything you can come [open an issue](https://github.com/Xwilarg/Sanara/issues), [come to her official server](https://discordapp.com/invite/H6wMRYV) or contact me directly (zirk on Discord, Zirk#4550 on Revolt)
