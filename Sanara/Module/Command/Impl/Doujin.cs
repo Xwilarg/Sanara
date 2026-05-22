@@ -304,6 +304,11 @@ public sealed class Doujin : ISubmodule
         {
             if (type == BooruType.Danbooru)
             {
+                if (tags.Length > 2)
+                {
+                    throw new CommandFailed("Danbooru doesn't allow search with more than 2 tags");
+                }
+
                 var http = ctx.Provider.GetRequiredService<HttpClient>();
                 var creds = ctx.Provider.GetRequiredService<Credentials>();
                 var url =  $"https://danbooru.donmai.us/posts/random.json?login={creds.Danbooru.Username}&api_key={creds.Danbooru.ApiKey}&tags={string.Join("+", tags)}";
