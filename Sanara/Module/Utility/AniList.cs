@@ -81,7 +81,11 @@ public static class AniList
 
         if (answer.StatusCode == HttpStatusCode.Forbidden) // When API is down, it'll return a 403
         {
-            return Array.Empty<AiringSchedule>();
+            return [];
+        }
+        if (answer.StatusCode == HttpStatusCode.InternalServerError)
+        {
+            return [];
         }
         answer.EnsureSuccessStatusCode();
 

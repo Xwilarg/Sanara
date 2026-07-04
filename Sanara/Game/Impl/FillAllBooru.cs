@@ -80,6 +80,6 @@ namespace Sanara.Game.Impl
         private List<string> _foundTags;
         private int _nbNeed; // Number of tags you need to find (75% of total count)
 
-        private Gelbooru _booru;
+        private DanbooruDonmai _booru;
     }
 }

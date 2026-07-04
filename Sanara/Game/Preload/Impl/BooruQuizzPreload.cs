@@ -22,7 +22,7 @@ namespace Sanara.Game.Preload.Impl
                 string[] curr = lines[i].Split(' ');
                 if (int.Parse(curr[1]) > 3)
                 {
-                    var booru = new Gelbooru()
+                    var booru = new DanbooruDonmai()
                     {
                         HttpClient = provider.GetRequiredService<HttpClient>()
                     };
